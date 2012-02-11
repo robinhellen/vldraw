@@ -7,15 +7,21 @@ namespace Ldraw.Lego
 		protected LdrawFile()
 		{
 		}
-		
+
 		public LdrawFile.FromFile(string filename)
 		{
 			// TODO: Parse the file.
 		}
-		
-		private List<LdrawNode> m_Nodes = new ArrayList();
+
+		//private ArrayList<LdrawNode> m_Nodes = new ArrayList();
 		private string m_FileName;
-		
-		
+
+		public virtual string Description
+		{
+			get
+			{
+				return "";
+			}
+		}
 	}
 }
