@@ -13,6 +13,31 @@ namespace Ldraw.Lego
 		public virtual string Geometry { get {return "";}}
 
 		public abstract string Description { get; }
+		
+		public static LdrawNode ParseLine(string line)
+			throws ParseError
+			requires(!("\n" in line))
+			requires(line[0] >= '0' && line[0] <= '5')
+		{
+			switch(line[0])
+			{
+				case '0':
+					// may be a meta command
+					return new Comment(line);
+				case '1':
+					return new PartNode.FromLine(line);
+				case '2':
+					return new LineNode.FromLine(line);
+				case '3':
+					return new TriangleNode.FromLine(line);
+				case '4':
+					return new QuadNode.FromLine(line);
+				case '5':
+					return new CondLineNode.FromLine(line);
+				default:
+					throw new ParseError.UnknownLineType ("Valid LDraw lines begin with a number from 0 to 5");
+			}
+		}
 	}
 
 	public class PartNode : LdrawNode
@@ -22,6 +47,28 @@ namespace Ldraw.Lego
 		private int m_Colour;
 		private LdrawFile? m_Contents;
 		private string m_Text;
+
+		public PartNode(Vector center, Matrix transform, LdrawFile contents)
+		{
+			m_Center = center;
+			m_Transform = transform;
+			m_Contents = contents;
+			
+			m_Text = contents.FileName;
+		}
+		
+		public PartNode.FromLine(string line)
+			requires(!("\n" in line))
+			requires(line[0] == '1')
+		{
+			var tokens = line.split(" ");
+			m_Center = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
+			m_Transform = Matrix((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]),
+								(float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]),
+								(float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
+								
+			m_Colour = int.parse(tokens[1]);
+		}
 
 		public override int ColourId
 		{
@@ -48,7 +95,7 @@ namespace Ldraw.Lego
 		}
 	}
 
-	public class LineNode
+	public class LineNode : LdrawNode
 	{
 		private int m_Colour;
 		private Vector m_A;
@@ -62,13 +109,140 @@ namespace Ldraw.Lego
 		}
 
 		public LineNode.FromLine(string line)
-		requires(!("\n" in line))
-		requires(line[0] == '2')
+			requires(!("\n" in line))
+			requires(line[0] == '2')
 		{
 			var tokens = line.split(" ");
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_Colour = int.parse(tokens[1]);
 		}
+		
+		public override int ColourId { get {return m_Colour; } }
+		
+		public override string Description { get {return "Line";}}
+	}
+
+	public class TriangleNode : LdrawNode
+	{
+		private int m_Colour;
+		private Vector m_A;
+		private Vector m_B;
+		private Vector m_C;
+
+		public TriangleNode(int colour, Vector a, Vector b, Vector c)
+		{
+			m_Colour = colour;
+			m_A = a;
+			m_B = b;
+			m_C = c;
+		}
+
+		public TriangleNode.FromLine(string line)
+			requires(!("\n" in line))
+			requires(line[0] == '3')
+		{
+			var tokens = line.split(" ");
+			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
+			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
+			m_C = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
+			m_Colour = int.parse(tokens[1]);
+		}
+		
+		public override int ColourId { get {return m_Colour; } }
+		
+		public override string Description { get {return "Triangle";}}
+	}
+
+	public class QuadNode : LdrawNode
+	{
+		private int m_Colour;
+		private Vector m_A;
+		private Vector m_B;
+		private Vector m_C;
+		private Vector m_D;
+
+		public QuadNode(int colour, Vector a, Vector b, Vector c, Vector d)
+		{
+			m_Colour = colour;
+			m_A = a;
+			m_B = b;
+			m_C = c;
+			m_D = d;
+		}
+
+		public QuadNode.FromLine(string line)
+			requires(!("\n" in line))
+			requires(line[0] == '4')
+		{
+			var tokens = line.split(" ");
+			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
+			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
+			m_C = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
+			m_D = Vector((float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
+			m_Colour = int.parse(tokens[1]);
+		}
+		
+		public override int ColourId { get {return m_Colour; } }
+		
+		public override string Description { get {return "Quad";}}
+	}
+
+	public class CondLineNode : LdrawNode
+	{
+		private int m_Colour;
+		private Vector m_A;
+		private Vector m_B;
+		private Vector m_Control1;
+		private Vector m_Control2;
+
+		public CondLineNode(int colour, Vector a, Vector b, Vector control1, Vector control2)
+		{
+			m_Colour = colour;
+			m_A = a;
+			m_B = b;
+			m_Control1 = control1;
+			m_Control2 = control2;
+		}
+
+		public CondLineNode.FromLine(string line)
+			requires(!("\n" in line))
+			requires(line[0] == '5')
+		{
+			var tokens = line.split(" ");
+			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
+			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
+			m_A = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
+			m_B = Vector((float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
+			m_Colour = int.parse(tokens[1]);
+		}
+		
+		public override int ColourId { get {return m_Colour; } }
+		
+		public override string Description { get {return "Conditional Line";}}
+	}
+
+	public class Comment : LdrawNode
+	{
+		private string m_CommentText;
+		
+		public Comment(string comment)
+		{
+			m_CommentText = comment;
+		}
+		
+		public Comment.FromLine(string line)
+			requires(!("\n" in line))
+			requires(line[0] == '0')
+		{
+			if(line.has_prefix("0 //"))
+				m_CommentText = line.substring(4);
+			else
+				m_CommentText = line.substring(2);
+		}
+		
+		public override int ColourId {get {return 0;}}
+		
+		public override string Description {get {return m_CommentText; } }
 	}
 }

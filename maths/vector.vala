@@ -3,13 +3,11 @@ namespace Ldraw.Maths
 	public struct Vector
 	{
 		private float m_Values[3];
-		public const Vector NullVector = {{0.0f, 0.0f, 0.0f}};
+		//public const Vector NullVector = {{0.0f, 0.0f, 0.0f}};
 
 		public Vector(float x, float y, float z)
 		{
-			m_Values[0] = x;
-			m_Values[1] = y;
-			m_Values[2] = z;
+			m_Values = {x, y, z};
 		}
 
 		public Vector Add(Vector v)
@@ -48,12 +46,9 @@ namespace Ldraw.Maths
 			}
 		}
 
-		public Vector Normalized
+		public Vector Normalized()
 		{
-			get
-			{
-				return Scale(1.0f / Magnitude);
-			}
+			return Scale(1.0f / Magnitude);
 		}
 
 		public Vector Scale(float scale)

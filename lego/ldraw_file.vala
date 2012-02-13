@@ -23,5 +23,18 @@ namespace Ldraw.Lego
 				return "";
 			}
 		}
+		
+		public string FileName
+		{
+			get
+			{
+				return m_FileName;
+			}
+		}
+	}
+
+	public errordomain ParseError
+	{
+		UnknownLineType,
 	}
 }
