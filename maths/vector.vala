@@ -3,12 +3,29 @@ namespace Ldraw.Maths
 	public struct Vector
 	{
 		private float m_Values[3];
-		//public const Vector NullVector = {{0.0f, 0.0f, 0.0f}};
+
+		public static Vector? s_NullVector = null;
+
+		public static Vector NullVector
+		{
+			get
+			{
+				if(s_NullVector == null)
+				{
+					s_NullVector = Vector(0,0,0);
+				}
+				return s_NullVector;
+			}
+		}
 
 		public Vector(float x, float y, float z)
 		{
 			m_Values = {x, y, z};
 		}
+
+		public float X {get {return m_Values[0];} set {m_Values[0] = value;}}
+		public float Y {get {return m_Values[1];} set {m_Values[1] = value;}}
+		public float Z {get {return m_Values[2];} set {m_Values[2] = value;}}
 
 		public Vector Add(Vector v)
 		{

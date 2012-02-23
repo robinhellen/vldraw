@@ -10,8 +10,32 @@ namespace Ldraw.Maths
 		}
 
 		// TODO: Work out a way to use these constants properly.
-		//public const Matrix NullMatrix = {{{0,0,0},{0,0,0},{0,0,0}}};
-		//public const Matrix Identity = {{{1,0,0},{0,1,0},{0,0,1}}};
+		public static Matrix? s_NullMatrix = null;
+		public static Matrix? s_Identity = null;
+
+		public static Matrix NullMatrix
+		{
+			get
+			{
+				if(s_NullMatrix == null)
+				{
+					s_NullMatrix = Matrix(0,0,0 ,0,0,0 ,0,0,0);
+				}
+				return s_NullMatrix;
+			}
+		}
+
+		public static Matrix Identity
+		{
+			get
+			{
+				if(s_Identity == null)
+				{
+					s_Identity = Matrix(1,0,0 ,0,1,0 ,0,0,1);
+				}
+				return s_Identity;
+			}
+		}
 
 		public Matrix TransformMatrix(Matrix m)
 		{

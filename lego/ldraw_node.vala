@@ -8,36 +8,11 @@ namespace Ldraw.Lego
 
 		public abstract int ColourId {get;}
 
-		public bool Selected { get {return m_Selected;}}
+		public bool Selected { get {return m_Selected;} set{m_Selected = value;}}
 
 		public virtual string Geometry { get {return "";}}
 
 		public abstract string Description { get; }
-		
-		public static LdrawNode ParseLine(string line)
-			throws ParseError
-			requires(!("\n" in line))
-			requires(line[0] >= '0' && line[0] <= '5')
-		{
-			switch(line[0])
-			{
-				case '0':
-					// may be a meta command
-					return new Comment(line);
-				case '1':
-					return new PartNode.FromLine(line);
-				case '2':
-					return new LineNode.FromLine(line);
-				case '3':
-					return new TriangleNode.FromLine(line);
-				case '4':
-					return new QuadNode.FromLine(line);
-				case '5':
-					return new CondLineNode.FromLine(line);
-				default:
-					throw new ParseError.UnknownLineType ("Valid LDraw lines begin with a number from 0 to 5");
-			}
-		}
 	}
 
 	public class PartNode : LdrawNode
@@ -45,8 +20,10 @@ namespace Ldraw.Lego
 		private Vector m_Center;
 		private Matrix m_Transform;
 		private int m_Colour;
-		private LdrawFile? m_Contents;
+		private LdrawFile m_Contents;
 		private string m_Text;
+
+		public delegate LdrawFile SubFileLocator(string reference) throws ParseError;
 
 		public PartNode(Vector center, Matrix transform, LdrawFile contents)
 		{
@@ -57,17 +34,30 @@ namespace Ldraw.Lego
 			m_Text = contents.FileName;
 		}
 		
-		public PartNode.FromLine(string line)
+		public PartNode.FromLine(string line, SubFileLocator locator)
+			throws ParseError
 			requires(!("\n" in line))
 			requires(line[0] == '1')
 		{
-			var tokens = line.split(" ");
+			string[] rawTokens = line.split_set(" \t");
+			
+			string[] tokens = {};
+			foreach(string rawToken in rawTokens)
+			{
+				if(rawToken != "")
+					tokens += rawToken;
+			}
+						
 			m_Center = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_Transform = Matrix((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]),
 								(float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]),
 								(float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
 								
 			m_Colour = int.parse(tokens[1]);
+			m_Text = tokens[14].strip().down();
+			
+			// generate contents
+			m_Contents = locator(m_Text);
 		}
 
 		public override int ColourId
@@ -112,7 +102,7 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '2')
 		{
-			var tokens = line.split(" ");
+			var tokens = line.split_set(" \t");
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_Colour = int.parse(tokens[1]);
@@ -142,7 +132,7 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '3')
 		{
-			var tokens = line.split(" ");
+			var tokens = line.split_set(" \t");
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_C = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
@@ -175,7 +165,7 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '4')
 		{
-			var tokens = line.split(" ");
+			var tokens = line.split_set(" \t");
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_C = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
@@ -209,7 +199,7 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '5')
 		{
-			var tokens = line.split(" ");
+			var tokens = line.split_set(" \t");
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_A = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
