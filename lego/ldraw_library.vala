@@ -17,6 +17,8 @@ namespace Ldraw.Lego
 		private Gee.List<LdrawPrimitive> m_Primitives;
 		private Gee.List<LdrawSubPart> m_SubParts;
 		private Gee.List<LdrawHiresPrimitive> m_HiresPrimitives;
+		
+		private TreeSet<string> m_Categories;
 
 		private LdrawLibrary()
 		{
@@ -29,6 +31,8 @@ namespace Ldraw.Lego
 			m_Primitives = new ArrayList<LdrawPrimitive>();
 			m_HiresPrimitives = new ArrayList<LdrawHiresPrimitive>();
 			m_SubParts = new ArrayList<LdrawSubPart>();
+			
+			m_Categories = new TreeSet<string>();
 		}
 
 		public static LdrawLibrary Instance
@@ -168,6 +172,7 @@ namespace Ldraw.Lego
 			if(!TryGetPart(primitive.Name, out p))
 			{
 				m_Parts.add(primitive);
+				m_Categories.add(primitive.Category);
 				return primitive;
 			}
 			return p;
@@ -198,7 +203,15 @@ namespace Ldraw.Lego
 			return p;
 		}
 
-		public Gee.List<LdrawPart> GetPartsByCategory(string category)
+		public Set<string> AllCategories
+		{
+			owned get
+			{
+				return m_Categories.read_only_view;
+			}
+		}
+
+		public Gee.List<LdrawPart> GetPartsByCategory(string? category)
 		{
 			ArrayList<LdrawPart> parts = new ArrayList<LdrawPart>();
 			foreach(LdrawPart part in m_Parts)
@@ -208,6 +221,7 @@ namespace Ldraw.Lego
 					parts.add(part);
 				}
 			}
+			parts.sort();
 			return parts;
 		}
 
@@ -233,6 +247,7 @@ namespace Ldraw.Lego
 				{
 					LdrawPart part = new LdrawPart(name);
 					m_Parts.add(part);
+					m_Categories.add(part.Category);
 				}
 				catch (ParseError e)
 				{

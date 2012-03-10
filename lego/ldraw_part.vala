@@ -4,11 +4,11 @@ namespace Ldraw.Lego
 {
 	public class LdrawPart : LdrawFile
 	{
-		private string m_Description;
-		private string m_Category;
+		private string m_Description = null;
+		private string m_Category = null;
 		private string m_FileName;
 		private string m_Name;
-		private Gee.List<string> m_Keywords;
+		private Gee.List<string> m_Keywords = new ArrayList<string>();
 
 		public static int s_Creations = 0;
 
@@ -22,14 +22,10 @@ namespace Ldraw.Lego
 				throw new ParseError.MissingFile(@"Unable to find part file $filename.");
 			}
 			base.FromFile(partFile);
-
-			m_Category = null;
-			m_Description = null;
+			
 			m_FileName = filename;
 
 			m_Name = filename.substring(0, filename.last_index_of_char('.'));
-
-			m_Keywords = new ArrayList<string>();
 
 			s_Creations++;
 		}
@@ -40,7 +36,7 @@ namespace Ldraw.Lego
 		{
 			get
 			{
-				if(m_Category == null)
+				if(m_Category == null && m_Description != null)
 				{
 					m_Category = m_Description.split(" ")[0];
 				}
@@ -60,9 +56,9 @@ namespace Ldraw.Lego
 			if(line.has_prefix("0 !CATEGORY "))
 			{
 				string category = line.substring(12);
-				if(m_Category == null)
+				if(m_Category != null)
 				{
-					throw new ParseError.InvalidComment("Part '$m_FileName' has two category lines. \nFirst: $m_Category\n Second: $category");
+					throw new ParseError.InvalidComment(@"Part '$m_FileName' has two category lines. \nFirst: $m_Category\n Second: $category");
 				}
 				m_Category = category;
 				return true;

@@ -47,6 +47,10 @@ namespace Ldraw.Lego
 					{
 						case '0':
 							// may be a meta command
+							if(HandleCommentLine(line))
+							{
+								continue;
+							}
 							nodeForLine = new Comment(line);
 							break;
 						case '1':

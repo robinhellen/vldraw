@@ -23,19 +23,47 @@ namespace Ldraw.Ui.Widgets
 			m_Tree.cursor_changed.connect(Tree_OnCursorChanged);
 		}
 
-		public TreeModel CreateAndPopulateModel()
+		private TreeModel CreateAndPopulateModel()
 		{
 			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(LdrawPart));
 
-
+			foreach(string category in LdrawLibrary.Instance.AllCategories)
+			{
+				PopulatePartsForCategory(store, category);
+			}
+			PopulatePartsForCategory(store, null); // add uncategorised items
 			return store;
 		}
 
+		private void PopulatePartsForCategory(TreeStore store, string? category)
+		{
+			TreeIter categoryIter;
+			store.append(out categoryIter, null);
+			store.set(categoryIter, 0, 0, 1, (category != null) ? category : "Uncategorised", -1);
+			
+			Gee.List<LdrawPart> parts = LdrawLibrary.Instance.GetPartsByCategory(category);
+			
+			foreach(LdrawPart part in parts)
+			{
+				TreeIter partIter;
+				store.append(out partIter, categoryIter);
+				store.set(partIter, 0, 1, 1, part.Description, 2, part.Name, 3, part, -1);
+			}
+		}
+		
 		public ScrolledWindow Widget
 		{
 			get
 			{
 				return m_Scrolled;
+			}
+		}
+
+		public LdrawViewPane DetailView
+		{
+			set
+			{
+				m_Detail = value;
 			}
 		}
 
