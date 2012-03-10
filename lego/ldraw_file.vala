@@ -1,4 +1,5 @@
 using Gee;
+using Ldraw.Maths;
 
 namespace Ldraw.Lego
 {
@@ -7,6 +8,7 @@ namespace Ldraw.Lego
 		private LinkedList<LdrawNode> m_Nodes;
 		private const string c_LdrawDirectory = "/home/robin/ldraw";
 		private string m_FileName;
+		private Bounds m_BoundingBox = null;
 
 		protected LdrawFile()
 		{
@@ -128,6 +130,38 @@ namespace Ldraw.Lego
 
 		public abstract LdrawFile LoadPartFromReference(string reference)
 			throws ParseError;
+
+		public Bounds BoundingBox
+		{
+			get
+			{
+				if(m_BoundingBox == null)
+				{
+					m_BoundingBox = CalculateBounds();
+				}
+				return m_BoundingBox;
+			}
+		}
+
+		protected Bounds CalculateBounds()
+		{
+			Bounds bounds = new Bounds();
+			foreach(LdrawNode node in m_Nodes)
+			{
+				if(node is PartNode)
+				{
+					PartNode part = (PartNode)node;
+					bounds.IncludeBounds(part.Contents.BoundingBox, part.Transform, part.Center);
+				}
+				else if(node is LineNode)
+				{
+					bounds.Union(((LineNode)node).A);
+					bounds.Union(((LineNode)node).B);
+				}
+				// TODO: Triangles, cond lines, quads.
+			}
+			return bounds;
+		}
 	}
 
 	public errordomain ParseError

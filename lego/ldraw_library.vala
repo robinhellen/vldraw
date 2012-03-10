@@ -7,6 +7,7 @@ namespace Ldraw.Lego
 		private static LdrawLibrary m_Instance;
 		private static Object s_InstanceLock = new Object();
 
+		private File m_LibraryDir;
 		private File m_PartsDirectory;
 		private File m_SubPartsDirectory;
 		private File m_PrimitivesDirectory;
@@ -19,10 +20,10 @@ namespace Ldraw.Lego
 
 		private LdrawLibrary()
 		{
-			File libraryDir = File.new_for_path("/home/robin/ldraw");
-			m_PartsDirectory = libraryDir.get_child("parts");
+			m_LibraryDir = File.new_for_path("/home/robin/ldraw");
+			m_PartsDirectory = m_LibraryDir.get_child("parts");
 			m_SubPartsDirectory = m_PartsDirectory.get_child("s");
-			m_PrimitivesDirectory = libraryDir.get_child("p");
+			m_PrimitivesDirectory = m_LibraryDir.get_child("p");
 			m_HiresPrimitivesDirectory = m_PrimitivesDirectory.get_child("48");
 			m_Parts = new ArrayList<LdrawPart>();
 			m_Primitives = new ArrayList<LdrawPrimitive>();
@@ -42,6 +43,14 @@ namespace Ldraw.Lego
 					}
 					return m_Instance;
 				}
+			}
+		}
+
+		public File LibraryDirectory
+		{
+			get
+			{
+				return m_LibraryDir;
 			}
 		}
 
@@ -347,6 +356,9 @@ namespace Ldraw.Lego
 		public void Initialize()
 			throws Error, InitializationError
 		{
+			// initialize colours
+			LdrawColour.ReadAllColours();
+
 			LoadAllHiresPrimitives();
 			LoadAllPrimitives();
 			LoadAllSubParts();

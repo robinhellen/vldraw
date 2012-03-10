@@ -12,6 +12,13 @@ namespace Ldraw.Maths
 			m_Max = Vector.NullVector;
 		}
 
+		public Bounds.Clone(Bounds b)
+		{
+			m_Min = b.m_Min;
+			m_Max = b.m_Max;
+			m_Initialized = b.m_Initialized;
+		}
+
 		public void Union(Vector v)
 		{
 			if(!m_Initialized)
@@ -25,29 +32,35 @@ namespace Ldraw.Maths
 				{
 					m_Min.X = v.X;
 				}
-				else if(m_Max.X > v.X)
+				else if(m_Max.X < v.X)
 				{
-					m_Min.X = v.X;
+					m_Max.X = v.X;
 				}
 
 				if(m_Min.Y > v.Y)
 				{
 					m_Min.Y = v.Y;
 				}
-				else if(m_Max.Y > v.Y)
+				else if(m_Max.Y < v.Y)
 				{
-					m_Min.Y = v.Y;
+					m_Max.Y = v.Y;
 				}
 
 				if(m_Min.Z > v.Z)
 				{
 					m_Min.Z = v.Z;
 				}
-				else if(m_Max.Z > v.Z)
+				else if(m_Max.Z < v.Z)
 				{
-					m_Min.Z = v.Z;
+					m_Max.Z = v.Z;
 				}
 			}
+		}
+
+		public void IncludeBounds(Bounds b, Matrix transform, Vector center)
+		{
+			Union(transform.TransformVector(b.m_Min).Add(center));
+			Union(transform.TransformVector(b.m_Max).Add(center));
 		}
 
 		public float MaxX {get{return m_Max.X;}}
@@ -57,5 +70,18 @@ namespace Ldraw.Maths
 		public float MinX {get{return m_Min.X;}}
 		public float MinY {get{return m_Min.Y;}}
 		public float MinZ {get{return m_Min.Z;}}
+
+		public Vector Center()
+		{
+			return m_Max.Add(m_Min).Scale(0.5f);
+		}
+
+		public float Radius
+		{
+			get
+			{
+				return Center().Subtract(m_Min).Magnitude;
+			}
+		}
 	}
 }

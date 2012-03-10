@@ -85,5 +85,12 @@ namespace Ldraw.Maths
 					 + m_Values[0,2] * (m_Values[1,0] * m_Values[2,1] - m_Values[1,1] * m_Values[2,0]);
 			}
 		}
+
+		public Vector TransformVector(Vector v)
+		{
+			return Vector((m_Values[0,0] * v.X + m_Values[0,1] * v.Y + m_Values[0,2] * v.Z),
+						  (m_Values[1,0] * v.X + m_Values[1,1] * v.Y + m_Values[1,2] * v.Z),
+						  (m_Values[2,0] * v.X + m_Values[2,1] * v.Y + m_Values[2,2] * v.Z));
+		}
 	}
 }

@@ -44,8 +44,8 @@ namespace Ldraw.Maths
 		public Vector Cross(Vector v)
 		{
 			return Vector(m_Values[1] * v.m_Values[2] - m_Values[2] * v.m_Values[1],
-						  m_Values[2] - v.m_Values[0] - m_Values[0] * v.m_Values[2],
-						  m_Values[0] - v.m_Values[1] - m_Values[1] * v.m_Values[0]);
+						  m_Values[2] * v.m_Values[0] - m_Values[0] * v.m_Values[2],
+						  m_Values[0] * v.m_Values[1] - m_Values[1] * v.m_Values[0]);
 		}
 
 		public float Dot(Vector v)
@@ -59,7 +59,7 @@ namespace Ldraw.Maths
 		{
 			get
 			{
-				return Dot(this);
+				return Math.sqrtf(Dot(this));
 			}
 		}
 
@@ -73,6 +73,11 @@ namespace Ldraw.Maths
 			return Vector(	m_Values[0] * scale,
 							m_Values[1] * scale,
 							m_Values[2] * scale);
+		}
+
+		public string to_string()
+		{
+			return @"( $(m_Values[0]), $(m_Values[1]), $(m_Values[2]) )";
 		}
 	}
 }

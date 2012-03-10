@@ -2,11 +2,11 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawBuilder : Object
 	{
-		public void BuildLine(LineNode line) {}
-		public void BuildTriangle(TriangleNode line) {}
-		public void BuildQuad(QuadNode line) {}
-		public void BuildCondLine(CondLineNode line) {}
-		public void BuildSubModel(PartNode line) {}
-		public void BuildComment(Comment line) {}
+		public virtual void BuildLine(LineNode line) {}
+		public virtual void BuildTriangle(TriangleNode line) {}
+		public virtual void BuildQuad(QuadNode line) {}
+		public virtual void BuildCondLine(CondLineNode line) {}
+		public virtual void BuildSubModel(PartNode line) {}
+		public virtual void BuildComment(Comment line) {}
 	}
 }

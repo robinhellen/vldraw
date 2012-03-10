@@ -13,6 +13,21 @@ namespace Ldraw.Lego
 		public virtual string Geometry { get {return "";}}
 
 		public abstract string Description { get; }
+
+		protected static string[] Tokenize(string line)
+		{
+			var allTokens = line.split_set(" \t");
+			string[] tokens = {};
+
+			foreach(string token in allTokens)
+			{
+				if(token != "")
+				{
+					tokens += token;
+				}
+			}
+			return tokens;
+		}
 	}
 
 	public class PartNode : LdrawNode
@@ -30,32 +45,25 @@ namespace Ldraw.Lego
 			m_Center = center;
 			m_Transform = transform;
 			m_Contents = contents;
-			
+
 			m_Text = contents.FileName;
 		}
-		
+
 		public PartNode.FromLine(string line, SubFileLocator locator)
 			throws ParseError
 			requires(!("\n" in line))
 			requires(line[0] == '1')
 		{
-			string[] rawTokens = line.split_set(" \t");
-			
-			string[] tokens = {};
-			foreach(string rawToken in rawTokens)
-			{
-				if(rawToken != "")
-					tokens += rawToken;
-			}
-						
+			var tokens = Tokenize(line);
+
 			m_Center = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_Transform = Matrix((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]),
 								(float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]),
 								(float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
-								
+
 			m_Colour = int.parse(tokens[1]);
 			m_Text = tokens[14].strip().down();
-			
+
 			// generate contents
 			m_Contents = locator(m_Text);
 		}
@@ -83,6 +91,22 @@ namespace Ldraw.Lego
 				return m_Contents.Description;
 			}
 		}
+
+		public Matrix Transform
+		{
+			get
+			{
+				return m_Transform;
+			}
+		}
+
+		public Vector Center
+		{
+			get
+			{
+				return m_Center;
+			}
+		}
 	}
 
 	public class LineNode : LdrawNode
@@ -102,15 +126,19 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '2')
 		{
-			var tokens = line.split_set(" \t");
+			var tokens = Tokenize(line);
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_Colour = int.parse(tokens[1]);
 		}
-		
+
 		public override int ColourId { get {return m_Colour; } }
-		
+
 		public override string Description { get {return "Line";}}
+
+		public Vector A { get {return m_A;}}
+
+		public Vector B { get {return m_B;}}
 	}
 
 	public class TriangleNode : LdrawNode
@@ -132,16 +160,22 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '3')
 		{
-			var tokens = line.split_set(" \t");
+			var tokens = Tokenize(line);
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_C = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
 			m_Colour = int.parse(tokens[1]);
 		}
-		
+
 		public override int ColourId { get {return m_Colour; } }
-		
+
 		public override string Description { get {return "Triangle";}}
+
+		public Vector A { get {return m_A;}}
+
+		public Vector B { get {return m_B;}}
+
+		public Vector C { get {return m_C;}}
 	}
 
 	public class QuadNode : LdrawNode
@@ -165,17 +199,25 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '4')
 		{
-			var tokens = line.split_set(" \t");
+			var tokens = Tokenize(line);
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_C = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
 			m_D = Vector((float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
 			m_Colour = int.parse(tokens[1]);
 		}
-		
+
 		public override int ColourId { get {return m_Colour; } }
-		
+
 		public override string Description { get {return "Quad";}}
+
+		public Vector A { get {return m_A;}}
+
+		public Vector B { get {return m_B;}}
+
+		public Vector C { get {return m_C;}}
+
+		public Vector D { get {return m_D;}}
 	}
 
 	public class CondLineNode : LdrawNode
@@ -199,28 +241,36 @@ namespace Ldraw.Lego
 			requires(!("\n" in line))
 			requires(line[0] == '5')
 		{
-			var tokens = line.split_set(" \t");
+			var tokens = Tokenize(line);
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
 			m_A = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
 			m_B = Vector((float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
 			m_Colour = int.parse(tokens[1]);
 		}
-		
+
 		public override int ColourId { get {return m_Colour; } }
-		
+
 		public override string Description { get {return "Conditional Line";}}
+
+		public Vector A { get {return m_A;}}
+
+		public Vector B { get {return m_B;}}
+
+		public Vector Control1 { get {return m_Control1;}}
+
+		public Vector Control2 { get {return m_Control2;}}
 	}
 
 	public class Comment : LdrawNode
 	{
 		private string m_CommentText;
-		
+
 		public Comment(string comment)
 		{
 			m_CommentText = comment;
 		}
-		
+
 		public Comment.FromLine(string line)
 			requires(!("\n" in line))
 			requires(line[0] == '0')
@@ -230,9 +280,9 @@ namespace Ldraw.Lego
 			else
 				m_CommentText = line.substring(2);
 		}
-		
+
 		public override int ColourId {get {return 0;}}
-		
+
 		public override string Description {get {return m_CommentText; } }
 	}
 }
