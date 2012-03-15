@@ -16,6 +16,7 @@ namespace Ldraw.Ui.Widgets
 			m_Tree = new TreeView.with_model(CreateAndPopulateModel());
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 1);
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 2);
+			m_Tree.headers_visible = false;
 
 			m_Scrolled = new ScrolledWindow(null, null);
 			m_Scrolled.add(m_Tree);
@@ -40,9 +41,9 @@ namespace Ldraw.Ui.Widgets
 			TreeIter categoryIter;
 			store.append(out categoryIter, null);
 			store.set(categoryIter, 0, 0, 1, (category != null) ? category : "Uncategorised", -1);
-			
+
 			Gee.List<LdrawPart> parts = LdrawLibrary.Instance.GetPartsByCategory(category);
-			
+
 			foreach(LdrawPart part in parts)
 			{
 				TreeIter partIter;
@@ -50,7 +51,7 @@ namespace Ldraw.Ui.Widgets
 				store.set(partIter, 0, 1, 1, part.Description, 2, part.Name, 3, part, -1);
 			}
 		}
-		
+
 		public ScrolledWindow Widget
 		{
 			get
@@ -85,6 +86,7 @@ namespace Ldraw.Ui.Widgets
 			Value val;
 			model.get_value(active, 0, out val);
 			int rowType = val.get_int();
+			stdout.printf(@"selection changed. rowType: $rowType\n");
 			if(rowType == 0)
 			{
 				return;

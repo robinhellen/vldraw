@@ -17,7 +17,7 @@ namespace Ldraw.Lego
 		private Gee.List<LdrawPrimitive> m_Primitives;
 		private Gee.List<LdrawSubPart> m_SubParts;
 		private Gee.List<LdrawHiresPrimitive> m_HiresPrimitives;
-		
+
 		private TreeSet<string> m_Categories;
 
 		private LdrawLibrary()
@@ -31,7 +31,7 @@ namespace Ldraw.Lego
 			m_Primitives = new ArrayList<LdrawPrimitive>();
 			m_HiresPrimitives = new ArrayList<LdrawHiresPrimitive>();
 			m_SubParts = new ArrayList<LdrawSubPart>();
-			
+
 			m_Categories = new TreeSet<string>();
 		}
 
@@ -224,7 +224,6 @@ namespace Ldraw.Lego
 			parts.sort();
 			return parts;
 		}
-
 		private void LoadAllParts()
 			throws Error, InitializationError
 		{

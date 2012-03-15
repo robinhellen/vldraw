@@ -13,6 +13,18 @@ namespace Ldraw.Lego
 			base.FromFile(partFile);
 		}
 
+		public LdrawModel.FromFile(File file)
+			throws ParseError
+		{
+			base.FromFile(file);
+		}
+
+		public LdrawModel.Empty()
+		{
+			base();
+			FileName = "untitled.dat";
+		}
+
 		public override LdrawFile LoadPartFromReference(string reference)
 			throws ParseError
 		{

@@ -2,7 +2,7 @@ using Gee;
 
 namespace Ldraw.Lego
 {
-	public class LdrawPart : LdrawFile
+	public class LdrawPart : LdrawFile, Comparable<LdrawPart>
 	{
 		private string m_Description = null;
 		private string m_Category = null;
@@ -22,7 +22,7 @@ namespace Ldraw.Lego
 				throw new ParseError.MissingFile(@"Unable to find part file $filename.");
 			}
 			base.FromFile(partFile);
-			
+
 			m_FileName = filename;
 
 			m_Name = filename.substring(0, filename.last_index_of_char('.'));
@@ -156,6 +156,11 @@ namespace Ldraw.Lego
 				return part;
 			}
 			throw new ParseError.MissingFile(@"Could not locate part or primitive for $reference");
+		}
+
+		public int compare_to(LdrawPart part)
+		{
+			return strcmp(m_Description, part.m_Description);
 		}
 	}
 }

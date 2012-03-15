@@ -16,19 +16,14 @@ namespace Ldraw.Ui.Widgets
 		private Vector? m_Up = null;
 
 		public LdrawViewPane(ViewAngle angle)
+			throws GlError
 		{
 			// base();
 			m_Model = null;
 			m_Angle = angle;
+			m_Eyeline = m_Center = m_Up = null;
 
 			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
-		}
-
-		public LdrawViewPane.WithModel(ViewAngle angle, LdrawFile model)
-			throws GlError
-		{
-			this(angle);
-			m_Model = model;
 
 			// initialize this control for OpenGl rendering
 			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA);
@@ -38,6 +33,13 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
+		public LdrawViewPane.WithModel(ViewAngle angle, LdrawFile model)
+			throws GlError
+		{
+			this(angle);
+			m_Model = model;
+		}
+
 		public signal void RenderingError(string description);
 
 		public LdrawFile Model
@@ -45,7 +47,7 @@ namespace Ldraw.Ui.Widgets
 			set
 			{
 				m_Model = value;
-				// TODO: initialize render data
+				m_Eyeline = m_Center = m_Up = null;
 				try
 				{
 					Redraw();
@@ -202,7 +204,7 @@ namespace Ldraw.Ui.Widgets
 			switch(m_Angle)
 			{
 				case ViewAngle.Ortho:
-					cameraShift = Vector(modelRadius * 0.390731128f,modelRadius * -0.650895224f,modelRadius * -0.650895224f);
+					cameraShift = Vector(modelRadius * -0.390731128f,modelRadius * -0.650895224f,modelRadius * -0.650895224f);
 					break;
 				case ViewAngle.Front:
 					cameraShift = Vector(0.0f, 0.0f, modelRadius * -1.5f);

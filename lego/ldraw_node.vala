@@ -14,6 +14,10 @@ namespace Ldraw.Lego
 
 		public abstract string Description { get; }
 
+		public virtual string Name { get {return "";} }
+
+		public abstract string Type { get; }
+
 		protected static string[] Tokenize(string line)
 		{
 			var allTokens = line.split_set(" \t");
@@ -107,6 +111,10 @@ namespace Ldraw.Lego
 				return m_Center;
 			}
 		}
+
+		public override string Name { get {return m_Contents.FileName;} }
+
+		public override string Type { get {return "Part";} }
 	}
 
 	public class LineNode : LdrawNode
@@ -139,6 +147,8 @@ namespace Ldraw.Lego
 		public Vector A { get {return m_A;}}
 
 		public Vector B { get {return m_B;}}
+
+		public override string Type { get {return "Line";} }
 	}
 
 	public class TriangleNode : LdrawNode
@@ -176,6 +186,8 @@ namespace Ldraw.Lego
 		public Vector B { get {return m_B;}}
 
 		public Vector C { get {return m_C;}}
+
+		public override string Type { get {return "Triangle";} }
 	}
 
 	public class QuadNode : LdrawNode
@@ -218,6 +230,8 @@ namespace Ldraw.Lego
 		public Vector C { get {return m_C;}}
 
 		public Vector D { get {return m_D;}}
+
+		public override string Type { get {return "Quad";} }
 	}
 
 	public class CondLineNode : LdrawNode
@@ -244,8 +258,8 @@ namespace Ldraw.Lego
 			var tokens = Tokenize(line);
 			m_A = Vector((float)double.parse(tokens[2]), (float)double.parse(tokens[3]), (float)double.parse(tokens[4]));
 			m_B = Vector((float)double.parse(tokens[5]), (float)double.parse(tokens[6]), (float)double.parse(tokens[7]));
-			m_A = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
-			m_B = Vector((float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
+			m_Control1 = Vector((float)double.parse(tokens[8]), (float)double.parse(tokens[9]), (float)double.parse(tokens[10]));
+			m_Control2 = Vector((float)double.parse(tokens[11]), (float)double.parse(tokens[12]), (float)double.parse(tokens[13]));
 			m_Colour = int.parse(tokens[1]);
 		}
 
@@ -260,6 +274,8 @@ namespace Ldraw.Lego
 		public Vector Control1 { get {return m_Control1;}}
 
 		public Vector Control2 { get {return m_Control2;}}
+
+		public override string Type { get {return "Conditional Line";} }
 	}
 
 	public class Comment : LdrawNode
@@ -284,5 +300,7 @@ namespace Ldraw.Lego
 		public override int ColourId {get {return 0;}}
 
 		public override string Description {get {return m_CommentText; } }
+
+		public override string Type { get {return "Comment";} }
 	}
 }

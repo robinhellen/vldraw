@@ -2,6 +2,8 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawBuilder : Object
 	{
+		public virtual void BuildNode(LdrawNode node) {}
+
 		public virtual void BuildLine(LineNode line) {}
 		public virtual void BuildTriangle(TriangleNode line) {}
 		public virtual void BuildQuad(QuadNode line) {}

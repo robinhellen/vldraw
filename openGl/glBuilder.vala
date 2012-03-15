@@ -36,7 +36,7 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 
-			glOrtho(viewArea.MinX, viewArea.MaxX,
+			glOrtho(viewArea.MaxX, viewArea.MinX,
 					-viewArea.MinY, -viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 
@@ -112,6 +112,7 @@ namespace Ldraw.OpenGl
 			Matrix oldTransform = m_Transform;
 			Vector oldCenter = m_Center;
 			int oldColour = m_CurrentColour;
+			bool oldInverted = m_InvertColour;
 
 			// apply the current transform to the sub-model's transform and center vector
 			m_Center = m_Transform.TransformVector(part.Center).Add(m_Center);
@@ -120,6 +121,10 @@ namespace Ldraw.OpenGl
 			if(part.ColourId != 16 && part.ColourId != 24)
 			{
 				m_CurrentColour = part.ColourId;
+			}
+			if(part.Selected)
+			{
+				m_InvertColour = true;
 			}
 
 			m_RecursionDepth++;
@@ -130,6 +135,7 @@ namespace Ldraw.OpenGl
 			m_Transform = oldTransform;
 			m_Center = oldCenter;
 			m_CurrentColour = oldColour;
+			m_InvertColour = oldInverted;
 		}
 
 		public override void BuildCondLine(CondLineNode line)

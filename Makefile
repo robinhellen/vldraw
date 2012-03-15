@@ -15,5 +15,11 @@ VALA_PACKAGES = --pkg gtk+-2.0 --pkg gee-1.0 --pkg gl --pkg gtkglext-1.0 --pkg g
 VALA_OPTS= -g --vapidir=vapi --save-temps $(VALA_PACKAGES)
 EXECUTABLE_NAME = ldraw
 
-all:
+all: $(SOURCES)
 	valac $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME)
+
+clean:
+	rm $(EXECUTABLE_NAME)
+
+tempclean:
+	rm $(patsubst %.vala,%.c,$(SOURCES))
