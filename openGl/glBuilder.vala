@@ -125,6 +125,8 @@ namespace Ldraw.OpenGl
 			if(part.Selected)
 			{
 				m_InvertColour = true;
+				glColor3f(0.0f, 0.0f, 0.0f);
+				RenderBounds(part.Contents.BoundingBox.Transform(m_Transform, m_Center).Scale(1.2f));
 			}
 
 			m_RecursionDepth++;
@@ -206,6 +208,31 @@ namespace Ldraw.OpenGl
 			glTranslatef(-eye.X, -eye.Y, -eye.Z);
 
 			return center.Subtract(eye);
+		}
+		
+		private void RenderBounds(Bounds bounds)
+		{
+			glBegin(GL_LINE_STRIP);
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MinZ); // (a) - 1
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MaxZ); // (b) - 2
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MaxZ); // (c) - 2
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MinZ); // (d) - 2
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MinZ); // (a) - 3
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MinZ); // (h) - 2
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MinZ); // (e) - 2
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MaxZ); // (f) - 2
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MaxZ); // (g) - 2
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MinZ); // (h) - 3
+			glEnd();
+			
+			glBegin(GL_LINES);
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MaxZ); // (g) - 3
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MaxZ); // (b) - 3
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MaxZ); // (c) - 3
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MaxZ); // (f) - 3
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MinZ); // (d) - 3
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MinZ); // (e) - 3
+			glEnd();
 		}
 	}
 }

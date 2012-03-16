@@ -83,5 +83,24 @@ namespace Ldraw.Maths
 				return Center().Subtract(m_Min).Magnitude;
 			}
 		}
+	
+		public Bounds Scale(float scale)
+		{
+			Bounds b = new Bounds();
+			Vector center = Center();
+			Vector diagonal = m_Min.Subtract(center);
+			Vector scaledDiagonal = diagonal.Scale(scale);
+			b.m_Min = center.Add(scaledDiagonal);
+			b.m_Max = center.Subtract(scaledDiagonal);
+			return b;
+		}
+	
+		public Bounds Transform(Matrix m, Vector pos)
+		{
+			Bounds b = new Bounds();
+			b.m_Min = m.TransformVector(m_Min).Add(pos);
+			b.m_Max = m.TransformVector(m_Max).Add(pos);
+			return b;
+		}
 	}
 }
