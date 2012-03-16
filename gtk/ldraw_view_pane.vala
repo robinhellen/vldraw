@@ -38,6 +38,7 @@ namespace Ldraw.Ui.Widgets
 		{
 			this(angle);
 			m_Model = model;
+			m_Model.VisibleChange.connect(() => Redraw());
 		}
 
 		public signal void RenderingError(string description);
@@ -47,6 +48,7 @@ namespace Ldraw.Ui.Widgets
 			set
 			{
 				m_Model = value;
+				m_Model.VisibleChange.connect(() => Redraw());
 				m_Eyeline = m_Center = m_Up = null;
 				try
 				{

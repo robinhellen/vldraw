@@ -67,7 +67,7 @@ namespace Ldraw.Ui
 			treePaned.add1(WithFrame(treeDetailBox));
 
 			Paned modelPanes = new VPaned();
-			ModelList m_ModelList = new ModelList(m_Model);
+			m_ModelList = new ModelList(m_Model);
 			modelPanes.add1(WithFrame(m_ModelList.Widget));
 			modelPanes.add2(WithFrame(m_View));
 

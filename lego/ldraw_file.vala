@@ -9,6 +9,7 @@ namespace Ldraw.Lego
 		private const string c_LdrawDirectory = "/home/robin/ldraw";
 		private string m_FileName;
 		private Bounds m_BoundingBox = null;
+		private bool m_ChangingSelection = false;
 
 		protected LdrawFile()
 		{
@@ -72,6 +73,7 @@ namespace Ldraw.Lego
 							throw new ParseError.UnknownLineType(@"Unable to parse line $lineNo.");
 					}
 					m_Nodes.add(nodeForLine);
+					nodeForLine.notify["Selected"].connect(Nodes_OnSelectChanged);
 				}
 				m_FileName = file.query_info(FILE_ATTRIBUTE_STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
 			}
@@ -124,10 +126,12 @@ namespace Ldraw.Lego
 
 		public void ClearSelection()
 		{
+			m_ChangingSelection = true;
 			foreach(LdrawNode node in m_Nodes)
 			{
 				node.Selected = false;
 			}
+			m_ChangingSelection = false;
 		}
 
 		// return true to indicate that all processing on this line is done,
@@ -189,6 +193,16 @@ namespace Ldraw.Lego
 			}
 			return bounds;
 		}
+
+		private void Nodes_OnSelectChanged(ParamSpec pspec)
+		{
+			if(m_ChangingSelection)
+				return;
+
+			VisibleChange();
+		}
+
+		public signal void VisibleChange();
 	}
 
 	public errordomain ParseError
