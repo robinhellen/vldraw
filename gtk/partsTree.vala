@@ -1,3 +1,4 @@
+using Gdk;
 using Gtk;
 using Ldraw.Lego;
 
@@ -22,6 +23,16 @@ namespace Ldraw.Ui.Widgets
 			m_Scrolled.add(m_Tree);
 
 			m_Tree.cursor_changed.connect(Tree_OnCursorChanged);
+
+			// set up for drag and drop
+			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
+			m_Tree.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
+			m_Tree.drag_begin.connect(() => stdout.printf("begin.\n"));
+			m_Tree.drag_motion.connect(() => {stdout.printf("motion.\n"); return true;});
+			m_Tree.drag_data_get.connect(Tree_OnDragDataGet);
+			m_Tree.drag_data_delete.connect(() => stdout.printf("data delete.\n"));
+			m_Tree.drag_drop.connect(() => {stdout.printf("drop.\n"); return true;});
+			m_Tree.drag_end.connect(() => stdout.printf("end.\n"));
 		}
 
 		private TreeModel CreateAndPopulateModel()
@@ -75,29 +86,45 @@ namespace Ldraw.Ui.Widgets
 				return;
 			}
 
-			TreeIter active;
-			TreeSelection sel = m_Tree.get_selection();
-			TreeModel model;
-			if(!sel.get_selected(out model, out active))
-			{
-				return; // no selection
-			}
-
-			Value val;
-			model.get_value(active, 0, out val);
-			int rowType = val.get_int();
-			stdout.printf(@"selection changed. rowType: $rowType\n");
-			if(rowType == 0)
-			{
+			LdrawPart current = CurrentPart;
+			if(current == null)
 				return;
-			}
-			if(rowType == 1)
+
+			m_Detail.Model = current;
+		}
+
+		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
+		{
+			LdrawPart current = CurrentPart;
+			string currentName = current.Name;
+			data.set(Atom.intern("Ldraw Part", false), 8, currentName.data);
+
+		}
+
+		private LdrawPart? CurrentPart
+		{
+			get
 			{
-				Value partVal ;
-				model.get_value(active, 3, out partVal);
-				GLib.Object partObj = partVal.get_object();
-				LdrawPart part = partObj as LdrawPart;
-				m_Detail.Model = part;
+				TreeIter active;
+				TreeSelection sel = m_Tree.get_selection();
+				TreeModel model;
+				if(!sel.get_selected(out model, out active))
+				{
+					return null; // no selection
+				}
+
+				Value val;
+				model.get_value(active, 0, out val);
+				int rowType = val.get_int();
+
+				if(rowType == 1)
+				{
+					Value partVal ;
+					model.get_value(active, 3, out partVal);
+					GLib.Object partObj = partVal.get_object();
+					return partObj as LdrawPart;
+				}
+				return null;
 			}
 		}
 	}

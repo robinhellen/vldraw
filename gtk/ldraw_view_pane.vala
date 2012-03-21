@@ -31,6 +31,10 @@ namespace Ldraw.Ui.Widgets
 			{
 				throw new GlError.InitializationError("Unable to initialize a drawing area for OpenGL rendering.");
 			}
+
+			// set up this control for drag-and-drop
+			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
+			drag_dest_set(this, DestDefaults.ALL, {LdrawDragData}, DragAction.COPY);
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawFile model)
@@ -132,6 +136,34 @@ namespace Ldraw.Ui.Widgets
 			}
 			return false;
 		}
+
+		public override bool drag_drop(DragContext context, int x, int y, uint time_)
+		{
+			stdout.printf("model view drop.\n");
+			drag_finish(context, true, false, time_);
+			return true;
+		}
+
+		public override bool drag_motion(DragContext context, int x, int y, uint time_)
+		{
+			stdout.printf("model view motion.\n");
+			return true;
+		}
+
+		public override void drag_data_received (DragContext context, int x, int y,
+												 SelectionData selection_data, uint info,
+												 uint time)
+		{
+			stdout.printf("model view data recieved:\n");
+			string partName = (string)selection_data.data;
+			LdrawPart part;
+			if(!LdrawLibrary.Instance.TryGetPart(partName, out part))
+				return;
+
+			stdout.printf(@"part received: $(part.Description)");
+			// TODO: work out where to add the new part, and what orientation
+		}
+
 
 		private Menu CreateContextMenu()
 		{
