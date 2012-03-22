@@ -44,11 +44,12 @@ namespace Ldraw.Lego
 
 		public delegate LdrawFile SubFileLocator(string reference) throws ParseError;
 
-		public PartNode(Vector center, Matrix transform, LdrawFile contents)
+		public PartNode(Vector center, Matrix transform, LdrawFile contents, int colour)
 		{
 			m_Center = center;
 			m_Transform = transform;
 			m_Contents = contents;
+			m_Colour = colour;
 
 			m_Text = contents.FileName;
 		}

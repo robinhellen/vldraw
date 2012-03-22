@@ -157,6 +157,53 @@ namespace Ldraw.Lego
 			}
 		}
 
+		public PartNode? LastSubFile
+		{
+			get
+			{
+				weak PartNode lastSubFile = null;
+				foreach(LdrawNode node in m_Nodes)
+				{
+					if(!(node is PartNode))
+					{
+						continue;
+					}
+					lastSubFile = node as PartNode;
+				}
+				return lastSubFile;
+			}
+		}
+
+		public PartNode? LastSelected
+		{
+			get
+			{
+				weak PartNode lastSubFile = null;
+				foreach(LdrawNode node in m_Nodes)
+				{
+					if(!(node is PartNode) || !node.Selected)
+					{
+						continue;
+					}
+					lastSubFile = node as PartNode;
+				}
+				return lastSubFile;
+			}
+		}
+
+		public void AddNode(LdrawNode newNode, LdrawNode? after = null)
+		{
+			if(after == null)
+			{
+				m_Nodes.add(newNode);
+			}
+			else
+			{
+				m_Nodes.insert(m_Nodes.index_of(after) + 1, newNode);
+			}
+			VisibleChange();
+		}
+
 		protected Bounds CalculateBounds()
 		{
 			Bounds bounds = new Bounds();

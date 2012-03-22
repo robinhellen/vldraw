@@ -12,7 +12,7 @@ namespace Ldraw.Ui.Widgets
 		public ModelList(LdrawFile model)
 		{
 			m_Model = model;
-
+			m_Model.VisibleChange.connect(() => UpdateList());
 			// initialise list
 			CreateList();
 
@@ -81,6 +81,7 @@ namespace Ldraw.Ui.Widgets
 				m_Model = value;
 				UpdateList();
 				m_Model.ClearSelection();
+				m_Model.VisibleChange.connect(() => UpdateList());
 			}
 		}
 
