@@ -162,7 +162,7 @@ namespace Ldraw.Ui.Widgets
 
 			stdout.printf(@"part received: $(part.Description)\n");
 			// TODO: work out where to add the new part, and what orientation
-			
+
 			// rotation is same as last or selected part, or no rotation
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
 			Matrix newTransform = Matrix.Identity;
@@ -180,15 +180,15 @@ namespace Ldraw.Ui.Widgets
 				newPosition = copyPart.Center;
 				newColour = copyPart.ColourId;
 			}
-			
+
 			// TODO: adjust addition position for drop location
 			switch(m_Angle)
 			{
-				case: ViewAngle.Ortho:
+				case ViewAngle.Ortho:
 					break; // do not adjust in the 3D view as that is PAINFUL
 			}
-			
-			
+
+
 			LdrawNode newNode = new PartNode(newPosition, newTransform, part, newColour);
 			m_Model.AddNode(newNode, copyPart);
 			stdout.printf(@"part dropped at $(newPosition)\n");

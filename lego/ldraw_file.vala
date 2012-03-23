@@ -201,6 +201,7 @@ namespace Ldraw.Lego
 			{
 				m_Nodes.insert(m_Nodes.index_of(after) + 1, newNode);
 			}
+			m_BoundingBox = null;
 			VisibleChange();
 		}
 
