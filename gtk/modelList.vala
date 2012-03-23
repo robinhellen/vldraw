@@ -52,9 +52,10 @@ namespace Ldraw.Ui.Widgets
 			renderer.size_points = 6.0;
 			m_ListView.insert_column_with_attributes(-1, "Description", renderer, text: 5);
 
-			//TreeSelection selection = m_ListView.get_selection();
-			//selection.set_mode(SelectionMode.SINGLE);
-			m_ListView.cursor_changed.connect(List_OnCursorChanged);
+			TreeSelection selection = m_ListView.get_selection();
+			selection.set_mode(SelectionMode.SINGLE);
+			selection.changed.connect(List_OnCursorChanged);
+			//m_ListView.cursor_changed.connect(List_OnCursorChanged);
 		}
 
 		private void UpdateList()
@@ -93,10 +94,8 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		private void List_OnCursorChanged(TreeView tree)
+		private void List_OnCursorChanged(TreeSelection selection)
 		{
-			stdout.printf("selection changed.\n");
-			TreeSelection selection = tree.get_selection();
 			TreeModel model;
 			TreeIter iter;
 			m_Model.ClearSelection();

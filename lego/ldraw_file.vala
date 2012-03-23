@@ -205,6 +205,20 @@ namespace Ldraw.Lego
 			VisibleChange();
 		}
 
+		public void MoveSelectedNodes(Vector displacement)
+		{
+			// iterate nodes and move those that are selected and are models
+			foreach(LdrawNode node in m_Nodes)
+			{
+				if(!(node is PartNode))
+					continue;
+					
+				PartNode part = (PartNode)node;
+				part.Move(displacement);
+			}
+			VisibleChange();
+		}
+
 		protected Bounds CalculateBounds()
 		{
 			Bounds bounds = new Bounds();

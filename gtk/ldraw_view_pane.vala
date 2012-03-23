@@ -14,7 +14,8 @@ namespace Ldraw.Ui.Widgets
 		private Vector? m_Eyeline = null;
 		private Vector? m_Center = null;
 		private Vector? m_Up = null;
-
+		private DateTime m_LastRedraw = null;
+		
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
 		{
@@ -24,6 +25,7 @@ namespace Ldraw.Ui.Widgets
 			m_Eyeline = m_Center = m_Up = null;
 
 			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
+			events |= Gdk.EventMask.KEY_PRESS_MASK;
 
 			// initialize this control for OpenGl rendering
 			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA);
@@ -72,7 +74,18 @@ namespace Ldraw.Ui.Widgets
 			{
 				return;
 			}
-
+			
+			if(m_LastRedraw != null)
+			{
+				DateTime now = new DateTime.now_utc();
+				TimeSpan span = now.difference(m_LastRedraw);
+				if(span < TimeSpan.SECOND)
+				{
+					return;
+				}
+			}
+			
+			m_LastRedraw = new DateTime.now_utc();
 			GLWindow drawableWin = widget_get_gl_window(this);
 			if(!(drawableWin is GLDrawable))
 			{
@@ -193,7 +206,6 @@ namespace Ldraw.Ui.Widgets
 			m_Model.AddNode(newNode, copyPart);
 			stdout.printf(@"part dropped at $(newPosition)\n");
 		}
-
 
 		private Menu CreateContextMenu()
 		{
@@ -330,6 +342,18 @@ namespace Ldraw.Ui.Widgets
 			retval.Union(Vector(minX, minY, minZ));
 			retval.Union(Vector(maxX, maxY, maxZ));
 			return retval;
+		}
+	
+		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");
+		private uint m_DownKeyVal = Gdk.keyval_from_name("Down");
+		private uint m_LeftKeyVal = Gdk.keyval_from_name("Left");
+		private uint m_RightKeyVal = Gdk.keyval_from_name("Right");
+	
+		public override bool key_press_event(Gdk.EventKey event)
+		{
+			stdout.printf("View pane recieved key press: $(event.keyval)");
+			
+			return false;
 		}
 	}
 

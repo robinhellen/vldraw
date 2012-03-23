@@ -40,8 +40,6 @@ namespace Ldraw.OpenGl
 					-viewArea.MinY, -viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 
-			stdout.printf(@"setting up view for $(viewArea.MinX), $(viewArea.MaxX), $(viewArea.MinY), $(viewArea.MaxY), $(viewArea.MinZ), $(viewArea.MaxZ).\n");
-
 			glMatrixMode(GL_MODELVIEW);
 			glScalef(1.0f, 1.0f, -1.0f);
 			glLoadIdentity();

@@ -116,6 +116,11 @@ namespace Ldraw.Lego
 		public override string Name { get {return m_Contents.FileName;} }
 
 		public override string Type { get {return "Part";} }
+		
+		public void Move(Vector shift)
+		{
+			m_Center.Add(shift);
+		}
 	}
 
 	public class LineNode : LdrawNode
