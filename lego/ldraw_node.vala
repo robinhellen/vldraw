@@ -10,7 +10,7 @@ namespace Ldraw.Lego
 
 		public bool Selected { get {return m_Selected;} set{m_Selected = value;}}
 
-		public virtual string Geometry { get {return "";}}
+		public virtual string Geometry() {return "";}
 
 		public abstract string Description { get; }
 
@@ -116,10 +116,12 @@ namespace Ldraw.Lego
 		public override string Name { get {return m_Contents.FileName;} }
 
 		public override string Type { get {return "Part";} }
-		
+
+		public override string Geometry() { return @"$(m_Center)"; }
+
 		public void Move(Vector shift)
 		{
-			m_Center.Add(shift);
+			m_Center = m_Center.Add(shift);
 		}
 	}
 

@@ -26,6 +26,7 @@ namespace Ldraw.Ui
 
 			SetUpControls();
 			SetUpErrorReporting();
+			SetUpAccelerators();
 		}
 
 		private void SetUpControls()
@@ -93,6 +94,16 @@ namespace Ldraw.Ui
 								msg.run();
 
 							});
+		}
+
+		// cursor keys - move model in x,z plane
+		// Home/End - move model on y axis
+		private void SetUpAccelerators()
+		{
+			AccelGroup group = new AccelGroup();
+			group.connect(Gdk.keyval_from_name("Up"), 0, 0, (group, object, keyval, modifier) => {stdout.printf("Up\n"); return false; });
+
+			add_accel_group(group);
 		}
 
 		private MenuBar CreateMenus()

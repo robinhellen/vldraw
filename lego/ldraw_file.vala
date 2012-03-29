@@ -202,6 +202,7 @@ namespace Ldraw.Lego
 				m_Nodes.insert(m_Nodes.index_of(after) + 1, newNode);
 			}
 			m_BoundingBox = null;
+			ComponentsChanged();
 			VisibleChange();
 		}
 
@@ -210,9 +211,9 @@ namespace Ldraw.Lego
 			// iterate nodes and move those that are selected and are models
 			foreach(LdrawNode node in m_Nodes)
 			{
-				if(!(node is PartNode))
+				if(!node.Selected || !(node is PartNode))
 					continue;
-					
+
 				PartNode part = (PartNode)node;
 				part.Move(displacement);
 			}
@@ -261,10 +262,14 @@ namespace Ldraw.Lego
 			if(m_ChangingSelection)
 				return;
 
-			VisibleChange();
+			SelectionChanged();
 		}
 
 		public signal void VisibleChange();
+
+		public signal void SelectionChanged();
+
+		public signal void ComponentsChanged();
 	}
 
 	public errordomain ParseError

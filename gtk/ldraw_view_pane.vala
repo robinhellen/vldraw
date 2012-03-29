@@ -15,15 +15,15 @@ namespace Ldraw.Ui.Widgets
 		private Vector? m_Center = null;
 		private Vector? m_Up = null;
 		private DateTime m_LastRedraw = null;
-		
+
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
 		{
-			// base();
 			m_Model = null;
 			m_Angle = angle;
 			m_Eyeline = m_Center = m_Up = null;
 
+			can_focus = true;
 			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
 			events |= Gdk.EventMask.KEY_PRESS_MASK;
 
@@ -44,7 +44,8 @@ namespace Ldraw.Ui.Widgets
 		{
 			this(angle);
 			m_Model = model;
-			m_Model.VisibleChange.connect(() => Redraw());
+			m_Model.VisibleChange.connect(() => RedrawWithError());
+			m_Model.SelectionChanged.connect(() => RedrawWithError());
 		}
 
 		public signal void RenderingError(string description);
@@ -54,7 +55,8 @@ namespace Ldraw.Ui.Widgets
 			set
 			{
 				m_Model = value;
-				m_Model.VisibleChange.connect(() => Redraw());
+				m_Model.VisibleChange.connect(() => RedrawWithError());
+				m_Model.SelectionChanged.connect(() => RedrawWithError());
 				m_Eyeline = m_Center = m_Up = null;
 				try
 				{
@@ -74,17 +76,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				return;
 			}
-			
-			if(m_LastRedraw != null)
-			{
-				DateTime now = new DateTime.now_utc();
-				TimeSpan span = now.difference(m_LastRedraw);
-				if(span < TimeSpan.SECOND)
-				{
-					return;
-				}
-			}
-			
+
 			m_LastRedraw = new DateTime.now_utc();
 			GLWindow drawableWin = widget_get_gl_window(this);
 			if(!(drawableWin is GLDrawable))
@@ -113,6 +105,18 @@ namespace Ldraw.Ui.Widgets
 			drawable.wait_gl();
 		}
 
+		private void RedrawWithError()
+		{
+			try
+			{
+				Redraw();
+			}
+			catch (GlError e)
+			{
+				RenderingError(e.message);
+			}
+		}
+
 		public override bool configure_event(Gdk.EventConfigure event)
 		{
 			try
@@ -136,6 +140,10 @@ namespace Ldraw.Ui.Widgets
 			{
 				RenderingError(@"OpenGL error during window redraw: \n $(e.message).");
 			}
+			if(has_focus)
+			{
+				stdout.printf("view pane has focus.\n");
+			}
 			return false;
 		}
 
@@ -145,6 +153,42 @@ namespace Ldraw.Ui.Widgets
 			if(event.button == 3) // right mouse button
 			{
 				CreateContextMenu().popup(null, null, null, event.button, event.time);
+				return true;
+			}
+			return false;
+		}
+
+		public override bool key_press_event(Gdk.EventKey event)
+		{
+			// if button is right, popup context menu
+			if(event.keyval == m_UpKeyVal) // right mouse button
+			{
+				m_Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -10.0f));
+				return true;
+			}
+			if(event.keyval == m_DownKeyVal) // right mouse button
+			{
+				m_Model.MoveSelectedNodes(Vector(0.0f, 0.0f, 10.0f));
+				return true;
+			}
+			if(event.keyval == m_LeftKeyVal) // right mouse button
+			{
+				m_Model.MoveSelectedNodes(Vector(10.0f, 0.0f, 0.0f));
+				return true;
+			}
+			if(event.keyval == m_RightKeyVal) // right mouse button
+			{
+				m_Model.MoveSelectedNodes(Vector(-10.0f, 0.0f, 0.0f));
+				return true;
+			}
+			if(event.keyval == m_EndKeyVal) // right mouse button
+			{
+				m_Model.MoveSelectedNodes(Vector(0.0f, 10.0f, 0.0f));
+				return true;
+			}
+			if(event.keyval == m_HomeKeyVal) // right mouse button
+			{
+				m_Model.MoveSelectedNodes(Vector(0.0f, -10.0f, 0.0f));
 				return true;
 			}
 			return false;
@@ -194,11 +238,43 @@ namespace Ldraw.Ui.Widgets
 				newColour = copyPart.ColourId;
 			}
 
+			Allocation alloc;
+			get_allocation(out alloc);
+			int deltaXPx = x - (alloc.width / 2);
+			int deltaYPx = y - (alloc.height / 2);
+
+			float deltaX = deltaXPx * m_Scale;
+			float deltaY = deltaYPx * m_Scale;
+
 			// TODO: adjust addition position for drop location
 			switch(m_Angle)
 			{
 				case ViewAngle.Ortho:
 					break; // do not adjust in the 3D view as that is PAINFUL
+				case ViewAngle.Front:
+					newPosition.X = 10.0f * Math.roundf((m_Center.X + deltaX) / 10.0f);
+					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					break;
+				case ViewAngle.Back:
+					newPosition.X = 10.0f * Math.roundf((m_Center.X - deltaX) / 10.0f);
+					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					break;
+				case ViewAngle.Left:
+					newPosition.Z = 10.0f * Math.roundf((m_Center.Z - deltaX) / 10.0f);
+					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					break;
+				case ViewAngle.Right:
+					newPosition.Z = 10.0f * Math.roundf((m_Center.Z + deltaX) / 10.0f);
+					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					break;
+				case ViewAngle.Top:
+					newPosition.X = 10.0f * Math.roundf((m_Center.X - deltaX) / 10.0f);
+					newPosition.Z = 10.0f * Math.roundf((m_Center.Z + deltaY) / 10.0f);
+					break;
+				case ViewAngle.Bottom:
+					newPosition.X = 10.0f * Math.roundf((m_Center.X + deltaX) / 10.0f);
+					newPosition.Z = 10.0f * Math.roundf((m_Center.Z + deltaY) / 10.0f);
+					break;
 			}
 
 
@@ -343,18 +419,13 @@ namespace Ldraw.Ui.Widgets
 			retval.Union(Vector(maxX, maxY, maxZ));
 			return retval;
 		}
-	
+
 		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");
 		private uint m_DownKeyVal = Gdk.keyval_from_name("Down");
 		private uint m_LeftKeyVal = Gdk.keyval_from_name("Left");
 		private uint m_RightKeyVal = Gdk.keyval_from_name("Right");
-	
-		public override bool key_press_event(Gdk.EventKey event)
-		{
-			stdout.printf("View pane recieved key press: $(event.keyval)");
-			
-			return false;
-		}
+		private uint m_HomeKeyVal = Gdk.keyval_from_name("Home");
+		private uint m_EndKeyVal = Gdk.keyval_from_name("End");
 	}
 
 	public enum ViewAngle

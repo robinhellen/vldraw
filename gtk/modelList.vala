@@ -12,7 +12,8 @@ namespace Ldraw.Ui.Widgets
 		public ModelList(LdrawFile model)
 		{
 			m_Model = model;
-			m_Model.VisibleChange.connect(() => UpdateList());
+			m_Model.ComponentsChanged.connect(() => UpdateList());
+			m_Model.VisibleChange.connect(Model_OnVisibleChange);
 			// initialise list
 			CreateList();
 
@@ -53,8 +54,8 @@ namespace Ldraw.Ui.Widgets
 			m_ListView.insert_column_with_attributes(-1, "Description", renderer, text: 5);
 
 			TreeSelection selection = m_ListView.get_selection();
-			selection.set_mode(SelectionMode.SINGLE);
-			selection.changed.connect(List_OnCursorChanged);
+			selection.set_mode(SelectionMode.MULTIPLE);
+			selection.changed.connect_after(List_OnCursorChanged);
 			//m_ListView.cursor_changed.connect(List_OnCursorChanged);
 		}
 
@@ -82,7 +83,8 @@ namespace Ldraw.Ui.Widgets
 				m_Model = value;
 				UpdateList();
 				m_Model.ClearSelection();
-				m_Model.VisibleChange.connect(() => UpdateList());
+				m_Model.ComponentsChanged.connect(() => UpdateList());
+				m_Model.VisibleChange.connect(Model_OnVisibleChange);
 			}
 		}
 
@@ -94,19 +96,38 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
+		private void Model_OnVisibleChange()
+		{
+			TreeModel model = m_ListView.model;
+			ListStore store = model as ListStore;
+			model.foreach((model, path, iter) =>
+							{
+								Value val;
+								model.get_value(iter, 0, out val);
+								GLib.Object valObj = val.get_object();
+								LdrawNode node = valObj as LdrawNode;
+								store.set(iter,
+									1, "",
+									2, node.ColourId,
+									3, node.Geometry(),
+									4, node.Name,
+									5, node.Description);
+								return false;
+							});
+		}
+
+
 		private void List_OnCursorChanged(TreeSelection selection)
 		{
-			TreeModel model;
-			TreeIter iter;
 			m_Model.ClearSelection();
-			if(selection.get_selected(out model, out iter))
-			{
-				Value val;
-				model.get_value(iter, 0, out val);
-				GLib.Object valObj = val.get_object();
-				LdrawNode node = valObj as LdrawNode;
-				node.Selected = true;
-			}
+			selection.selected_foreach((model, path, iter) =>
+					{
+						Value val;
+						model.get_value(iter, 0, out val);
+						GLib.Object valObj = val.get_object();
+						LdrawNode node = valObj as LdrawNode;
+						node.Selected = true;
+					});
 		}
 
 		private class ListBuilder : LdrawBuilder
@@ -126,7 +147,7 @@ namespace Ldraw.Ui.Widgets
 					0, node,
 					1, "",
 					2, node.ColourId,
-					3, node.Geometry,
+					3, node.Geometry(),
 					4, node.Name,
 					5, node.Description);
 			}
