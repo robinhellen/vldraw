@@ -32,7 +32,7 @@ namespace Ldraw
 				stdout.printf(e.message);
 			}
 
-			Window win = new MainWindow.WithModel(model);
+			Window win = new MainWindow.WithModel(Settings.Load(), model);
 			win.destroy.connect(() => main_quit());
 			win.show_all();
 

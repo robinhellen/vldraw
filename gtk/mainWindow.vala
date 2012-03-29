@@ -12,15 +12,17 @@ namespace Ldraw.Ui
 		LdrawViewPane m_View;
 		LdrawViewPane m_PartDetail;
 		ModelList m_ModelList;
+		Settings m_Settings;
 
-		public MainWindow()
+		public MainWindow(Settings settings)
 		{
-			this.WithModel(null);
+			this.WithModel(settings, null);
 		}
 
-		public MainWindow.WithModel(LdrawFile? model)
+		public MainWindow.WithModel(Settings settings, LdrawFile? model)
 		{
 			m_Model = model;
+			m_Settings = settings;
 
 			maximize();
 
@@ -38,7 +40,7 @@ namespace Ldraw.Ui
 
 			try
 			{
-				m_View = new LdrawViewPane.WithModel(ViewAngle.Front, m_Model);
+				m_View = new LdrawEditPane.WithModel(ViewAngle.Front, m_Model, m_Settings);
 			}
 			catch(OpenGl.GlError e)
 			{
