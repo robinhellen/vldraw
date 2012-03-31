@@ -30,11 +30,20 @@ namespace Ldraw.Ui.Widgets
 		{
 			base.WithModel(angle, model);
 			m_Settings = settings;
+
+			can_focus = true;
+			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
+			events |= Gdk.EventMask.KEY_PRESS_MASK;
+
+			// set up this control for drag-and-drop
+			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
+			drag_dest_set(this, DestDefaults.ALL, {LdrawDragData}, DragAction.COPY);
 		}
 
 		public override bool button_press_event(Gdk.EventButton event)
 		{
 			// if button is right, popup context menu
+			grab_focus();
 			if(event.button == 3) // right mouse button
 			{
 				CreateContextMenu().popup(null, null, null, event.button, event.time);
@@ -48,32 +57,32 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -10.0f));
+				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -m_Settings.GridZ));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, 10.0f));
+				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, m_Settings.GridZ));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(10.0f, 0.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(m_Settings.GridX, 0.0f, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(-10.0f, 0.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(-m_Settings.GridX, 0.0f, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 10.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(0.0f, m_Settings.GridY, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, -10.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(0.0f, -m_Settings.GridY, 0.0f));
 				return true;
 			}
 			return false;
@@ -102,9 +111,6 @@ namespace Ldraw.Ui.Widgets
 			if(!LdrawLibrary.Instance.TryGetPart(partName, out part))
 				return;
 
-			stdout.printf(@"part received: $(part.Description)\n");
-			// TODO: work out where to add the new part, and what orientation
-
 			// rotation is same as last or selected part, or no rotation
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
 			Matrix newTransform = Matrix.Identity;
@@ -131,34 +137,37 @@ namespace Ldraw.Ui.Widgets
 			float deltaX = deltaXPx * m_Scale;
 			float deltaY = deltaYPx * m_Scale;
 
+			stdout.printf(@"part dropped at ($x, $y), delta values are ($deltaX, $deltaY), center is $m_Center.\n");
+
+
 			// TODO: adjust addition position for drop location
 			switch(Angle)
 			{
 				case ViewAngle.Ortho:
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
-					newPosition.X = 10.0f * Math.roundf((m_Center.X + deltaX) / 10.0f);
-					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X + deltaX) / m_Settings.GridX);
+					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
 					break;
 				case ViewAngle.Back:
-					newPosition.X = 10.0f * Math.roundf((m_Center.X - deltaX) / 10.0f);
-					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X - deltaX) / m_Settings.GridX);
+					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
 					break;
 				case ViewAngle.Left:
-					newPosition.Z = 10.0f * Math.roundf((m_Center.Z - deltaX) / 10.0f);
-					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z - deltaX) / m_Settings.GridZ);
+					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
 					break;
 				case ViewAngle.Right:
-					newPosition.Z = 10.0f * Math.roundf((m_Center.Z + deltaX) / 10.0f);
-					newPosition.Y = 10.0f * Math.roundf((m_Center.Y + deltaY) / 10.0f);
+					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z + deltaX) / m_Settings.GridZ);
+					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
 					break;
 				case ViewAngle.Top:
-					newPosition.X = 10.0f * Math.roundf((m_Center.X - deltaX) / 10.0f);
-					newPosition.Z = 10.0f * Math.roundf((m_Center.Z + deltaY) / 10.0f);
+					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X - deltaX) / m_Settings.GridX);
+					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z + deltaY) / m_Settings.GridZ);
 					break;
 				case ViewAngle.Bottom:
-					newPosition.X = 10.0f * Math.roundf((m_Center.X + deltaX) / 10.0f);
-					newPosition.Z = 10.0f * Math.roundf((m_Center.Z + deltaY) / 10.0f);
+					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X + deltaX) / m_Settings.GridX);
+					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z + deltaY) / m_Settings.GridZ);
 					break;
 			}
 

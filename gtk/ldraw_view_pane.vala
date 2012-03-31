@@ -167,7 +167,7 @@ namespace Ldraw.Ui.Widgets
 		private void InitializeView()
 		{
 			m_Center = m_Model.BoundingBox.Center();
-			m_Center.Y = -m_Center.Y;
+			m_Center.Y = 0;
 			float modelRadius = m_Model.BoundingBox.Radius;
 
 			Vector cameraShift;
