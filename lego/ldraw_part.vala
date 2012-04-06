@@ -58,7 +58,8 @@ namespace Ldraw.Lego
 				string category = line.substring(12);
 				if(m_Category != null)
 				{
-					throw new ParseError.InvalidComment(@"Part '$m_FileName' has two category lines. \nFirst: $m_Category\n Second: $category");
+					string s = "Part '" + m_FileName + @"' has two category lines. \nFirst: $m_Category\n Second: $category";
+					throw new ParseError.InvalidComment(s);
 				}
 				m_Category = category;
 				return true;
