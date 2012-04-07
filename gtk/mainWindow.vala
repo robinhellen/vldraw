@@ -72,7 +72,7 @@ namespace Ldraw.Ui
 			Paned modelPanes = new VPaned();
 			m_ModelList = new ModelList(m_Model);
 			modelPanes.add1(WithFrame(m_ModelList.Widget));
-			modelPanes.add2(WithFrame(m_View));
+			modelPanes.add2(WithFrame(WithScrolls(m_View)));
 
 			treePaned.add2(modelPanes);
 
@@ -137,6 +137,13 @@ namespace Ldraw.Ui
 			frame.add(widget);
 			frame.shadow_type = ShadowType.IN;
 			return frame;
+		}
+
+		private Widget WithScrolls(Widget widget)
+		{
+			ScrolledWindow win = new ScrolledWindow(null, null);
+			win.add(widget);
+			return win;
 		}
 
 		private void FileOpen_OnActivate()

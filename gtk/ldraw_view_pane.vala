@@ -6,7 +6,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class LdrawViewPane : DrawingArea
+	public class LdrawViewPane : Layout
 	{
 		private LdrawFile m_Model;
 		private ViewAngle m_Angle;
@@ -15,6 +15,9 @@ namespace Ldraw.Ui.Widgets
 		protected Vector? m_Center = null;
 		private Vector? m_Up = null;
 		private DateTime m_LastRedraw = null;
+
+		private Adjustment m_Hadj = null;
+		private Adjustment m_Vadj = null;
 
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
@@ -141,6 +144,35 @@ namespace Ldraw.Ui.Widgets
 				stdout.printf("view pane has focus.\n");
 			}
 			return false;
+		}
+
+		public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
+			ensures(m_Hadj != null)
+		{
+			m_Hadj = hadj;
+			m_Vadj = vadj;
+			SetAdjustmentRanges();
+		}
+
+		private void SetAdjustmentRanges()
+			requires(m_Hadj != null)
+		{
+			switch (m_Angle)
+			{
+				case ViewAngle.Ortho:
+				case ViewAngle.Front:
+					m_Hadj.lower = 2 * m_Model.BoundingBox.MinX - m_Center.X;
+					m_Hadj.upper = 2 * m_Model.BoundingBox.MaxX - m_Center.X;
+					m_Hadj.value = m_Center.X;
+					m_Hadj.value_changed.connect(adj => {m_Center.X = (float)adj.value; RedrawWithError();});
+					break;
+				case ViewAngle.Back:
+				case ViewAngle.Left:
+				case ViewAngle.Right:
+				case ViewAngle.Top:
+				case ViewAngle.Bottom:
+					break;
+			}
 		}
 
 		public ViewAngle Angle
