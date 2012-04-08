@@ -39,11 +39,12 @@ namespace Ldraw.OpenGl
 			glOrtho(viewArea.MaxX, viewArea.MinX,
 					-viewArea.MinY, -viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
-
-			glMatrixMode(GL_MODELVIEW);
-			glScalef(1.0f, 1.0f, -1.0f);
-			glLoadIdentity();
 			m_Eyeline = lookAt(eyeline, centre, up);
+			stdout.printf(@"Setting view center at $centre");
+			stdout.printf(@"Setting up view for ($(viewArea.MaxX), $(viewArea.MinX), $(-viewArea.MinY), $(-viewArea.MaxY), $(viewArea.MinZ), $(viewArea.MaxZ)\n"); 
+			glMatrixMode(GL_MODELVIEW);
+			//glScalef(1.0f, 1.0f, -1.0f);
+			glLoadIdentity();
 
 			glLineWidth(2.0f);
 			glMatrixMode(GL_MODELVIEW);
@@ -208,7 +209,7 @@ namespace Ldraw.OpenGl
 			return center.Subtract(eye);
 		}
 		
-		private void RenderBounds(Bounds bounds)
+		public void RenderBounds(Bounds bounds)
 		{
 			glBegin(GL_LINE_STRIP);
 			glVertex3f(bounds.MinX, bounds.MinY, bounds.MinZ); // (a) - 1

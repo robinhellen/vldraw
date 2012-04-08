@@ -147,32 +147,37 @@ namespace Ldraw.Ui.Widgets
 		}
 
 		public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
-			ensures(m_Hadj != null)
 		{
 			m_Hadj = hadj;
+			m_Hadj.value_changed.connect(adj => 
+					{
+						float dx = (float)adj.value - m_Center.X;
+						m_Center.X += dx;
+						m_Eyeline.X += dx; 
+						RedrawWithError();
+					});
 			m_Vadj = vadj;
+			m_Vadj.value_changed.connect(adj => 
+					{
+						float dy = (float)adj.value - m_Center.Y;
+						m_Center.Y += dy;
+						m_Eyeline.Y += dy; 
+						RedrawWithError();
+					});
+
 			SetAdjustmentRanges();
 		}
 
 		private void SetAdjustmentRanges()
 			requires(m_Hadj != null)
+			requires(m_Center != null)
 		{
-			switch (m_Angle)
-			{
-				case ViewAngle.Ortho:
-				case ViewAngle.Front:
-					m_Hadj.lower = 2 * m_Model.BoundingBox.MinX - m_Center.X;
-					m_Hadj.upper = 2 * m_Model.BoundingBox.MaxX - m_Center.X;
-					m_Hadj.value = m_Center.X;
-					m_Hadj.value_changed.connect(adj => {m_Center.X = (float)adj.value; RedrawWithError();});
-					break;
-				case ViewAngle.Back:
-				case ViewAngle.Left:
-				case ViewAngle.Right:
-				case ViewAngle.Top:
-				case ViewAngle.Bottom:
-					break;
-			}
+			m_Hadj.lower = 2 * m_Model.BoundingBox.MinX - m_Center.X;
+			m_Hadj.upper = 2 * m_Model.BoundingBox.MaxX - m_Center.X;
+			m_Hadj.value = m_Center.X;
+			m_Vadj.lower = 2 * m_Model.BoundingBox.MinY - m_Center.Y;
+			m_Vadj.upper = 2 * m_Model.BoundingBox.MaxY - m_Center.Y;
+			m_Vadj.value = m_Center.Y;
 		}
 
 		public ViewAngle Angle
@@ -193,13 +198,17 @@ namespace Ldraw.Ui.Widgets
 				{
 					RenderingError(@"OpenGL error redrawing due to changte of view angle: \n $(e.message).");
 				}
+				if(m_Hadj != null)
+				{
+					SetAdjustmentRanges();
+				}
 			}
 		}
 
 		private void InitializeView()
 		{
-			m_Center = m_Model.BoundingBox.Center();
-			m_Center.Y = 0;
+			m_Center = Vector(0, 0, 0);
+			Vector modelCenter = m_Model.BoundingBox.Center();
 			float modelRadius = m_Model.BoundingBox.Radius;
 
 			Vector cameraShift;
@@ -210,21 +219,33 @@ namespace Ldraw.Ui.Widgets
 					break;
 				case ViewAngle.Front:
 					cameraShift = Vector(0.0f, 0.0f, modelRadius * -1.5f);
+					m_Center.Y = -modelCenter.Y;
+					m_Center.X = modelCenter.X;
 					break;
 				case ViewAngle.Back:
 					cameraShift = Vector(0.0f, 0.0f, modelRadius * 1.5f);
+					m_Center.Y = -modelCenter.Y;
+					m_Center.X = -modelCenter.X;
 					break;
 				case ViewAngle.Top:
 					cameraShift = Vector(0.0f, modelRadius * -1.5f, 0.0f);
+					m_Center.Y = modelCenter.Z;
+					m_Center.X = modelCenter.X;
 					break;
 				case ViewAngle.Bottom:
 					cameraShift = Vector(0.0f, modelRadius * 1.5f, 0.0f);
+					m_Center.Y = -modelCenter.Z;
+					m_Center.X = modelCenter.X;
 					break;
 				case ViewAngle.Left:
 					cameraShift = Vector(modelRadius * -1.5f, 0.0f, 0.0f);
+					m_Center.Y = -modelCenter.Y;
+					m_Center.X = modelCenter.Z;
 					break;
 				case ViewAngle.Right:
 					cameraShift = Vector(modelRadius * 1.5f, 0.0f, 0.0f);
+					m_Center.Y = -modelCenter.Y;
+					m_Center.X = -modelCenter.Z;
 					break;
 				default:
 					cameraShift = Vector.NullVector;
