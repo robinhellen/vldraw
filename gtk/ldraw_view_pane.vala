@@ -109,6 +109,7 @@ namespace Ldraw.Ui.Widgets
 			try
 			{
 				Redraw();
+				stdout.printf("redraw finished.\n");
 			}
 			catch (GlError e)
 			{
@@ -149,19 +150,19 @@ namespace Ldraw.Ui.Widgets
 		public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
 		{
 			m_Hadj = hadj;
-			m_Hadj.value_changed.connect(adj => 
+			m_Hadj.value_changed.connect(adj =>
 					{
 						float dx = (float)adj.value - m_Center.X;
 						m_Center.X += dx;
-						m_Eyeline.X += dx; 
+						m_Eyeline.X += dx;
 						RedrawWithError();
 					});
 			m_Vadj = vadj;
-			m_Vadj.value_changed.connect(adj => 
+			m_Vadj.value_changed.connect(adj =>
 					{
 						float dy = (float)adj.value - m_Center.Y;
 						m_Center.Y += dy;
-						m_Eyeline.Y += dy; 
+						m_Eyeline.Y += dy;
 						RedrawWithError();
 					});
 

@@ -37,11 +37,11 @@ namespace Ldraw.OpenGl
 			glLoadIdentity();
 
 			glOrtho(viewArea.MaxX, viewArea.MinX,
-					-viewArea.MinY, -viewArea.MaxY,
+					viewArea.MinY, viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 			m_Eyeline = lookAt(eyeline, centre, up);
-			stdout.printf(@"Setting view center at $centre");
-			stdout.printf(@"Setting up view for ($(viewArea.MaxX), $(viewArea.MinX), $(-viewArea.MinY), $(-viewArea.MaxY), $(viewArea.MinZ), $(viewArea.MaxZ)\n"); 
+			stdout.printf(@"Setting view center at $centre\n");
+			//stdout.printf(@"Setting up view for ($(viewArea.MaxX), $(viewArea.MinX), $(-viewArea.MinY), $(-viewArea.MaxY), $(viewArea.MinZ), $(viewArea.MaxZ)\n");
 			glMatrixMode(GL_MODELVIEW);
 			//glScalef(1.0f, 1.0f, -1.0f);
 			glLoadIdentity();
@@ -203,12 +203,13 @@ namespace Ldraw.OpenGl
 									   s.Y, u.Y, -f.Y, 0,
 									   s.Z, u.Z, -f.Z, 0,
 									   0  , 0  , 0   , 1};
+
 			glMultMatrixf(viewTransform);
 			glTranslatef(-eye.X, -eye.Y, -eye.Z);
 
 			return center.Subtract(eye);
 		}
-		
+
 		public void RenderBounds(Bounds bounds)
 		{
 			glBegin(GL_LINE_STRIP);
@@ -223,7 +224,7 @@ namespace Ldraw.OpenGl
 			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MaxZ); // (g) - 2
 			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MinZ); // (h) - 3
 			glEnd();
-			
+
 			glBegin(GL_LINES);
 			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MaxZ); // (g) - 3
 			glVertex3f(bounds.MinX, bounds.MinY, bounds.MaxZ); // (b) - 3

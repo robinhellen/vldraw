@@ -37,6 +37,8 @@ namespace Ldraw.Ui
 			MenuBar menus = CreateMenus();
 			VBox bigVBox = new VBox(false, 0);
 			bigVBox.pack_start(menus, false, false);
+			Toolbar tools = CreateMovementToolbar();
+			bigVBox.pack_start(tools, false, false);
 
 			try
 			{
@@ -129,6 +131,26 @@ namespace Ldraw.Ui
 			fileQuit.activate.connect(() => main_quit());
 
 			return menus;
+		}
+
+		private Toolbar CreateMovementToolbar()
+		{
+			Toolbar bar = new Toolbar();
+			ToolButton upButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/minusY.xpm"), "up");
+			ToolButton downButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/plusY.xpm"), "up");
+			ToolButton leftButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/minusX.xpm"), "up");
+			ToolButton rightButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/plusX.xpm"), "up");
+			ToolButton inButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/minusZ.xpm"), "up");
+			ToolButton outButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/plusZ.xpm"), "up");
+
+			bar.insert(upButton, -1);
+			bar.insert(downButton, -1);
+			bar.insert(leftButton, -1);
+			bar.insert(rightButton, -1);
+			bar.insert(inButton, -1);
+			bar.insert(outButton, -1);
+
+			return bar;
 		}
 
 		private Widget WithFrame(Widget widget)
