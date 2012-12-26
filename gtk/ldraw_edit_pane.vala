@@ -1,16 +1,18 @@
 using Gtk;
 using Gdk;
 using Ldraw.Lego;
+using Ldraw.Lego.Nodes;
 using Ldraw.OpenGl;
 using Ldraw.Maths;
+using Ldraw.Options;
 
 namespace Ldraw.Ui.Widgets
 {
 	public class LdrawEditPane : LdrawViewPane
 	{
-		private Settings m_Settings;
+		private IOptions m_Settings;
 
-		public LdrawEditPane(ViewAngle angle, Settings settings)
+		public LdrawEditPane(ViewAngle angle, IOptions settings)
 			throws GlError
 		{
 			base(angle);
@@ -25,7 +27,7 @@ namespace Ldraw.Ui.Widgets
 			drag_dest_set(this, DestDefaults.ALL, {LdrawDragData}, DragAction.COPY);
 		}
 
-		public LdrawEditPane.WithModel(ViewAngle angle, LdrawFile model, Settings settings)
+		public LdrawEditPane.WithModel(ViewAngle angle, LdrawObject model, IOptions settings)
 			throws GlError
 		{
 			base.WithModel(angle, model);
@@ -57,32 +59,32 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -m_Settings.GridZ));
+				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -m_Settings.CurrentGrid.Z));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, m_Settings.GridZ));
+				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, m_Settings.CurrentGrid.Z));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(m_Settings.GridX, 0.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(m_Settings.CurrentGrid.X, 0.0f, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(-m_Settings.GridX, 0.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(-m_Settings.CurrentGrid.X, 0.0f, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, m_Settings.GridY, 0.0f));
+				Model.MoveSelectedNodes(Vector(0.0f, m_Settings.CurrentGrid.Y, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, -m_Settings.GridY, 0.0f));
+				Model.MoveSelectedNodes(Vector(0.0f, -m_Settings.CurrentGrid.Y, 0.0f));
 				return true;
 			}
 			return false;
@@ -146,72 +148,72 @@ namespace Ldraw.Ui.Widgets
 				case ViewAngle.Ortho:
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
-					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X + deltaX) / m_Settings.GridX);
-					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
+					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X);
+					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
 					break;
 				case ViewAngle.Back:
-					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X - deltaX) / m_Settings.GridX);
-					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
+					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X);
+					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
 					break;
 				case ViewAngle.Left:
-					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z - deltaX) / m_Settings.GridZ);
-					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
+					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z - deltaX) / m_Settings.CurrentGrid.Z);
+					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
 					break;
 				case ViewAngle.Right:
-					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z + deltaX) / m_Settings.GridZ);
-					newPosition.Y = m_Settings.GridX * Math.roundf((-m_Center.Y + deltaY) / m_Settings.GridX);
+					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaX) / m_Settings.CurrentGrid.Z);
+					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
 					break;
 				case ViewAngle.Top:
-					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X - deltaX) / m_Settings.GridX);
-					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z + deltaY) / m_Settings.GridZ);
+					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X);
+					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z);
 					break;
 				case ViewAngle.Bottom:
-					newPosition.X = m_Settings.GridX * Math.roundf((m_Center.X + deltaX) / m_Settings.GridX);
-					newPosition.Z = m_Settings.GridZ * Math.roundf((m_Center.Z + deltaY) / m_Settings.GridZ);
+					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X);
+					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z);
 					break;
 			}
 
 
-			LdrawNode newNode = new PartNode(newPosition, newTransform, part, newColour);
+			LdrawNode newNode = new PartNode(newPosition, newTransform, part.MainObject, newColour);
 			Model.AddNode(newNode, copyPart);
 			stdout.printf(@"part dropped at $(newPosition)\n");
 		}
 
-		private Menu CreateContextMenu()
+		private Gtk.Menu CreateContextMenu()
 		{
-			Menu menu = new Menu();
+			Gtk.Menu menu = new Gtk.Menu();
 
-			MenuItem frontAngle  = new MenuItem.with_label("Front");
+			Gtk.MenuItem frontAngle  = new Gtk.MenuItem.with_label("Front");
 			frontAngle.activate.connect(() => Angle = ViewAngle.Front);
 			frontAngle.show();
 			menu.append(frontAngle);
 
-			MenuItem backAngle   = new MenuItem.with_label("Back");
+			Gtk.MenuItem backAngle   = new Gtk.MenuItem.with_label("Back");
 			backAngle.activate.connect(() => Angle = ViewAngle.Back);
 			menu.append(backAngle);
 			backAngle.show();
 
-			MenuItem leftAngle   = new MenuItem.with_label("Left");
+			Gtk.MenuItem leftAngle   = new Gtk.MenuItem.with_label("Left");
 			leftAngle.activate.connect(() => Angle = ViewAngle.Left);
 			menu.append(leftAngle);
 			leftAngle.show();
 
-			MenuItem rightAngle  = new MenuItem.with_label("Right");
+			Gtk.MenuItem rightAngle  = new Gtk.MenuItem.with_label("Right");
 			rightAngle.activate.connect(() => Angle = ViewAngle.Right);
 			menu.append(rightAngle);
 			rightAngle.show();
 
-			MenuItem topAngle    = new MenuItem.with_label("Top");
+			Gtk.MenuItem topAngle    = new Gtk.MenuItem.with_label("Top");
 			topAngle.activate.connect(() => Angle = ViewAngle.Top);
 			menu.append(topAngle);
 			topAngle.show();
 
-			MenuItem bottomAngle = new MenuItem.with_label("Bottom");
+			Gtk.MenuItem bottomAngle = new Gtk.MenuItem.with_label("Bottom");
 			bottomAngle.activate.connect(() => Angle = ViewAngle.Bottom);
 			menu.append(bottomAngle);
 			bottomAngle.show();
 
-			MenuItem orthoAngle  = new MenuItem.with_label("3D");
+			Gtk.MenuItem orthoAngle  = new Gtk.MenuItem.with_label("3D");
 			orthoAngle.activate.connect(() => Angle = ViewAngle.Ortho);
 			menu.append(orthoAngle);
 			orthoAngle.show();

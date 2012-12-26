@@ -13,7 +13,6 @@ namespace Ldraw.Ui.Widgets
 	{
 		public PartsTree()
 		{
-
 			m_Tree = new TreeView.with_model(CreateAndPopulateModel());
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 1);
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 2);
@@ -90,7 +89,7 @@ namespace Ldraw.Ui.Widgets
 			if(current == null)
 				return;
 
-			m_Detail.Model = current;
+			m_Detail.Model = current.MainObject;
 		}
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)

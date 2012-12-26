@@ -1,6 +1,6 @@
 namespace Ldraw.Lego
 {
-	public class LdrawModel : LdrawFile
+	public class LdrawModel : LdrawModelFile
 	{
 		public LdrawModel(string fullFilename)
 			throws ParseError
@@ -10,13 +10,13 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $fullFilename.");
 			}
-			base.FromFile(partFile);
+			base.FromFile(partFile, new LdrawParser(new LibrarySubFileLocator()));
 		}
 
 		public LdrawModel.FromFile(File file)
 			throws ParseError
 		{
-			base.FromFile(file);
+			base.FromFile(file, new LdrawParser(new LibrarySubFileLocator()));
 		}
 
 		public LdrawModel.Empty()
@@ -25,20 +25,19 @@ namespace Ldraw.Lego
 			FileName = "untitled.dat";
 		}
 
-		public override LdrawFile LoadPartFromReference(string reference)
-			throws ParseError
-		{
-			LdrawLibrary lib = LdrawLibrary.Instance;
-
-			return lib.GetPartByName(reference.substring(0, reference.last_index_of(".")));
-		}
-
 		public override string Description
 		{
 			get
 			{
 				return "";
 			}
+		}
+
+		public override void Save()
+		{
+			var builder = new LdrFileBuilder(FilePath);
+			MainObject.BuildFromFile(builder);
+			builder.Finish();
 		}
 	}
 }

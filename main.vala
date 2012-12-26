@@ -1,6 +1,7 @@
 using Gtk;
 using Ldraw.Lego;
 using Ldraw.Ui;
+using Ldraw.Options;
 
 namespace Ldraw
 {
@@ -21,18 +22,19 @@ namespace Ldraw
 			{
 				stdout.printf(e.message);
 			}
-			LdrawModel model = null;
+			LdrawModelFile model = null;
+			var loader = new LdrawFileLoader();
 			try
 			{
-				model = new LdrawModel("/home/robin/ldraw/models/car.dat");
-				stdout.printf(@"$(model.FileName)");
+				model = loader.LoadModelFile("/home/robin/ldraw/models/car.dat");
 			}
 			catch(Error e)
 			{
 				stdout.printf(e.message);
+				return 1;
 			}
 
-			Window win = new MainWindow.WithModel(Settings.Load(), model);
+			Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model);
 			win.destroy.connect(() => main_quit());
 			win.show_all();
 

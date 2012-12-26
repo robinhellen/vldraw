@@ -1,66 +1,72 @@
 using Gtk;
 using Ldraw.Ui.Widgets;
 using Ldraw.Lego;
+using Ldraw.Options;
 
 namespace Ldraw.Ui
 {
-	public class MainWindow : Window
+	public class MainWindow : Window, IHaveModel
 	{
-		private LdrawFile m_Model;
+		private LdrawModelFile m_Model;
+		private LdrawObject EditingObject {get; set;}
+		private ComboBox m_SubModels;
 
 		// controls
 		LdrawViewPane m_View;
 		LdrawViewPane m_PartDetail;
 		ModelList m_ModelList;
-		Settings m_Settings;
+		LdrawFileLoader m_Loader;
+		IOptions m_Settings;
 
-		public MainWindow(Settings settings)
+		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null)
 		{
-			this.WithModel(settings, null);
-		}
-
-		public MainWindow.WithModel(Settings settings, LdrawFile? model)
-		{
-			m_Model = model;
+			EditingObject = model.MainObject;
 			m_Settings = settings;
+			m_Loader = loader;
 
 			maximize();
 
 			SetUpControls();
+			File = model;
 			SetUpErrorReporting();
 			SetUpAccelerators();
 		}
 
 		private void SetUpControls()
 		{
+			var toolbarProvider = new ToolBarProvider(this, m_Settings);
+
 			// start with a menubar as that runs across the whole window
 			MenuBar menus = CreateMenus();
 			VBox bigVBox = new VBox(false, 0);
 			bigVBox.pack_start(menus, false, false);
-			Toolbar tools = CreateMovementToolbar();
+			Toolbar tools = toolbarProvider.GetMovementToolbar();
 			bigVBox.pack_start(tools, false, false);
+			Toolbar colourTools = toolbarProvider.GetColoursToolbar();
+			bigVBox.pack_start(colourTools, false, false);
+			bigVBox.pack_start(toolbarProvider.GetGridToolbar(), false, false);
 
 			try
 			{
-				m_View = new LdrawEditPane.WithModel(ViewAngle.Front, m_Model, m_Settings);
+				m_View = new LdrawEditPane(ViewAngle.Front, m_Settings);
 			}
 			catch(OpenGl.GlError e)
 			{
 				stdout.printf(e.message);
 			}
 
-
 			// add a list of available parts on the left
 			try
 			{
-				m_PartDetail = new LdrawViewPane.WithModel(ViewAngle.Ortho, new LdrawModel.Empty());
+				m_PartDetail = new LdrawViewPane.WithModel(ViewAngle.Ortho, new LdrawModel.Empty().MainObject);
 			}
 			catch(OpenGl.GlError e)
 			{
 				stdout.printf(e.message);
 			}
 			m_PartDetail.set_size_request(200, 200);
-
+			m_PartDetail.DefaultColour = m_Settings.PreviewColourId;
+			m_Settings.notify["PreviewColourId"].connect(() => m_PartDetail.DefaultColour = m_Settings.PreviewColourId);
 			PartsTree tree = new PartsTree();
 			tree.DetailView = m_PartDetail;
 
@@ -72,14 +78,46 @@ namespace Ldraw.Ui
 			treePaned.add1(WithFrame(treeDetailBox));
 
 			Paned modelPanes = new VPaned();
-			m_ModelList = new ModelList(m_Model);
-			modelPanes.add1(WithFrame(m_ModelList.Widget));
+			VBox viewDetails = new VBox(false, 2);
+			m_SubModels = CreateSubModelsDropDown();
+			viewDetails.pack_start(m_SubModels, false, false);
+
+			m_ModelList = new ModelList(EditingObject);
+			viewDetails.pack_start(m_ModelList.Widget);
+
+			modelPanes.add1(WithFrame(viewDetails));
 			modelPanes.add2(WithFrame(WithScrolls(m_View)));
 
 			treePaned.add2(modelPanes);
 
 			bigVBox.pack_start(treePaned, true, true);
 			add(bigVBox);
+		}
+
+		private ComboBox CreateSubModelsDropDown()
+		{
+
+			var cb = new ComboBox();
+			var filenameRenderer = new CellRendererText();
+			cb.pack_start(filenameRenderer, true);
+			cb.set_cell_data_func(filenameRenderer, (layout, renderer, model, iter) =>
+				{
+					LdrawObject object;
+					model.get(iter, 0, out object, -1);
+					((CellRendererText)renderer).text = object.FileName;
+				});
+			cb.changed.connect(cb =>
+				{
+					var tModel = cb.get_model();
+					TreeIter tIter;
+					cb.get_active_iter(out tIter);
+					LdrawObject object;
+					tModel.get(tIter, 0, out object, -1);
+					EditingObject = object;
+					m_View.Model = object;
+					m_ModelList.Model = object;
+				});
+			return cb;
 		}
 
 		private void SetUpErrorReporting()
@@ -112,45 +150,30 @@ namespace Ldraw.Ui
 
 		private MenuBar CreateMenus()
 		{
-			MenuBar menus = new MenuBar();
+			Gtk.MenuBar menus = new MenuBar();
 
-			MenuItem fileMenuItem = new MenuItem.with_mnemonic("_File");
+			Gtk.MenuItem fileMenuItem = new Gtk.MenuItem.with_mnemonic("_File");
 			menus.append(fileMenuItem);
 
-			Menu fileMenu = new Menu();
+			Gtk.Menu fileMenu = new Gtk.Menu();
 			fileMenuItem.submenu = fileMenu;
 
-			MenuItem fileNew = new MenuItem.with_mnemonic("_New");
+			Gtk.MenuItem fileNew = new Gtk.MenuItem.with_mnemonic("_New");
 			fileMenu.append(fileNew);
-			fileNew.activate.connect(() => Model = new LdrawModel.Empty());
-			MenuItem fileLoad = new MenuItem.with_mnemonic("_Open");
+			fileNew.activate.connect(() => File = new LdrawModel.Empty());
+			Gtk.MenuItem fileLoad = new Gtk.MenuItem.with_mnemonic("_Open");
 			fileMenu.append(fileLoad);
 			fileLoad.activate.connect(FileOpen_OnActivate);
-			MenuItem fileQuit = new MenuItem.with_mnemonic("_Quit");
+
+			Gtk.MenuItem fileSave = new Gtk.MenuItem.with_mnemonic("_Save");
+			fileSave.activate.connect(FileSave_OnActivate);
+			fileMenu.append(fileSave);
+
+			Gtk.MenuItem fileQuit = new Gtk.MenuItem.with_mnemonic("_Quit");
 			fileMenu.append(fileQuit);
 			fileQuit.activate.connect(() => main_quit());
 
 			return menus;
-		}
-
-		private Toolbar CreateMovementToolbar()
-		{
-			Toolbar bar = new Toolbar();
-			ToolButton upButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/minusY.xpm"), "up");
-			ToolButton downButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/plusY.xpm"), "up");
-			ToolButton leftButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/minusX.xpm"), "up");
-			ToolButton rightButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/plusX.xpm"), "up");
-			ToolButton inButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/minusZ.xpm"), "up");
-			ToolButton outButton = new ToolButton(new Image.from_file("/home/robin/projects/ldraw_vala/icons/plusZ.xpm"), "up");
-
-			bar.insert(upButton, -1);
-			bar.insert(downButton, -1);
-			bar.insert(leftButton, -1);
-			bar.insert(rightButton, -1);
-			bar.insert(inButton, -1);
-			bar.insert(outButton, -1);
-
-			return bar;
 		}
 
 		private Widget WithFrame(Widget widget)
@@ -174,43 +197,70 @@ namespace Ldraw.Ui
 												, Stock.CANCEL, ResponseType.CANCEL
 												, Stock.OPEN, ResponseType.ACCEPT);
 
+			FileFilter filter = new FileFilter();
+			filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
+
 			string modelsFolder = "/home/robin/ldraw/MODELS";
 			dialog.set_current_folder(modelsFolder);
 
 			if(dialog.run() == ResponseType.ACCEPT)
 			{
 				string fileToOpen = dialog.get_filename();
-				if(fileToOpen.has_suffix(".mpd"))
+				try
 				{
-					// TODO: Implement MPD files
+					LdrawModelFile opened = m_Loader.LoadModelFile(fileToOpen);
+					File = opened;
 				}
-				else
+				catch(ParseError e)
 				{
-					File file = File.new_for_path(fileToOpen);
-					try
-					{
-						LdrawModel opened = new LdrawModel.FromFile(file);
-						Model = opened;
-					}
-					catch(ParseError e)
-					{
-						// TODO: print an error message
-						dialog.close();
-						return;
-					}
+					// TODO: print an error message
+					stdout.printf(e.message);
+					dialog.close();
+					return;
 				}
 			}
 			dialog.close();
 		}
 
-		private LdrawFile Model
+		private void FileSave_OnActivate()
 		{
+			if(File.FilePath != null)
+				File.Save();
+			FileSaveAs_OnActivate();
+		}
+
+		private void FileSaveAs_OnActivate()
+		{
+		}
+
+		protected LdrawModelFile File
+		{
+			public get
+			{
+				return m_Model;
+			}
 			set
 			{
 				m_Model = value;
-				m_View.Model = value;
-				m_ModelList.Model = value;
+				m_View.Model = value.MainObject;
+				m_ModelList.Model = value.MainObject;
+				if(value is MultipartModel)
+				{
+					m_SubModels.model = ((MultipartModel)value).SubModels;
+					m_SubModels.active = 0;
+					m_SubModels.visible = true;
+				}
+				else
+				{
+					m_SubModels.visible = false;
+				}
 			}
+		}
+
+		public LdrawObject Model
+		{
+			get{return m_Model.MainObject;}
+			protected set{}
 		}
 	}
 }

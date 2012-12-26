@@ -21,7 +21,11 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filename.");
 			}
-			base.FromFile(partFile);
+			base.FromFile(partFile, new LdrawParser(
+						new PartialLibrarySubFileLocator(LibraryObjectTypes.Part
+													| LibraryObjectTypes.SubPart
+													| LibraryObjectTypes.Primitive
+													| LibraryObjectTypes.HiResPrimitive)));
 
 			m_FileName = filename;
 
@@ -85,76 +89,6 @@ namespace Ldraw.Lego
 			{
 				return m_Name;
 			}
-		}
-
-		public override LdrawFile LoadPartFromReference(string reference)
-			throws ParseError
-		{
-			// in a sub-part file, the only allowed refs are sub-parts and primitives.
-			LdrawLibrary lib = LdrawLibrary.Instance;
-
-			string[] toks = reference.split_set("/\\");
-			if(toks[0] == "s")
-			{
-				string name = toks[1].substring(0, toks[1].last_index_of("."));
-				LdrawSubPart sp;
-				if(lib.TryGetSubPart(name, out sp))
-				{
-					return sp;
-				}
-				File subPartAttempt = lib.SubPartsDirectory.get_child(toks[1]);
-				if(subPartAttempt.query_exists())
-				{
-					sp = new LdrawSubPart(toks[1]);
-					lib.RegisterSubPart(sp);
-					return sp;
-				}
-				throw new ParseError.MissingFile(@"Could not locate sub-part at $reference");
-			}
-			if(toks[0] == "48")
-			{
-				string name = toks[1].substring(0, toks[1].last_index_of("."));
-				LdrawHiresPrimitive hp;
-				if(lib.TryGetHiresPrimitive(name, out hp))
-				{
-					return hp;
-				}
-
-				File hiresAttempt = lib.HiresPrimitivesDirectory.get_child(toks[1]);
-				if(hiresAttempt.query_exists())
-				{
-					hp = new LdrawHiresPrimitive(toks[1]);
-					lib.RegisterHiresPrimitive(hp);
-					return hp;
-				}
-				throw new ParseError.MissingFile(@"Could not locate primitive at $reference");
-			}
-			// no directory prefix : primitive
-			string name = toks[0].substring(0, toks[0].last_index_of("."));
-			LdrawPrimitive p;
-			if(lib.TryGetPrimitive(name, out p))
-				return p;
-
-			File primitiveAttempt = lib.PrimitivesDirectory.get_child(toks[0]);
-			if(primitiveAttempt.query_exists())
-			{
-				p = new LdrawPrimitive(toks[0]);
-				p = lib.RegisterPrimitive(p);
-				return p;
-			}
-
-			LdrawPart part;
-			if(lib.TryGetPart(name, out part))
-				return part;
-
-			File partAttempt = lib.PartsDirectory.get_child(toks[0]);
-			if(partAttempt.query_exists())
-			{
-				part = new LdrawPart(toks[0]);
-				lib.RegisterPart(part);
-				return part;
-			}
-			throw new ParseError.MissingFile(@"Could not locate primitive for $reference");
 		}
 	}
 }

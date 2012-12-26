@@ -1,3 +1,5 @@
+using Ldraw.Lego.Nodes;
+
 namespace Ldraw.Lego
 {
 	public abstract class LdrawBuilder : Object

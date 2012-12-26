@@ -1,4 +1,5 @@
 using Ldraw.Lego;
+using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 using GL;
 
@@ -37,7 +38,7 @@ namespace Ldraw.OpenGl
 			glLoadIdentity();
 
 			glOrtho(viewArea.MaxX, viewArea.MinX,
-					viewArea.MinY, viewArea.MaxY,
+					-viewArea.MinY, -viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 			m_Eyeline = lookAt(eyeline, centre, up);
 			stdout.printf(@"Setting view center at $centre\n");
@@ -62,7 +63,7 @@ namespace Ldraw.OpenGl
 			Vector a = m_Transform.TransformVector(line.A).Add(m_Center);
 			Vector b = m_Transform.TransformVector(line.B).Add(m_Center);
 
-			glBegin(GL_LINE);
+			glBegin(GL_LINES);
 
 			glVertex3f(a.X, a.Y, a.Z);
 			glVertex3f(b.X, b.Y, b.Z);
@@ -164,7 +165,7 @@ namespace Ldraw.OpenGl
 			}
 
 			SetRenderColour(line.ColourId);
-			glBegin(GL_LINE);
+			glBegin(GL_LINES);
 
 			glVertex3f(a.X, a.Y, a.Z);
 			glVertex3f(b.X, b.Y, b.Z);

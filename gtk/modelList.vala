@@ -1,19 +1,19 @@
 using Gtk;
 using Ldraw.Lego;
+using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
 	public class ModelList : GLib.Object
 	{
-		private LdrawFile m_Model;
+		private LdrawObject m_Model;
 		private TreeView m_ListView;
 		private ScrolledWindow m_Widget;
 
-		public ModelList(LdrawFile model)
+		public ModelList(LdrawObject model)
 		{
 			m_Model = model;
-			m_Model.ComponentsChanged.connect(() => UpdateList());
-			m_Model.VisibleChange.connect(Model_OnVisibleChange);
+			//m_Model.VisibleChange.connect(Model_OnVisibleChange);
 			// initialise list
 			CreateList();
 
@@ -23,68 +23,64 @@ namespace Ldraw.Ui.Widgets
 
 		private void CreateList()
 		{
-			ListStore model = new ListStore(6,
-					typeof(LdrawNode),  // the node
-					typeof(string), 	// type
-					typeof(int),		// colourId (for now)
-					typeof(string),		// geometry
-					typeof(string),		// name
-					typeof(string)		// description
-			);
-			// TODO: populate model
-			ListBuilder builder = new ListBuilder(model);
-			m_Model.BuildFromFile(builder);
+			TreeModel model = m_Model.Nodes as ObservableList;
 
 			m_ListView = new TreeView.with_model(model);
 			// TODO: set up columns
 			CellRendererText renderer = new CellRendererText();
+			/*renderer.size_points = 6.0;
+			m_ListView.insert_column_with_data_func(-1, "Type", renderer, (col, cell, model, iter) =>
+			{
+				LdrawNode node;
+				model.get(iter, 0, out node);
+				((CellRendererText)cell).text = node.Type;
+			});
+			renderer = new CellRendererText();*/
 			renderer.size_points = 6.0;
-			m_ListView.insert_column_with_attributes(-1, "Type", renderer, text: 1);
+			m_ListView.insert_column_with_data_func(-1, "Colour", renderer, (col, cell, model, iter) =>
+			{
+				LdrawNode node;
+				model.get(iter, 0, out node);
+				((CellRendererText)cell).text = node.ColourId.to_string();
+			});
 			renderer = new CellRendererText();
 			renderer.size_points = 6.0;
-			m_ListView.insert_column_with_attributes(-1, "Colour", renderer, text: 2);
+			m_ListView.insert_column_with_data_func(-1, "Geometry", renderer, (col, cell, model, iter) =>
+			{
+				LdrawNode node;
+				model.get(iter, 0, out node);
+				((CellRendererText)cell).text = node.Geometry();
+			});
 			renderer = new CellRendererText();
 			renderer.size_points = 6.0;
-			m_ListView.insert_column_with_attributes(-1, "Geometry", renderer, text: 3);
+			m_ListView.insert_column_with_data_func(-1, "Name", renderer, (col, cell, model, iter) =>
+			{
+				LdrawNode node;
+				model.get(iter, 0, out node);
+				((CellRendererText)cell).text = node.Name;
+			});
 			renderer = new CellRendererText();
 			renderer.size_points = 6.0;
-			m_ListView.insert_column_with_attributes(-1, "Name", renderer, text: 4);
-			renderer = new CellRendererText();
-			renderer.size_points = 6.0;
-			m_ListView.insert_column_with_attributes(-1, "Description", renderer, text: 5);
+			m_ListView.insert_column_with_data_func(-1, "Description", renderer, (col, cell, model, iter) =>
+			{
+				LdrawNode node;
+				model.get(iter, 0, out node);
+				((CellRendererText)cell).text = node.Description;
+			});
 
 			TreeSelection selection = m_ListView.get_selection();
 			selection.set_mode(SelectionMode.MULTIPLE);
 			selection.changed.connect_after(List_OnCursorChanged);
-			//m_ListView.cursor_changed.connect(List_OnCursorChanged);
 		}
 
-		private void UpdateList()
-		{
-			ListStore newModel = new ListStore(6,
-					typeof(LdrawNode),  // the node
-					typeof(string), 	// type
-					typeof(int),		// colourId (for now)
-					typeof(string),		// geometry
-					typeof(string),		// name
-					typeof(string)		// description
-			);
-			// TODO: populate model
-			ListBuilder builder = new ListBuilder(newModel);
-			m_Model.BuildFromFile(builder);
-
-			m_ListView.set_model(newModel);
-		}
-
-		public LdrawFile Model
+		public LdrawObject Model
 		{
 			set
 			{
 				m_Model = value;
-				UpdateList();
+				m_ListView.model = m_Model.Nodes as ObservableList;
 				m_Model.ClearSelection();
-				m_Model.ComponentsChanged.connect(() => UpdateList());
-				m_Model.VisibleChange.connect(Model_OnVisibleChange);
+				//m_Model.VisibleChange.connect(Model_OnVisibleChange);
 			}
 		}
 
@@ -95,27 +91,6 @@ namespace Ldraw.Ui.Widgets
 				return m_Widget;
 			}
 		}
-
-		private void Model_OnVisibleChange()
-		{
-			TreeModel model = m_ListView.model;
-			ListStore store = model as ListStore;
-			model.foreach((model, path, iter) =>
-							{
-								Value val;
-								model.get_value(iter, 0, out val);
-								GLib.Object valObj = val.get_object();
-								LdrawNode node = valObj as LdrawNode;
-								store.set(iter,
-									1, "",
-									2, node.ColourId,
-									3, node.Geometry(),
-									4, node.Name,
-									5, node.Description);
-								return false;
-							});
-		}
-
 
 		private void List_OnCursorChanged(TreeSelection selection)
 		{
@@ -128,29 +103,6 @@ namespace Ldraw.Ui.Widgets
 						LdrawNode node = valObj as LdrawNode;
 						node.Selected = true;
 					});
-		}
-
-		private class ListBuilder : LdrawBuilder
-		{
-			private ListStore m_Store;
-
-			public ListBuilder(ListStore store)
-			{
-				m_Store = store;
-			}
-
-			public override void BuildNode(LdrawNode node)
-			{
-				TreeIter iter;
-				m_Store.append(out iter);
-				m_Store.set(iter,
-					0, node,
-					1, "",
-					2, node.ColourId,
-					3, node.Geometry(),
-					4, node.Name,
-					5, node.Description);
-			}
 		}
 	}
 }

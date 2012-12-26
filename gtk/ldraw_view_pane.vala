@@ -8,7 +8,7 @@ namespace Ldraw.Ui.Widgets
 {
 	public class LdrawViewPane : Layout
 	{
-		private LdrawFile m_Model;
+		private LdrawObject m_Model;
 		private ViewAngle m_Angle;
 		protected float m_Scale;
 		private Vector? m_Eyeline = null;
@@ -32,9 +32,12 @@ namespace Ldraw.Ui.Widgets
 			{
 				throw new GlError.InitializationError("Unable to initialize a drawing area for OpenGL rendering.");
 			}
+
+			// create overlay rendering window
+
 		}
 
-		public LdrawViewPane.WithModel(ViewAngle angle, LdrawFile model)
+		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
 			throws GlError
 		{
 			this(angle);
@@ -45,7 +48,7 @@ namespace Ldraw.Ui.Widgets
 
 		public signal void RenderingError(string description);
 
-		public LdrawFile Model
+		public LdrawObject Model
 		{
 			protected get
 			{
@@ -67,6 +70,8 @@ namespace Ldraw.Ui.Widgets
 				}
 			}
 		}
+
+		public int DefaultColour {get; set; default = 0;}
 
 		public void Redraw()
 			throws GlError
@@ -96,7 +101,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			GlBuilder builder = new GlBuilder(width, height, 0, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
+			GlBuilder builder = new GlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
 			m_Model.BuildFromFile(builder);
 
 			builder.Flush();
@@ -220,12 +225,12 @@ namespace Ldraw.Ui.Widgets
 					break;
 				case ViewAngle.Front:
 					cameraShift = Vector(0.0f, 0.0f, modelRadius * -1.5f);
-					m_Center.Y = -modelCenter.Y;
+					m_Center.Y = modelCenter.Y;
 					m_Center.X = modelCenter.X;
 					break;
 				case ViewAngle.Back:
 					cameraShift = Vector(0.0f, 0.0f, modelRadius * 1.5f);
-					m_Center.Y = -modelCenter.Y;
+					m_Center.Y = modelCenter.Y;
 					m_Center.X = -modelCenter.X;
 					break;
 				case ViewAngle.Top:
@@ -307,3 +312,10 @@ namespace Ldraw.Ui.Widgets
 		Ortho,
 	}
 }
+
+// extra methods for gdkglext / x11
+
+/*
+public static extern void* GetXDisplayForConfig(Gdk.GLConfig config);
+public static extern int GetScreenForConfig(Gdk.GLConfig config);
+*/

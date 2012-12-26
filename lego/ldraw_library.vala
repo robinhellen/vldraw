@@ -90,13 +90,13 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public LdrawPart? GetPartByName(string name)
+		public LdrawObject? GetPartByName(string name)
 		{
 			foreach(LdrawPart part in m_Parts)
 			{
 				if(part.Name == name)
 				{
-					return part;
+					return part.MainObject;
 				}
 			}
 			return null;
