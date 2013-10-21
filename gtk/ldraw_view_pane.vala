@@ -3,6 +3,7 @@ using Gdk;
 using Ldraw.Lego;
 using Ldraw.OpenGl;
 using Ldraw.Maths;
+using GL;
 
 namespace Ldraw.Ui.Widgets
 {
@@ -102,6 +103,8 @@ namespace Ldraw.Ui.Widgets
 			}
 
 			GlBuilder builder = new GlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
+			glColor3f(0.0f, 0.0f, 0.0f);
+			builder.RenderBounds(m_Model.BoundingBox);
 			m_Model.BuildFromFile(builder);
 
 			builder.Flush();
@@ -213,50 +216,10 @@ namespace Ldraw.Ui.Widgets
 
 		private void InitializeView()
 		{
-			m_Center = Vector(0, 0, 0);
-			Vector modelCenter = m_Model.BoundingBox.Center();
 			float modelRadius = m_Model.BoundingBox.Radius;
-
-			Vector cameraShift;
-			switch(m_Angle)
-			{
-				case ViewAngle.Ortho:
-					cameraShift = Vector(modelRadius * -0.390731128f,modelRadius * -0.650895224f,modelRadius * -0.650895224f);
-					break;
-				case ViewAngle.Front:
-					cameraShift = Vector(0.0f, 0.0f, modelRadius * -1.5f);
-					m_Center.Y = modelCenter.Y;
-					m_Center.X = modelCenter.X;
-					break;
-				case ViewAngle.Back:
-					cameraShift = Vector(0.0f, 0.0f, modelRadius * 1.5f);
-					m_Center.Y = modelCenter.Y;
-					m_Center.X = -modelCenter.X;
-					break;
-				case ViewAngle.Top:
-					cameraShift = Vector(0.0f, modelRadius * -1.5f, 0.0f);
-					m_Center.Y = modelCenter.Z;
-					m_Center.X = modelCenter.X;
-					break;
-				case ViewAngle.Bottom:
-					cameraShift = Vector(0.0f, modelRadius * 1.5f, 0.0f);
-					m_Center.Y = -modelCenter.Z;
-					m_Center.X = modelCenter.X;
-					break;
-				case ViewAngle.Left:
-					cameraShift = Vector(modelRadius * -1.5f, 0.0f, 0.0f);
-					m_Center.Y = -modelCenter.Y;
-					m_Center.X = modelCenter.Z;
-					break;
-				case ViewAngle.Right:
-					cameraShift = Vector(modelRadius * 1.5f, 0.0f, 0.0f);
-					m_Center.Y = -modelCenter.Y;
-					m_Center.X = -modelCenter.Z;
-					break;
-				default:
-					cameraShift = Vector.NullVector;
-					break;
-			}
+			var modelCenter = m_Model.BoundingBox.Center();
+			Vector cameraShift = m_Angle.GetCameraDirection().Scale(modelRadius);
+			m_Center = m_Angle.GetViewCenter(modelCenter);
 
 			m_Eyeline = m_Center.Add(cameraShift);
 
@@ -265,17 +228,8 @@ namespace Ldraw.Ui.Widgets
 			int size = (alloc.height > alloc.width) ? alloc.width : alloc.height;
 			m_Scale = (2.0f * modelRadius) / size;
 			if(m_Scale < 0.0f) {m_Scale = -m_Scale;}
-			switch(m_Angle)
-			{
-				case ViewAngle.Top:
-				case ViewAngle.Bottom:
-					m_Up = Vector(0.0f, 0.0f, 1.0f);
-					break;
-				default:
-					m_Up = Vector(0.0f, 1.0f, 0.0f);
-					break;
 
-			}
+			m_Up = m_Angle.GetCameraUp();
 		}
 
 		private Bounds CalculateViewArea()
@@ -283,18 +237,7 @@ namespace Ldraw.Ui.Widgets
 			Allocation alloc;
 			get_allocation(out alloc);
 
-			float minX = m_Center.X + (alloc.width * m_Scale / 2.0f);
-			float maxX = m_Center.X - (alloc.width * m_Scale / 2.0f);
-			float minY = m_Center.Y - (alloc.height * m_Scale / 2.0f);
-			float maxY = m_Center.Y + (alloc.height * m_Scale / 2.0f);
-			Bounds box = m_Model.BoundingBox;
-			float minZ = -50.0f * (box.MaxZ - box.MinZ);
-			float maxZ = -minZ;
-
-			Bounds retval = new Bounds();
-			retval.Union(Vector(minX, minY, minZ));
-			retval.Union(Vector(maxX, maxY, maxZ));
-			return retval;
+			return m_Angle.GetViewBounds(m_Model.BoundingBox, alloc.width, alloc.height, 1);
 		}
 	}
 
@@ -309,7 +252,117 @@ namespace Ldraw.Ui.Widgets
 		Top,
 		Bottom,
 
-		Ortho,
+		Ortho;
+
+		public Vector GetCameraDirection()
+		{
+			switch(this)
+			{
+				case Front:
+					return Vector(0, 0, -1.5f);
+				case Back:
+					return Vector(0, 0, 1.5f);
+				case Right:
+					return Vector(1.5f, 0, 0);
+				case Left:
+					return Vector(-1.5f, 0, 0);
+				case Top:
+					return Vector(0, -1.5f, 0);
+				case Bottom:
+					return Vector(0, 1.5f, 0);
+				case Ortho:
+					return Vector(0.390731128f, -0.650895224f, -0.650895224f);
+				default:
+					return Vector.NullVector;
+			}
+		}
+
+		public Vector GetCameraUp()
+		{
+			switch(this)
+			{
+				case Top:
+				case Bottom:
+					return Vector(0, 0, 1);
+				default:
+					return Vector(0,- 1, 0);
+			}
+		}
+
+		public Vector GetViewCenter(Vector modelCenter)
+		{
+			switch(this)
+			{
+				case Front:
+				case Back:
+					return Vector(modelCenter.X, modelCenter.Y, 0);
+				case Top:
+				case Bottom:
+					return Vector(modelCenter.X, modelCenter.Z, 0);
+				case Left:
+				case Right:
+					return Vector(modelCenter.Z, modelCenter.Y, 0);
+				case Ortho:
+				default:
+					return Vector(0, 0, 0);
+			}
+		}
+
+		public Bounds GetViewBounds(Bounds modelBounds, int viewWidth, int viewHeight, int zoomLevel)
+		{
+			float viewRatio = (float)viewWidth / viewHeight;
+			var scaleFactor = 1.1 * Math.pow(2, ((float)zoomLevel / 4));
+
+			Bounds b = new Bounds();
+			switch(this)
+			{
+				case Front:
+				case Back:
+					b.Union(Vector(modelBounds.MaxX, modelBounds.MaxY, 0));
+					b.Union(Vector(modelBounds.MinX, modelBounds.MinY, 0));
+					break;
+				case Left:
+				case Right:
+					b.Union(Vector(modelBounds.MaxZ, modelBounds.MaxY, 0));
+					b.Union(Vector(modelBounds.MinZ, modelBounds.MinY, 0));
+					break;
+				case Top:
+				case Bottom:
+					b.Union(Vector(modelBounds.MaxX, modelBounds.MaxZ, 0));
+					b.Union(Vector(modelBounds.MinX, modelBounds.MinZ, 0));
+					break;
+				case Ortho:
+				default:
+					b.IncludeBounds(b, Matrix.Identity, Vector.NullVector);
+					break;
+			}
+
+			stderr.printf(@"Bounds currently: $b\n");
+
+			var modelRatio = (b.MaxX - b.MinX) / (b.MaxY - b.MinY);
+			var viewCenter = b.Center();
+			if(modelRatio > viewRatio)
+			{
+				b.Union(Vector(0, (float)((b.MaxY - viewCenter.Y) * (modelRatio / viewRatio) + viewCenter.Y), 0));
+				b.Union(Vector(0, (float)((b.MinY - viewCenter.Y) * (modelRatio / viewRatio) + viewCenter.Y), 0));
+			}
+			else
+			{
+				b.Union(Vector((float)((b.MaxX - viewCenter.X) * (viewRatio / modelRatio) + viewCenter.X), 0, 0));
+				b.Union(Vector((float)((b.MinX - viewCenter.X) * (viewRatio / modelRatio) + viewCenter.X), 0, 0));
+			}
+			stderr.printf(@"Bounds currently: $b\n");
+
+			b = b.Scale((float)scaleFactor);
+			stderr.printf(@"Bounds currently: $b\n");
+
+			var radius = modelBounds.Radius;
+			var modelCenterZ = modelBounds.Center().Z;
+			b.Union(Vector(0, 0, modelCenterZ + radius * 100));
+			b.Union(Vector(0, 0, modelCenterZ - radius * 100));
+			stderr.printf(@"view bounds: $b\n");
+			return b;
+		}
 	}
 }
 

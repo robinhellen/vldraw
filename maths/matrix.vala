@@ -13,6 +13,12 @@ namespace Ldraw.Maths
 
 		public Matrix.ForRotation(Vector axis, float angle)
 		{
+			if(axis.Magnitude == 0)
+			{
+				m_Values = NullMatrix.m_Values;
+				return;
+			}
+			axis = axis.Normalized();
 			angle = (float)(angle * (2 * PI / 360));
 			m_Values = {
 				{cosf(angle) + axis.X * axis.X * (1 - cosf(angle))		,axis.X*axis.Y*(1 - cosf(angle)) - axis.Z*sinf(angle)	,axis.X*axis.Z*(1 - cosf(angle)) + axis.Y*sinf(angle)},
@@ -108,6 +114,11 @@ namespace Ldraw.Maths
 		public float get(int row, int col)
 		{
 			return m_Values[row, col];
+		}
+
+		public string to_string()
+		{
+			return @"($(m_Values[0,0]),\t$(m_Values[0,1]),\t$(m_Values[0,2]))\n($(m_Values[1,0]),\t$(m_Values[1,1]),\t$(m_Values[1,2]))\n($(m_Values[2,0]),\t$(m_Values[2,1]),\t$(m_Values[2,2]))";
 		}
 	}
 }

@@ -38,7 +38,7 @@ namespace Ldraw.OpenGl
 			glLoadIdentity();
 
 			glOrtho(viewArea.MaxX, viewArea.MinX,
-					-viewArea.MinY, -viewArea.MaxY,
+					viewArea.MinY, viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 			m_Eyeline = lookAt(eyeline, centre, up);
 			stdout.printf(@"Setting view center at $centre\n");
@@ -206,7 +206,6 @@ namespace Ldraw.OpenGl
 									   0  , 0  , 0   , 1};
 
 			glMultMatrixf(viewTransform);
-			glTranslatef(-eye.X, -eye.Y, -eye.Z);
 
 			return center.Subtract(eye);
 		}

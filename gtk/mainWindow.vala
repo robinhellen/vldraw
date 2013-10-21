@@ -173,6 +173,16 @@ namespace Ldraw.Ui
 			fileMenu.append(fileQuit);
 			fileQuit.activate.connect(() => main_quit());
 
+			var viewMenuItem = new Gtk.MenuItem.with_mnemonic("_View");
+			menus.append(viewMenuItem);
+
+			var viewMenu = new Gtk.Menu();
+			viewMenuItem.submenu = viewMenu;
+
+			var viewTree = new Gtk.MenuItem.with_mnemonic("_Tree");
+			viewMenu.append(viewTree);
+			viewMenuItem.activate.connect(() => new ModelTree(Model).show_all());
+
 			return menus;
 		}
 
