@@ -24,7 +24,7 @@ SOURCES=$(wildcard *.vala) $(ENGINE_SOURCES) $(OPENGL_SOURCES) \
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
 
 VALA_PACKAGES = --pkg gtk+-2.0 --pkg gee-0.8 --pkg gl --pkg gtkglext-1.0 --pkg gdkglext-1.0 --pkg gio-2.0
-VALA_OPTS= -g --vapidir=vapi $(VALA_PACKAGES)
+VALA_OPTS= -g --vapidir=vapi $(VALA_PACKAGES) -X -w
 EXECUTABLE_NAME = ldraw
 TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 
