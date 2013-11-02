@@ -54,6 +54,7 @@ namespace Ldraw.Lego
 			if(m_Description == null)
 			{
 				m_Description = line.substring(2);
+				MainObject.Description = m_Description;
 				return true;
 			}
 

@@ -25,16 +25,13 @@ namespace Ldraw.Lego
 
 			public NodeGenerator(File file, LdrawParser parser)
 			{
-				stdout.printf("constructing node generator.\n");
 				m_File = file;
 				m_Parser = parser;
 				helper();
-				stdout.printf("constructed node generator.\n");
 			}
 
 			protected override async void generate()
 			{
-				stdout.printf("generate called.\n");
 				try
 				{
 					DataInputStream inStream = new DataInputStream(m_File.read());

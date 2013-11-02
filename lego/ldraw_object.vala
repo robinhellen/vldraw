@@ -10,15 +10,17 @@ namespace Ldraw.Lego
 		private Bounds m_BoundingBox;
 		private bool m_ChangingSelection;
 
-		public LdrawObject()
+		public LdrawObject(string description)
 		{
 			var nodeList = new LinkedList<LdrawNode>();
-			Object(Nodes: nodeList);
+			Object(Nodes: nodeList, Description: description);
 		}
 
 		public Gee.List<LdrawNode> Nodes {get; protected construct set;}
 
 		public string FileName {get; set;}
+
+		public string Description {get; public construct set;}
 
 		public Bounds BoundingBox
 		{
