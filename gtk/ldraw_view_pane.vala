@@ -115,7 +115,6 @@ namespace Ldraw.Ui.Widgets
 			try
 			{
 				Redraw();
-				stdout.printf("redraw finished.\n");
 			}
 			catch (GlError e)
 			{
@@ -145,10 +144,6 @@ namespace Ldraw.Ui.Widgets
 			catch (GlError e)
 			{
 				RenderingError(@"OpenGL error during window redraw: \n $(e.message).");
-			}
-			if(has_focus)
-			{
-				stdout.printf("view pane has focus.\n");
 			}
 			return false;
 		}
