@@ -59,12 +59,12 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -m_Settings.CurrentGrid.Z));
+				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, m_Settings.CurrentGrid.Z));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, m_Settings.CurrentGrid.Z));
+				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -m_Settings.CurrentGrid.Z));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
@@ -92,14 +92,12 @@ namespace Ldraw.Ui.Widgets
 
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
 		{
-			stdout.printf("model view drop.\n");
 			drag_finish(context, true, false, time_);
 			return true;
 		}
 
 		public override bool drag_motion(DragContext context, int x, int y, uint time_)
 		{
-			stdout.printf("model view motion.\n");
 			return true;
 		}
 
@@ -107,7 +105,6 @@ namespace Ldraw.Ui.Widgets
 												 SelectionData selection_data, uint info,
 												 uint time)
 		{
-			stdout.printf("model view data recieved:\n");
 			string partName = (string)selection_data.data;
 			LdrawPart part;
 			if(!LdrawLibrary.Instance.TryGetPart(partName, out part))

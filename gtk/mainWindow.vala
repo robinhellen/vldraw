@@ -40,11 +40,15 @@ namespace Ldraw.Ui
 			MenuBar menus = CreateMenus();
 			VBox bigVBox = new VBox(false, 0);
 			bigVBox.pack_start(menus, false, false);
+
+			HBox toolbars = new HBox(false, 0);
+
+			toolbars.pack_start(toolbarProvider.GetGridToolbar(), false, false);
 			Toolbar tools = toolbarProvider.GetMovementToolbar();
-			bigVBox.pack_start(tools, false, false);
+			toolbars.pack_start(tools, false, false);
 			Toolbar colourTools = toolbarProvider.GetColoursToolbar();
 			bigVBox.pack_start(colourTools, false, false);
-			bigVBox.pack_start(toolbarProvider.GetGridToolbar(), false, false);
+			bigVBox.pack_start(toolbars, false, false);
 
 			try
 			{

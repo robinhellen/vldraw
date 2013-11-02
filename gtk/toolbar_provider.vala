@@ -20,6 +20,7 @@ namespace Ldraw.Ui
 		public Toolbar GetMovementToolbar()
 		{
 			Toolbar bar = new Toolbar();
+			bar.insert(new SeparatorToolItem(), -1);
 			bar.insert(CreateTranslateButton(Axis.X, true), -1);
 			bar.insert(CreateTranslateButton(Axis.X, false), -1);
 			bar.insert(CreateTranslateButton(Axis.Y, true), -1);
@@ -39,6 +40,7 @@ namespace Ldraw.Ui
 		public Toolbar GetColoursToolbar()
 		{
 			Toolbar bar = new Toolbar();
+			bar.insert(new SeparatorToolItem(), -1);
 			for(int i = 0; i < 16; i++)
 			{
 				bar.insert(CreateColourButton(i), -1);
@@ -49,6 +51,7 @@ namespace Ldraw.Ui
 		public Toolbar GetGridToolbar()
 		{
 			Toolbar bar = new Toolbar();
+			bar.insert(new SeparatorToolItem(), -1);
 			bar.insert(CreateGridButton(GridSize.Large, "gridLarge"), -1);
 			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium"), -1);
 			bar.insert(CreateGridButton(GridSize.Small, "gridSmall"), -1);
@@ -101,7 +104,11 @@ namespace Ldraw.Ui
 
 			button.clicked.connect(() =>
 				{
-					Vector displacement = Vector(axis == Axis.X ? m_Options.CurrentGrid.X : 0.0f, axis == Axis.Y ? m_Options.CurrentGrid.Y : 0.0f, axis == Axis.Z ? m_Options.CurrentGrid.Z : 0.0f);
+					Vector displacement = Vector(
+												axis == Axis.X ? m_Options.CurrentGrid.X : 0.0f,
+												axis == Axis.Y ? m_Options.CurrentGrid.Y : 0.0f,
+												axis == Axis.Z ? m_Options.CurrentGrid.Z : 0.0f
+											);
 
 					if(!positive)
 						displacement = displacement.Scale(-1.0f);

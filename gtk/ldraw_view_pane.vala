@@ -103,8 +103,6 @@ namespace Ldraw.Ui.Widgets
 			}
 
 			GlBuilder builder = new GlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
-			glColor3f(0.0f, 0.0f, 0.0f);
-			builder.RenderBounds(m_Model.BoundingBox);
 			m_Model.BuildFromFile(builder);
 
 			builder.Flush();
@@ -161,16 +159,16 @@ namespace Ldraw.Ui.Widgets
 			m_Hadj.value_changed.connect(adj =>
 					{
 						float dx = (float)adj.value - m_Center.X;
-						m_Center.X += dx;
-						m_Eyeline.X += dx;
+						m_Center.X = (m_Center.X + dx);
+						m_Eyeline.X = (m_Eyeline.X + dx);
 						RedrawWithError();
 					});
 			m_Vadj = vadj;
 			m_Vadj.value_changed.connect(adj =>
 					{
 						float dy = (float)adj.value - m_Center.Y;
-						m_Center.Y += dy;
-						m_Eyeline.Y += dy;
+						m_Center.Y = (m_Center.Y + dy);
+						m_Eyeline.Y = (m_Eyeline.Y + dy);
 						RedrawWithError();
 					});
 
@@ -285,7 +283,7 @@ namespace Ldraw.Ui.Widgets
 				case Bottom:
 					return Vector(0, 0, 1);
 				default:
-					return Vector(0,- 1, 0);
+					return Vector(0, -1, 0);
 			}
 		}
 
@@ -318,13 +316,13 @@ namespace Ldraw.Ui.Widgets
 			{
 				case Front:
 				case Back:
-					b.Union(Vector(modelBounds.MaxX, modelBounds.MaxY, 0));
-					b.Union(Vector(modelBounds.MinX, modelBounds.MinY, 0));
+					b.Union(Vector(modelBounds.MaxX, -modelBounds.MaxY, 0));
+					b.Union(Vector(modelBounds.MinX, -modelBounds.MinY, 0));
 					break;
 				case Left:
 				case Right:
-					b.Union(Vector(modelBounds.MaxZ, modelBounds.MaxY, 0));
-					b.Union(Vector(modelBounds.MinZ, modelBounds.MinY, 0));
+					b.Union(Vector(modelBounds.MaxZ, -modelBounds.MaxY, 0));
+					b.Union(Vector(modelBounds.MinZ, -modelBounds.MinY, 0));
 					break;
 				case Top:
 				case Bottom:
@@ -333,11 +331,9 @@ namespace Ldraw.Ui.Widgets
 					break;
 				case Ortho:
 				default:
-					b.IncludeBounds(b, Matrix.Identity, Vector.NullVector);
+					b.IncludeBounds(modelBounds, Matrix(1, 0, 0, 0, -1, 0, 0, 0, 1), Vector.NullVector);
 					break;
 			}
-
-			stderr.printf(@"Bounds currently: $b\n");
 
 			var modelRatio = (b.MaxX - b.MinX) / (b.MaxY - b.MinY);
 			var viewCenter = b.Center();
@@ -351,16 +347,13 @@ namespace Ldraw.Ui.Widgets
 				b.Union(Vector((float)((b.MaxX - viewCenter.X) * (viewRatio / modelRatio) + viewCenter.X), 0, 0));
 				b.Union(Vector((float)((b.MinX - viewCenter.X) * (viewRatio / modelRatio) + viewCenter.X), 0, 0));
 			}
-			stderr.printf(@"Bounds currently: $b\n");
 
 			b = b.Scale((float)scaleFactor);
-			stderr.printf(@"Bounds currently: $b\n");
 
 			var radius = modelBounds.Radius;
 			var modelCenterZ = modelBounds.Center().Z;
 			b.Union(Vector(0, 0, modelCenterZ + radius * 100));
 			b.Union(Vector(0, 0, modelCenterZ - radius * 100));
-			stderr.printf(@"view bounds: $b\n");
 			return b;
 		}
 	}
