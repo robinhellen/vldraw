@@ -41,8 +41,7 @@ namespace Ldraw.OpenGl
 					viewArea.MinY, viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 			m_Eyeline = lookAt(eyeline, centre, up);
-			stdout.printf(@"Setting view center at $centre\n");
-			//stdout.printf(@"Setting up view for ($(viewArea.MaxX), $(viewArea.MinX), $(-viewArea.MinY), $(-viewArea.MaxY), $(viewArea.MinZ), $(viewArea.MaxZ)\n");
+
 			glMatrixMode(GL_MODELVIEW);
 			//glScalef(1.0f, 1.0f, -1.0f);
 			glLoadIdentity();

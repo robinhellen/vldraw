@@ -29,7 +29,6 @@ namespace Ldraw.Options
 		{
 			get
 			{
-				stderr.printf(@"Asked for grid spacing. Currently: $Grid");
 				switch(Grid)
 				{
 					case GridSize.Small:
