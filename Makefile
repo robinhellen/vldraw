@@ -7,7 +7,7 @@ TEST_SOURCES= $(TEST_FRAMEWORK_SOURCES) $(TEST_MATHS_SOURCES)
 UTILS_SOURCES=		$(wildcard utils/*.vala)
 OPENGL_SOURCES=		$(wildcard openGl/*.vala)
 POVRAY_SOURCES=		$(wildcard povray/*.vala)
-MATHS_SOURCES=		$(wildcard maths/*.vala)
+MATHS_SOURCES=		$(wildcard maths/*.c)
 LEGO_PARTS_SOURCES=	$(wildcard lego/partsLib/*.vala)
 LEGO_NODES_SOURCES=	$(wildcard lego/nodes/*.vala)
 LEGO_SOURCES=		$(wildcard lego/*.vala) $(LEGO_PARTS_SOURCES) $(LEGO_NODES_SOURCES)
@@ -23,8 +23,8 @@ SOURCES=$(wildcard *.vala) $(ENGINE_SOURCES) $(OPENGL_SOURCES) \
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
 
-VALA_PACKAGES = --pkg gtk+-2.0 --pkg gee-0.8 --pkg gl --pkg gtkglext-1.0 --pkg gdkglext-1.0 --pkg gio-2.0
-VALA_OPTS= -g --vapidir=vapi $(VALA_PACKAGES) -X -w
+VALA_PACKAGES = --pkg gtk+-2.0 --pkg gee-0.8 --pkg gl --pkg gtkglext-1.0 --pkg gdkglext-1.0 --pkg gio-2.0 --pkg geometry
+VALA_OPTS= -g --vapidir=vapi $(VALA_PACKAGES) -X -w -X -Ivapi
 EXECUTABLE_NAME = ldraw
 TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 
@@ -41,4 +41,4 @@ clean:
 	rm $(EXECUTABLE_NAME)
 
 tempclean:
-	rm -f $(patsubst %.vala,%.c,$(SOURCES) $(TEST_SOURCES)) $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))
+	rm -f $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))
