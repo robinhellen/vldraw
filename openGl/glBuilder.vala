@@ -16,6 +16,8 @@ namespace Ldraw.OpenGl
 
 		private int m_RecursionDepth = 0;
 
+		private Timer timer;
+
 		public GlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
 					, Vector eyeline, Vector centre, Vector up)
 			requires(defaultColour != 24 && defaultColour != 16) // default colour must be an actual colour
@@ -23,6 +25,8 @@ namespace Ldraw.OpenGl
 			m_CurrentColour = defaultColour;
 			m_Transform = Matrix.Identity;
 			m_Center = Vector.NullVector;
+
+			timer = new Timer();
 
 			// Set up the current openGl area for drawing
 			// Clear the colour and alpha
@@ -53,6 +57,7 @@ namespace Ldraw.OpenGl
 		public void Flush()
 		{
 			glFlush();
+			stderr.printf(@"Finished rendering in $(timer.elapsed()) seconds.\n");
 		}
 
 		public override void BuildLine(LineNode line)

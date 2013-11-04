@@ -37,6 +37,7 @@ namespace Ldraw.Lego
 		protected Bounds CalculateBounds()
 		{
 			Bounds bounds = new Bounds();
+			var timer = new Timer();
 			foreach(LdrawNode node in Nodes)
 			{
 				if(node is PartNode)
@@ -68,6 +69,7 @@ namespace Ldraw.Lego
 					bounds.Union(((CondLineNode)node).B);
 				}
 			}
+			stderr.printf(@"Finished calculating bounds in $(timer.elapsed()) seconds.\n");
 			return bounds;
 		}
 
