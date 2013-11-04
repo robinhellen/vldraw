@@ -154,16 +154,17 @@ namespace Ldraw.Ui.Widgets
 			m_Hadj.value_changed.connect(adj =>
 					{
 						float dx = (float)adj.value - m_Center.X;
-						m_Center.X = (m_Center.X + dx);
-						m_Eyeline.X = (m_Eyeline.X + dx);
+						m_Center = m_Center.Add(Vector(dx, 0, 0));
+						m_Eyeline = m_Eyeline.Add(Vector(dx, 0, 0));
 						RedrawWithError();
 					});
 			m_Vadj = vadj;
 			m_Vadj.value_changed.connect(adj =>
 					{
 						float dy = (float)adj.value - m_Center.Y;
-						m_Center.Y = (m_Center.Y + dy);
-						m_Eyeline.Y = (m_Eyeline.Y + dy);
+
+						m_Center = m_Center.Add(Vector(0, dy, 0));
+						m_Eyeline = m_Eyeline.Add(Vector(0, dy, 0));
 						RedrawWithError();
 					});
 

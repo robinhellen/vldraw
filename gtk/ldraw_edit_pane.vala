@@ -143,30 +143,46 @@ namespace Ldraw.Ui.Widgets
 			switch(Angle)
 			{
 				case ViewAngle.Ortho:
+					newPosition = Vector.NullVector;
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
-					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X);
-					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
+					newPosition = Vector(
+						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X),
+						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
+						0);
 					break;
 				case ViewAngle.Back:
-					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X);
-					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
+					newPosition = Vector(
+						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X),
+						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
+						0);
 					break;
 				case ViewAngle.Left:
-					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z - deltaX) / m_Settings.CurrentGrid.Z);
-					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
+					newPosition = Vector(
+						0,
+						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
+						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z - deltaX) / m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Right:
-					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaX) / m_Settings.CurrentGrid.Z);
-					newPosition.Y = m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y);
+					newPosition = Vector(
+						0,
+						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
+						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaX) / m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Top:
-					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X);
-					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z);
+					newPosition = Vector(
+						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X),
+						0,
+						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Bottom:
-					newPosition.X = m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X);
-					newPosition.Z = m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z);
+					newPosition = Vector(
+						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X),
+						0,
+						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z));
+					break;
+				default:
+					newPosition = Vector.NullVector;
 					break;
 			}
 

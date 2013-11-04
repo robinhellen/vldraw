@@ -28,32 +28,8 @@ namespace Ldraw.Maths
 			}
 			else
 			{
-				if(m_Min.X > v.X)
-				{
-					m_Min.X = v.X;
-				}
-				else if(m_Max.X < v.X)
-				{
-					m_Max.X = v.X;
-				}
-
-				if(m_Min.Y > v.Y)
-				{
-					m_Min.Y = v.Y;
-				}
-				else if(m_Max.Y < v.Y)
-				{
-					m_Max.Y = v.Y;
-				}
-
-				if(m_Min.Z > v.Z)
-				{
-					m_Min.Z = v.Z;
-				}
-				else if(m_Max.Z < v.Z)
-				{
-					m_Max.Z = v.Z;
-				}
+				m_Min = Vector.Min(m_Min, v);
+				m_Max = Vector.Max(m_Max, v);
 			}
 		}
 

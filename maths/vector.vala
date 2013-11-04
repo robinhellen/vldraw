@@ -1,3 +1,5 @@
+using GLib.Math;
+
 namespace Ldraw.Maths
 {
 	public struct Vector
@@ -23,9 +25,19 @@ namespace Ldraw.Maths
 			m_Values = {x, y, z};
 		}
 
-		public float X {get {return m_Values[0];} set {m_Values[0] = value;}}
-		public float Y {get {return m_Values[1];} set {m_Values[1] = value;}}
-		public float Z {get {return m_Values[2];} set {m_Values[2] = value;}}
+		public Vector.Min(Vector a, Vector b)
+		{
+			m_Values = {fminf(a.X, b.X), fminf(a.Y, b.Y), fminf(a.Z, b.Z)};
+		}
+
+		public Vector.Max(Vector a, Vector b)
+		{
+			m_Values = {fmaxf(a.X, b.X), fmaxf(a.Y, b.Y), fmaxf(a.Z, b.Z)};
+		}
+
+		public float X {get {return m_Values[0];}}
+		public float Y {get {return m_Values[1];}}
+		public float Z {get {return m_Values[2];}}
 
 		public Vector Add(Vector v)
 		{
