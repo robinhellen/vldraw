@@ -18,15 +18,18 @@ typedef struct _LdrawMathsVector LdrawMathsVector;
 #define _g_free0(var) (var = (g_free (var), NULL))
 #define _ldraw_maths_matrix_free0(var) ((var == NULL) ? NULL : (var = (ldraw_maths_matrix_free (var), NULL)))
 
+typedef float v4sf __attribute__ ((vector_size(16), aligned(16)));
+
 struct _LdrawMathsMatrix {
-	gfloat* m_Values;
-	gint m_Values_length1;
-	gint m_Values_length2;
-};
+	v4sf row0;
+	v4sf row1;
+	v4sf row2;
+} __attribute__((aligned(16)));
 
 struct _LdrawMathsVector {
-	gfloat m_Values[3];
-};
+	v4sf values;
+} __attribute__((aligned(16)));
+
 
 
 extern LdrawMathsMatrix* ldraw_maths_matrix_s_NullMatrix;
@@ -63,46 +66,19 @@ gfloat ldraw_maths_matrix_get_Determinant (LdrawMathsMatrix* self);
 static gfloat* _vala_array_dup2 (gfloat* self, int length);
 
 
-void ldraw_maths_matrix_init (LdrawMathsMatrix *self, gfloat a, gfloat b, gfloat c, gfloat d, gfloat e, gfloat f, gfloat g, gfloat h, gfloat i) {
-	gfloat _tmp0_;
-	gfloat _tmp1_;
-	gfloat _tmp2_;
-	gfloat _tmp3_;
-	gfloat _tmp4_;
-	gfloat _tmp5_;
-	gfloat _tmp6_;
-	gfloat _tmp7_;
-	gfloat _tmp8_;
-	gfloat* _tmp9_ = NULL;
+void ldraw_maths_matrix_init (LdrawMathsMatrix *self,
+									gfloat a, gfloat b, gfloat c,
+									gfloat d, gfloat e, gfloat f,
+									gfloat g, gfloat h, gfloat i
+							 ) {
+
 	memset (self, 0, sizeof (LdrawMathsMatrix));
-	_tmp0_ = a;
-	_tmp1_ = b;
-	_tmp2_ = c;
-	_tmp3_ = d;
-	_tmp4_ = e;
-	_tmp5_ = f;
-	_tmp6_ = g;
-	_tmp7_ = h;
-	_tmp8_ = i;
-	_tmp9_ = g_new0 (gfloat, 3 * 3);
-	_tmp9_[0] = _tmp0_;
-	_tmp9_[1] = _tmp1_;
-	_tmp9_[2] = _tmp2_;
-	_tmp9_[3] = _tmp3_;
-	_tmp9_[4] = _tmp4_;
-	_tmp9_[5] = _tmp5_;
-	_tmp9_[6] = _tmp6_;
-	_tmp9_[7] = _tmp7_;
-	_tmp9_[8] = _tmp8_;
-	(*self).m_Values = (g_free ((*self).m_Values), NULL);
-	(*self).m_Values = _tmp9_;
-	(*self).m_Values_length1 = 3;
-	(*self).m_Values_length2 = 3;
-}
-
-
-static gfloat* _vala_array_dup1 (gfloat* self, int length) {
-	return g_memdup (self, length * sizeof (gfloat));
+	v4sf row0 = {a, b, c, 0.0F};
+	v4sf row1 = {d, e, f, 0.0F};
+	v4sf row2 = {g, h, i, 0.0F};
+	self->row0 = row0;
+	self->row1 = row1;
+	self->row2 = row2;
 }
 
 
@@ -220,7 +196,6 @@ void ldraw_maths_matrix_init_ForRotation (LdrawMathsMatrix *self, LdrawMathsVect
 	gfloat _tmp114_;
 	gfloat _tmp115_;
 	gfloat _tmp116_ = 0.0F;
-	gfloat* _tmp117_ = NULL;
 	g_return_if_fail (axis != NULL);
 	memset (self, 0, sizeof (LdrawMathsMatrix));
 	_tmp0_ = *axis;
@@ -228,25 +203,12 @@ void ldraw_maths_matrix_init_ForRotation (LdrawMathsMatrix *self, LdrawMathsVect
 	_tmp2_ = _tmp1_;
 	if (_tmp2_ == ((gfloat) 0)) {
 		LdrawMathsMatrix _tmp3_;
-		LdrawMathsMatrix _tmp4_;
-		gfloat* _tmp5_;
-		gint _tmp5__length1;
-		gint _tmp5__length2;
-		gfloat* _tmp6_;
-		gint _tmp6__length1;
-		gint _tmp6__length2;
 		ldraw_maths_matrix_get_NullMatrix (&_tmp3_);
-		_tmp4_ = _tmp3_;
-		_tmp5_ = _tmp4_.m_Values;
-		_tmp5__length1 = _tmp4_.m_Values_length1;
-		_tmp5__length2 = _tmp4_.m_Values_length2;
-		_tmp6_ = (_tmp5_ != NULL) ? _vala_array_dup1 (_tmp5_, _tmp5__length1 * _tmp5__length2) : ((gpointer) _tmp5_);
-		_tmp6__length1 = _tmp5__length1;
-		_tmp6__length2 = _tmp5__length2;
-		(*self).m_Values = (g_free ((*self).m_Values), NULL);
-		(*self).m_Values = _tmp6_;
-		(*self).m_Values_length1 = _tmp6__length1;
-		(*self).m_Values_length2 = _tmp6__length2;
+
+		self->row0 = _tmp3_.row0;
+		self->row1 = _tmp3_.row1;
+		self->row2 = _tmp3_.row2;
+
 		return self;
 	}
 	ldraw_maths_vector_Normalized (axis, &_tmp7_);
@@ -361,1052 +323,189 @@ void ldraw_maths_matrix_init_ForRotation (LdrawMathsMatrix *self, LdrawMathsVect
 	_tmp114_ = _tmp113_;
 	_tmp115_ = angle;
 	_tmp116_ = cosf (_tmp115_);
-	_tmp117_ = g_new0 (gfloat, 3 * 3);
-	_tmp117_[0] = _tmp10_ + ((_tmp13_ * _tmp16_) * (1 - _tmp18_));
-	_tmp117_[1] = ((_tmp21_ * _tmp24_) * (1 - _tmp26_)) - (_tmp29_ * _tmp31_);
-	_tmp117_[2] = ((_tmp34_ * _tmp37_) * (1 - _tmp39_)) + (_tmp42_ * _tmp44_);
-	_tmp117_[3] = ((_tmp47_ * _tmp50_) * (1 - _tmp52_)) + (_tmp55_ * _tmp57_);
-	_tmp117_[4] = _tmp59_ + ((_tmp62_ * _tmp65_) * (1 - _tmp67_));
-	_tmp117_[5] = ((_tmp70_ * _tmp73_) * (1 - _tmp75_)) - (_tmp78_ * _tmp80_);
-	_tmp117_[6] = ((_tmp83_ * _tmp86_) * (1 - _tmp88_)) - (_tmp91_ * _tmp93_);
-	_tmp117_[7] = ((_tmp96_ * _tmp99_) * (1 - _tmp101_)) + (_tmp104_ * _tmp106_);
-	_tmp117_[8] = _tmp108_ + ((_tmp111_ * _tmp114_) * (1 - _tmp116_));
-	(*self).m_Values = (g_free ((*self).m_Values), NULL);
-	(*self).m_Values = _tmp117_;
-	(*self).m_Values_length1 = 3;
-	(*self).m_Values_length2 = 3;
+
+	v4sf row0 = {
+					_tmp10_ + ((_tmp13_ * _tmp16_) * (1 - _tmp18_)),
+					((_tmp21_ * _tmp24_) * (1 - _tmp26_)) - (_tmp29_ * _tmp31_),
+					((_tmp34_ * _tmp37_) * (1 - _tmp39_)) + (_tmp42_ * _tmp44_),
+					0
+				};
+
+	v4sf row1 = {
+					((_tmp47_ * _tmp50_) * (1 - _tmp52_)) + (_tmp55_ * _tmp57_),
+					_tmp59_ + ((_tmp62_ * _tmp65_) * (1 - _tmp67_)),
+					((_tmp70_ * _tmp73_) * (1 - _tmp75_)) - (_tmp78_ * _tmp80_),
+					0
+				};
+
+	v4sf row2 = {
+					((_tmp83_ * _tmp86_) * (1 - _tmp88_)) - (_tmp91_ * _tmp93_),
+					((_tmp96_ * _tmp99_) * (1 - _tmp101_)) + (_tmp104_ * _tmp106_),
+					_tmp108_ + ((_tmp111_ * _tmp114_) * (1 - _tmp116_)),
+					0
+				};
+
+	self->row0 = row0;
+	self->row1 = row1;
+	self->row2 = row2;
 }
 
 
 void ldraw_maths_matrix_TransformMatrix (LdrawMathsMatrix *self, LdrawMathsMatrix* m, LdrawMathsMatrix* result) {
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat _tmp1_;
-	LdrawMathsMatrix _tmp2_;
-	gfloat* _tmp3_;
-	gint _tmp3__length1;
-	gint _tmp3__length2;
-	gfloat _tmp4_;
-	gfloat* _tmp5_;
-	gint _tmp5__length1;
-	gint _tmp5__length2;
-	gfloat _tmp6_;
-	LdrawMathsMatrix _tmp7_;
-	gfloat* _tmp8_;
-	gint _tmp8__length1;
-	gint _tmp8__length2;
-	gfloat _tmp9_;
-	gfloat* _tmp10_;
-	gint _tmp10__length1;
-	gint _tmp10__length2;
-	gfloat _tmp11_;
-	LdrawMathsMatrix _tmp12_;
-	gfloat* _tmp13_;
-	gint _tmp13__length1;
-	gint _tmp13__length2;
-	gfloat _tmp14_;
-	gfloat* _tmp15_;
-	gint _tmp15__length1;
-	gint _tmp15__length2;
-	gfloat _tmp16_;
-	LdrawMathsMatrix _tmp17_;
-	gfloat* _tmp18_;
-	gint _tmp18__length1;
-	gint _tmp18__length2;
-	gfloat _tmp19_;
-	gfloat* _tmp20_;
-	gint _tmp20__length1;
-	gint _tmp20__length2;
-	gfloat _tmp21_;
-	LdrawMathsMatrix _tmp22_;
-	gfloat* _tmp23_;
-	gint _tmp23__length1;
-	gint _tmp23__length2;
-	gfloat _tmp24_;
-	gfloat* _tmp25_;
-	gint _tmp25__length1;
-	gint _tmp25__length2;
-	gfloat _tmp26_;
-	LdrawMathsMatrix _tmp27_;
-	gfloat* _tmp28_;
-	gint _tmp28__length1;
-	gint _tmp28__length2;
-	gfloat _tmp29_;
-	gfloat* _tmp30_;
-	gint _tmp30__length1;
-	gint _tmp30__length2;
-	gfloat _tmp31_;
-	LdrawMathsMatrix _tmp32_;
-	gfloat* _tmp33_;
-	gint _tmp33__length1;
-	gint _tmp33__length2;
-	gfloat _tmp34_;
-	gfloat* _tmp35_;
-	gint _tmp35__length1;
-	gint _tmp35__length2;
-	gfloat _tmp36_;
-	LdrawMathsMatrix _tmp37_;
-	gfloat* _tmp38_;
-	gint _tmp38__length1;
-	gint _tmp38__length2;
-	gfloat _tmp39_;
-	gfloat* _tmp40_;
-	gint _tmp40__length1;
-	gint _tmp40__length2;
-	gfloat _tmp41_;
-	LdrawMathsMatrix _tmp42_;
-	gfloat* _tmp43_;
-	gint _tmp43__length1;
-	gint _tmp43__length2;
-	gfloat _tmp44_;
-	gfloat* _tmp45_;
-	gint _tmp45__length1;
-	gint _tmp45__length2;
-	gfloat _tmp46_;
-	LdrawMathsMatrix _tmp47_;
-	gfloat* _tmp48_;
-	gint _tmp48__length1;
-	gint _tmp48__length2;
-	gfloat _tmp49_;
-	gfloat* _tmp50_;
-	gint _tmp50__length1;
-	gint _tmp50__length2;
-	gfloat _tmp51_;
-	LdrawMathsMatrix _tmp52_;
-	gfloat* _tmp53_;
-	gint _tmp53__length1;
-	gint _tmp53__length2;
-	gfloat _tmp54_;
-	gfloat* _tmp55_;
-	gint _tmp55__length1;
-	gint _tmp55__length2;
-	gfloat _tmp56_;
-	LdrawMathsMatrix _tmp57_;
-	gfloat* _tmp58_;
-	gint _tmp58__length1;
-	gint _tmp58__length2;
-	gfloat _tmp59_;
-	gfloat* _tmp60_;
-	gint _tmp60__length1;
-	gint _tmp60__length2;
-	gfloat _tmp61_;
-	LdrawMathsMatrix _tmp62_;
-	gfloat* _tmp63_;
-	gint _tmp63__length1;
-	gint _tmp63__length2;
-	gfloat _tmp64_;
-	gfloat* _tmp65_;
-	gint _tmp65__length1;
-	gint _tmp65__length2;
-	gfloat _tmp66_;
-	LdrawMathsMatrix _tmp67_;
-	gfloat* _tmp68_;
-	gint _tmp68__length1;
-	gint _tmp68__length2;
-	gfloat _tmp69_;
-	gfloat* _tmp70_;
-	gint _tmp70__length1;
-	gint _tmp70__length2;
-	gfloat _tmp71_;
-	LdrawMathsMatrix _tmp72_;
-	gfloat* _tmp73_;
-	gint _tmp73__length1;
-	gint _tmp73__length2;
-	gfloat _tmp74_;
-	gfloat* _tmp75_;
-	gint _tmp75__length1;
-	gint _tmp75__length2;
-	gfloat _tmp76_;
-	LdrawMathsMatrix _tmp77_;
-	gfloat* _tmp78_;
-	gint _tmp78__length1;
-	gint _tmp78__length2;
-	gfloat _tmp79_;
-	gfloat* _tmp80_;
-	gint _tmp80__length1;
-	gint _tmp80__length2;
-	gfloat _tmp81_;
-	LdrawMathsMatrix _tmp82_;
-	gfloat* _tmp83_;
-	gint _tmp83__length1;
-	gint _tmp83__length2;
-	gfloat _tmp84_;
-	gfloat* _tmp85_;
-	gint _tmp85__length1;
-	gint _tmp85__length2;
-	gfloat _tmp86_;
-	LdrawMathsMatrix _tmp87_;
-	gfloat* _tmp88_;
-	gint _tmp88__length1;
-	gint _tmp88__length2;
-	gfloat _tmp89_;
-	gfloat* _tmp90_;
-	gint _tmp90__length1;
-	gint _tmp90__length2;
-	gfloat _tmp91_;
-	LdrawMathsMatrix _tmp92_;
-	gfloat* _tmp93_;
-	gint _tmp93__length1;
-	gint _tmp93__length2;
-	gfloat _tmp94_;
-	gfloat* _tmp95_;
-	gint _tmp95__length1;
-	gint _tmp95__length2;
-	gfloat _tmp96_;
-	LdrawMathsMatrix _tmp97_;
-	gfloat* _tmp98_;
-	gint _tmp98__length1;
-	gint _tmp98__length2;
-	gfloat _tmp99_;
-	gfloat* _tmp100_;
-	gint _tmp100__length1;
-	gint _tmp100__length2;
-	gfloat _tmp101_;
-	LdrawMathsMatrix _tmp102_;
-	gfloat* _tmp103_;
-	gint _tmp103__length1;
-	gint _tmp103__length2;
-	gfloat _tmp104_;
-	gfloat* _tmp105_;
-	gint _tmp105__length1;
-	gint _tmp105__length2;
-	gfloat _tmp106_;
-	LdrawMathsMatrix _tmp107_;
-	gfloat* _tmp108_;
-	gint _tmp108__length1;
-	gint _tmp108__length2;
-	gfloat _tmp109_;
-	gfloat* _tmp110_;
-	gint _tmp110__length1;
-	gint _tmp110__length2;
-	gfloat _tmp111_;
-	LdrawMathsMatrix _tmp112_;
-	gfloat* _tmp113_;
-	gint _tmp113__length1;
-	gint _tmp113__length2;
-	gfloat _tmp114_;
-	gfloat* _tmp115_;
-	gint _tmp115__length1;
-	gint _tmp115__length2;
-	gfloat _tmp116_;
-	LdrawMathsMatrix _tmp117_;
-	gfloat* _tmp118_;
-	gint _tmp118__length1;
-	gint _tmp118__length2;
-	gfloat _tmp119_;
-	gfloat* _tmp120_;
-	gint _tmp120__length1;
-	gint _tmp120__length2;
-	gfloat _tmp121_;
-	LdrawMathsMatrix _tmp122_;
-	gfloat* _tmp123_;
-	gint _tmp123__length1;
-	gint _tmp123__length2;
-	gfloat _tmp124_;
-	gfloat* _tmp125_;
-	gint _tmp125__length1;
-	gint _tmp125__length2;
-	gfloat _tmp126_;
-	LdrawMathsMatrix _tmp127_;
-	gfloat* _tmp128_;
-	gint _tmp128__length1;
-	gint _tmp128__length2;
-	gfloat _tmp129_;
-	gfloat* _tmp130_;
-	gint _tmp130__length1;
-	gint _tmp130__length2;
-	gfloat _tmp131_;
-	LdrawMathsMatrix _tmp132_;
-	gfloat* _tmp133_;
-	gint _tmp133__length1;
-	gint _tmp133__length2;
-	gfloat _tmp134_;
-	LdrawMathsMatrix _tmp135_ = {0};
 	g_return_if_fail (m != NULL);
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = _tmp0_[(0 * _tmp0__length2) + 0];
-	_tmp2_ = *m;
-	_tmp3_ = _tmp2_.m_Values;
-	_tmp3__length1 = _tmp2_.m_Values_length1;
-	_tmp3__length2 = _tmp2_.m_Values_length2;
-	_tmp4_ = _tmp3_[(0 * _tmp3__length2) + 0];
-	_tmp5_ = (*self).m_Values;
-	_tmp5__length1 = (*self).m_Values_length1;
-	_tmp5__length2 = (*self).m_Values_length2;
-	_tmp6_ = _tmp5_[(0 * _tmp5__length2) + 1];
-	_tmp7_ = *m;
-	_tmp8_ = _tmp7_.m_Values;
-	_tmp8__length1 = _tmp7_.m_Values_length1;
-	_tmp8__length2 = _tmp7_.m_Values_length2;
-	_tmp9_ = _tmp8_[(1 * _tmp8__length2) + 0];
-	_tmp10_ = (*self).m_Values;
-	_tmp10__length1 = (*self).m_Values_length1;
-	_tmp10__length2 = (*self).m_Values_length2;
-	_tmp11_ = _tmp10_[(0 * _tmp10__length2) + 2];
-	_tmp12_ = *m;
-	_tmp13_ = _tmp12_.m_Values;
-	_tmp13__length1 = _tmp12_.m_Values_length1;
-	_tmp13__length2 = _tmp12_.m_Values_length2;
-	_tmp14_ = _tmp13_[(2 * _tmp13__length2) + 0];
-	_tmp15_ = (*self).m_Values;
-	_tmp15__length1 = (*self).m_Values_length1;
-	_tmp15__length2 = (*self).m_Values_length2;
-	_tmp16_ = _tmp15_[(0 * _tmp15__length2) + 0];
-	_tmp17_ = *m;
-	_tmp18_ = _tmp17_.m_Values;
-	_tmp18__length1 = _tmp17_.m_Values_length1;
-	_tmp18__length2 = _tmp17_.m_Values_length2;
-	_tmp19_ = _tmp18_[(0 * _tmp18__length2) + 1];
-	_tmp20_ = (*self).m_Values;
-	_tmp20__length1 = (*self).m_Values_length1;
-	_tmp20__length2 = (*self).m_Values_length2;
-	_tmp21_ = _tmp20_[(0 * _tmp20__length2) + 1];
-	_tmp22_ = *m;
-	_tmp23_ = _tmp22_.m_Values;
-	_tmp23__length1 = _tmp22_.m_Values_length1;
-	_tmp23__length2 = _tmp22_.m_Values_length2;
-	_tmp24_ = _tmp23_[(1 * _tmp23__length2) + 1];
-	_tmp25_ = (*self).m_Values;
-	_tmp25__length1 = (*self).m_Values_length1;
-	_tmp25__length2 = (*self).m_Values_length2;
-	_tmp26_ = _tmp25_[(0 * _tmp25__length2) + 2];
-	_tmp27_ = *m;
-	_tmp28_ = _tmp27_.m_Values;
-	_tmp28__length1 = _tmp27_.m_Values_length1;
-	_tmp28__length2 = _tmp27_.m_Values_length2;
-	_tmp29_ = _tmp28_[(2 * _tmp28__length2) + 1];
-	_tmp30_ = (*self).m_Values;
-	_tmp30__length1 = (*self).m_Values_length1;
-	_tmp30__length2 = (*self).m_Values_length2;
-	_tmp31_ = _tmp30_[(0 * _tmp30__length2) + 0];
-	_tmp32_ = *m;
-	_tmp33_ = _tmp32_.m_Values;
-	_tmp33__length1 = _tmp32_.m_Values_length1;
-	_tmp33__length2 = _tmp32_.m_Values_length2;
-	_tmp34_ = _tmp33_[(0 * _tmp33__length2) + 2];
-	_tmp35_ = (*self).m_Values;
-	_tmp35__length1 = (*self).m_Values_length1;
-	_tmp35__length2 = (*self).m_Values_length2;
-	_tmp36_ = _tmp35_[(0 * _tmp35__length2) + 1];
-	_tmp37_ = *m;
-	_tmp38_ = _tmp37_.m_Values;
-	_tmp38__length1 = _tmp37_.m_Values_length1;
-	_tmp38__length2 = _tmp37_.m_Values_length2;
-	_tmp39_ = _tmp38_[(1 * _tmp38__length2) + 2];
-	_tmp40_ = (*self).m_Values;
-	_tmp40__length1 = (*self).m_Values_length1;
-	_tmp40__length2 = (*self).m_Values_length2;
-	_tmp41_ = _tmp40_[(0 * _tmp40__length2) + 2];
-	_tmp42_ = *m;
-	_tmp43_ = _tmp42_.m_Values;
-	_tmp43__length1 = _tmp42_.m_Values_length1;
-	_tmp43__length2 = _tmp42_.m_Values_length2;
-	_tmp44_ = _tmp43_[(2 * _tmp43__length2) + 2];
-	_tmp45_ = (*self).m_Values;
-	_tmp45__length1 = (*self).m_Values_length1;
-	_tmp45__length2 = (*self).m_Values_length2;
-	_tmp46_ = _tmp45_[(1 * _tmp45__length2) + 0];
-	_tmp47_ = *m;
-	_tmp48_ = _tmp47_.m_Values;
-	_tmp48__length1 = _tmp47_.m_Values_length1;
-	_tmp48__length2 = _tmp47_.m_Values_length2;
-	_tmp49_ = _tmp48_[(0 * _tmp48__length2) + 0];
-	_tmp50_ = (*self).m_Values;
-	_tmp50__length1 = (*self).m_Values_length1;
-	_tmp50__length2 = (*self).m_Values_length2;
-	_tmp51_ = _tmp50_[(1 * _tmp50__length2) + 1];
-	_tmp52_ = *m;
-	_tmp53_ = _tmp52_.m_Values;
-	_tmp53__length1 = _tmp52_.m_Values_length1;
-	_tmp53__length2 = _tmp52_.m_Values_length2;
-	_tmp54_ = _tmp53_[(1 * _tmp53__length2) + 0];
-	_tmp55_ = (*self).m_Values;
-	_tmp55__length1 = (*self).m_Values_length1;
-	_tmp55__length2 = (*self).m_Values_length2;
-	_tmp56_ = _tmp55_[(1 * _tmp55__length2) + 2];
-	_tmp57_ = *m;
-	_tmp58_ = _tmp57_.m_Values;
-	_tmp58__length1 = _tmp57_.m_Values_length1;
-	_tmp58__length2 = _tmp57_.m_Values_length2;
-	_tmp59_ = _tmp58_[(2 * _tmp58__length2) + 0];
-	_tmp60_ = (*self).m_Values;
-	_tmp60__length1 = (*self).m_Values_length1;
-	_tmp60__length2 = (*self).m_Values_length2;
-	_tmp61_ = _tmp60_[(1 * _tmp60__length2) + 0];
-	_tmp62_ = *m;
-	_tmp63_ = _tmp62_.m_Values;
-	_tmp63__length1 = _tmp62_.m_Values_length1;
-	_tmp63__length2 = _tmp62_.m_Values_length2;
-	_tmp64_ = _tmp63_[(0 * _tmp63__length2) + 1];
-	_tmp65_ = (*self).m_Values;
-	_tmp65__length1 = (*self).m_Values_length1;
-	_tmp65__length2 = (*self).m_Values_length2;
-	_tmp66_ = _tmp65_[(1 * _tmp65__length2) + 1];
-	_tmp67_ = *m;
-	_tmp68_ = _tmp67_.m_Values;
-	_tmp68__length1 = _tmp67_.m_Values_length1;
-	_tmp68__length2 = _tmp67_.m_Values_length2;
-	_tmp69_ = _tmp68_[(1 * _tmp68__length2) + 1];
-	_tmp70_ = (*self).m_Values;
-	_tmp70__length1 = (*self).m_Values_length1;
-	_tmp70__length2 = (*self).m_Values_length2;
-	_tmp71_ = _tmp70_[(1 * _tmp70__length2) + 2];
-	_tmp72_ = *m;
-	_tmp73_ = _tmp72_.m_Values;
-	_tmp73__length1 = _tmp72_.m_Values_length1;
-	_tmp73__length2 = _tmp72_.m_Values_length2;
-	_tmp74_ = _tmp73_[(2 * _tmp73__length2) + 1];
-	_tmp75_ = (*self).m_Values;
-	_tmp75__length1 = (*self).m_Values_length1;
-	_tmp75__length2 = (*self).m_Values_length2;
-	_tmp76_ = _tmp75_[(1 * _tmp75__length2) + 0];
-	_tmp77_ = *m;
-	_tmp78_ = _tmp77_.m_Values;
-	_tmp78__length1 = _tmp77_.m_Values_length1;
-	_tmp78__length2 = _tmp77_.m_Values_length2;
-	_tmp79_ = _tmp78_[(0 * _tmp78__length2) + 2];
-	_tmp80_ = (*self).m_Values;
-	_tmp80__length1 = (*self).m_Values_length1;
-	_tmp80__length2 = (*self).m_Values_length2;
-	_tmp81_ = _tmp80_[(1 * _tmp80__length2) + 1];
-	_tmp82_ = *m;
-	_tmp83_ = _tmp82_.m_Values;
-	_tmp83__length1 = _tmp82_.m_Values_length1;
-	_tmp83__length2 = _tmp82_.m_Values_length2;
-	_tmp84_ = _tmp83_[(1 * _tmp83__length2) + 2];
-	_tmp85_ = (*self).m_Values;
-	_tmp85__length1 = (*self).m_Values_length1;
-	_tmp85__length2 = (*self).m_Values_length2;
-	_tmp86_ = _tmp85_[(1 * _tmp85__length2) + 2];
-	_tmp87_ = *m;
-	_tmp88_ = _tmp87_.m_Values;
-	_tmp88__length1 = _tmp87_.m_Values_length1;
-	_tmp88__length2 = _tmp87_.m_Values_length2;
-	_tmp89_ = _tmp88_[(2 * _tmp88__length2) + 2];
-	_tmp90_ = (*self).m_Values;
-	_tmp90__length1 = (*self).m_Values_length1;
-	_tmp90__length2 = (*self).m_Values_length2;
-	_tmp91_ = _tmp90_[(2 * _tmp90__length2) + 0];
-	_tmp92_ = *m;
-	_tmp93_ = _tmp92_.m_Values;
-	_tmp93__length1 = _tmp92_.m_Values_length1;
-	_tmp93__length2 = _tmp92_.m_Values_length2;
-	_tmp94_ = _tmp93_[(0 * _tmp93__length2) + 0];
-	_tmp95_ = (*self).m_Values;
-	_tmp95__length1 = (*self).m_Values_length1;
-	_tmp95__length2 = (*self).m_Values_length2;
-	_tmp96_ = _tmp95_[(2 * _tmp95__length2) + 1];
-	_tmp97_ = *m;
-	_tmp98_ = _tmp97_.m_Values;
-	_tmp98__length1 = _tmp97_.m_Values_length1;
-	_tmp98__length2 = _tmp97_.m_Values_length2;
-	_tmp99_ = _tmp98_[(1 * _tmp98__length2) + 0];
-	_tmp100_ = (*self).m_Values;
-	_tmp100__length1 = (*self).m_Values_length1;
-	_tmp100__length2 = (*self).m_Values_length2;
-	_tmp101_ = _tmp100_[(2 * _tmp100__length2) + 2];
-	_tmp102_ = *m;
-	_tmp103_ = _tmp102_.m_Values;
-	_tmp103__length1 = _tmp102_.m_Values_length1;
-	_tmp103__length2 = _tmp102_.m_Values_length2;
-	_tmp104_ = _tmp103_[(2 * _tmp103__length2) + 0];
-	_tmp105_ = (*self).m_Values;
-	_tmp105__length1 = (*self).m_Values_length1;
-	_tmp105__length2 = (*self).m_Values_length2;
-	_tmp106_ = _tmp105_[(2 * _tmp105__length2) + 0];
-	_tmp107_ = *m;
-	_tmp108_ = _tmp107_.m_Values;
-	_tmp108__length1 = _tmp107_.m_Values_length1;
-	_tmp108__length2 = _tmp107_.m_Values_length2;
-	_tmp109_ = _tmp108_[(0 * _tmp108__length2) + 1];
-	_tmp110_ = (*self).m_Values;
-	_tmp110__length1 = (*self).m_Values_length1;
-	_tmp110__length2 = (*self).m_Values_length2;
-	_tmp111_ = _tmp110_[(2 * _tmp110__length2) + 1];
-	_tmp112_ = *m;
-	_tmp113_ = _tmp112_.m_Values;
-	_tmp113__length1 = _tmp112_.m_Values_length1;
-	_tmp113__length2 = _tmp112_.m_Values_length2;
-	_tmp114_ = _tmp113_[(1 * _tmp113__length2) + 1];
-	_tmp115_ = (*self).m_Values;
-	_tmp115__length1 = (*self).m_Values_length1;
-	_tmp115__length2 = (*self).m_Values_length2;
-	_tmp116_ = _tmp115_[(2 * _tmp115__length2) + 2];
-	_tmp117_ = *m;
-	_tmp118_ = _tmp117_.m_Values;
-	_tmp118__length1 = _tmp117_.m_Values_length1;
-	_tmp118__length2 = _tmp117_.m_Values_length2;
-	_tmp119_ = _tmp118_[(2 * _tmp118__length2) + 1];
-	_tmp120_ = (*self).m_Values;
-	_tmp120__length1 = (*self).m_Values_length1;
-	_tmp120__length2 = (*self).m_Values_length2;
-	_tmp121_ = _tmp120_[(2 * _tmp120__length2) + 0];
-	_tmp122_ = *m;
-	_tmp123_ = _tmp122_.m_Values;
-	_tmp123__length1 = _tmp122_.m_Values_length1;
-	_tmp123__length2 = _tmp122_.m_Values_length2;
-	_tmp124_ = _tmp123_[(0 * _tmp123__length2) + 2];
-	_tmp125_ = (*self).m_Values;
-	_tmp125__length1 = (*self).m_Values_length1;
-	_tmp125__length2 = (*self).m_Values_length2;
-	_tmp126_ = _tmp125_[(2 * _tmp125__length2) + 1];
-	_tmp127_ = *m;
-	_tmp128_ = _tmp127_.m_Values;
-	_tmp128__length1 = _tmp127_.m_Values_length1;
-	_tmp128__length2 = _tmp127_.m_Values_length2;
-	_tmp129_ = _tmp128_[(1 * _tmp128__length2) + 2];
-	_tmp130_ = (*self).m_Values;
-	_tmp130__length1 = (*self).m_Values_length1;
-	_tmp130__length2 = (*self).m_Values_length2;
-	_tmp131_ = _tmp130_[(2 * _tmp130__length2) + 2];
-	_tmp132_ = *m;
-	_tmp133_ = _tmp132_.m_Values;
-	_tmp133__length1 = _tmp132_.m_Values_length1;
-	_tmp133__length2 = _tmp132_.m_Values_length2;
-	_tmp134_ = _tmp133_[(2 * _tmp133__length2) + 2];
-	ldraw_maths_matrix_init (&_tmp135_, ((_tmp1_ * _tmp4_) + (_tmp6_ * _tmp9_)) + (_tmp11_ * _tmp14_), ((_tmp16_ * _tmp19_) + (_tmp21_ * _tmp24_)) + (_tmp26_ * _tmp29_), ((_tmp31_ * _tmp34_) + (_tmp36_ * _tmp39_)) + (_tmp41_ * _tmp44_), ((_tmp46_ * _tmp49_) + (_tmp51_ * _tmp54_)) + (_tmp56_ * _tmp59_), ((_tmp61_ * _tmp64_) + (_tmp66_ * _tmp69_)) + (_tmp71_ * _tmp74_), ((_tmp76_ * _tmp79_) + (_tmp81_ * _tmp84_)) + (_tmp86_ * _tmp89_), ((_tmp91_ * _tmp94_) + (_tmp96_ * _tmp99_)) + (_tmp101_ * _tmp104_), ((_tmp106_ * _tmp109_) + (_tmp111_ * _tmp114_)) + (_tmp116_ * _tmp119_), ((_tmp121_ * _tmp124_) + (_tmp126_ * _tmp129_)) + (_tmp131_ * _tmp134_));
-	*result = _tmp135_;
+
+	v4sf abc = self->row0;
+	v4sf bca = __builtin_ia32_shufps(abc, abc, 0xc9);
+	v4sf cab = __builtin_ia32_shufps(abc, abc, 0xd2);
+
+	v4sf def = self->row1;
+	v4sf efd = __builtin_ia32_shufps(def, def, 0xc9);
+	v4sf fde = __builtin_ia32_shufps(def, def, 0xd2);
+
+	v4sf ghi = self->row2;
+	v4sf hig = __builtin_ia32_shufps(ghi, ghi, 0xc9);
+	v4sf igh = __builtin_ia32_shufps(ghi, ghi, 0xd2);
+
+	v4sf aec = {m->row0[0], m->row1[1], m->row2[2], 0.0F};
+	v4sf dhc = {m->row1[0], m->row2[1], m->row0[2], 0.0F};
+	v4sf gbf = {m->row2[0], m->row0[1], m->row1[2], 0.0F};
+
+	v4sf row0 = __builtin_ia32_addps(__builtin_ia32_addps(
+					__builtin_ia32_mulps(abc, aec),
+					__builtin_ia32_mulps(bca, dhc)),
+					__builtin_ia32_mulps(cab, gbf));
+
+	v4sf row1 = __builtin_ia32_addps(__builtin_ia32_addps(
+					__builtin_ia32_mulps(def, aec),
+					__builtin_ia32_mulps(efd, dhc)),
+					__builtin_ia32_mulps(fde, gbf));
+
+
+	v4sf row2 = __builtin_ia32_addps(__builtin_ia32_addps(
+					__builtin_ia32_mulps(ghi, aec),
+					__builtin_ia32_mulps(hig, dhc)),
+					__builtin_ia32_mulps(igh, gbf));
+
+	result->row0 = row0;
+	result->row1 = row1;
+	result->row2 = row2;
+
 	return;
 }
 
 
 void ldraw_maths_matrix_Add (LdrawMathsMatrix *self, LdrawMathsMatrix* m, LdrawMathsMatrix* result) {
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat _tmp1_;
-	LdrawMathsMatrix _tmp2_;
-	gfloat* _tmp3_;
-	gint _tmp3__length1;
-	gint _tmp3__length2;
-	gfloat _tmp4_;
-	gfloat* _tmp5_;
-	gint _tmp5__length1;
-	gint _tmp5__length2;
-	gfloat _tmp6_;
-	LdrawMathsMatrix _tmp7_;
-	gfloat* _tmp8_;
-	gint _tmp8__length1;
-	gint _tmp8__length2;
-	gfloat _tmp9_;
-	gfloat* _tmp10_;
-	gint _tmp10__length1;
-	gint _tmp10__length2;
-	gfloat _tmp11_;
-	LdrawMathsMatrix _tmp12_;
-	gfloat* _tmp13_;
-	gint _tmp13__length1;
-	gint _tmp13__length2;
-	gfloat _tmp14_;
-	gfloat* _tmp15_;
-	gint _tmp15__length1;
-	gint _tmp15__length2;
-	gfloat _tmp16_;
-	LdrawMathsMatrix _tmp17_;
-	gfloat* _tmp18_;
-	gint _tmp18__length1;
-	gint _tmp18__length2;
-	gfloat _tmp19_;
-	gfloat* _tmp20_;
-	gint _tmp20__length1;
-	gint _tmp20__length2;
-	gfloat _tmp21_;
-	LdrawMathsMatrix _tmp22_;
-	gfloat* _tmp23_;
-	gint _tmp23__length1;
-	gint _tmp23__length2;
-	gfloat _tmp24_;
-	gfloat* _tmp25_;
-	gint _tmp25__length1;
-	gint _tmp25__length2;
-	gfloat _tmp26_;
-	LdrawMathsMatrix _tmp27_;
-	gfloat* _tmp28_;
-	gint _tmp28__length1;
-	gint _tmp28__length2;
-	gfloat _tmp29_;
-	gfloat* _tmp30_;
-	gint _tmp30__length1;
-	gint _tmp30__length2;
-	gfloat _tmp31_;
-	LdrawMathsMatrix _tmp32_;
-	gfloat* _tmp33_;
-	gint _tmp33__length1;
-	gint _tmp33__length2;
-	gfloat _tmp34_;
-	gfloat* _tmp35_;
-	gint _tmp35__length1;
-	gint _tmp35__length2;
-	gfloat _tmp36_;
-	LdrawMathsMatrix _tmp37_;
-	gfloat* _tmp38_;
-	gint _tmp38__length1;
-	gint _tmp38__length2;
-	gfloat _tmp39_;
-	gfloat* _tmp40_;
-	gint _tmp40__length1;
-	gint _tmp40__length2;
-	gfloat _tmp41_;
-	LdrawMathsMatrix _tmp42_;
-	gfloat* _tmp43_;
-	gint _tmp43__length1;
-	gint _tmp43__length2;
-	gfloat _tmp44_;
-	LdrawMathsMatrix _tmp45_ = {0};
+
 	g_return_if_fail (m != NULL);
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = _tmp0_[(0 * _tmp0__length2) + 0];
-	_tmp2_ = *m;
-	_tmp3_ = _tmp2_.m_Values;
-	_tmp3__length1 = _tmp2_.m_Values_length1;
-	_tmp3__length2 = _tmp2_.m_Values_length2;
-	_tmp4_ = _tmp3_[(0 * _tmp3__length2) + 0];
-	_tmp5_ = (*self).m_Values;
-	_tmp5__length1 = (*self).m_Values_length1;
-	_tmp5__length2 = (*self).m_Values_length2;
-	_tmp6_ = _tmp5_[(0 * _tmp5__length2) + 1];
-	_tmp7_ = *m;
-	_tmp8_ = _tmp7_.m_Values;
-	_tmp8__length1 = _tmp7_.m_Values_length1;
-	_tmp8__length2 = _tmp7_.m_Values_length2;
-	_tmp9_ = _tmp8_[(0 * _tmp8__length2) + 1];
-	_tmp10_ = (*self).m_Values;
-	_tmp10__length1 = (*self).m_Values_length1;
-	_tmp10__length2 = (*self).m_Values_length2;
-	_tmp11_ = _tmp10_[(0 * _tmp10__length2) + 2];
-	_tmp12_ = *m;
-	_tmp13_ = _tmp12_.m_Values;
-	_tmp13__length1 = _tmp12_.m_Values_length1;
-	_tmp13__length2 = _tmp12_.m_Values_length2;
-	_tmp14_ = _tmp13_[(0 * _tmp13__length2) + 2];
-	_tmp15_ = (*self).m_Values;
-	_tmp15__length1 = (*self).m_Values_length1;
-	_tmp15__length2 = (*self).m_Values_length2;
-	_tmp16_ = _tmp15_[(1 * _tmp15__length2) + 0];
-	_tmp17_ = *m;
-	_tmp18_ = _tmp17_.m_Values;
-	_tmp18__length1 = _tmp17_.m_Values_length1;
-	_tmp18__length2 = _tmp17_.m_Values_length2;
-	_tmp19_ = _tmp18_[(1 * _tmp18__length2) + 0];
-	_tmp20_ = (*self).m_Values;
-	_tmp20__length1 = (*self).m_Values_length1;
-	_tmp20__length2 = (*self).m_Values_length2;
-	_tmp21_ = _tmp20_[(1 * _tmp20__length2) + 1];
-	_tmp22_ = *m;
-	_tmp23_ = _tmp22_.m_Values;
-	_tmp23__length1 = _tmp22_.m_Values_length1;
-	_tmp23__length2 = _tmp22_.m_Values_length2;
-	_tmp24_ = _tmp23_[(1 * _tmp23__length2) + 1];
-	_tmp25_ = (*self).m_Values;
-	_tmp25__length1 = (*self).m_Values_length1;
-	_tmp25__length2 = (*self).m_Values_length2;
-	_tmp26_ = _tmp25_[(1 * _tmp25__length2) + 2];
-	_tmp27_ = *m;
-	_tmp28_ = _tmp27_.m_Values;
-	_tmp28__length1 = _tmp27_.m_Values_length1;
-	_tmp28__length2 = _tmp27_.m_Values_length2;
-	_tmp29_ = _tmp28_[(1 * _tmp28__length2) + 2];
-	_tmp30_ = (*self).m_Values;
-	_tmp30__length1 = (*self).m_Values_length1;
-	_tmp30__length2 = (*self).m_Values_length2;
-	_tmp31_ = _tmp30_[(2 * _tmp30__length2) + 0];
-	_tmp32_ = *m;
-	_tmp33_ = _tmp32_.m_Values;
-	_tmp33__length1 = _tmp32_.m_Values_length1;
-	_tmp33__length2 = _tmp32_.m_Values_length2;
-	_tmp34_ = _tmp33_[(2 * _tmp33__length2) + 0];
-	_tmp35_ = (*self).m_Values;
-	_tmp35__length1 = (*self).m_Values_length1;
-	_tmp35__length2 = (*self).m_Values_length2;
-	_tmp36_ = _tmp35_[(2 * _tmp35__length2) + 1];
-	_tmp37_ = *m;
-	_tmp38_ = _tmp37_.m_Values;
-	_tmp38__length1 = _tmp37_.m_Values_length1;
-	_tmp38__length2 = _tmp37_.m_Values_length2;
-	_tmp39_ = _tmp38_[(2 * _tmp38__length2) + 1];
-	_tmp40_ = (*self).m_Values;
-	_tmp40__length1 = (*self).m_Values_length1;
-	_tmp40__length2 = (*self).m_Values_length2;
-	_tmp41_ = _tmp40_[(2 * _tmp40__length2) + 2];
-	_tmp42_ = *m;
-	_tmp43_ = _tmp42_.m_Values;
-	_tmp43__length1 = _tmp42_.m_Values_length1;
-	_tmp43__length2 = _tmp42_.m_Values_length2;
-	_tmp44_ = _tmp43_[(2 * _tmp43__length2) + 2];
-	ldraw_maths_matrix_init (&_tmp45_, _tmp1_ + _tmp4_, _tmp6_ + _tmp9_, _tmp11_ + _tmp14_, _tmp16_ + _tmp19_, _tmp21_ + _tmp24_, _tmp26_ + _tmp29_, _tmp31_ + _tmp34_, _tmp36_ + _tmp39_, _tmp41_ + _tmp44_);
-	*result = _tmp45_;
+
+	v4sf row0 = __builtin_ia32_addps(self->row0, m->row0);
+	v4sf row1 = __builtin_ia32_addps(self->row1, m->row1);
+	v4sf row2 = __builtin_ia32_addps(self->row2, m->row2);
+
+	result->row0 = row0;
+	result->row1 = row1;
+	result->row2 = row2;
+
 	return;
 }
 
 
 void ldraw_maths_matrix_Scale (LdrawMathsMatrix *self, gfloat scale, LdrawMathsMatrix* result) {
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat _tmp1_;
-	gfloat _tmp2_;
-	gfloat* _tmp3_;
-	gint _tmp3__length1;
-	gint _tmp3__length2;
-	gfloat _tmp4_;
-	gfloat _tmp5_;
-	gfloat* _tmp6_;
-	gint _tmp6__length1;
-	gint _tmp6__length2;
-	gfloat _tmp7_;
-	gfloat _tmp8_;
-	gfloat* _tmp9_;
-	gint _tmp9__length1;
-	gint _tmp9__length2;
-	gfloat _tmp10_;
-	gfloat _tmp11_;
-	gfloat* _tmp12_;
-	gint _tmp12__length1;
-	gint _tmp12__length2;
-	gfloat _tmp13_;
-	gfloat _tmp14_;
-	gfloat* _tmp15_;
-	gint _tmp15__length1;
-	gint _tmp15__length2;
-	gfloat _tmp16_;
-	gfloat _tmp17_;
-	gfloat* _tmp18_;
-	gint _tmp18__length1;
-	gint _tmp18__length2;
-	gfloat _tmp19_;
-	gfloat _tmp20_;
-	gfloat* _tmp21_;
-	gint _tmp21__length1;
-	gint _tmp21__length2;
-	gfloat _tmp22_;
-	gfloat _tmp23_;
-	gfloat* _tmp24_;
-	gint _tmp24__length1;
-	gint _tmp24__length2;
-	gfloat _tmp25_;
-	gfloat _tmp26_;
-	LdrawMathsMatrix _tmp27_ = {0};
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = _tmp0_[(0 * _tmp0__length2) + 0];
-	_tmp2_ = scale;
-	_tmp3_ = (*self).m_Values;
-	_tmp3__length1 = (*self).m_Values_length1;
-	_tmp3__length2 = (*self).m_Values_length2;
-	_tmp4_ = _tmp3_[(0 * _tmp3__length2) + 1];
-	_tmp5_ = scale;
-	_tmp6_ = (*self).m_Values;
-	_tmp6__length1 = (*self).m_Values_length1;
-	_tmp6__length2 = (*self).m_Values_length2;
-	_tmp7_ = _tmp6_[(0 * _tmp6__length2) + 2];
-	_tmp8_ = scale;
-	_tmp9_ = (*self).m_Values;
-	_tmp9__length1 = (*self).m_Values_length1;
-	_tmp9__length2 = (*self).m_Values_length2;
-	_tmp10_ = _tmp9_[(1 * _tmp9__length2) + 0];
-	_tmp11_ = scale;
-	_tmp12_ = (*self).m_Values;
-	_tmp12__length1 = (*self).m_Values_length1;
-	_tmp12__length2 = (*self).m_Values_length2;
-	_tmp13_ = _tmp12_[(1 * _tmp12__length2) + 1];
-	_tmp14_ = scale;
-	_tmp15_ = (*self).m_Values;
-	_tmp15__length1 = (*self).m_Values_length1;
-	_tmp15__length2 = (*self).m_Values_length2;
-	_tmp16_ = _tmp15_[(1 * _tmp15__length2) + 2];
-	_tmp17_ = scale;
-	_tmp18_ = (*self).m_Values;
-	_tmp18__length1 = (*self).m_Values_length1;
-	_tmp18__length2 = (*self).m_Values_length2;
-	_tmp19_ = _tmp18_[(2 * _tmp18__length2) + 0];
-	_tmp20_ = scale;
-	_tmp21_ = (*self).m_Values;
-	_tmp21__length1 = (*self).m_Values_length1;
-	_tmp21__length2 = (*self).m_Values_length2;
-	_tmp22_ = _tmp21_[(2 * _tmp21__length2) + 1];
-	_tmp23_ = scale;
-	_tmp24_ = (*self).m_Values;
-	_tmp24__length1 = (*self).m_Values_length1;
-	_tmp24__length2 = (*self).m_Values_length2;
-	_tmp25_ = _tmp24_[(2 * _tmp24__length2) + 2];
-	_tmp26_ = scale;
-	ldraw_maths_matrix_init (&_tmp27_, _tmp1_ * _tmp2_, _tmp4_ * _tmp5_, _tmp7_ * _tmp8_, _tmp10_ * _tmp11_, _tmp13_ * _tmp14_, _tmp16_ * _tmp17_, _tmp19_ * _tmp20_, _tmp22_ * _tmp23_, _tmp25_ * _tmp26_);
-	*result = _tmp27_;
+
+	v4sf scaling_vector = {scale, scale, scale, scale};
+	v4sf row0 = __builtin_ia32_mulps(self->row0, scaling_vector);
+	v4sf row1 = __builtin_ia32_mulps(self->row1, scaling_vector);
+	v4sf row2 = __builtin_ia32_mulps(self->row2, scaling_vector);
+
+	result->row0 = row0;
+	result->row1 = row1;
+	result->row2 = row2;
+
 	return;
 }
 
 
 void ldraw_maths_matrix_TransformVector (LdrawMathsMatrix *self, LdrawMathsVector* v, LdrawMathsVector* result) {
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat _tmp1_;
-	LdrawMathsVector _tmp2_;
-	gfloat _tmp3_;
-	gfloat _tmp4_;
-	gfloat* _tmp5_;
-	gint _tmp5__length1;
-	gint _tmp5__length2;
-	gfloat _tmp6_;
-	LdrawMathsVector _tmp7_;
-	gfloat _tmp8_;
-	gfloat _tmp9_;
-	gfloat* _tmp10_;
-	gint _tmp10__length1;
-	gint _tmp10__length2;
-	gfloat _tmp11_;
-	LdrawMathsVector _tmp12_;
-	gfloat _tmp13_;
-	gfloat _tmp14_;
-	gfloat* _tmp15_;
-	gint _tmp15__length1;
-	gint _tmp15__length2;
-	gfloat _tmp16_;
-	LdrawMathsVector _tmp17_;
-	gfloat _tmp18_;
-	gfloat _tmp19_;
-	gfloat* _tmp20_;
-	gint _tmp20__length1;
-	gint _tmp20__length2;
-	gfloat _tmp21_;
-	LdrawMathsVector _tmp22_;
-	gfloat _tmp23_;
-	gfloat _tmp24_;
-	gfloat* _tmp25_;
-	gint _tmp25__length1;
-	gint _tmp25__length2;
-	gfloat _tmp26_;
-	LdrawMathsVector _tmp27_;
-	gfloat _tmp28_;
-	gfloat _tmp29_;
-	gfloat* _tmp30_;
-	gint _tmp30__length1;
-	gint _tmp30__length2;
-	gfloat _tmp31_;
-	LdrawMathsVector _tmp32_;
-	gfloat _tmp33_;
-	gfloat _tmp34_;
-	gfloat* _tmp35_;
-	gint _tmp35__length1;
-	gint _tmp35__length2;
-	gfloat _tmp36_;
-	LdrawMathsVector _tmp37_;
-	gfloat _tmp38_;
-	gfloat _tmp39_;
-	gfloat* _tmp40_;
-	gint _tmp40__length1;
-	gint _tmp40__length2;
-	gfloat _tmp41_;
-	LdrawMathsVector _tmp42_;
-	gfloat _tmp43_;
-	gfloat _tmp44_;
-	LdrawMathsVector _tmp45_ = {0};
+
+
 	g_return_if_fail (v != NULL);
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = _tmp0_[(0 * _tmp0__length2) + 0];
-	_tmp2_ = *v;
-	_tmp3_ = ldraw_maths_vector_get_X (&_tmp2_);
-	_tmp4_ = _tmp3_;
-	_tmp5_ = (*self).m_Values;
-	_tmp5__length1 = (*self).m_Values_length1;
-	_tmp5__length2 = (*self).m_Values_length2;
-	_tmp6_ = _tmp5_[(0 * _tmp5__length2) + 1];
-	_tmp7_ = *v;
-	_tmp8_ = ldraw_maths_vector_get_Y (&_tmp7_);
-	_tmp9_ = _tmp8_;
-	_tmp10_ = (*self).m_Values;
-	_tmp10__length1 = (*self).m_Values_length1;
-	_tmp10__length2 = (*self).m_Values_length2;
-	_tmp11_ = _tmp10_[(0 * _tmp10__length2) + 2];
-	_tmp12_ = *v;
-	_tmp13_ = ldraw_maths_vector_get_Z (&_tmp12_);
-	_tmp14_ = _tmp13_;
-	_tmp15_ = (*self).m_Values;
-	_tmp15__length1 = (*self).m_Values_length1;
-	_tmp15__length2 = (*self).m_Values_length2;
-	_tmp16_ = _tmp15_[(1 * _tmp15__length2) + 0];
-	_tmp17_ = *v;
-	_tmp18_ = ldraw_maths_vector_get_X (&_tmp17_);
-	_tmp19_ = _tmp18_;
-	_tmp20_ = (*self).m_Values;
-	_tmp20__length1 = (*self).m_Values_length1;
-	_tmp20__length2 = (*self).m_Values_length2;
-	_tmp21_ = _tmp20_[(1 * _tmp20__length2) + 1];
-	_tmp22_ = *v;
-	_tmp23_ = ldraw_maths_vector_get_Y (&_tmp22_);
-	_tmp24_ = _tmp23_;
-	_tmp25_ = (*self).m_Values;
-	_tmp25__length1 = (*self).m_Values_length1;
-	_tmp25__length2 = (*self).m_Values_length2;
-	_tmp26_ = _tmp25_[(1 * _tmp25__length2) + 2];
-	_tmp27_ = *v;
-	_tmp28_ = ldraw_maths_vector_get_Z (&_tmp27_);
-	_tmp29_ = _tmp28_;
-	_tmp30_ = (*self).m_Values;
-	_tmp30__length1 = (*self).m_Values_length1;
-	_tmp30__length2 = (*self).m_Values_length2;
-	_tmp31_ = _tmp30_[(2 * _tmp30__length2) + 0];
-	_tmp32_ = *v;
-	_tmp33_ = ldraw_maths_vector_get_X (&_tmp32_);
-	_tmp34_ = _tmp33_;
-	_tmp35_ = (*self).m_Values;
-	_tmp35__length1 = (*self).m_Values_length1;
-	_tmp35__length2 = (*self).m_Values_length2;
-	_tmp36_ = _tmp35_[(2 * _tmp35__length2) + 1];
-	_tmp37_ = *v;
-	_tmp38_ = ldraw_maths_vector_get_Y (&_tmp37_);
-	_tmp39_ = _tmp38_;
-	_tmp40_ = (*self).m_Values;
-	_tmp40__length1 = (*self).m_Values_length1;
-	_tmp40__length2 = (*self).m_Values_length2;
-	_tmp41_ = _tmp40_[(2 * _tmp40__length2) + 2];
-	_tmp42_ = *v;
-	_tmp43_ = ldraw_maths_vector_get_Z (&_tmp42_);
-	_tmp44_ = _tmp43_;
-	ldraw_maths_vector_init (&_tmp45_, ((_tmp1_ * _tmp4_) + (_tmp6_ * _tmp9_)) + (_tmp11_ * _tmp14_), ((_tmp16_ * _tmp19_) + (_tmp21_ * _tmp24_)) + (_tmp26_ * _tmp29_), ((_tmp31_ * _tmp34_) + (_tmp36_ * _tmp39_)) + (_tmp41_ * _tmp44_));
-	*result = _tmp45_;
+
+	v4sf x_components = __builtin_ia32_mulps(self->row0, v->values);
+	v4sf y_components = __builtin_ia32_mulps(self->row1, v->values);
+	v4sf z_components = __builtin_ia32_mulps(self->row2, v->values);
+
+	v4sf res = {(x_components[0] + x_components[1] + x_components[2]),
+				   (y_components[0] + y_components[1] + y_components[2]),
+				   (z_components[0] + z_components[1] + z_components[2]),
+				   0.0F};
+	result->values = res;
+
 	return;
 }
 
 
 gfloat ldraw_maths_matrix_get (LdrawMathsMatrix *self, gint row, gint col) {
-	gfloat result = 0.0F;
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gint _tmp1_;
-	gint _tmp2_;
-	gfloat _tmp3_;
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = row;
-	_tmp2_ = col;
-	_tmp3_ = _tmp0_[(_tmp1_ * _tmp0__length2) + _tmp2_];
-	result = _tmp3_;
-	return result;
+	switch(row)
+	{
+		case 0:
+			return self->row0[col];
+		case 1:
+			return self->row1[col];
+		case 2:
+			return self->row2[col];
+		default:
+			return 0.0F;
+	}
 }
 
 
 gchar* ldraw_maths_matrix_to_string (LdrawMathsMatrix *self) {
 	gchar* result = NULL;
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat _tmp1_;
 	gchar* _tmp2_ = NULL;
 	gchar* _tmp3_;
-	gfloat* _tmp4_;
-	gint _tmp4__length1;
-	gint _tmp4__length2;
-	gfloat _tmp5_;
 	gchar* _tmp6_ = NULL;
 	gchar* _tmp7_;
-	gfloat* _tmp8_;
-	gint _tmp8__length1;
-	gint _tmp8__length2;
-	gfloat _tmp9_;
 	gchar* _tmp10_ = NULL;
 	gchar* _tmp11_;
-	gfloat* _tmp12_;
-	gint _tmp12__length1;
-	gint _tmp12__length2;
-	gfloat _tmp13_;
 	gchar* _tmp14_ = NULL;
 	gchar* _tmp15_;
-	gfloat* _tmp16_;
-	gint _tmp16__length1;
-	gint _tmp16__length2;
-	gfloat _tmp17_;
 	gchar* _tmp18_ = NULL;
 	gchar* _tmp19_;
-	gfloat* _tmp20_;
-	gint _tmp20__length1;
-	gint _tmp20__length2;
-	gfloat _tmp21_;
 	gchar* _tmp22_ = NULL;
 	gchar* _tmp23_;
-	gfloat* _tmp24_;
-	gint _tmp24__length1;
-	gint _tmp24__length2;
-	gfloat _tmp25_;
 	gchar* _tmp26_ = NULL;
 	gchar* _tmp27_;
-	gfloat* _tmp28_;
-	gint _tmp28__length1;
-	gint _tmp28__length2;
-	gfloat _tmp29_;
 	gchar* _tmp30_ = NULL;
 	gchar* _tmp31_;
-	gfloat* _tmp32_;
-	gint _tmp32__length1;
-	gint _tmp32__length2;
-	gfloat _tmp33_;
 	gchar* _tmp34_ = NULL;
 	gchar* _tmp35_;
 	gchar* _tmp36_ = NULL;
 	gchar* _tmp37_;
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = _tmp0_[(0 * _tmp0__length2) + 0];
-	_tmp2_ = g_strdup_printf ("%g", _tmp1_);
+	_tmp2_ = g_strdup_printf ("%g", self->row0[0]);
 	_tmp3_ = _tmp2_;
-	_tmp4_ = (*self).m_Values;
-	_tmp4__length1 = (*self).m_Values_length1;
-	_tmp4__length2 = (*self).m_Values_length2;
-	_tmp5_ = _tmp4_[(0 * _tmp4__length2) + 1];
-	_tmp6_ = g_strdup_printf ("%g", _tmp5_);
+
+	_tmp6_ = g_strdup_printf ("%g", self->row0[1]);
 	_tmp7_ = _tmp6_;
-	_tmp8_ = (*self).m_Values;
-	_tmp8__length1 = (*self).m_Values_length1;
-	_tmp8__length2 = (*self).m_Values_length2;
-	_tmp9_ = _tmp8_[(0 * _tmp8__length2) + 2];
-	_tmp10_ = g_strdup_printf ("%g", _tmp9_);
+
+	_tmp10_ = g_strdup_printf ("%g", self->row0[2]);
 	_tmp11_ = _tmp10_;
-	_tmp12_ = (*self).m_Values;
-	_tmp12__length1 = (*self).m_Values_length1;
-	_tmp12__length2 = (*self).m_Values_length2;
-	_tmp13_ = _tmp12_[(1 * _tmp12__length2) + 0];
-	_tmp14_ = g_strdup_printf ("%g", _tmp13_);
+
+	_tmp14_ = g_strdup_printf ("%g", self->row1[0]);
 	_tmp15_ = _tmp14_;
-	_tmp16_ = (*self).m_Values;
-	_tmp16__length1 = (*self).m_Values_length1;
-	_tmp16__length2 = (*self).m_Values_length2;
-	_tmp17_ = _tmp16_[(1 * _tmp16__length2) + 1];
-	_tmp18_ = g_strdup_printf ("%g", _tmp17_);
+
+	_tmp18_ = g_strdup_printf ("%g", self->row1[1]);
 	_tmp19_ = _tmp18_;
-	_tmp20_ = (*self).m_Values;
-	_tmp20__length1 = (*self).m_Values_length1;
-	_tmp20__length2 = (*self).m_Values_length2;
-	_tmp21_ = _tmp20_[(1 * _tmp20__length2) + 2];
-	_tmp22_ = g_strdup_printf ("%g", _tmp21_);
+
+	_tmp22_ = g_strdup_printf ("%g", self->row1[2]);
 	_tmp23_ = _tmp22_;
-	_tmp24_ = (*self).m_Values;
-	_tmp24__length1 = (*self).m_Values_length1;
-	_tmp24__length2 = (*self).m_Values_length2;
-	_tmp25_ = _tmp24_[(2 * _tmp24__length2) + 0];
-	_tmp26_ = g_strdup_printf ("%g", _tmp25_);
+
+	_tmp26_ = g_strdup_printf ("%g", self->row2[0]);
 	_tmp27_ = _tmp26_;
-	_tmp28_ = (*self).m_Values;
-	_tmp28__length1 = (*self).m_Values_length1;
-	_tmp28__length2 = (*self).m_Values_length2;
-	_tmp29_ = _tmp28_[(2 * _tmp28__length2) + 1];
-	_tmp30_ = g_strdup_printf ("%g", _tmp29_);
+
+	_tmp30_ = g_strdup_printf ("%g", self->row2[1]);
 	_tmp31_ = _tmp30_;
-	_tmp32_ = (*self).m_Values;
-	_tmp32__length1 = (*self).m_Values_length1;
-	_tmp32__length2 = (*self).m_Values_length2;
-	_tmp33_ = _tmp32_[(2 * _tmp32__length2) + 2];
-	_tmp34_ = g_strdup_printf ("%g", _tmp33_);
+
+	_tmp34_ = g_strdup_printf ("%g", self->row2[2]);
 	_tmp35_ = _tmp34_;
 	_tmp36_ = g_strconcat ("(", _tmp3_, ",\t", _tmp7_, ",\t", _tmp11_, ")\n(", _tmp15_, ",\t", _tmp19_, ",\t", _tmp23_, ")\n(", _tmp27_, ",\t", _tmp31_, ",\t", _tmp35_, ")", NULL);
 	_tmp37_ = _tmp36_;
@@ -1472,160 +571,29 @@ void ldraw_maths_matrix_get_Identity (LdrawMathsMatrix* result) {
 
 
 gfloat ldraw_maths_matrix_get_Determinant (LdrawMathsMatrix* self) {
-	gfloat result;
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat _tmp1_;
-	gfloat* _tmp2_;
-	gint _tmp2__length1;
-	gint _tmp2__length2;
-	gfloat _tmp3_;
-	gfloat* _tmp4_;
-	gint _tmp4__length1;
-	gint _tmp4__length2;
-	gfloat _tmp5_;
-	gfloat* _tmp6_;
-	gint _tmp6__length1;
-	gint _tmp6__length2;
-	gfloat _tmp7_;
-	gfloat* _tmp8_;
-	gint _tmp8__length1;
-	gint _tmp8__length2;
-	gfloat _tmp9_;
-	gfloat* _tmp10_;
-	gint _tmp10__length1;
-	gint _tmp10__length2;
-	gfloat _tmp11_;
-	gfloat* _tmp12_;
-	gint _tmp12__length1;
-	gint _tmp12__length2;
-	gfloat _tmp13_;
-	gfloat* _tmp14_;
-	gint _tmp14__length1;
-	gint _tmp14__length2;
-	gfloat _tmp15_;
-	gfloat* _tmp16_;
-	gint _tmp16__length1;
-	gint _tmp16__length2;
-	gfloat _tmp17_;
-	gfloat* _tmp18_;
-	gint _tmp18__length1;
-	gint _tmp18__length2;
-	gfloat _tmp19_;
-	gfloat* _tmp20_;
-	gint _tmp20__length1;
-	gint _tmp20__length2;
-	gfloat _tmp21_;
-	gfloat* _tmp22_;
-	gint _tmp22__length1;
-	gint _tmp22__length2;
-	gfloat _tmp23_;
-	gfloat* _tmp24_;
-	gint _tmp24__length1;
-	gint _tmp24__length2;
-	gfloat _tmp25_;
-	gfloat* _tmp26_;
-	gint _tmp26__length1;
-	gint _tmp26__length2;
-	gfloat _tmp27_;
-	gfloat* _tmp28_;
-	gint _tmp28__length1;
-	gint _tmp28__length2;
-	gfloat _tmp29_;
+
 	g_return_val_if_fail (self != NULL, 0.0F);
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = _tmp0_[(0 * _tmp0__length2) + 0];
-	_tmp2_ = (*self).m_Values;
-	_tmp2__length1 = (*self).m_Values_length1;
-	_tmp2__length2 = (*self).m_Values_length2;
-	_tmp3_ = _tmp2_[(1 * _tmp2__length2) + 1];
-	_tmp4_ = (*self).m_Values;
-	_tmp4__length1 = (*self).m_Values_length1;
-	_tmp4__length2 = (*self).m_Values_length2;
-	_tmp5_ = _tmp4_[(2 * _tmp4__length2) + 2];
-	_tmp6_ = (*self).m_Values;
-	_tmp6__length1 = (*self).m_Values_length1;
-	_tmp6__length2 = (*self).m_Values_length2;
-	_tmp7_ = _tmp6_[(1 * _tmp6__length2) + 2];
-	_tmp8_ = (*self).m_Values;
-	_tmp8__length1 = (*self).m_Values_length1;
-	_tmp8__length2 = (*self).m_Values_length2;
-	_tmp9_ = _tmp8_[(2 * _tmp8__length2) + 1];
-	_tmp10_ = (*self).m_Values;
-	_tmp10__length1 = (*self).m_Values_length1;
-	_tmp10__length2 = (*self).m_Values_length2;
-	_tmp11_ = _tmp10_[(0 * _tmp10__length2) + 1];
-	_tmp12_ = (*self).m_Values;
-	_tmp12__length1 = (*self).m_Values_length1;
-	_tmp12__length2 = (*self).m_Values_length2;
-	_tmp13_ = _tmp12_[(1 * _tmp12__length2) + 0];
-	_tmp14_ = (*self).m_Values;
-	_tmp14__length1 = (*self).m_Values_length1;
-	_tmp14__length2 = (*self).m_Values_length2;
-	_tmp15_ = _tmp14_[(2 * _tmp14__length2) + 2];
-	_tmp16_ = (*self).m_Values;
-	_tmp16__length1 = (*self).m_Values_length1;
-	_tmp16__length2 = (*self).m_Values_length2;
-	_tmp17_ = _tmp16_[(1 * _tmp16__length2) + 2];
-	_tmp18_ = (*self).m_Values;
-	_tmp18__length1 = (*self).m_Values_length1;
-	_tmp18__length2 = (*self).m_Values_length2;
-	_tmp19_ = _tmp18_[(2 * _tmp18__length2) + 0];
-	_tmp20_ = (*self).m_Values;
-	_tmp20__length1 = (*self).m_Values_length1;
-	_tmp20__length2 = (*self).m_Values_length2;
-	_tmp21_ = _tmp20_[(0 * _tmp20__length2) + 2];
-	_tmp22_ = (*self).m_Values;
-	_tmp22__length1 = (*self).m_Values_length1;
-	_tmp22__length2 = (*self).m_Values_length2;
-	_tmp23_ = _tmp22_[(1 * _tmp22__length2) + 0];
-	_tmp24_ = (*self).m_Values;
-	_tmp24__length1 = (*self).m_Values_length1;
-	_tmp24__length2 = (*self).m_Values_length2;
-	_tmp25_ = _tmp24_[(2 * _tmp24__length2) + 1];
-	_tmp26_ = (*self).m_Values;
-	_tmp26__length1 = (*self).m_Values_length1;
-	_tmp26__length2 = (*self).m_Values_length2;
-	_tmp27_ = _tmp26_[(1 * _tmp26__length2) + 1];
-	_tmp28_ = (*self).m_Values;
-	_tmp28__length1 = (*self).m_Values_length1;
-	_tmp28__length2 = (*self).m_Values_length2;
-	_tmp29_ = _tmp28_[(2 * _tmp28__length2) + 0];
-	result = ((_tmp1_ * ((_tmp3_ * _tmp5_) - (_tmp7_ * _tmp9_))) - (_tmp11_ * ((_tmp13_ * _tmp15_) - (_tmp17_ * _tmp19_)))) + (_tmp21_ * ((_tmp23_ * _tmp25_) - (_tmp27_ * _tmp29_)));
-	return result;
+
+	v4sf cab = __builtin_ia32_shufps(self->row0, self->row0, 0xd2);
+	v4sf efd = __builtin_ia32_shufps(self->row1, self->row1, 0xc9);
+	v4sf igh = __builtin_ia32_shufps(self->row2, self->row2, 0xd2);
+
+	v4sf pos = __builtin_ia32_mulps(self->row0, __builtin_ia32_mulps(efd, igh));
+	v4sf neg = __builtin_ia32_mulps(cab, __builtin_ia32_mulps(efd, self->row2));
+
+	v4sf foo = __builtin_ia32_subps(pos, neg);
+
+	return foo[0] + foo[1] + foo[2];
 }
-
-
-static gfloat* _vala_array_dup2 (gfloat* self, int length) {
-	return g_memdup (self, length * sizeof (gfloat));
-}
-
 
 void ldraw_maths_matrix_copy (const LdrawMathsMatrix* self, LdrawMathsMatrix* dest) {
-	gfloat* _tmp0_;
-	gint _tmp0__length1;
-	gint _tmp0__length2;
-	gfloat* _tmp1_;
-	gint _tmp1__length1;
-	gint _tmp1__length2;
-	_tmp0_ = (*self).m_Values;
-	_tmp0__length1 = (*self).m_Values_length1;
-	_tmp0__length2 = (*self).m_Values_length2;
-	_tmp1_ = (_tmp0_ != NULL) ? _vala_array_dup2 (_tmp0_, _tmp0__length1 * _tmp0__length2) : ((gpointer) _tmp0_);
-	_tmp1__length1 = _tmp0__length1;
-	_tmp1__length2 = _tmp0__length2;
-	(*dest).m_Values = (g_free ((*dest).m_Values), NULL);
-	(*dest).m_Values = _tmp1_;
-	(*dest).m_Values_length1 = _tmp1__length1;
-	(*dest).m_Values_length2 = _tmp1__length2;
+	dest->row0 = self->row0;
+	dest->row1 = self->row1;
+	dest->row2 = self->row2;
 }
 
 
 void ldraw_maths_matrix_destroy (LdrawMathsMatrix* self) {
-	(*self).m_Values = (g_free ((*self).m_Values), NULL);
 }
 
 

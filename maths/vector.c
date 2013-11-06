@@ -9,15 +9,16 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 #define LDRAW_MATHS_TYPE_VECTOR (ldraw_maths_vector_get_type ())
 typedef struct _LdrawMathsVector LdrawMathsVector;
 #define _g_free0(var) (var = (g_free (var), NULL))
 #define _ldraw_maths_vector_free0(var) ((var == NULL) ? NULL : (var = (ldraw_maths_vector_free (var), NULL)))
 
+typedef float v4sf __attribute__ ((vector_size(16), aligned(16)));
+
 struct _LdrawMathsVector {
-	gfloat m_Values[3];
-};
+	v4sf values;
+} __attribute__((aligned(16)));
 
 
 extern LdrawMathsVector* ldraw_maths_vector_s_NullVector;
@@ -44,179 +45,31 @@ void ldraw_maths_vector_get_NullVector (LdrawMathsVector* result);
 
 
 void ldraw_maths_vector_init (LdrawMathsVector *self, gfloat x, gfloat y, gfloat z) {
-	gfloat _tmp0_;
-	gfloat _tmp1_;
-	gfloat _tmp2_;
-	gfloat _tmp3_[3] = {0};
-	memset (self, 0, sizeof (LdrawMathsVector));
-	_tmp0_ = x;
-	_tmp1_ = y;
-	_tmp2_ = z;
-	_tmp3_[0] = _tmp0_;
-	_tmp3_[1] = _tmp1_;
-	_tmp3_[2] = _tmp2_;
-	memcpy ((*self).m_Values, _tmp3_, 3 * sizeof (gfloat));
+	v4sf temp = {x, y, z, 0.0f};
+	self->values = temp;
 }
 
 
 void ldraw_maths_vector_init_Min (LdrawMathsVector *self, LdrawMathsVector* a, LdrawMathsVector* b) {
-	LdrawMathsVector _tmp0_;
-	gfloat _tmp1_;
-	gfloat _tmp2_;
-	LdrawMathsVector _tmp3_;
-	gfloat _tmp4_;
-	gfloat _tmp5_;
-	gfloat _tmp6_ = 0.0F;
-	LdrawMathsVector _tmp7_;
-	gfloat _tmp8_;
-	gfloat _tmp9_;
-	LdrawMathsVector _tmp10_;
-	gfloat _tmp11_;
-	gfloat _tmp12_;
-	gfloat _tmp13_ = 0.0F;
-	LdrawMathsVector _tmp14_;
-	gfloat _tmp15_;
-	gfloat _tmp16_;
-	LdrawMathsVector _tmp17_;
-	gfloat _tmp18_;
-	gfloat _tmp19_;
-	gfloat _tmp20_ = 0.0F;
-	gfloat _tmp21_[3] = {0};
-	g_return_if_fail (a != NULL);
-	g_return_if_fail (b != NULL);
-	memset (self, 0, sizeof (LdrawMathsVector));
-	_tmp0_ = *a;
-	_tmp1_ = ldraw_maths_vector_get_X (&_tmp0_);
-	_tmp2_ = _tmp1_;
-	_tmp3_ = *b;
-	_tmp4_ = ldraw_maths_vector_get_X (&_tmp3_);
-	_tmp5_ = _tmp4_;
-	_tmp6_ = fminf (_tmp2_, _tmp5_);
-	_tmp7_ = *a;
-	_tmp8_ = ldraw_maths_vector_get_Y (&_tmp7_);
-	_tmp9_ = _tmp8_;
-	_tmp10_ = *b;
-	_tmp11_ = ldraw_maths_vector_get_Y (&_tmp10_);
-	_tmp12_ = _tmp11_;
-	_tmp13_ = fminf (_tmp9_, _tmp12_);
-	_tmp14_ = *a;
-	_tmp15_ = ldraw_maths_vector_get_Z (&_tmp14_);
-	_tmp16_ = _tmp15_;
-	_tmp17_ = *b;
-	_tmp18_ = ldraw_maths_vector_get_Z (&_tmp17_);
-	_tmp19_ = _tmp18_;
-	_tmp20_ = fminf (_tmp16_, _tmp19_);
-	_tmp21_[0] = _tmp6_;
-	_tmp21_[1] = _tmp13_;
-	_tmp21_[2] = _tmp20_;
-	memcpy ((*self).m_Values, _tmp21_, 3 * sizeof (gfloat));
+	self->values = __builtin_ia32_minps(a->values, b->values);
 }
 
 
 void ldraw_maths_vector_init_Max (LdrawMathsVector *self, LdrawMathsVector* a, LdrawMathsVector* b) {
-	LdrawMathsVector _tmp0_;
-	gfloat _tmp1_;
-	gfloat _tmp2_;
-	LdrawMathsVector _tmp3_;
-	gfloat _tmp4_;
-	gfloat _tmp5_;
-	gfloat _tmp6_ = 0.0F;
-	LdrawMathsVector _tmp7_;
-	gfloat _tmp8_;
-	gfloat _tmp9_;
-	LdrawMathsVector _tmp10_;
-	gfloat _tmp11_;
-	gfloat _tmp12_;
-	gfloat _tmp13_ = 0.0F;
-	LdrawMathsVector _tmp14_;
-	gfloat _tmp15_;
-	gfloat _tmp16_;
-	LdrawMathsVector _tmp17_;
-	gfloat _tmp18_;
-	gfloat _tmp19_;
-	gfloat _tmp20_ = 0.0F;
-	gfloat _tmp21_[3] = {0};
-	g_return_if_fail (a != NULL);
-	g_return_if_fail (b != NULL);
-	memset (self, 0, sizeof (LdrawMathsVector));
-	_tmp0_ = *a;
-	_tmp1_ = ldraw_maths_vector_get_X (&_tmp0_);
-	_tmp2_ = _tmp1_;
-	_tmp3_ = *b;
-	_tmp4_ = ldraw_maths_vector_get_X (&_tmp3_);
-	_tmp5_ = _tmp4_;
-	_tmp6_ = fmaxf (_tmp2_, _tmp5_);
-	_tmp7_ = *a;
-	_tmp8_ = ldraw_maths_vector_get_Y (&_tmp7_);
-	_tmp9_ = _tmp8_;
-	_tmp10_ = *b;
-	_tmp11_ = ldraw_maths_vector_get_Y (&_tmp10_);
-	_tmp12_ = _tmp11_;
-	_tmp13_ = fmaxf (_tmp9_, _tmp12_);
-	_tmp14_ = *a;
-	_tmp15_ = ldraw_maths_vector_get_Z (&_tmp14_);
-	_tmp16_ = _tmp15_;
-	_tmp17_ = *b;
-	_tmp18_ = ldraw_maths_vector_get_Z (&_tmp17_);
-	_tmp19_ = _tmp18_;
-	_tmp20_ = fmaxf (_tmp16_, _tmp19_);
-	_tmp21_[0] = _tmp6_;
-	_tmp21_[1] = _tmp13_;
-	_tmp21_[2] = _tmp20_;
-	memcpy ((*self).m_Values, _tmp21_, 3 * sizeof (gfloat));
+	self->values = __builtin_ia32_maxps(a->values, b->values);
 }
 
 
 void ldraw_maths_vector_Add (LdrawMathsVector *self, LdrawMathsVector* v, LdrawMathsVector* result) {
-	gfloat _tmp0_;
-	LdrawMathsVector _tmp1_;
-	gfloat _tmp2_;
-	gfloat _tmp3_;
-	LdrawMathsVector _tmp4_;
-	gfloat _tmp5_;
-	gfloat _tmp6_;
-	LdrawMathsVector _tmp7_;
-	gfloat _tmp8_;
-	LdrawMathsVector _tmp9_ = {0};
-	g_return_if_fail (v != NULL);
-	_tmp0_ = (*self).m_Values[0];
-	_tmp1_ = *v;
-	_tmp2_ = _tmp1_.m_Values[0];
-	_tmp3_ = (*self).m_Values[1];
-	_tmp4_ = *v;
-	_tmp5_ = _tmp4_.m_Values[1];
-	_tmp6_ = (*self).m_Values[2];
-	_tmp7_ = *v;
-	_tmp8_ = _tmp7_.m_Values[2];
-	ldraw_maths_vector_init (&_tmp9_, _tmp0_ + _tmp2_, _tmp3_ + _tmp5_, _tmp6_ + _tmp8_);
-	*result = _tmp9_;
+	v4sf self_vals = self->values;
+	v4sf v_vals = v->values;
+	result->values = __builtin_ia32_addps(self_vals, v_vals);
 	return;
 }
 
 
 void ldraw_maths_vector_Subtract (LdrawMathsVector *self, LdrawMathsVector* v, LdrawMathsVector* result) {
-	gfloat _tmp0_;
-	LdrawMathsVector _tmp1_;
-	gfloat _tmp2_;
-	gfloat _tmp3_;
-	LdrawMathsVector _tmp4_;
-	gfloat _tmp5_;
-	gfloat _tmp6_;
-	LdrawMathsVector _tmp7_;
-	gfloat _tmp8_;
-	LdrawMathsVector _tmp9_ = {0};
-	g_return_if_fail (v != NULL);
-	_tmp0_ = (*self).m_Values[0];
-	_tmp1_ = *v;
-	_tmp2_ = _tmp1_.m_Values[0];
-	_tmp3_ = (*self).m_Values[1];
-	_tmp4_ = *v;
-	_tmp5_ = _tmp4_.m_Values[1];
-	_tmp6_ = (*self).m_Values[2];
-	_tmp7_ = *v;
-	_tmp8_ = _tmp7_.m_Values[2];
-	ldraw_maths_vector_init (&_tmp9_, _tmp0_ - _tmp2_, _tmp3_ - _tmp5_, _tmp6_ - _tmp8_);
-	*result = _tmp9_;
+	result->values = __builtin_ia32_subps(self->values, v->values);
 	return;
 }
 
@@ -242,24 +95,24 @@ void ldraw_maths_vector_Cross (LdrawMathsVector *self, LdrawMathsVector* v, Ldra
 	gfloat _tmp17_;
 	LdrawMathsVector _tmp18_ = {0};
 	g_return_if_fail (v != NULL);
-	_tmp0_ = (*self).m_Values[1];
+	_tmp0_ = (*self).values[1];
 	_tmp1_ = *v;
-	_tmp2_ = _tmp1_.m_Values[2];
-	_tmp3_ = (*self).m_Values[2];
+	_tmp2_ = _tmp1_.values[2];
+	_tmp3_ = (*self).values[2];
 	_tmp4_ = *v;
-	_tmp5_ = _tmp4_.m_Values[1];
-	_tmp6_ = (*self).m_Values[2];
+	_tmp5_ = _tmp4_.values[1];
+	_tmp6_ = (*self).values[2];
 	_tmp7_ = *v;
-	_tmp8_ = _tmp7_.m_Values[0];
-	_tmp9_ = (*self).m_Values[0];
+	_tmp8_ = _tmp7_.values[0];
+	_tmp9_ = (*self).values[0];
 	_tmp10_ = *v;
-	_tmp11_ = _tmp10_.m_Values[2];
-	_tmp12_ = (*self).m_Values[0];
+	_tmp11_ = _tmp10_.values[2];
+	_tmp12_ = (*self).values[0];
 	_tmp13_ = *v;
-	_tmp14_ = _tmp13_.m_Values[1];
-	_tmp15_ = (*self).m_Values[1];
+	_tmp14_ = _tmp13_.values[1];
+	_tmp15_ = (*self).values[1];
 	_tmp16_ = *v;
-	_tmp17_ = _tmp16_.m_Values[0];
+	_tmp17_ = _tmp16_.values[0];
 	ldraw_maths_vector_init (&_tmp18_, (_tmp0_ * _tmp2_) - (_tmp3_ * _tmp5_), (_tmp6_ * _tmp8_) - (_tmp9_ * _tmp11_), (_tmp12_ * _tmp14_) - (_tmp15_ * _tmp17_));
 	*result = _tmp18_;
 	return;
@@ -267,28 +120,8 @@ void ldraw_maths_vector_Cross (LdrawMathsVector *self, LdrawMathsVector* v, Ldra
 
 
 gfloat ldraw_maths_vector_Dot (LdrawMathsVector *self, LdrawMathsVector* v) {
-	gfloat result = 0.0F;
-	gfloat _tmp0_;
-	LdrawMathsVector _tmp1_;
-	gfloat _tmp2_;
-	gfloat _tmp3_;
-	LdrawMathsVector _tmp4_;
-	gfloat _tmp5_;
-	gfloat _tmp6_;
-	LdrawMathsVector _tmp7_;
-	gfloat _tmp8_;
-	g_return_val_if_fail (v != NULL, 0.0F);
-	_tmp0_ = (*self).m_Values[0];
-	_tmp1_ = *v;
-	_tmp2_ = _tmp1_.m_Values[0];
-	_tmp3_ = (*self).m_Values[1];
-	_tmp4_ = *v;
-	_tmp5_ = _tmp4_.m_Values[1];
-	_tmp6_ = (*self).m_Values[2];
-	_tmp7_ = *v;
-	_tmp8_ = _tmp7_.m_Values[2];
-	result = ((_tmp0_ * _tmp2_) + (_tmp3_ * _tmp5_)) + (_tmp6_ * _tmp8_);
-	return result;
+	v4sf parts = __builtin_ia32_mulps(self->values, v->values);
+	return parts[0] + parts[1] + parts[2];
 }
 
 
@@ -305,21 +138,8 @@ void ldraw_maths_vector_Normalized (LdrawMathsVector *self, LdrawMathsVector* re
 
 
 void ldraw_maths_vector_Scale (LdrawMathsVector *self, gfloat scale, LdrawMathsVector* result) {
-	gfloat _tmp0_;
-	gfloat _tmp1_;
-	gfloat _tmp2_;
-	gfloat _tmp3_;
-	gfloat _tmp4_;
-	gfloat _tmp5_;
-	LdrawMathsVector _tmp6_ = {0};
-	_tmp0_ = (*self).m_Values[0];
-	_tmp1_ = scale;
-	_tmp2_ = (*self).m_Values[1];
-	_tmp3_ = scale;
-	_tmp4_ = (*self).m_Values[2];
-	_tmp5_ = scale;
-	ldraw_maths_vector_init (&_tmp6_, _tmp0_ * _tmp1_, _tmp2_ * _tmp3_, _tmp4_ * _tmp5_);
-	*result = _tmp6_;
+	v4sf scale_vector = {scale, scale, scale, scale};
+	result->values = __builtin_ia32_mulps(self->values, scale_vector);
 	return;
 }
 
@@ -337,13 +157,13 @@ gchar* ldraw_maths_vector_to_string (LdrawMathsVector *self) {
 	gchar* _tmp8_;
 	gchar* _tmp9_ = NULL;
 	gchar* _tmp10_;
-	_tmp0_ = (*self).m_Values[0];
+	_tmp0_ = (*self).values[0];
 	_tmp1_ = g_strdup_printf ("%g", _tmp0_);
 	_tmp2_ = _tmp1_;
-	_tmp3_ = (*self).m_Values[1];
+	_tmp3_ = (*self).values[1];
 	_tmp4_ = g_strdup_printf ("%g", _tmp3_);
 	_tmp5_ = _tmp4_;
-	_tmp6_ = (*self).m_Values[2];
+	_tmp6_ = (*self).values[2];
 	_tmp7_ = g_strdup_printf ("%g", _tmp6_);
 	_tmp8_ = _tmp7_;
 	_tmp9_ = g_strconcat ("( ", _tmp2_, ", ", _tmp5_, ", ", _tmp8_, " )", NULL);
@@ -364,8 +184,7 @@ static gpointer _ldraw_maths_vector_dup0 (gpointer self) {
 void ldraw_maths_vector_get_NullVector (LdrawMathsVector* result) {
 	LdrawMathsVector* _tmp0_;
 	LdrawMathsVector* _tmp3_;
-	_tmp0_ = ldraw_maths_vector_s_NullVector;
-	if (_tmp0_ == NULL) {
+	if (ldraw_maths_vector_s_NullVector == NULL) {
 		LdrawMathsVector _tmp1_ = {0};
 		LdrawMathsVector* _tmp2_;
 		ldraw_maths_vector_init (&_tmp1_, (gfloat) 0, (gfloat) 0, (gfloat) 0);
@@ -373,39 +192,26 @@ void ldraw_maths_vector_get_NullVector (LdrawMathsVector* result) {
 		_ldraw_maths_vector_free0 (ldraw_maths_vector_s_NullVector);
 		ldraw_maths_vector_s_NullVector = _tmp2_;
 	}
-	_tmp3_ = ldraw_maths_vector_s_NullVector;
-	*result = *_tmp3_;
+	*result = *ldraw_maths_vector_s_NullVector;
 	return;
 }
 
 
 gfloat ldraw_maths_vector_get_X (LdrawMathsVector* self) {
-	gfloat result;
-	gfloat _tmp0_;
 	g_return_val_if_fail (self != NULL, 0.0F);
-	_tmp0_ = (*self).m_Values[0];
-	result = _tmp0_;
-	return result;
+	return self->values[0];
 }
 
 
 gfloat ldraw_maths_vector_get_Y (LdrawMathsVector* self) {
-	gfloat result;
-	gfloat _tmp0_;
 	g_return_val_if_fail (self != NULL, 0.0F);
-	_tmp0_ = (*self).m_Values[1];
-	result = _tmp0_;
-	return result;
+	return self->values[1];
 }
 
 
 gfloat ldraw_maths_vector_get_Z (LdrawMathsVector* self) {
-	gfloat result;
-	gfloat _tmp0_;
 	g_return_val_if_fail (self != NULL, 0.0F);
-	_tmp0_ = (*self).m_Values[2];
-	result = _tmp0_;
-	return result;
+	return self->values[2];
 }
 
 

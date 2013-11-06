@@ -31,9 +31,18 @@ typedef struct _LdrawMathsMatrix LdrawMathsMatrix;
 #define _g_free0(var) (var = (g_free (var), NULL))
 typedef struct _LdrawMathsParamSpecBounds LdrawMathsParamSpecBounds;
 
+
+typedef float v4sf __attribute__ ((vector_size(16), aligned(16)));
+
+struct _LdrawMathsMatrix {
+	v4sf row0;
+	v4sf row1;
+	v4sf row2;
+} __attribute__((aligned(16)));
+
 struct _LdrawMathsVector {
-	gfloat m_Values[3];
-};
+	v4sf values;
+} __attribute__((aligned(16)));
 
 struct _LdrawMathsBounds {
 	GTypeInstance parent_instance;
@@ -47,12 +56,6 @@ struct _LdrawMathsBounds {
 struct _LdrawMathsBoundsClass {
 	GTypeClass parent_class;
 	void (*finalize) (LdrawMathsBounds *self);
-};
-
-struct _LdrawMathsMatrix {
-	gfloat* m_Values;
-	gint m_Values_length1;
-	gint m_Values_length2;
 };
 
 struct _LdrawMathsParamSpecBounds {
