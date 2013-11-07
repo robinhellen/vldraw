@@ -64,7 +64,7 @@ namespace Ldraw.Lego
 			{
 				foreach(LdrawObject object in possibilities)
 				{
-					if(object.FileName == m_FileName)
+					if(object.FileName.casefold() == m_FileName.casefold())
 					{
 						Nodes = object.Nodes;
 						FileName = m_FileName;
