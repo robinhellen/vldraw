@@ -69,16 +69,8 @@ namespace Ldraw.Lego
 					bounds.Union(((CondLineNode)node).B);
 				}
 			}
-			stderr.printf(@"Finished calculating bounds in $(timer.elapsed()) seconds.\n");
+			//stderr.printf(@"Finished calculating bounds in $(timer.elapsed()) seconds.\n");
 			return bounds;
-		}
-
-		private void Nodes_OnSelectChanged(ParamSpec pspec)
-		{
-			if(m_ChangingSelection)
-				return;
-
-			SelectionChanged();
 		}
 
 		public Collection<LdrawNode> Selection
@@ -148,6 +140,7 @@ namespace Ldraw.Lego
 			{
 				newNode.notify["ColourId"].connect(() => VisibleChange());
 			}
+			newNode.notify["Selected"].connect(() => {stderr.printf("recieved node selected changed signal.\n"); VisibleChange();});
 		}
 
 		public void MoveSelectedNodes(Vector displacement)

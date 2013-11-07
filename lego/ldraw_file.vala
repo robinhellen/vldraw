@@ -35,7 +35,7 @@ namespace Ldraw.Lego
 					if(nodeForLine is Comment)
 						if(HandleCommentLine(line))
 							continue;
-					MainObject.Nodes.add(nodeForLine);
+					MainObject.AddNode(nodeForLine);
 				}
 				m_FileName = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
 				MainObject.FileName = m_FileName;
