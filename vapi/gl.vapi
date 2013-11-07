@@ -11567,7 +11567,7 @@ namespace GL {
 	[CCode (cheader_filename = "GL/gl.h", cname = "glSecondaryColorPointerListIBM")]
 	public static void glSecondaryColorPointerListIBM (GL.GLint size, GL.GLenum type, GL.GLint stride, [CCode (array_length = false, array_null_terminated = true)] GL.GLvoid[]? pointer, GL.GLint ptrstride);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glSelectBuffer")]
-	public static void glSelectBuffer (GL.GLsizei size, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] buffer);
+	public static void glSelectBuffer (GL.GLsizei size, [CCode (array_length = false)] GL.GLuint[] buffer);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glSelectPerfMonitorCountersAMD")]
 	public static void glSelectPerfMonitorCountersAMD (GL.GLuint monitor, GL.GLboolean enable, GL.GLuint group, GL.GLint numCounters, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] counterList);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glSeparableFilter2D")]

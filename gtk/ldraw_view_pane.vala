@@ -12,9 +12,9 @@ namespace Ldraw.Ui.Widgets
 		private LdrawObject m_Model;
 		private ViewAngle m_Angle;
 		protected float m_Scale;
-		private Vector? m_Eyeline = null;
+		protected Vector? m_Eyeline = null;
 		protected Vector? m_Center = null;
-		private Vector? m_Up = null;
+		protected Vector? m_Up = null;
 		private DateTime m_LastRedraw = null;
 
 		private Adjustment m_Hadj = null;
@@ -226,7 +226,7 @@ namespace Ldraw.Ui.Widgets
 			m_Up = m_Angle.GetCameraUp();
 		}
 
-		private Bounds CalculateViewArea()
+		protected Bounds CalculateViewArea()
 		{
 			Allocation alloc;
 			get_allocation(out alloc);

@@ -46,10 +46,14 @@ namespace Ldraw.Ui.Widgets
 		{
 			// if button is right, popup context menu
 			grab_focus();
-			if(event.button == 3) // right mouse button
+			switch(event.button)
 			{
-				CreateContextMenu().popup(null, null, null, event.button, event.time);
-				return true;
+				case 1: // left
+					SelectTopMostUnderMouse(event.x, event.y);
+					break;
+				case 3: // right button
+					CreateContextMenu().popup(null, null, null, event.button, event.time);
+					return true;
 			}
 			return false;
 		}
@@ -135,9 +139,6 @@ namespace Ldraw.Ui.Widgets
 
 			float deltaX = deltaXPx * m_Scale;
 			float deltaY = deltaYPx * m_Scale;
-
-			stdout.printf(@"part dropped at ($x, $y), delta values are ($deltaX, $deltaY), center is $m_Center.\n");
-
 
 			// TODO: adjust addition position for drop location
 			switch(Angle)
@@ -232,6 +233,44 @@ namespace Ldraw.Ui.Widgets
 			orthoAngle.show();
 
 			return menu;
+		}
+
+		private void SelectTopMostUnderMouse(double x, double y)
+		{
+			Allocation alloc;
+			get_allocation(out alloc);
+
+			var fullBounds = CalculateViewArea();
+
+			var modelBounds = Model.BoundingBox;
+			var radius = modelBounds.Radius;
+			var modelCenterZ = modelBounds.Center().Z;
+
+			var pixelVolume = new Bounds();
+			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MaxX, fullBounds.MinX, ((float)x + 0.5f) / alloc.width),
+									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y + 0.5f) / alloc.height),
+									 modelCenterZ + radius * 100));
+			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MaxX, fullBounds.MinX, ((float)x - 0.5f) / alloc.width),
+									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y - 0.5f) / alloc.height),
+									 modelCenterZ - radius * 100));
+
+			GLWindow drawableWin = widget_get_gl_window(this);
+			GLDrawable drawable = (GLDrawable)drawableWin;
+			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
+
+			drawable.gl_begin(context);
+
+			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
+			Model.BuildFromFile(builder);
+
+			builder.ApplySelection(Model);
+			drawable.gl_end();
+			drawable.wait_gl();
+		}
+
+		private float ScaleBetween(float start, float end, float ratio)
+		{
+			return start + ((end - start) * ratio);
 		}
 
 		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");
