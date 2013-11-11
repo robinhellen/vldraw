@@ -34,7 +34,8 @@ namespace Ldraw.Ui.Widgets
 				throw new GlError.InitializationError("Unable to initialize a drawing area for OpenGL rendering.");
 			}
 
-			// create overlay rendering window
+			// minimum size 100 px square
+			set_size_request(100, 100);
 
 		}
 
@@ -43,8 +44,8 @@ namespace Ldraw.Ui.Widgets
 		{
 			this(angle);
 			m_Model = model;
-			m_Model.VisibleChange.connect(() => RedrawWithError());
-			m_Model.SelectionChanged.connect(() => RedrawWithError());
+			m_Model.VisibleChange.connect(() => queue_draw());
+			m_Model.SelectionChanged.connect(() => queue_draw());
 		}
 
 		public signal void RenderingError(string description);
@@ -58,17 +59,12 @@ namespace Ldraw.Ui.Widgets
 			set
 			{
 				m_Model = value;
-				m_Model.VisibleChange.connect(() => RedrawWithError());
-				m_Model.SelectionChanged.connect(() => RedrawWithError());
+				m_Model.VisibleChange.connect(() => queue_draw());
+				m_Model.SelectionChanged.connect(() => queue_draw());
 				m_Eyeline = m_Center = m_Up = null;
-				try
-				{
-					Redraw();
-				}
-				catch(GlError e)
-				{
-					RenderingError(@"Unable to render model:\n $(e.message)");
-				}
+				SetAdjustmentRanges();
+
+				queue_draw();
 			}
 		}
 
@@ -110,18 +106,6 @@ namespace Ldraw.Ui.Widgets
 			drawable.wait_gl();
 		}
 
-		private void RedrawWithError()
-		{
-			try
-			{
-				Redraw();
-			}
-			catch (GlError e)
-			{
-				RenderingError(e.message);
-			}
-		}
-
 		public override bool configure_event(Gdk.EventConfigure event)
 		{
 			try
@@ -150,22 +134,30 @@ namespace Ldraw.Ui.Widgets
 
 		public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
 		{
-			m_Hadj = hadj;
+			m_Hadj = hadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
+			m_Hadj.lower = -3000;
+			m_Hadj.upper = 3000;
+			m_Hadj.page_increment = 150;
+			m_Hadj.step_increment = 30;
 			m_Hadj.value_changed.connect(adj =>
 					{
-						float dx = (float)adj.value - m_Center.X;
+						float dx = -(float)adj.value - m_Center.X;
 						m_Center = m_Center.Add(Vector(dx, 0, 0));
 						m_Eyeline = m_Eyeline.Add(Vector(dx, 0, 0));
-						RedrawWithError();
+						queue_draw();
 					});
-			m_Vadj = vadj;
+			m_Vadj = vadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
+			m_Vadj.lower = -3000;
+			m_Vadj.upper = 3000;
+			m_Vadj.page_increment = 150;
+			m_Vadj.step_increment = 30;
 			m_Vadj.value_changed.connect(adj =>
 					{
-						float dy = (float)adj.value - m_Center.Y;
+						float dy = -(float)adj.value - m_Center.Y;
 
 						m_Center = m_Center.Add(Vector(0, dy, 0));
 						m_Eyeline = m_Eyeline.Add(Vector(0, dy, 0));
-						RedrawWithError();
+						queue_draw();
 					});
 
 			SetAdjustmentRanges();
@@ -173,14 +165,13 @@ namespace Ldraw.Ui.Widgets
 
 		private void SetAdjustmentRanges()
 			requires(m_Hadj != null)
-			requires(m_Center != null)
 		{
-			m_Hadj.lower = 2 * m_Model.BoundingBox.MinX - m_Center.X;
-			m_Hadj.upper = 2 * m_Model.BoundingBox.MaxX - m_Center.X;
-			m_Hadj.value = m_Center.X;
-			m_Vadj.lower = 2 * m_Model.BoundingBox.MinY - m_Center.Y;
-			m_Vadj.upper = 2 * m_Model.BoundingBox.MaxY - m_Center.Y;
-			m_Vadj.value = m_Center.Y;
+			if(m_Center == null)
+				return;
+
+			m_Hadj.value = -m_Center.X;
+
+			m_Vadj.value = -m_Center.Y;
 		}
 
 		public ViewAngle Angle
@@ -193,25 +184,26 @@ namespace Ldraw.Ui.Widgets
 			{
 				m_Angle = value;
 				m_Eyeline = m_Center = m_Up = null;
-				try
-				{
-					Redraw();
-				}
-				catch (GlError e)
-				{
-					RenderingError(@"OpenGL error redrawing due to changte of view angle: \n $(e.message).");
-				}
 				if(m_Hadj != null)
 				{
 					SetAdjustmentRanges();
 				}
+				queue_draw();
 			}
 		}
 
 		private void InitializeView()
 		{
-			float modelRadius = m_Model.BoundingBox.Radius;
-			var modelCenter = m_Model.BoundingBox.Center();
+			var modelBounds = new Bounds.Clone(m_Model.BoundingBox);
+			if(modelBounds.Radius == 0)
+			{
+				var v = Vector(240, 120, 240);
+				modelBounds.Union(Vector.NullVector.Add(v));
+				modelBounds.Union(Vector.NullVector.Subtract(v));
+			}
+
+			float modelRadius = modelBounds.Radius;
+			var modelCenter = modelBounds.Center();
 			Vector cameraShift = m_Angle.GetCameraDirection().Scale(modelRadius);
 			m_Center = m_Angle.GetViewCenter(modelCenter);
 
@@ -220,10 +212,13 @@ namespace Ldraw.Ui.Widgets
 			Allocation alloc;
 			get_allocation(out alloc);
 			int size = (alloc.height > alloc.width) ? alloc.width : alloc.height;
-			m_Scale = (2.0f * modelRadius) / size;
+			m_Scale = (modelRadius) / size;
 			if(m_Scale < 0.0f) {m_Scale = -m_Scale;}
+			m_Scale = Math.fmaxf(m_Scale, 0.25f);
 
 			m_Up = m_Angle.GetCameraUp();
+
+			SetAdjustmentRanges();
 		}
 
 		protected Bounds CalculateViewArea()
@@ -231,7 +226,7 @@ namespace Ldraw.Ui.Widgets
 			Allocation alloc;
 			get_allocation(out alloc);
 
-			return m_Angle.GetViewBounds(m_Model.BoundingBox, alloc.width, alloc.height, 1);
+			return m_Angle.GetViewBounds(alloc.width, alloc.height, m_Scale, m_Center);
 		}
 	}
 
@@ -289,67 +284,28 @@ namespace Ldraw.Ui.Widgets
 			{
 				case Front:
 				case Back:
-					return Vector(modelCenter.X, modelCenter.Y, 0);
+					return Vector(modelCenter.X, -modelCenter.Y, 0);
 				case Top:
 				case Bottom:
 					return Vector(modelCenter.X, modelCenter.Z, 0);
 				case Left:
 				case Right:
-					return Vector(modelCenter.Z, modelCenter.Y, 0);
+					return Vector(modelCenter.Z, -modelCenter.Y, 0);
 				case Ortho:
 				default:
 					return Vector(0, 0, 0);
 			}
 		}
 
-		public Bounds GetViewBounds(Bounds modelBounds, int viewWidth, int viewHeight, int zoomLevel)
+		public Bounds GetViewBounds(int viewWidth, int viewHeight, float scale, Vector viewCenter)
 		{
-			float viewRatio = (float)viewWidth / viewHeight;
-			var scaleFactor = 1.1 * Math.pow(2, ((float)zoomLevel / 4));
+			var viewWidthLdu = viewWidth * scale;
+			var viewHeightLdu = viewHeight * scale;
 
 			Bounds b = new Bounds();
-			switch(this)
-			{
-				case Front:
-				case Back:
-					b.Union(Vector(modelBounds.MaxX, -modelBounds.MaxY, 0));
-					b.Union(Vector(modelBounds.MinX, -modelBounds.MinY, 0));
-					break;
-				case Left:
-				case Right:
-					b.Union(Vector(modelBounds.MaxZ, -modelBounds.MaxY, 0));
-					b.Union(Vector(modelBounds.MinZ, -modelBounds.MinY, 0));
-					break;
-				case Top:
-				case Bottom:
-					b.Union(Vector(modelBounds.MaxX, modelBounds.MaxZ, 0));
-					b.Union(Vector(modelBounds.MinX, modelBounds.MinZ, 0));
-					break;
-				case Ortho:
-				default:
-					b.IncludeBounds(modelBounds, Matrix(1, 0, 0, 0, -1, 0, 0, 0, 1), Vector.NullVector);
-					break;
-			}
+			b.Union(viewCenter.Add(Vector(viewWidthLdu / 2, viewHeightLdu / 2, 1000000)));
+			b.Union(viewCenter.Subtract(Vector(viewWidthLdu / 2, viewHeightLdu / 2, 1000000)));
 
-			var modelRatio = (b.MaxX - b.MinX) / (b.MaxY - b.MinY);
-			var viewCenter = b.Center();
-			if(modelRatio > viewRatio)
-			{
-				b.Union(Vector(0, (float)((b.MaxY - viewCenter.Y) * (modelRatio / viewRatio) + viewCenter.Y), 0));
-				b.Union(Vector(0, (float)((b.MinY - viewCenter.Y) * (modelRatio / viewRatio) + viewCenter.Y), 0));
-			}
-			else
-			{
-				b.Union(Vector((float)((b.MaxX - viewCenter.X) * (viewRatio / modelRatio) + viewCenter.X), 0, 0));
-				b.Union(Vector((float)((b.MinX - viewCenter.X) * (viewRatio / modelRatio) + viewCenter.X), 0, 0));
-			}
-
-			b = b.Scale((float)scaleFactor);
-
-			var radius = modelBounds.Radius;
-			var modelCenterZ = modelBounds.Center().Z;
-			b.Union(Vector(0, 0, modelCenterZ + radius * 100));
-			b.Union(Vector(0, 0, modelCenterZ - radius * 100));
 			return b;
 		}
 	}

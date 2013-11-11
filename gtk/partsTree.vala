@@ -26,12 +26,8 @@ namespace Ldraw.Ui.Widgets
 			// set up for drag and drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
 			m_Tree.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
-			m_Tree.drag_begin.connect(() => stdout.printf("begin.\n"));
-			m_Tree.drag_motion.connect(() => {stdout.printf("motion.\n"); return true;});
+			m_Tree.drag_begin.connect(Tree_OnDragBegin);
 			m_Tree.drag_data_get.connect(Tree_OnDragDataGet);
-			m_Tree.drag_data_delete.connect(() => stdout.printf("data delete.\n"));
-			m_Tree.drag_drop.connect(() => {stdout.printf("drop.\n"); return true;});
-			m_Tree.drag_end.connect(() => stdout.printf("end.\n"));
 		}
 
 		private TreeModel CreateAndPopulateModel()
@@ -92,12 +88,16 @@ namespace Ldraw.Ui.Widgets
 			m_Detail.Model = current.MainObject;
 		}
 
+		private void Tree_OnDragBegin(DragContext context)
+		{
+			drag_set_icon_default(context);
+		}
+
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
 			LdrawPart current = CurrentPart;
 			string currentName = current.Name;
-			data.set(Atom.intern("Ldraw Part", false), 8, currentName.data);
-
+			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
 		}
 
 		private LdrawPart? CurrentPart

@@ -24,10 +24,11 @@ namespace Ldraw.Ui.Widgets
 
 			// set up this control for drag-and-drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
-			drag_dest_set(this, DestDefaults.ALL, {LdrawDragData}, DragAction.COPY);
+			drag_dest_set(this, (DestDefaults)0, {LdrawDragData}, DragAction.COPY);
+			drag_dest_set_track_motion(this, true);
 		}
 
-		public LdrawEditPane.WithModel(ViewAngle angle, LdrawObject model, IOptions settings)
+		/*public LdrawEditPane.WithModel(ViewAngle angle, LdrawObject model, IOptions settings)
 			throws GlError
 		{
 			base.WithModel(angle, model);
@@ -39,8 +40,8 @@ namespace Ldraw.Ui.Widgets
 
 			// set up this control for drag-and-drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
-			drag_dest_set(this, DestDefaults.ALL, {LdrawDragData}, DragAction.COPY);
-		}
+			drag_dest_set(this, (DestDefaults)0, {LdrawDragData}, DragAction.COPY);
+		}*/
 
 		public override bool button_press_event(Gdk.EventButton event)
 		{
@@ -56,6 +57,22 @@ namespace Ldraw.Ui.Widgets
 					return true;
 			}
 			return false;
+		}
+
+		public override bool scroll_event(Gdk.EventScroll event)
+		{
+			switch(event.direction)
+			{
+				case Gdk.ScrollDirection.UP:
+					m_Scale *= Math.powf(2, -0.2f);
+					queue_draw();
+					break;
+				case Gdk.ScrollDirection.DOWN:
+					m_Scale *= Math.powf(2, 0.2f);
+					queue_draw();
+					break;
+			}
+			return true;
 		}
 
 		public override bool key_press_event(Gdk.EventKey event)
@@ -94,14 +111,19 @@ namespace Ldraw.Ui.Widgets
 			return false;
 		}
 
+		private bool finishDrag = false;
+
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
 		{
-			drag_finish(context, true, false, time_);
+			finishDrag = true;
+			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
+			finishDrag = false;
 			return true;
 		}
 
 		public override bool drag_motion(DragContext context, int x, int y, uint time_)
 		{
+			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			return true;
 		}
 
@@ -120,11 +142,8 @@ namespace Ldraw.Ui.Widgets
 			Vector newPosition = Vector.NullVector;
 			int newColour = 0;
 			PartNode copyPart = null;
-			copyPart = Model.LastSelected;
-			if(copyPart == null)
-			{
-				copyPart = Model.LastSubFile;
-			}
+			copyPart = Model.LastSelected ?? Model.LastSubFile;
+
 			if(copyPart != null)
 			{
 				newTransform = copyPart.Transform;
@@ -144,53 +163,59 @@ namespace Ldraw.Ui.Widgets
 			switch(Angle)
 			{
 				case ViewAngle.Ortho:
-					newPosition = Vector.NullVector;
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
 					newPosition = Vector(
-						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X),
-						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
-						0);
+						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
+						newPosition.Z);
 					break;
 				case ViewAngle.Back:
 					newPosition = Vector(
-						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X),
-						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
-						0);
+						SnapTo(-m_Center.X + deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
+						newPosition.Z);
 					break;
 				case ViewAngle.Left:
 					newPosition = Vector(
-						0,
-						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
-						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z - deltaX) / m_Settings.CurrentGrid.Z));
+						newPosition.X,
+						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
+						SnapTo(m_Center.Z + deltaX, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Right:
 					newPosition = Vector(
-						0,
-						m_Settings.CurrentGrid.Y * Math.roundf((-m_Center.Y + deltaY) / m_Settings.CurrentGrid.Y),
-						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaX) / m_Settings.CurrentGrid.Z));
+						newPosition.X,
+						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
+						SnapTo(m_Center.Z - deltaX, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Top:
 					newPosition = Vector(
-						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X - deltaX) / m_Settings.CurrentGrid.X),
-						0,
-						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.X),
+						newPosition.Y,
+						SnapTo(m_Center.Z - deltaY, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Bottom:
 					newPosition = Vector(
-						m_Settings.CurrentGrid.X * Math.roundf((m_Center.X + deltaX) / m_Settings.CurrentGrid.X),
-						0,
-						m_Settings.CurrentGrid.Z * Math.roundf((m_Center.Z + deltaY) / m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.X),
+						newPosition.Y,
+						SnapTo(m_Center.Z - deltaY, m_Settings.CurrentGrid.Z));
 					break;
 				default:
 					newPosition = Vector.NullVector;
 					break;
 			}
 
-
-			LdrawNode newNode = new PartNode(newPosition, newTransform, part.MainObject, newColour);
-			Model.AddNode(newNode, copyPart);
-			stdout.printf(@"part dropped at $(newPosition)\n");
+			if(finishDrag)
+			{
+				LdrawNode newNode = new PartNode(newPosition, newTransform, part.MainObject, newColour);
+				Model.AddNode(newNode, copyPart);
+				drag_finish(context, true, false, time);
+			}
+			else
+			{
+				// TODO: make an outline get drawn.
+				drag_status(context, context.suggested_action, time);
+			}
 		}
 
 		private Gtk.Menu CreateContextMenu()
@@ -271,6 +296,13 @@ namespace Ldraw.Ui.Widgets
 		private float ScaleBetween(float start, float end, float ratio)
 		{
 			return start + ((end - start) * ratio);
+		}
+
+		private float SnapTo(float raw, float step)
+		{
+			var result = step * Math.roundf(raw / step);
+			stderr.printf(@"Snapping $raw to $step gives $result.\n");
+			return result;
 		}
 
 		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");

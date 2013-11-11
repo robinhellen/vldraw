@@ -12,7 +12,7 @@ namespace Ldraw.Ui
 		private ComboBox m_SubModels;
 
 		// controls
-		LdrawViewPane m_View;
+		EditPanes m_View;
 		LdrawViewPane m_PartDetail;
 		ModelList m_ModelList;
 		LdrawFileLoader m_Loader;
@@ -41,18 +41,14 @@ namespace Ldraw.Ui
 			VBox bigVBox = new VBox(false, 0);
 			bigVBox.pack_start(menus, false, false);
 
-			HBox toolbars = new HBox(false, 0);
-
-			toolbars.pack_start(toolbarProvider.GetGridToolbar(), false, false);
 			Toolbar tools = toolbarProvider.GetMovementToolbar();
-			toolbars.pack_start(tools, false, false);
 			Toolbar colourTools = toolbarProvider.GetColoursToolbar();
 			bigVBox.pack_start(colourTools, false, false);
-			bigVBox.pack_start(toolbars, false, false);
+			bigVBox.pack_start(tools, false, false);
 
 			try
 			{
-				m_View = new LdrawEditPane(ViewAngle.Front, m_Settings);
+				m_View = new EditPanes(m_Settings);
 			}
 			catch(OpenGl.GlError e)
 			{
@@ -90,7 +86,7 @@ namespace Ldraw.Ui
 			viewDetails.pack_start(m_ModelList.Widget);
 
 			modelPanes.add1(WithFrame(viewDetails));
-			modelPanes.add2(WithFrame(WithScrolls(m_View)));
+			modelPanes.add2(WithFrame(m_View));
 
 			treePaned.add2(modelPanes);
 
@@ -198,13 +194,6 @@ namespace Ldraw.Ui
 			return frame;
 		}
 
-		private Widget WithScrolls(Widget widget)
-		{
-			ScrolledWindow win = new ScrolledWindow(null, null);
-			win.add(widget);
-			return win;
-		}
-
 		private void FileOpen_OnActivate()
 		{
 			FileChooserDialog dialog = new FileChooserDialog("Open File", this, FileChooserAction.OPEN
@@ -238,13 +227,51 @@ namespace Ldraw.Ui
 
 		private void FileSave_OnActivate()
 		{
+			stderr.printf("Save button clicked.\n");
 			if(File.FilePath != null)
+			{
+				stderr.printf("Saving file.\n");
 				File.Save();
-			FileSaveAs_OnActivate();
+			}
+			else
+			{
+				stderr.printf("Filename not set, calling save as.\n");
+				FileSaveAs_OnActivate();
+			}
 		}
 
 		private void FileSaveAs_OnActivate()
 		{
+			FileChooserDialog dialog = new FileChooserDialog("Save File As", this, FileChooserAction.SAVE
+												, Stock.CANCEL, ResponseType.CANCEL
+												, Stock.SAVE, ResponseType.ACCEPT);
+
+			FileFilter filter = new FileFilter();
+			filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
+
+			string modelsFolder = "/home/robin/ldraw/models";
+			dialog.set_current_folder(modelsFolder);
+
+			if(dialog.run() == ResponseType.ACCEPT)
+			{
+				string saveTo = dialog.get_filename();
+				try
+				{
+					File.FilePath = saveTo;
+					File.Save();
+					var file = GLib.File.new_for_path(saveTo);
+					File.FileName = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
+					title = @"vldraw - $(File.FileName)";
+				}
+				catch(Error e)
+				{
+					// TODO: print an error message
+					stdout.printf(e.message);
+					dialog.close();
+					return;
+				}
+			}
+			dialog.close();
 		}
 
 		protected LdrawModelFile File
@@ -268,6 +295,10 @@ namespace Ldraw.Ui
 				{
 					m_SubModels.visible = false;
 				}
+
+				var titleFileName = value.FileName ?? "untitled";
+
+				title = @"vldraw - $titleFileName";
 			}
 		}
 

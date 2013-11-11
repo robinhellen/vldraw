@@ -20,6 +20,7 @@ namespace Ldraw.Ui
 		public Toolbar GetMovementToolbar()
 		{
 			Toolbar bar = new Toolbar();
+
 			bar.insert(new SeparatorToolItem(), -1);
 			bar.insert(CreateTranslateButton(Axis.X, true), -1);
 			bar.insert(CreateTranslateButton(Axis.X, false), -1);
@@ -27,6 +28,7 @@ namespace Ldraw.Ui
 			bar.insert(CreateTranslateButton(Axis.Y, false), -1);
 			bar.insert(CreateTranslateButton(Axis.Z, true), -1);
 			bar.insert(CreateTranslateButton(Axis.Z, false), -1);
+
 			bar.insert(new SeparatorToolItem(), -1);
 			bar.insert(CreateRotateButton(Axis.X, true), -1);
 			bar.insert(CreateRotateButton(Axis.X, false), -1);
@@ -34,6 +36,11 @@ namespace Ldraw.Ui
 			bar.insert(CreateRotateButton(Axis.Y, false), -1);
 			bar.insert(CreateRotateButton(Axis.Z, true), -1);
 			bar.insert(CreateRotateButton(Axis.Z, false), -1);
+
+			bar.insert(new SeparatorToolItem(), -1);
+			bar.insert(CreateGridButton(GridSize.Large, "gridLarge"), -1);
+			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium"), -1);
+			bar.insert(CreateGridButton(GridSize.Small, "gridSmall"), -1);
 			return bar;
 		}
 
@@ -51,10 +58,6 @@ namespace Ldraw.Ui
 		public Toolbar GetGridToolbar()
 		{
 			Toolbar bar = new Toolbar();
-			bar.insert(new SeparatorToolItem(), -1);
-			bar.insert(CreateGridButton(GridSize.Large, "gridLarge"), -1);
-			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium"), -1);
-			bar.insert(CreateGridButton(GridSize.Small, "gridSmall"), -1);
 			return bar;
 		}
 
