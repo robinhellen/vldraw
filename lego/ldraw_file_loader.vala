@@ -76,7 +76,7 @@ namespace Ldraw.Lego
 			if(mainObject == null)
 			{
 				mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: currentObject, FileName: filename);
-				return (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename);
+				return (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
 			}
 			else
 			{
@@ -91,7 +91,7 @@ namespace Ldraw.Lego
 						subObjs.add(foo);
 				}
 				locator.ResolveAll(subObjs);
-				return (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: subObjs);
+				return (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: subObjs, FileName: filename, FilePath: filepath);
 			}
 		}
 	}

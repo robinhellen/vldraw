@@ -12,7 +12,8 @@ namespace Ldraw.Lego
 		public LdrFileBuilder(string filename)
 			throws Error
 		{
-			m_File = File.new_for_path(filename + "a");
+			stderr.printf(@"Saving a file to: $filename.\n");
+			m_File = File.new_for_path(filename);
 			m_OutStream = m_File.replace(null, false, FileCreateFlags.NONE);
 		}
 

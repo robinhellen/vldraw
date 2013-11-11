@@ -60,7 +60,7 @@ namespace Ldraw.Lego
 			{
 				return m_FileName;
 			}
-			protected set
+			set
 			{
 				m_FileName = value;
 			}

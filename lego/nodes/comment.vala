@@ -16,6 +16,6 @@ namespace Ldraw.Lego.Nodes
 
 		public override string Description {get {return m_CommentText; } }
 
-		public override string FileLine{owned get{return @"$m_CommentText";}}
+		public override string FileLine{owned get{return @"0 $m_CommentText";}}
 	}
 }

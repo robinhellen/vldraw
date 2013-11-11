@@ -22,7 +22,6 @@ namespace Ldraw.Lego
 		public LdrawModel.Empty()
 		{
 			base();
-			FileName = "untitled.dat";
 		}
 
 		public override string Description
@@ -35,6 +34,7 @@ namespace Ldraw.Lego
 
 		public override void Save()
 		{
+			stderr.printf("Saving standard model.\n");
 			var builder = new LdrFileBuilder(FilePath);
 			MainObject.BuildFromFile(builder);
 			builder.Finish();

@@ -12,7 +12,7 @@ namespace Ldraw.Lego
 
 		public LdrawObject(string description)
 		{
-			var nodeList = new LinkedList<LdrawNode>();
+			var nodeList = new ObservableList<LdrawNode>();
 			Object(Nodes: nodeList, Description: description);
 		}
 
@@ -133,7 +133,6 @@ namespace Ldraw.Lego
 			{
 				Nodes.insert(Nodes.index_of(after) + 1, newNode);
 			}
-			m_BoundingBox = null;
 			ComponentsChanged();
 			VisibleChange();
 			if(newNode is PartNode)
@@ -201,7 +200,10 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public signal void VisibleChange();
+		public virtual signal void VisibleChange()
+		{
+			m_BoundingBox = null;
+		}
 
 		public signal void SelectionChanged();
 
