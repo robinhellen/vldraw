@@ -135,6 +135,7 @@ namespace Ldraw.Lego
 			}
 			ComponentsChanged();
 			VisibleChange();
+			m_BoundingBox = null;
 			if(newNode is PartNode)
 			{
 				newNode.notify["ColourId"].connect(() => VisibleChange());
