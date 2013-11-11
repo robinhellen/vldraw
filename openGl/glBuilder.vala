@@ -129,7 +129,6 @@ namespace Ldraw.OpenGl
 			if(part.Selected)
 			{
 				m_InvertColour = true;
-				glColor3f(0.0f, 0.0f, 0.0f);
 				RenderBounds(part.Contents.BoundingBox.Transform(m_Transform, m_Center).Scale(1.2f));
 			}
 
@@ -216,6 +215,8 @@ namespace Ldraw.OpenGl
 
 		public void RenderBounds(Bounds bounds)
 		{
+			glColor3f(0.0f, 0.0f, 0.0f);
+
 			glBegin(GL_LINE_STRIP);
 			glVertex3f(bounds.MinX, bounds.MinY, bounds.MinZ); // (a) - 1
 			glVertex3f(bounds.MinX, bounds.MinY, bounds.MaxZ); // (b) - 2
