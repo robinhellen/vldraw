@@ -99,11 +99,17 @@ namespace Ldraw.Ui.Widgets
 			}
 
 			GlBuilder builder = new GlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
-			m_Model.BuildFromFile(builder);
+
+			BuildModel(builder);
 
 			builder.Flush();
 			drawable.gl_end();
 			drawable.wait_gl();
+		}
+
+		protected virtual void BuildModel(GlBuilder builder)
+		{
+			m_Model.BuildFromFile(builder);
 		}
 
 		public override bool configure_event(Gdk.EventConfigure event)

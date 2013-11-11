@@ -11,6 +11,7 @@ namespace Ldraw.Ui.Widgets
 	public class LdrawEditPane : LdrawViewPane
 	{
 		private IOptions m_Settings;
+		private PartNode dropItem = null;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings)
 			throws GlError
@@ -116,6 +117,7 @@ namespace Ldraw.Ui.Widgets
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
 		{
 			finishDrag = true;
+			dropItem = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			finishDrag = false;
 			return true;
@@ -123,14 +125,26 @@ namespace Ldraw.Ui.Widgets
 
 		public override bool drag_motion(DragContext context, int x, int y, uint time_)
 		{
+			dropItem = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			return true;
+		}
+
+		public override void drag_leave(DragContext context, uint time)
+		{
+			dropItem = null;
 		}
 
 		public override void drag_data_received (DragContext context, int x, int y,
 												 SelectionData selection_data, uint info,
 												 uint time)
 		{
+			if(!finishDrag)
+			{
+				// this is the drag motion, so the provided mouse coordinates are bunkum
+				get_pointer(out x, out y);
+			}
+
 			string partName = (string)selection_data.data;
 			LdrawPart part;
 			if(!LdrawLibrary.Instance.TryGetPart(partName, out part))
@@ -166,7 +180,7 @@ namespace Ldraw.Ui.Widgets
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
 					newPosition = Vector(
-						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.X),
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
 						newPosition.Z);
 					break;
@@ -180,25 +194,25 @@ namespace Ldraw.Ui.Widgets
 					newPosition = Vector(
 						newPosition.X,
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
-						SnapTo(m_Center.Z + deltaX, m_Settings.CurrentGrid.Z));
+						SnapTo(-m_Center.X + deltaX, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Right:
 					newPosition = Vector(
 						newPosition.X,
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
-						SnapTo(m_Center.Z - deltaX, m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Top:
 					newPosition = Vector(
 						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.X),
 						newPosition.Y,
-						SnapTo(m_Center.Z - deltaY, m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.Y - deltaY, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Bottom:
 					newPosition = Vector(
-						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(-m_Center.X + deltaX, m_Settings.CurrentGrid.X),
 						newPosition.Y,
-						SnapTo(m_Center.Z - deltaY, m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.Y - deltaY, m_Settings.CurrentGrid.Z));
 					break;
 				default:
 					newPosition = Vector.NullVector;
@@ -213,6 +227,7 @@ namespace Ldraw.Ui.Widgets
 			}
 			else
 			{
+				dropItem = new PartNode(newPosition, newTransform, part.MainObject, newColour);
 				// TODO: make an outline get drawn.
 				drag_status(context, context.suggested_action, time);
 			}
@@ -258,6 +273,16 @@ namespace Ldraw.Ui.Widgets
 			orthoAngle.show();
 
 			return menu;
+		}
+
+		protected override void BuildModel(GlBuilder builder)
+		{
+			base.BuildModel(builder);
+			if(dropItem != null)
+			{
+				var part = dropItem;
+				builder.RenderBounds(part.Contents.BoundingBox.Transform(part.Transform, part.Center));
+			}
 		}
 
 		private void SelectTopMostUnderMouse(double x, double y)
