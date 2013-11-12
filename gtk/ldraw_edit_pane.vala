@@ -29,21 +29,6 @@ namespace Ldraw.Ui.Widgets
 			drag_dest_set_track_motion(this, true);
 		}
 
-		/*public LdrawEditPane.WithModel(ViewAngle angle, LdrawObject model, IOptions settings)
-			throws GlError
-		{
-			base.WithModel(angle, model);
-			m_Settings = settings;
-
-			can_focus = true;
-			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
-			events |= Gdk.EventMask.KEY_PRESS_MASK;
-
-			// set up this control for drag-and-drop
-			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
-			drag_dest_set(this, (DestDefaults)0, {LdrawDragData}, DragAction.COPY);
-		}*/
-
 		public override bool button_press_event(Gdk.EventButton event)
 		{
 			// if button is right, popup context menu
