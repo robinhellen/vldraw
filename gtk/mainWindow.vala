@@ -1,7 +1,9 @@
 using Gtk;
 using Ldraw.Ui.Widgets;
 using Ldraw.Lego;
+using Ldraw.Lego.Nodes;
 using Ldraw.Options;
+using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
@@ -173,15 +175,18 @@ namespace Ldraw.Ui
 			fileMenu.append(fileQuit);
 			fileQuit.activate.connect(() => main_quit());
 
-			var viewMenuItem = new Gtk.MenuItem.with_mnemonic("_View");
-			menus.append(viewMenuItem);
+			var modelMenuItem = new Gtk.MenuItem.with_mnemonic("_Model");
+			menus.append(modelMenuItem);
 
-			var viewMenu = new Gtk.Menu();
-			viewMenuItem.submenu = viewMenu;
+			var modelMenu = new Gtk.Menu();
+			modelMenuItem.submenu = modelMenu;
 
-			var viewTree = new Gtk.MenuItem.with_mnemonic("_Tree");
-			viewMenu.append(viewTree);
-			viewMenuItem.activate.connect(() => new ModelTree(Model).show_all());
+			var modelProperties = new Gtk.MenuItem.with_mnemonic("_Properties");
+			modelMenu.append(modelProperties);
+
+			var modelAddSubModel = new Gtk.MenuItem.with_mnemonic("_Add sub-model");
+			modelAddSubModel.activate.connect(ModelAddSubModel_OnActivate);
+			modelMenu.append(modelAddSubModel);
 
 			return menus;
 		}
@@ -272,6 +277,60 @@ namespace Ldraw.Ui
 				}
 			}
 			dialog.close();
+		}
+
+		private void ModelAddSubModel_OnActivate()
+		{
+			var dialog = new Dialog.with_buttons("Model details", this,
+				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
+				STOCK_OK, ResponseType.ACCEPT,
+				STOCK_CANCEL, ResponseType.REJECT);
+
+			var content = (Box) dialog.get_content_area();
+			var table = new Table(3, 2, false);
+			AttachToTable(table, new Label("Filename"), 0, 0);
+			AttachToTable(table, new Label("Sub-model name"), 0, 1);
+			AttachToTable(table, new Label("Description"), 0, 2);
+			var filenameEntry = new Entry();
+			var nameEntry = new Entry();
+			var descriptionEntry = new Entry();
+			AttachToTable(table, filenameEntry, 1, 0);
+			AttachToTable(table, nameEntry, 1, 1);
+			AttachToTable(table, descriptionEntry, 1, 2);
+			content.pack_start(table);
+
+			dialog.show_all();
+
+			var response = dialog.run();
+
+			var newFileName = filenameEntry.text;
+			stderr.printf(@"Adding submodel with filename: $newFileName.\n");
+			dialog.destroy();
+			if(response != ResponseType.ACCEPT)
+				return;
+
+			var mpdModel = File as MultipartModel;
+			if(mpdModel == null)
+			{
+				var subObjs = new ObservableList<LdrawObject>();
+				subObjs.add(File.MainObject);
+				mpdModel = (MultipartModel)GLib.Object.new(typeof(MultipartModel),
+							MainObject: File.MainObject,
+							SubModels: subObjs,
+							FileName: File.FileName,
+							FilePath: File.FilePath);
+
+				File = mpdModel;
+			}
+			var nodes = new ObservableList<LdrawNode>();
+			var mainObject = (LdrawObject)GLib.Object.new(typeof(LdrawObject), Nodes: nodes, FileName: newFileName);
+			var model = (LdrawModel)GLib.Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: newFileName);
+			mpdModel.SubModels.add(mainObject);
+		}
+
+		private void AttachToTable(Table t, Widget w, uint x, uint y)
+		{
+			t.attach(w, x, x + 1, y, y + 1, AttachOptions.EXPAND, AttachOptions.EXPAND, 5, 5);
 		}
 
 		protected LdrawModelFile File
