@@ -7,7 +7,7 @@ namespace Ldraw.Lego
 {
 	public class MultipartModel : LdrawModelFile
 	{
-		public ObservableList<LdrawModel> SubModels {get; construct;}
+		public ObservableList<LdrawObject> SubModels {get; construct;}
 
 		public override string Description{get{return "";}}
 
@@ -19,7 +19,7 @@ namespace Ldraw.Lego
 			{
 				builder.BuildNode(new MetaCommand("FILE", {model.FileName}));
 
-				model.MainObject.BuildFromFile(builder);
+				model.BuildFromFile(builder);
 
 				builder.BuildNode(new MetaCommand("NOFILE", {}));
 			}
