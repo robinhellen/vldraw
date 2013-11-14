@@ -323,9 +323,9 @@ namespace Ldraw.Ui
 				File = mpdModel;
 			}
 			var nodes = new ObservableList<LdrawNode>();
-			var mainObject = (LdrawObject)GLib.Object.new(typeof(LdrawObject), Nodes: nodes, FileName: newFileName);
-			var model = (LdrawModel)GLib.Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: newFileName);
-			mpdModel.SubModels.add(mainObject);
+			var newObject = (LdrawObject)GLib.Object.new(typeof(LdrawObject), Nodes: nodes, FileName: newFileName);
+			mpdModel.SubModels.add(newObject);
+			EditingObject = newObject;
 		}
 
 		private void AttachToTable(Table t, Widget w, uint x, uint y)
@@ -363,7 +363,7 @@ namespace Ldraw.Ui
 
 		public LdrawObject Model
 		{
-			get{return m_Model.MainObject;}
+			get{return EditingObject;}
 			protected set{}
 		}
 	}
