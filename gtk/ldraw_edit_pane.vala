@@ -207,13 +207,14 @@ namespace Ldraw.Ui.Widgets
 			if(finishDrag)
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, part.MainObject, newColour);
+				newNode.Selected = true;
+				Model.ClearSelection();
 				Model.AddNode(newNode, copyPart);
 				drag_finish(context, true, false, time);
 			}
 			else
 			{
 				dropItem = new PartNode(newPosition, newTransform, part.MainObject, newColour);
-				// TODO: make an outline get drawn.
 				drag_status(context, context.suggested_action, time);
 			}
 		}
