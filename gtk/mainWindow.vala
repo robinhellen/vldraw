@@ -344,15 +344,18 @@ namespace Ldraw.Ui
 				m_Model = value;
 				m_View.Model = value.MainObject;
 				m_ModelList.Model = value.MainObject;
-				if(value is MultipartModel)
+				var mpd = value as MultipartModel;
+				if(mpd != null)
 				{
 					m_SubModels.model = ((MultipartModel)value).SubModels;
 					m_SubModels.active = 0;
 					m_SubModels.visible = true;
+					EditingObject = mpd.MainObject;
 				}
 				else
 				{
 					m_SubModels.visible = false;
+					EditingObject = value.MainObject;
 				}
 
 				var titleFileName = value.FileName ?? "untitled";
