@@ -22,7 +22,6 @@ namespace Ldraw.Tests.Vectors
 				return b == 0;
 
 			var diff = Math.fabsf(a - b);
-			float relDiff = diff / a;
 			return (diff / a) < 0.0001;
 		}
 	}
