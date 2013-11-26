@@ -11,11 +11,10 @@ namespace Ldraw.Ui.Widgets
 		private ScrolledWindow m_Scrolled;
 
 		private LdrawViewPane m_Detail;
-		private ObservableList<LdrawObject> models;
 
 		public SubModelsTree()
 		{
-			models = new ObservableList<LdrawObject>();
+			var models = new ObservableList<LdrawObject>();
 			m_Tree = new TreeView.with_model(models);
 			m_Tree.insert_column_with_data_func(-1, "", new CellRendererText(), (col, cell, model, iter) =>
 				{
@@ -58,8 +57,7 @@ namespace Ldraw.Ui.Widgets
 		{
 			set
 			{
-				models.clear();
-				models.add_all(value);
+				m_Tree.model = value;
 			}
 		}
 
