@@ -1,3 +1,4 @@
+using Gee;
 using Gtk;
 
 using Ldraw.Lego;
@@ -40,19 +41,21 @@ namespace Ldraw.Ui
 			bar.insert(CreateRotateButton(Axis.Z, false), -1);
 
 			bar.insert(new SeparatorToolItem(), -1);
-			bar.insert(CreateGridButton(GridSize.Large, "gridLarge"), -1);
-			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium"), -1);
-			bar.insert(CreateGridButton(GridSize.Small, "gridSmall"), -1);
+
+			unowned SList<RadioToolButton>? group = null;
+			bar.insert(CreateGridButton(GridSize.Large, "gridLarge", ref group), -1);
+			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium", ref group), -1);
+			bar.insert(CreateGridButton(GridSize.Small, "gridSmall", ref group), -1);
 			return bar;
 		}
 
-		public Toolbar GetColoursToolbar(Window window)
+		public Toolbar GetColoursToolbar(Gtk.Window window)
 		{
 			Toolbar bar = new Toolbar();
 			bar.insert(new SeparatorToolItem(), -1);
 			var falseVal = Value(typeof(bool));
 			falseVal.set_boolean(false);
-			for(int i = 0; i < 32; i++)
+			for(int i = 0; i < 16; i++)
 			{
 				var button = CreateColourButton(i);
 				bar.insert(button, -1);
@@ -78,7 +81,11 @@ namespace Ldraw.Ui
 						return;
 					}
 
-					stderr.printf(@"Colour chosen: $(chooser.ChosenColour).\n");
+					foreach(var node in m_ModelContainer.Model.Selection)
+					{
+						node.ColourId = chooser.ChosenColour;
+					}
+					m_ModelContainer.Model.VisibleChange();
 					dialog.destroy();
 				});
 			moreButton.set_tooltip_text("More colours");
@@ -88,16 +95,17 @@ namespace Ldraw.Ui
 			return bar;
 		}
 
-		private ToolButton CreateGridButton(GridSize size, string iconName)
+		private ToolButton CreateGridButton(GridSize size, string iconName, ref unowned SList<RadioToolButton>? group)
 		{
 			string icon = "/home/robin/projects/ldraw_vala/icons/" + iconName + ".xpm";
-			var button = CreateButtonFromImageFile(icon);
+			var button = CreateToggleButtonFromImageFile(icon, ref group);
+			button.active = size == m_Options.Grid;
 
-			button.clicked.connect(() =>
+			button.toggled.connect(() =>
 				{
-					m_Options.Grid = size;
+					if(button.active)
+						m_Options.Grid = size;
 				});
-
 			return button;
 		}
 
@@ -169,9 +177,19 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateButtonFromImageFile(string fileName)
 		{
-			Image image = new Image.from_file(fileName);
+			var image = new Image.from_file(fileName);
 			image.pixbuf = image.pixbuf.scale_simple(ButtonSize, ButtonSize, Gdk.InterpType.BILINEAR);
 			return new ToolButton(image, null);
+		}
+
+		private RadioToolButton CreateToggleButtonFromImageFile(string fileName, ref unowned SList<RadioToolButton>? group)
+		{
+			var image = new Image.from_file(fileName);
+			image.pixbuf = image.pixbuf.scale_simple(ButtonSize, ButtonSize, Gdk.InterpType.BILINEAR);
+			var button = new RadioToolButton(group);
+			button.set_icon_widget(image);
+			group = button.get_group();
+			return button;
 		}
 
 		private enum Axis
