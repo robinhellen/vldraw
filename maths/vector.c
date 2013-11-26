@@ -42,6 +42,7 @@ void ldraw_maths_vector_Scale (LdrawMathsVector *self, gfloat scale, LdrawMathsV
 gfloat ldraw_maths_vector_get_Magnitude (LdrawMathsVector* self);
 gchar* ldraw_maths_vector_to_string (LdrawMathsVector *self);
 void ldraw_maths_vector_get_NullVector (LdrawMathsVector* result);
+gfloat *ldraw_maths_vector_value_vector(LdrawMathsVector* self);
 
 
 void ldraw_maths_vector_init (LdrawMathsVector *self, gfloat x, gfloat y, gfloat z) {
@@ -250,5 +251,8 @@ GType ldraw_maths_vector_get_type (void) {
 	return ldraw_maths_vector_type_id__volatile;
 }
 
-
+gfloat *ldraw_maths_vector_value_vector(LdrawMathsVector* self)
+{
+	return &(self->values);
+}
 

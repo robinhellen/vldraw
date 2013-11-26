@@ -114,6 +114,12 @@ namespace Ldraw.Lego
 			return s_Colours[code];
 		}
 
+		public static string GetName(int code)
+			requires (code <= 512 && code >= 0)
+		{
+			return s_Colours[code].m_Name;
+		}
+
 		public static void SurfaceColour(int code, out float red, out float green, out float blue, out float alpha)
 			requires (code != 16)
 			requires (code != 24)

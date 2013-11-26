@@ -1,4 +1,6 @@
+using Gee;
 using Gtk;
+
 using Ldraw.Ui.Widgets;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
@@ -19,6 +21,11 @@ namespace Ldraw.Ui
 		ModelList m_ModelList;
 		LdrawFileLoader m_Loader;
 		IOptions m_Settings;
+
+		// trees
+		PartsTree parts;
+		SubModelsTree subModels;
+		DocumentObjectLocator documentLocator;
 
 		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null)
 		{
@@ -44,40 +51,52 @@ namespace Ldraw.Ui
 			bigVBox.pack_start(menus, false, false);
 
 			Toolbar tools = toolbarProvider.GetMovementToolbar();
-			Toolbar colourTools = toolbarProvider.GetColoursToolbar();
+			Toolbar colourTools = toolbarProvider.GetColoursToolbar(this);
 			bigVBox.pack_start(colourTools, false, false);
 			bigVBox.pack_start(tools, false, false);
 
+			documentLocator = new DocumentObjectLocator();
+			documentLocator.Objects = Gee.List.empty<LdrawObject>();
+
+			var locators = new HashMap<string, IDroppedObjectLocator>();
+			locators[""] = new LibraryObjectLocator();
+			locators["Document"] = documentLocator;
+
+
 			try
 			{
-				m_View = new EditPanes(m_Settings);
+				m_View = new EditPanes(m_Settings, new CombinedObjectLocator(locators));
 			}
 			catch(OpenGl.GlError e)
 			{
 				stdout.printf(e.message);
 			}
 
+			var notebook = new Notebook();
 			// add a list of available parts on the left
-			try
-			{
-				m_PartDetail = new LdrawViewPane.WithModel(ViewAngle.Ortho, new LdrawModel.Empty().MainObject);
-			}
-			catch(OpenGl.GlError e)
-			{
-				stdout.printf(e.message);
-			}
-			m_PartDetail.set_size_request(200, 200);
-			m_PartDetail.DefaultColour = m_Settings.PreviewColourId;
-			m_Settings.notify["PreviewColourId"].connect(() => m_PartDetail.DefaultColour = m_Settings.PreviewColourId);
-			PartsTree tree = new PartsTree();
-			tree.DetailView = m_PartDetail;
+			m_PartDetail = CreatePreviewPane();
+			parts = new PartsTree();
+			var treeDetailBox = new VBox(false, 0);
 
-			Box treeDetailBox = new VBox(false, 0);
-			treeDetailBox.pack_start(tree.Widget);
+			parts.DetailView = m_PartDetail;
+
+			treeDetailBox.pack_start(parts.Widget);
 			treeDetailBox.pack_start(m_PartDetail, false);
+			notebook.append_page(treeDetailBox, new Label("Parts"));
+
+
+			var subModelsBox = new VBox(false, 0);
+			var subModelPreview = CreatePreviewPane();
+
+			subModels = new SubModelsTree();
+			subModels.DetailView = subModelPreview;
+
+			subModelsBox.pack_start(subModels.Widget);
+			subModelsBox.pack_start(subModelPreview, false);
+			notebook.append_page(subModelsBox, new Label("Multipart"));
 
 			Paned treePaned = new HPaned();
-			treePaned.add1(WithFrame(treeDetailBox));
+			treePaned.add1(WithFrame(notebook));
 
 			Paned modelPanes = new VPaned();
 			VBox viewDetails = new VBox(false, 2);
@@ -96,9 +115,26 @@ namespace Ldraw.Ui
 			add(bigVBox);
 		}
 
+		private LdrawViewPane CreatePreviewPane()
+		{
+			LdrawViewPane previewPane;
+			try
+			{
+				previewPane = new LdrawViewPane.WithModel(ViewAngle.Ortho, new LdrawModel.Empty().MainObject);
+			}
+			catch(OpenGl.GlError e)
+			{
+				stderr.printf(e.message);
+				return null;
+			}
+			previewPane.set_size_request(200, 200);
+			previewPane.DefaultColour = m_Settings.PreviewColourId;
+			m_Settings.notify["PreviewColourId"].connect(() => previewPane.DefaultColour = m_Settings.PreviewColourId);
+			return previewPane;
+		}
+
 		private ComboBox CreateSubModelsDropDown()
 		{
-
 			var cb = new ComboBox();
 			var filenameRenderer = new CellRendererText();
 			cb.pack_start(filenameRenderer, true);
@@ -131,7 +167,7 @@ namespace Ldraw.Ui
 								msg.run();
 
 							});
-			m_Detail.RenderingError.connect(x =>
+			m_PartDetail.RenderingError.connect(x =>
 							{
 								MessageDialog msg = new MessageDialog(this, DialogFlags.DESTROY_WITH_PARENT, MessageType.ERROR, ButtonsType.CLOSE,
 											"Error rendering part detail: %s", x);
@@ -145,7 +181,7 @@ namespace Ldraw.Ui
 		private void SetUpAccelerators()
 		{
 			AccelGroup group = new AccelGroup();
-			group.connect(Gdk.keyval_from_name("Up"), 0, 0, (group, object, keyval, modifier) => {stdout.printf("Up\n"); return false; });
+			//group.connect(Gdk.keyval_from_name("Up"), 0, 0, (group, object, keyval, modifier) => {stdout.printf("Up\n"); return false; });
 
 			add_accel_group(group);
 		}
@@ -232,15 +268,12 @@ namespace Ldraw.Ui
 
 		private void FileSave_OnActivate()
 		{
-			stderr.printf("Save button clicked.\n");
 			if(File.FilePath != null)
 			{
-				stderr.printf("Saving file.\n");
 				File.Save();
 			}
 			else
 			{
-				stderr.printf("Filename not set, calling save as.\n");
 				FileSaveAs_OnActivate();
 			}
 		}
@@ -303,13 +336,20 @@ namespace Ldraw.Ui
 
 			var response = dialog.run();
 
+			var mpdModel = File as MultipartModel;
+
 			var newFileName = filenameEntry.text;
-			stderr.printf(@"Adding submodel with filename: $newFileName.\n");
+			if(newFileName == null || newFileName.length == 0)
+			{
+				if(mpdModel == null)
+					newFileName = File.FileName + " (1)";
+				else
+					newFileName = File.FileName + @" ($(mpdModel.SubModels.size))";
+			}
 			dialog.destroy();
 			if(response != ResponseType.ACCEPT)
 				return;
 
-			var mpdModel = File as MultipartModel;
 			if(mpdModel == null)
 			{
 				var subObjs = new ObservableList<LdrawObject>();
@@ -347,15 +387,19 @@ namespace Ldraw.Ui
 				var mpd = value as MultipartModel;
 				if(mpd != null)
 				{
-					m_SubModels.model = ((MultipartModel)value).SubModels;
+					m_SubModels.model = mpd.SubModels;
 					m_SubModels.active = 0;
 					m_SubModels.visible = true;
 					EditingObject = mpd.MainObject;
+					subModels.Models = mpd.SubModels;
+					documentLocator.Objects = mpd.SubModels;
 				}
 				else
 				{
 					m_SubModels.visible = false;
 					EditingObject = value.MainObject;
+					subModels.Models = new ObservableList<LdrawObject>();
+					documentLocator.Objects = Gee.List.empty<LdrawObject>();
 				}
 
 				var titleFileName = value.FileName ?? "untitled";

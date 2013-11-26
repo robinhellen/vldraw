@@ -13,17 +13,23 @@ namespace Ldraw.Lego
 
 		public override void Save()
 		{
-			stderr.printf("Saving multipart model.\n");
-			var builder = new LdrFileBuilder(FilePath);
-			foreach(var model in SubModels)
+			try
 			{
-				builder.BuildNode(new MetaCommand("FILE", {model.FileName}));
+				var builder = new LdrFileBuilder(FilePath);
+				foreach(var model in SubModels)
+				{
+					builder.VisitNode(new MetaCommand("FILE", {model.FileName}));
 
-				model.BuildFromFile(builder);
+					model.BuildFromFile(builder);
 
-				builder.BuildNode(new MetaCommand("NOFILE", {}));
+					builder.VisitNode(new MetaCommand("NOFILE", {}));
+				}
+				builder.Finish();
 			}
-			builder.Finish();
+			catch(Error e)
+			{
+				stderr.printf(@"Unable to save $FileName to $FilePath: $(e.message).\n");
+			}
 		}
 	}
 }

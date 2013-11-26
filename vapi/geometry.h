@@ -119,6 +119,7 @@ gfloat ldraw_maths_vector_get_X (LdrawMathsVector* self);
 gfloat ldraw_maths_vector_get_Y (LdrawMathsVector* self);
 gfloat ldraw_maths_vector_get_Z (LdrawMathsVector* self);
 gfloat ldraw_maths_vector_get_Magnitude (LdrawMathsVector* self);
+gfloat *ldraw_maths_vector_value_vector(LdrawMathsVector* self);
 
 
 G_END_DECLS

@@ -26,5 +26,18 @@ namespace Ldraw.Lego.Nodes
 		public Vector B { get {return m_B;}}
 
 		public override string FileLine{owned get{return @"2 $ColourId $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z)";}}
+
+		public override LdrawNode TransformNode(Matrix transform, Vector center)
+		{
+			var a = transform.TransformVector(m_A).Add(center);
+			var b = transform.TransformVector(m_B).Add(center);
+
+			return new LineNode(ColourId, a, b);
+		}
+
+		public override void Accept(LdrawVisitor visitor)
+		{
+			visitor.VisitLine(this);
+		}
 	}
 }

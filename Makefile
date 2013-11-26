@@ -24,7 +24,8 @@ SOURCES=$(wildcard *.vala) $(ENGINE_SOURCES) $(OPENGL_SOURCES) $(GTK_SOURCES)
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
 
 VALA_PACKAGES = --pkg gtk+-2.0 --pkg gee-0.8 --pkg gl --pkg gtkglext-1.0 --pkg gdkglext-1.0 --pkg gio-2.0 --pkg geometry
-VALA_OPTS= -g --vapidir=vapi $(VALA_PACKAGES) -X -w -X -Ivapi -X -msse
+#VALA_OPTS= --vapidir=vapi $(VALA_PACKAGES) -X -w -X -Ivapi -X -msse -X -O2
+VALA_OPTS= --vapidir=vapi $(VALA_PACKAGES) -X -w -X -Ivapi -X -msse -g
 
 EXECUTABLE_NAME = ldraw
 TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
@@ -32,14 +33,14 @@ TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
 	./$(TEST_EXECUTABLE_NAME)
 
-$(EXECUTABLE_NAME): $(SOURCES)
+$(EXECUTABLE_NAME): $(SOURCES) $(ENGINE_C_SOURCES)
 	valac-0.18 $(VALA_OPTS) $(SOURCES) $(ENGINE_C_SOURCES) -o $(EXECUTABLE_NAME)
 
 $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES)
 	valac-0.18 $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME)
 
 clean:
-	rm $(EXECUTABLE_NAME)
+	rm $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME)
 
 tempclean:
 	rm -f $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))

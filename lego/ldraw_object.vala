@@ -9,6 +9,7 @@ namespace Ldraw.Lego
 	{
 		private Bounds m_BoundingBox;
 		private bool m_ChangingSelection;
+		private Gee.List<LdrawNode> flattenedNodes;
 
 		public LdrawObject(string description)
 		{
@@ -17,6 +18,33 @@ namespace Ldraw.Lego
 		}
 
 		public Gee.List<LdrawNode> Nodes {get; protected construct set;}
+
+		public Gee.List<LdrawNode> FlattenedNodes
+		{
+			get
+			{
+				if(flattenedNodes == null)
+				{
+					flattenedNodes = new LinkedList<LdrawNode>();
+					foreach(var node in Nodes)
+					{
+						var partNode = node as PartNode;
+
+						if(partNode == null)
+						{
+							flattenedNodes.add(node);
+							continue;
+						}
+
+						foreach(var innerNode in partNode.Contents.FlattenedNodes)
+						{
+							flattenedNodes.add(innerNode.TransformNode(partNode.Transform, partNode.Center));
+						}
+					}
+				}
+				return flattenedNodes;
+			}
+		}
 
 		public string FileName {get; set;}
 
@@ -37,7 +65,6 @@ namespace Ldraw.Lego
 		protected Bounds CalculateBounds()
 		{
 			Bounds bounds = new Bounds();
-			var timer = new Timer();
 			foreach(LdrawNode node in Nodes)
 			{
 				if(node is PartNode)
@@ -69,7 +96,6 @@ namespace Ldraw.Lego
 					bounds.Union(((CondLineNode)node).B);
 				}
 			}
-			//stderr.printf(@"Finished calculating bounds in $(timer.elapsed()) seconds.\n");
 			return bounds;
 		}
 
@@ -140,7 +166,7 @@ namespace Ldraw.Lego
 			{
 				newNode.notify["ColourId"].connect(() => VisibleChange());
 			}
-			newNode.notify["Selected"].connect(() => {stderr.printf("recieved node selected changed signal.\n"); VisibleChange();});
+			newNode.notify["Selected"].connect(() => VisibleChange());
 		}
 
 		public void MoveSelectedNodes(Vector displacement)
@@ -155,6 +181,24 @@ namespace Ldraw.Lego
 				part.Move(displacement);
 			}
 			VisibleChange();
+		}
+
+		public void DeleteSelected()
+		{
+			var toDelete = new ArrayList<LdrawNode>();
+			foreach(var node in Nodes)
+			{
+				if(node.Selected)
+					toDelete.add(node);
+			}
+			foreach(var node in toDelete)
+			{
+				Nodes.remove(node);
+			}
+			if(!toDelete.is_empty)
+			{
+				VisibleChange();
+			}
 		}
 
 		public void TransformSelectedNodes(Matrix transform)
@@ -180,30 +224,15 @@ namespace Ldraw.Lego
 			m_ChangingSelection = false;
 		}
 
-		public void BuildFromFile(LdrawBuilder builder)
+		public void BuildFromFile(LdrawVisitor builder, bool useFlattened = false)
 		{
-			foreach(LdrawNode node in Nodes)
-			{
-				builder.BuildNode(node);
-
-				if(node is LineNode)
-					builder.BuildLine((LineNode) node);
-				else if(node is TriangleNode)
-					builder.BuildTriangle((TriangleNode) node);
-				else if(node is QuadNode)
-					builder.BuildQuad((QuadNode) node);
-				else if(node is CondLineNode)
-					builder.BuildCondLine((CondLineNode) node);
-				else if(node is PartNode)
-					builder.BuildSubModel((PartNode) node);
-				else if(node is Comment)
-					builder.BuildComment((Comment) node);
-			}
+			builder.Visit(this, useFlattened);
 		}
 
 		public virtual signal void VisibleChange()
 		{
 			m_BoundingBox = null;
+			flattenedNodes = null;
 		}
 
 		public signal void SelectionChanged();

@@ -34,10 +34,16 @@ namespace Ldraw.Lego
 
 		public override void Save()
 		{
-			stderr.printf("Saving standard model.\n");
-			var builder = new LdrFileBuilder(FilePath);
-			MainObject.BuildFromFile(builder);
-			builder.Finish();
+			try
+			{
+				var builder = new LdrFileBuilder(FilePath);
+				MainObject.BuildFromFile(builder);
+				builder.Finish();
+			}
+			catch(Error e)
+			{
+				stderr.printf(@"Unable to save $FileName to $FilePath: $(e.message).\n");
+			}
 		}
 	}
 }

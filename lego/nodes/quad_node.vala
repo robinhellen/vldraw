@@ -34,5 +34,20 @@ namespace Ldraw.Lego.Nodes
 		public Vector D { get {return m_D;}}
 
 		public override string FileLine{owned get{return @"3 $ColourId $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z) $(m_C.X) $(m_C.Y) $(m_C.Z) $(m_D.X) $(m_D.Y) $(m_D.Z)";}}
+
+		public override LdrawNode TransformNode(Matrix transform, Vector center)
+		{
+			var a = transform.TransformVector(m_A).Add(center);
+			var b = transform.TransformVector(m_B).Add(center);
+			var c = transform.TransformVector(m_C).Add(center);
+			var d = transform.TransformVector(m_D).Add(center);
+
+			return new QuadNode(ColourId, a, b, c, d);
+		}
+
+		public override void Accept(LdrawVisitor visitor)
+		{
+			visitor.VisitQuad(this);
+		}
 	}
 }

@@ -50,16 +50,16 @@ namespace Ldraw.Ui.Widgets
 		private LdrawEditPane top_right;
 		private LdrawEditPane bottom_right;
 
-		public EditPanes(IOptions settings)
+		public EditPanes(IOptions settings, IDroppedObjectLocator locator)
 			throws OpenGl.GlError
 		{
 			base();
 
-			top_left 	= new LdrawEditPane(ViewAngle.Front, settings);
-			bottom_left = new LdrawEditPane(ViewAngle.Top, settings);
+			top_left 	= new LdrawEditPane(ViewAngle.Front, settings, locator);
+			bottom_left = new LdrawEditPane(ViewAngle.Top, settings, locator);
 
-			top_right 	 = new LdrawEditPane(ViewAngle.Right, settings);
-			bottom_right = new LdrawEditPane(ViewAngle.Ortho, settings);
+			top_right 	 = new LdrawEditPane(ViewAngle.Right, settings, locator);
+			bottom_right = new LdrawEditPane(ViewAngle.Ortho, settings, locator);
 
 			add_top_left(WithScrolls(top_left));
 			add_bottom_left(WithScrolls(bottom_left));

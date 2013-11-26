@@ -1,3 +1,5 @@
+using Ldraw.Maths;
+
 namespace Ldraw.Lego.Nodes
 {
 	public class Comment : LdrawNode
@@ -17,5 +19,15 @@ namespace Ldraw.Lego.Nodes
 		public override string Description {get {return m_CommentText; } }
 
 		public override string FileLine{owned get{return @"0 $m_CommentText";}}
+
+		public override LdrawNode TransformNode(Matrix _, Vector __)
+		{
+			return this;
+		}
+
+		public override void Accept(LdrawVisitor visitor)
+		{
+			visitor.VisitComment(this);
+		}
 	}
 }

@@ -30,5 +30,19 @@ namespace Ldraw.Lego.Nodes
 		public Vector C { get {return m_C;}}
 
 		public override string FileLine{owned get{return @"3 $ColourId $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z) $(m_C.X) $(m_C.Y) $(m_C.Z)";}}
+
+		public override LdrawNode TransformNode(Matrix transform, Vector center)
+		{
+			var a = transform.TransformVector(m_A).Add(center);
+			var b = transform.TransformVector(m_B).Add(center);
+			var c = transform.TransformVector(m_C).Add(center);
+
+			return new TriangleNode(ColourId, a, b, c);
+		}
+
+		public override void Accept(LdrawVisitor visitor)
+		{
+			visitor.VisitTriangle(this);
+		}
 	}
 }

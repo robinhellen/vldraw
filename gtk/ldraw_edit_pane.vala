@@ -1,5 +1,7 @@
 using Gtk;
 using Gdk;
+using Gee;
+
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.OpenGl;
@@ -12,12 +14,14 @@ namespace Ldraw.Ui.Widgets
 	{
 		private IOptions m_Settings;
 		private PartNode dropItem = null;
+		private IDroppedObjectLocator locator;
 
-		public LdrawEditPane(ViewAngle angle, IOptions settings)
+		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator)
 			throws GlError
 		{
 			base(angle);
 			m_Settings = settings;
+			this.locator = locator;
 
 			can_focus = true;
 			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
@@ -76,12 +80,12 @@ namespace Ldraw.Ui.Widgets
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(m_Settings.CurrentGrid.X, 0.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(-m_Settings.CurrentGrid.X, 0.0f, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(-m_Settings.CurrentGrid.X, 0.0f, 0.0f));
+				Model.MoveSelectedNodes(Vector(m_Settings.CurrentGrid.X, 0.0f, 0.0f));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
@@ -92,6 +96,11 @@ namespace Ldraw.Ui.Widgets
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
 				Model.MoveSelectedNodes(Vector(0.0f, -m_Settings.CurrentGrid.Y, 0.0f));
+				return true;
+			}
+			if(event.keyval == delKeyVal)
+			{
+				Model.DeleteSelected();
 				return true;
 			}
 			return false;
@@ -105,6 +114,7 @@ namespace Ldraw.Ui.Widgets
 			dropItem = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			finishDrag = false;
+			grab_focus();
 			return true;
 		}
 
@@ -131,8 +141,10 @@ namespace Ldraw.Ui.Widgets
 			}
 
 			string partName = (string)selection_data.data;
-			LdrawPart part;
-			if(!LdrawLibrary.Instance.TryGetPart(partName, out part))
+
+			var droppedObject = locator.GetObjectForName(partName);
+
+			if(droppedObject == null)
 				return;
 
 			// rotation is same as last or selected part, or no rotation
@@ -165,13 +177,13 @@ namespace Ldraw.Ui.Widgets
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
 					newPosition = Vector(
-						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.X),
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
 						newPosition.Z);
 					break;
 				case ViewAngle.Back:
 					newPosition = Vector(
-						SnapTo(-m_Center.X + deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.X),
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
 						newPosition.Z);
 					break;
@@ -179,23 +191,23 @@ namespace Ldraw.Ui.Widgets
 					newPosition = Vector(
 						newPosition.X,
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
-						SnapTo(-m_Center.X + deltaX, m_Settings.CurrentGrid.Z));
+						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Right:
 					newPosition = Vector(
 						newPosition.X,
 						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
-						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Top:
 					newPosition = Vector(
-						SnapTo(m_Center.X - deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.X),
 						newPosition.Y,
 						SnapTo(m_Center.Y - deltaY, m_Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Bottom:
 					newPosition = Vector(
-						SnapTo(-m_Center.X + deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.X),
 						newPosition.Y,
 						SnapTo(m_Center.Y - deltaY, m_Settings.CurrentGrid.Z));
 					break;
@@ -206,7 +218,7 @@ namespace Ldraw.Ui.Widgets
 
 			if(finishDrag)
 			{
-				LdrawNode newNode = new PartNode(newPosition, newTransform, part.MainObject, newColour);
+				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 				newNode.Selected = true;
 				Model.ClearSelection();
 				Model.AddNode(newNode, copyPart);
@@ -214,7 +226,7 @@ namespace Ldraw.Ui.Widgets
 			}
 			else
 			{
-				dropItem = new PartNode(newPosition, newTransform, part.MainObject, newColour);
+				dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
 				drag_status(context, context.suggested_action, time);
 			}
 		}
@@ -283,10 +295,10 @@ namespace Ldraw.Ui.Widgets
 			var modelCenterZ = modelBounds.Center().Z;
 
 			var pixelVolume = new Bounds();
-			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MaxX, fullBounds.MinX, ((float)x + 0.5f) / alloc.width),
+			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MinX, fullBounds.MaxX, ((float)x + 0.5f) / alloc.width),
 									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y + 0.5f) / alloc.height),
 									 modelCenterZ + radius * 100));
-			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MaxX, fullBounds.MinX, ((float)x - 0.5f) / alloc.width),
+			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MinX, fullBounds.MaxX, ((float)x - 0.5f) / alloc.width),
 									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y - 0.5f) / alloc.height),
 									 modelCenterZ - radius * 100));
 
@@ -311,9 +323,7 @@ namespace Ldraw.Ui.Widgets
 
 		private float SnapTo(float raw, float step)
 		{
-			var result = step * Math.roundf(raw / step);
-			stderr.printf(@"Snapping $raw to $step gives $result.\n");
-			return result;
+			return step * Math.roundf(raw / step);
 		}
 
 		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");
@@ -322,5 +332,58 @@ namespace Ldraw.Ui.Widgets
 		private uint m_RightKeyVal = Gdk.keyval_from_name("Right");
 		private uint m_HomeKeyVal = Gdk.keyval_from_name("Home");
 		private uint m_EndKeyVal = Gdk.keyval_from_name("End");
+		private uint delKeyVal = Gdk.keyval_from_name("Delete");
+	}
+
+	public interface IDroppedObjectLocator : GLib.Object
+	{
+		public abstract LdrawObject? GetObjectForName(string name);
+	}
+
+	public class LibraryObjectLocator : IDroppedObjectLocator, GLib.Object
+	{
+		public LdrawObject? GetObjectForName(string name)
+		{
+			LdrawPart part;
+			if(!LdrawLibrary.Instance.TryGetPart(name, out part))
+			{
+				return null;
+			}
+			return part.MainObject;
+		}
+	}
+
+	public class DocumentObjectLocator : IDroppedObjectLocator, GLib.Object
+	{
+		public Collection<LdrawObject> Objects {get; construct set; }
+
+		public LdrawObject? GetObjectForName(string name)
+		{
+			foreach(var obj in Objects)
+			{
+				if(obj.FileName == name)
+					return obj;
+			}
+			return null;
+		}
+	}
+
+	public class CombinedObjectLocator : IDroppedObjectLocator, GLib.Object
+	{
+		private Map<string, IDroppedObjectLocator> locators;
+
+		public CombinedObjectLocator(Map<string, IDroppedObjectLocator> locators)
+		{
+			this.locators = locators;
+		}
+
+		public LdrawObject? GetObjectForName(string name)
+		{
+			var separatorIndex = name.index_of("::");
+			if(separatorIndex == -1)
+				return locators[""].GetObjectForName(name);
+
+			return locators[name.substring(0, separatorIndex)].GetObjectForName(name.substring(separatorIndex + 2));
+		}
 	}
 }

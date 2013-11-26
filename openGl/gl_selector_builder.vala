@@ -5,7 +5,7 @@ using GL;
 
 namespace Ldraw.OpenGl
 {
-	public class GlSelectorBuilder : LdrawBuilder
+	public class GlSelectorBuilder : LdrawVisitor
 	{
 		private Vector m_Eyeline;
 		private Matrix m_Transform;
@@ -46,7 +46,7 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 
-			glOrtho(clickArea.MaxX, clickArea.MinX,
+			glOrtho(clickArea.MinX, clickArea.MaxX,
 					clickArea.MinY, clickArea.MaxY,
 					clickArea.MinZ, clickArea.MaxZ);
 			m_Eyeline = lookAt(eyeline, centre, up);
@@ -92,7 +92,7 @@ namespace Ldraw.OpenGl
 			model.VisibleChange();
 		}
 
-		public override void BuildLine(LineNode line)
+		public override void VisitLine(LineNode line)
 		{
 			if(m_RecursionDepth == 0)
 			{
@@ -112,7 +112,7 @@ namespace Ldraw.OpenGl
 			glEnd();
 		}
 
-		public override void BuildTriangle(TriangleNode triangle)
+		public override void VisitTriangle(TriangleNode triangle)
 		{
 			if(m_RecursionDepth == 0)
 			{
@@ -134,7 +134,7 @@ namespace Ldraw.OpenGl
 			glEnd();
 		}
 
-		public override void BuildQuad(QuadNode quad)
+		public override void VisitQuad(QuadNode quad)
 		{
 			if(m_RecursionDepth == 0)
 			{
@@ -158,7 +158,7 @@ namespace Ldraw.OpenGl
 			glEnd();
 		}
 
-		public override void BuildSubModel(PartNode part)
+		public override void VisitSubModel(PartNode part)
 		{
 			if(m_RecursionDepth == 0)
 			{
@@ -191,7 +191,7 @@ namespace Ldraw.OpenGl
 			m_InvertColour = oldInverted;
 		}
 
-		public override void BuildCondLine(CondLineNode line)
+		public override void VisitCondLine(CondLineNode line)
 		{
 			if(m_RecursionDepth == 0)
 			{
@@ -229,7 +229,7 @@ namespace Ldraw.OpenGl
 			glEnd();
 		}
 
-		public override void BuildComment(Comment line)
+		public override void VisitComment(Comment line)
 		{
 			if(m_RecursionDepth == 0)
 			{

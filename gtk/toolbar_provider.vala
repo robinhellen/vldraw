@@ -1,4 +1,6 @@
 using Gtk;
+
+using Ldraw.Lego;
 using Ldraw.Maths;
 using Ldraw.Options;
 
@@ -44,20 +46,45 @@ namespace Ldraw.Ui
 			return bar;
 		}
 
-		public Toolbar GetColoursToolbar()
+		public Toolbar GetColoursToolbar(Window window)
 		{
 			Toolbar bar = new Toolbar();
 			bar.insert(new SeparatorToolItem(), -1);
-			for(int i = 0; i < 16; i++)
+			var falseVal = Value(typeof(bool));
+			falseVal.set_boolean(false);
+			for(int i = 0; i < 32; i++)
 			{
-				bar.insert(CreateColourButton(i), -1);
+				var button = CreateColourButton(i);
+				bar.insert(button, -1);
+				bar.child_set_property(button, "homogeneous", falseVal);
 			}
-			return bar;
-		}
 
-		public Toolbar GetGridToolbar()
-		{
-			Toolbar bar = new Toolbar();
+			var moreButton = new ToolButton(null, "More");
+			moreButton.clicked.connect(() =>
+				{
+					var dialog = new Dialog.with_buttons("Select colour", window, DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
+					Stock.OK,		ResponseType.ACCEPT,
+					Stock.CANCEL,	ResponseType.REJECT);
+
+					var chooser = new ColourChooser();
+
+					((Container)dialog.get_content_area()).add(chooser);
+
+					dialog.show_all();
+					var result = dialog.run();
+					if(result != ResponseType.ACCEPT)
+					{
+						dialog.destroy();
+						return;
+					}
+
+					stderr.printf(@"Colour chosen: $(chooser.ChosenColour).\n");
+					dialog.destroy();
+				});
+			moreButton.set_tooltip_text("More colours");
+			bar.insert(moreButton, -1);
+			bar.child_set_property(moreButton, "homogeneous", falseVal);
+
 			return bar;
 		}
 
@@ -96,7 +123,7 @@ namespace Ldraw.Ui
 					}
 					m_ModelContainer.Model.VisibleChange();
 				});
-
+			button.set_tooltip_text(LdrawColour.GetName(colourId));
 			return button;
 		}
 
@@ -150,6 +177,7 @@ namespace Ldraw.Ui
 		private enum Axis
 		{
 			X, Y, Z;
+
 			public string to_string()
 			{
 				switch(this)
@@ -165,5 +193,103 @@ namespace Ldraw.Ui
 				}
 			}
 		}
+	}
+
+	public class ColourChooser : VBox
+	{
+		private int page = 0;
+		private Button[] buttons = new Button[32];
+
+		public ColourChooser()
+		{
+			var grid = new Table(4, 8, true);
+			for(int i = 0; i < 32; i++)
+			{
+				var button = new Button();
+				int x = i;
+				button.clicked.connect(() =>
+					{
+						ChosenColour = 32 * page + x;
+					});
+
+				grid.attach_defaults(button, i % 8, i % 8 + 1, i / 8, i / 8 + 1);
+
+				buttons[i] = button;
+
+			}
+
+			var nextPageButton = new Button.from_stock(Stock.GO_FORWARD);
+			var prevPageButton = new Button.from_stock(Stock.GO_BACK);
+			prevPageButton.sensitive = false;
+
+			nextPageButton.clicked.connect(() =>
+				{
+					page++;
+					if(page >= 16)
+						nextPageButton.sensitive = false;
+
+					prevPageButton.sensitive = true;
+
+					UpdateButtonColours();
+				});
+			prevPageButton.clicked.connect(() =>
+				{
+					page--;
+					if(page <= 0)
+						prevPageButton.sensitive = false;
+
+					nextPageButton.sensitive = true;
+
+					UpdateButtonColours();
+				});
+
+			pack_start(grid, false, true, 10);
+			var button_box = new VBox(true, 10);
+			button_box.pack_start(prevPageButton, true, false);
+			button_box.pack_start(nextPageButton, true, false);
+			pack_end(button_box, false);
+			UpdateButtonColours();
+		}
+
+		private void UpdateButtonColours()
+		{
+			for(int i = 0; i < 32; i++)
+			{
+				var colourId = page * 32 + i;
+				var button = buttons[i];
+				button.remove(button.child);
+
+				var colourName = LdrawColour.GetName(colourId);
+				if(colourName != null)
+				{
+					Gdk.Pixbuf data = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 16, 16);
+
+					float red, green, blue, alpha;
+					Ldraw.Lego.LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
+
+					uint32 fillColour = ((int)(red * 255) << 24)
+									  | ((int)(green * 255) << 16)
+									  | ((int)(blue * 255) << 8)
+									  | ((int)(alpha * 255));
+					data.fill(fillColour);
+
+					var image = new Image.from_pixbuf(data);
+
+					button.sensitive = true;
+					button.add(image);
+					button.set_tooltip_text(colourName);
+				}
+				else
+				{
+					button.sensitive = false;
+					button.add(new Image.from_stock(Stock.STOP, IconSize.BUTTON));
+					button.set_tooltip_text("Not defined");
+				}
+			}
+			show_all();
+			queue_draw();
+		}
+
+		public int ChosenColour {get; private set;}
 	}
 }

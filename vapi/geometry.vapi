@@ -59,6 +59,9 @@ namespace Ldraw {
 			public float Y { get; }
 			public float Z { get; }
 			public float Magnitude { get; }
+
+			[CCode(array_length = false)]
+			public unowned float[] value_vector();
 		}
 	}
 }

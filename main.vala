@@ -26,7 +26,7 @@ namespace Ldraw
 			var loader = new LdrawFileLoader();
 			try
 			{
-				model = loader.LoadModelFile("/home/robin/ldraw/models/car.dat");
+				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd");
 			}
 			catch(Error e)
 			{

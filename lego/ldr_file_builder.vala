@@ -1,7 +1,7 @@
 
 namespace Ldraw.Lego
 {
-	public class LdrFileBuilder : LdrawBuilder
+	public class LdrFileBuilder : LdrawVisitor
 	{
 		private File m_File;
 		private FileOutputStream m_OutStream;
@@ -12,12 +12,11 @@ namespace Ldraw.Lego
 		public LdrFileBuilder(string filename)
 			throws Error
 		{
-			stderr.printf(@"Saving a file to: $filename.\n");
 			m_File = File.new_for_path(filename);
 			m_OutStream = m_File.replace(null, false, FileCreateFlags.NONE);
 		}
 
-		public override void BuildNode(LdrawNode node)
+		public override void VisitNode(LdrawNode node)
 		{
 			if(HadError)
 				return;

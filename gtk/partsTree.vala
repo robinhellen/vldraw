@@ -4,13 +4,12 @@ using Ldraw.Lego;
 
 namespace Ldraw.Ui.Widgets
 {
-	private TreeView m_Tree;
-	private ScrolledWindow m_Scrolled;
-
-	private LdrawViewPane m_Detail;
-
 	public class PartsTree
 	{
+		private ScrolledWindow m_Scrolled;
+		private TreeView m_Tree;
+		private LdrawViewPane m_Detail;
+
 		public PartsTree()
 		{
 			m_Tree = new TreeView.with_model(CreateAndPopulateModel());

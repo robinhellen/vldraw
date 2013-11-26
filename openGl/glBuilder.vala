@@ -5,7 +5,7 @@ using GL;
 
 namespace Ldraw.OpenGl
 {
-	public class GlBuilder : LdrawBuilder
+	public class GlBuilder : LdrawVisitor
 	{
 		private Vector m_Eyeline;
 		private Matrix m_Transform;
@@ -16,8 +16,6 @@ namespace Ldraw.OpenGl
 
 		private int m_RecursionDepth = 0;
 
-		private Timer timer;
-
 		public GlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
 					, Vector eyeline, Vector centre, Vector up)
 			requires(defaultColour != 24 && defaultColour != 16) // default colour must be an actual colour
@@ -25,8 +23,6 @@ namespace Ldraw.OpenGl
 			m_CurrentColour = defaultColour;
 			m_Transform = Matrix.Identity;
 			m_Center = Vector.NullVector;
-
-			timer = new Timer();
 
 			// Set up the current openGl area for drawing
 			// Clear the colour and alpha
@@ -41,7 +37,7 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 
-			glOrtho(viewArea.MaxX, viewArea.MinX,
+			glOrtho(viewArea.MinX, viewArea.MaxX,
 					viewArea.MinY, viewArea.MaxY,
 					viewArea.MinZ, viewArea.MaxZ);
 			m_Eyeline = lookAt(eyeline, centre, up);
@@ -57,10 +53,9 @@ namespace Ldraw.OpenGl
 		public void Flush()
 		{
 			glFlush();
-			stderr.printf(@"Finished rendering in $(timer.elapsed()) seconds.\n");
 		}
 
-		public override void BuildLine(LineNode line)
+		public override void VisitLine(LineNode line)
 		{
 			SetRenderColour(line.ColourId);
 
@@ -69,13 +64,13 @@ namespace Ldraw.OpenGl
 
 			glBegin(GL_LINES);
 
-			glVertex3f(a.X, a.Y, a.Z);
-			glVertex3f(b.X, b.Y, b.Z);
+			glVertex3fv(a.value_vector());
+			glVertex3fv(b.value_vector());
 
 			glEnd();
 		}
 
-		public override void BuildTriangle(TriangleNode triangle)
+		public override void VisitTriangle(TriangleNode triangle)
 		{
 			SetRenderColour(triangle.ColourId);
 
@@ -85,14 +80,14 @@ namespace Ldraw.OpenGl
 
 			glBegin(GL_POLYGON);
 
-			glVertex3f(a.X, a.Y, a.Z);
-			glVertex3f(b.X, b.Y, b.Z);
-			glVertex3f(c.X, c.Y, c.Z);
+			glVertex3fv(a.value_vector());
+			glVertex3fv(b.value_vector());
+			glVertex3fv(c.value_vector());
 
 			glEnd();
 		}
 
-		public override void BuildQuad(QuadNode quad)
+		public override void VisitQuad(QuadNode quad)
 		{
 			SetRenderColour(quad.ColourId);
 
@@ -103,15 +98,15 @@ namespace Ldraw.OpenGl
 
 			glBegin(GL_POLYGON);
 
-			glVertex3f(a.X, a.Y, a.Z);
-			glVertex3f(b.X, b.Y, b.Z);
-			glVertex3f(c.X, c.Y, c.Z);
-			glVertex3f(d.X, d.Y, d.Z);
+			glVertex3fv(a.value_vector());
+			glVertex3fv(b.value_vector());
+			glVertex3fv(c.value_vector());
+			glVertex3fv(d.value_vector());
 
 			glEnd();
 		}
 
-		public override void BuildSubModel(PartNode part)
+		public override void VisitSubModel(PartNode part)
 		{
 			Matrix oldTransform = m_Transform;
 			Vector oldCenter = m_Center;
@@ -134,7 +129,7 @@ namespace Ldraw.OpenGl
 
 			m_RecursionDepth++;
 			// recurse into the current builder
-			part.Contents.BuildFromFile(this);
+			Visit(part.Contents);
 			// finally restore the old state
 			m_RecursionDepth--;
 			m_Transform = oldTransform;
@@ -143,7 +138,7 @@ namespace Ldraw.OpenGl
 			m_InvertColour = oldInverted;
 		}
 
-		public override void BuildCondLine(CondLineNode line)
+		public override void VisitCondLine(CondLineNode line)
 		{
 
 			Vector a = m_Transform.TransformVector(line.A).Add(m_Center);
@@ -170,8 +165,8 @@ namespace Ldraw.OpenGl
 			SetRenderColour(line.ColourId);
 			glBegin(GL_LINES);
 
-			glVertex3f(a.X, a.Y, a.Z);
-			glVertex3f(b.X, b.Y, b.Z);
+			glVertex3fv(a.value_vector());
+			glVertex3fv(b.value_vector());
 
 			glEnd();
 		}

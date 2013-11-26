@@ -63,5 +63,18 @@ namespace Ldraw.Lego.Nodes
 		{
 			Transform = transform.TransformMatrix(Transform);
 		}
+
+		public override LdrawNode TransformNode(Matrix transform, Vector center)
+		{
+			var newTransform = transform.TransformMatrix(Transform);
+			var newCenter = transform.TransformVector(Center).Add(center);
+
+			return new PartNode(newCenter, newTransform, m_Contents, ColourId);
+		}
+
+		public override void Accept(LdrawVisitor visitor)
+		{
+			visitor.VisitSubModel(this);
+		}
 	}
 }

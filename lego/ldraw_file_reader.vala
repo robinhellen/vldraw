@@ -27,7 +27,7 @@ namespace Ldraw.Lego
 			{
 				m_File = file;
 				m_Parser = parser;
-				helper();
+				helper.begin();
 			}
 
 			protected override async void generate()

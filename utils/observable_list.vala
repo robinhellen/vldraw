@@ -3,7 +3,7 @@ using Gtk;
 
 namespace Ldraw.Utils
 {
-	public class ObservableList<T> : LinkedList<T>, TreeModel
+	public class ObservableList<T> : LinkedList<T>, TreeModel, TreeDragSource
 	{
 		// overrides of LinkedList
 		public override bool remove(T item)
@@ -114,7 +114,7 @@ namespace Ldraw.Utils
 				return false;
 			var listIndex = path.get_indices()[0];
 
-			if(size < listIndex)
+			if(size <= listIndex)
 				return false;
 
 			iter.stamp = c_IteratorStamp;
@@ -168,7 +168,7 @@ namespace Ldraw.Utils
 
 		public bool iter_next(ref TreeIter iter)
 		{
-			if(iter.stamp != c_IteratorStamp || (int)(iter.user_data) == size)
+			if(iter.stamp != c_IteratorStamp || (int)(iter.user_data) >= size - 1)
 			{
 				iter.stamp = 0;
 				return false;
@@ -210,5 +210,24 @@ namespace Ldraw.Utils
 		}
 
 		// end implementation of TreeModel
+
+		// implementation of TreeDragSource
+
+		public bool drag_data_delete(TreePath path)
+		{
+			return false;
+		}
+
+		public bool drag_data_get(TreePath path, SelectionData selData)
+		{
+			return false;
+		}
+
+		public bool row_draggable(TreePath path)
+		{
+			return true;
+		}
+
+		// end implementation of TreeDragSource
 	}
 }
