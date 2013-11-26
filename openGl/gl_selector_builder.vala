@@ -63,7 +63,6 @@ namespace Ldraw.OpenGl
 			glFlush();
 
 			var hits = glRenderMode(GL_RENDER);
-			model.ClearSelection();
 
 			if(hits == 0)
 				return;

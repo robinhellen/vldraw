@@ -40,6 +40,11 @@ namespace Ldraw.Ui.Widgets
 			switch(event.button)
 			{
 				case 1: // left
+					if((event.state & ModifierType.CONTROL_MASK) != ModifierType.CONTROL_MASK)
+					{
+						Model.ClearSelection();
+					}
+
 					SelectTopMostUnderMouse(event.x, event.y);
 					break;
 				case 3: // right button
