@@ -207,6 +207,10 @@ namespace Ldraw.Ui
 			fileSave.activate.connect(FileSave_OnActivate);
 			fileMenu.append(fileSave);
 
+			Gtk.MenuItem fileSaveAs = new Gtk.MenuItem.with_mnemonic("Save _As");
+			fileSaveAs.activate.connect(FileSaveAs_OnActivate);
+			fileMenu.append(fileSaveAs);
+
 			Gtk.MenuItem fileQuit = new Gtk.MenuItem.with_mnemonic("_Quit");
 			fileMenu.append(fileQuit);
 			fileQuit.activate.connect(() => main_quit());
