@@ -10,7 +10,7 @@ namespace Ldraw
 		public static int main(string[] args)
 		{
 			// initialize Gtk and OpenGL
-			Gtk.init(ref args);
+			init(ref args);
 			Gdk.gl_init(ref args);
 
 			LdrawLibrary lib = LdrawLibrary.Instance;
@@ -34,9 +34,17 @@ namespace Ldraw
 				return 1;
 			}
 
-			Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model);
-			win.destroy.connect(() => main_quit());
-			win.show_all();
+			try
+			{
+				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model);
+				win.destroy.connect(() => main_quit());
+				win.show_all();
+			}
+			catch(OpenGl.GlError e)
+			{
+				stderr.printf(@"Unable to initialize OpenGl displays: $(e.message).\n");
+				return -1;
+			}
 
 			Gtk.main();
 
