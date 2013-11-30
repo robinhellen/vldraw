@@ -28,6 +28,7 @@ namespace Ldraw.Ui
 		DocumentObjectLocator documentLocator;
 
 		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null)
+			throws OpenGl.GlError
 		{
 			EditingObject = model.MainObject;
 			m_Settings = settings;
@@ -42,6 +43,7 @@ namespace Ldraw.Ui
 		}
 
 		private void SetUpControls()
+			throws OpenGl.GlError
 		{
 			var toolbarProvider = new ToolBarProvider(this, m_Settings);
 
@@ -70,6 +72,7 @@ namespace Ldraw.Ui
 			catch(OpenGl.GlError e)
 			{
 				stdout.printf(e.message);
+				throw e;
 			}
 
 			var notebook = new Notebook();
@@ -320,8 +323,8 @@ namespace Ldraw.Ui
 		{
 			var dialog = new Dialog.with_buttons("Model details", this,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-				STOCK_OK, ResponseType.ACCEPT,
-				STOCK_CANCEL, ResponseType.REJECT);
+				Stock.OK, ResponseType.ACCEPT,
+				Stock.CANCEL, ResponseType.REJECT);
 
 			var content = (Box) dialog.get_content_area();
 			var table = new Table(3, 2, false);

@@ -76,7 +76,6 @@ namespace Ldraw.OpenGl
 				var namesOnStack = selectBuffer[datapointBase];
 				assert(namesOnStack == 1);
 				var minZ = selectBuffer[datapointBase + 1];
-				var maxZ = selectBuffer[datapointBase + 2];
 				var name = selectBuffer[datapointBase + 3];
 
 				if(minZ < currentMinZ)
