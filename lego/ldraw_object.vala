@@ -10,14 +10,27 @@ namespace Ldraw.Lego
 		private Bounds m_BoundingBox;
 		private bool m_ChangingSelection;
 		private Gee.List<LdrawNode> flattenedNodes;
+		private Gee.List<LdrawNode> nodes;
 
 		public LdrawObject(string description)
 		{
-			var nodeList = new ObservableList<LdrawNode>();
+			var nodeList = new ArrayList<LdrawNode>();
 			Object(Nodes: nodeList, Description: description);
 		}
 
-		public Gee.List<LdrawNode> Nodes {get; protected construct set;}
+		public Gee.List<LdrawNode> Nodes
+		{
+			get{return nodes;}
+			protected construct set
+			{
+				nodes = value;
+				var observable = nodes as ObservableList<LdrawNode>;
+				if(observable != null)
+				{
+					observable.row_changed.connect(() => VisibleChange());
+				}
+			}
+		}
 
 		public Gee.List<LdrawNode> FlattenedNodes
 		{
@@ -162,10 +175,7 @@ namespace Ldraw.Lego
 			ComponentsChanged();
 			VisibleChange();
 			m_BoundingBox = null;
-			if(newNode is PartNode)
-			{
-				newNode.notify["ColourId"].connect(() => VisibleChange());
-			}
+			newNode.notify["ColourId"].connect(() => VisibleChange());
 			newNode.notify["Selected"].connect(() => VisibleChange());
 		}
 
