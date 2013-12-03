@@ -147,7 +147,8 @@ namespace Ldraw.Ui
 
 					if(!positive)
 						displacement = displacement.Scale(-1.0f);
-					m_ModelContainer.Model.MoveSelectedNodes(displacement);
+
+					undoStack.ExecuteCommand(new MoveNodesCommand(m_ModelContainer.Model.Selection, displacement));
 				});
 
 			return button;

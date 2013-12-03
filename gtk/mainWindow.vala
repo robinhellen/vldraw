@@ -69,7 +69,7 @@ namespace Ldraw.Ui
 
 			try
 			{
-				m_View = new EditPanes(m_Settings, new CombinedObjectLocator(locators));
+				m_View = new EditPanes(m_Settings, new CombinedObjectLocator(locators), undoStack);
 			}
 			catch(OpenGl.GlError e)
 			{

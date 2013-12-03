@@ -7,6 +7,7 @@ using Ldraw.Lego.Nodes;
 using Ldraw.OpenGl;
 using Ldraw.Maths;
 using Ldraw.Options;
+using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui.Widgets
 {
@@ -15,13 +16,15 @@ namespace Ldraw.Ui.Widgets
 		private IOptions m_Settings;
 		private PartNode dropItem = null;
 		private IDroppedObjectLocator locator;
+		private UndoStack undoStack;
 
-		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator)
+		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws GlError
 		{
 			base(angle);
 			m_Settings = settings;
 			this.locator = locator;
+			this.undoStack = undoStack;
 
 			can_focus = true;
 			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
@@ -75,32 +78,32 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, m_Settings.CurrentGrid.Z));
+				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, 0, m_Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, 0.0f, -m_Settings.CurrentGrid.Z));
+				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, 0, -m_Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(-m_Settings.CurrentGrid.X, 0.0f, 0.0f));
+				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(-m_Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(m_Settings.CurrentGrid.X, 0.0f, 0.0f));
+				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(m_Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, m_Settings.CurrentGrid.Y, 0.0f));
+				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, m_Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
-				Model.MoveSelectedNodes(Vector(0.0f, -m_Settings.CurrentGrid.Y, 0.0f));
+				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, -m_Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == delKeyVal)

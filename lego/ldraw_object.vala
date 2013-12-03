@@ -179,20 +179,6 @@ namespace Ldraw.Lego
 			newNode.notify["Selected"].connect(() => VisibleChange());
 		}
 
-		public void MoveSelectedNodes(Vector displacement)
-		{
-			// iterate nodes and move those that are selected and are models
-			foreach(LdrawNode node in Nodes)
-			{
-				if(!node.Selected || !(node is PartNode))
-					continue;
-
-				PartNode part = (PartNode)node;
-				part.Move(displacement);
-			}
-			VisibleChange();
-		}
-
 		public void DeleteSelected()
 		{
 			var toDelete = new ArrayList<LdrawNode>();

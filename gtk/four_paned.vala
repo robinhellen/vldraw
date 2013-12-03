@@ -2,6 +2,7 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Options;
+using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui.Widgets
 {
@@ -50,16 +51,16 @@ namespace Ldraw.Ui.Widgets
 		private LdrawEditPane top_right;
 		private LdrawEditPane bottom_right;
 
-		public EditPanes(IOptions settings, IDroppedObjectLocator locator)
+		public EditPanes(IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws OpenGl.GlError
 		{
 			base();
 
-			top_left 	= new LdrawEditPane(ViewAngle.Front, settings, locator);
-			bottom_left = new LdrawEditPane(ViewAngle.Top, settings, locator);
+			top_left 	= new LdrawEditPane(ViewAngle.Front, settings, locator, undoStack);
+			bottom_left = new LdrawEditPane(ViewAngle.Top, settings, locator, undoStack);
 
-			top_right 	 = new LdrawEditPane(ViewAngle.Right, settings, locator);
-			bottom_right = new LdrawEditPane(ViewAngle.Ortho, settings, locator);
+			top_right 	 = new LdrawEditPane(ViewAngle.Right, settings, locator, undoStack);
+			bottom_right = new LdrawEditPane(ViewAngle.Ortho, settings, locator, undoStack);
 
 			add_top_left(WithScrolls(top_left));
 			add_bottom_left(WithScrolls(bottom_left));
