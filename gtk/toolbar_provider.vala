@@ -4,6 +4,7 @@ using Gtk;
 using Ldraw.Lego;
 using Ldraw.Maths;
 using Ldraw.Options;
+using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui
 {
@@ -11,11 +12,13 @@ namespace Ldraw.Ui
 	{
 		private IHaveModel m_ModelContainer;
 		private IOptions m_Options;
+		private UndoStack undoStack;
 
-		public ToolBarProvider(IHaveModel modelContainer, IOptions options)
+		public ToolBarProvider(IHaveModel modelContainer, IOptions options, UndoStack undoStack)
 		{
 			m_ModelContainer = modelContainer;
 			m_Options = options;
+			this.undoStack = undoStack;
 		}
 
 		public int ButtonSize {get; set; default = 16;}
@@ -65,9 +68,11 @@ namespace Ldraw.Ui
 			var moreButton = new ToolButton(null, "More");
 			moreButton.clicked.connect(() =>
 				{
-					var dialog = new Dialog.with_buttons("Select colour", window, DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-					Stock.OK,		ResponseType.ACCEPT,
-					Stock.CANCEL,	ResponseType.REJECT);
+					var dialog = new Dialog.with_buttons("Select colour", window,
+						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
+						Stock.OK,		ResponseType.ACCEPT,
+						Stock.CANCEL,	ResponseType.REJECT
+					);
 
 					var chooser = new ColourChooser();
 
@@ -81,11 +86,7 @@ namespace Ldraw.Ui
 						return;
 					}
 
-					foreach(var node in m_ModelContainer.Model.Selection)
-					{
-						node.ColourId = chooser.ChosenColour;
-					}
-					m_ModelContainer.Model.VisibleChange();
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Model.Selection, chooser.ChosenColour));
 					dialog.destroy();
 				});
 			moreButton.set_tooltip_text("More colours");
@@ -125,11 +126,7 @@ namespace Ldraw.Ui
 			var button = new ToolButton(new Image.from_pixbuf(data), null);
 			button.clicked.connect(() =>
 				{
-					foreach(var node in m_ModelContainer.Model.Selection)
-					{
-						node.ColourId = colourId;
-					}
-					m_ModelContainer.Model.VisibleChange();
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Model.Selection, colourId));
 				});
 			button.set_tooltip_text(LdrawColour.GetName(colourId));
 			return button;

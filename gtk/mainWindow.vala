@@ -5,6 +5,7 @@ using Ldraw.Ui.Widgets;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Options;
+using Ldraw.Ui.Commands;
 using Ldraw.Utils;
 
 namespace Ldraw.Ui
@@ -14,6 +15,7 @@ namespace Ldraw.Ui
 		private LdrawModelFile m_Model;
 		private LdrawObject EditingObject {get; set;}
 		private ComboBox m_SubModels;
+		private UndoStack undoStack = new UndoStack();
 
 		// controls
 		EditPanes m_View;
@@ -39,16 +41,16 @@ namespace Ldraw.Ui
 			SetUpControls();
 			File = model;
 			SetUpErrorReporting();
-			SetUpAccelerators();
 		}
 
 		private void SetUpControls()
 			throws OpenGl.GlError
 		{
-			var toolbarProvider = new ToolBarProvider(this, m_Settings);
+			var toolbarProvider = new ToolBarProvider(this, m_Settings, undoStack);
 
 			// start with a menubar as that runs across the whole window
-			MenuBar menus = CreateMenus();
+			var accelerators = SetUpAccelerators();
+			MenuBar menus = CreateMenus(accelerators);
 			VBox bigVBox = new VBox(false, 0);
 			bigVBox.pack_start(menus, false, false);
 
@@ -181,15 +183,16 @@ namespace Ldraw.Ui
 
 		// cursor keys - move model in x,z plane
 		// Home/End - move model on y axis
-		private void SetUpAccelerators()
+		private AccelGroup SetUpAccelerators()
 		{
 			AccelGroup group = new AccelGroup();
 			//group.connect(Gdk.keyval_from_name("Up"), 0, 0, (group, object, keyval, modifier) => {stdout.printf("Up\n"); return false; });
 
 			add_accel_group(group);
+			return group;
 		}
 
-		private MenuBar CreateMenus()
+		private MenuBar CreateMenus(AccelGroup accelerators)
 		{
 			Gtk.MenuBar menus = new MenuBar();
 
@@ -198,6 +201,8 @@ namespace Ldraw.Ui
 
 			Gtk.Menu fileMenu = new Gtk.Menu();
 			fileMenuItem.submenu = fileMenu;
+			fileMenu.set_accel_group(accelerators);
+			fileMenu.set_accel_path("<Ldraw>/File");
 
 			Gtk.MenuItem fileNew = new Gtk.MenuItem.with_mnemonic("_New");
 			fileMenu.append(fileNew);
@@ -217,6 +222,28 @@ namespace Ldraw.Ui
 			Gtk.MenuItem fileQuit = new Gtk.MenuItem.with_mnemonic("_Quit");
 			fileMenu.append(fileQuit);
 			fileQuit.activate.connect(() => main_quit());
+
+			var editMenuItem = new Gtk.MenuItem.with_mnemonic("_Edit");
+			menus.append(editMenuItem);
+
+			var editMenu = new Gtk.Menu();
+			editMenuItem.submenu = editMenu;
+			editMenu.set_accel_group(accelerators);
+			editMenu.set_accel_path("<Ldraw>/Edit");
+
+			var editUndo = new Gtk.MenuItem.with_mnemonic("_Undo");
+			editUndo.activate.connect(() => undoStack.UndoSingle());
+			undoStack.notify["HasUndoItems"].connect(() => editUndo.sensitive = undoStack.HasUndoItems);
+			editUndo.sensitive = undoStack.HasUndoItems;
+			editMenu.append(editUndo);
+			AccelMap.add_entry(editUndo.get_accel_path(), Gdk.keyval_from_name("Z"), Gdk.ModifierType.CONTROL_MASK);
+
+			var editRedo = new Gtk.MenuItem.with_mnemonic("_Redo");
+			editRedo.activate.connect(() => undoStack.RedoSingle());
+			undoStack.notify["HasRedoItems"].connect(() => editRedo.sensitive = undoStack.HasRedoItems);
+			editRedo.sensitive = undoStack.HasRedoItems;
+			editMenu.append(editRedo);
+			AccelMap.add_entry(editRedo.get_accel_path(), Gdk.keyval_from_name("Y"), Gdk.ModifierType.CONTROL_MASK);
 
 			var modelMenuItem = new Gtk.MenuItem.with_mnemonic("_Model");
 			menus.append(modelMenuItem);
