@@ -159,6 +159,7 @@ namespace Ldraw.Ui
 					EditingObject = object;
 					m_View.Model = object;
 					m_ModelList.Model = object;
+					undoStack.Clear();
 				});
 			return cb;
 		}
@@ -443,6 +444,7 @@ namespace Ldraw.Ui
 				var titleFileName = value.FileName ?? "untitled";
 
 				title = @"vldraw - $titleFileName";
+				undoStack.Clear();
 			}
 		}
 
