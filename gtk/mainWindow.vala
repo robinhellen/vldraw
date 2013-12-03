@@ -207,6 +207,8 @@ namespace Ldraw.Ui
 			Gtk.MenuItem fileNew = new Gtk.MenuItem.with_mnemonic("_New");
 			fileMenu.append(fileNew);
 			fileNew.activate.connect(() => File = new LdrawModel.Empty());
+			AccelMap.add_entry(fileNew.get_accel_path(), Gdk.keyval_from_name("N"), Gdk.ModifierType.CONTROL_MASK);
+
 			Gtk.MenuItem fileLoad = new Gtk.MenuItem.with_mnemonic("_Open");
 			fileMenu.append(fileLoad);
 			fileLoad.activate.connect(FileOpen_OnActivate);
@@ -214,6 +216,7 @@ namespace Ldraw.Ui
 			Gtk.MenuItem fileSave = new Gtk.MenuItem.with_mnemonic("_Save");
 			fileSave.activate.connect(FileSave_OnActivate);
 			fileMenu.append(fileSave);
+			AccelMap.add_entry(fileSave.get_accel_path(), Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK);
 
 			Gtk.MenuItem fileSaveAs = new Gtk.MenuItem.with_mnemonic("Save _As");
 			fileSaveAs.activate.connect(FileSaveAs_OnActivate);
@@ -222,6 +225,7 @@ namespace Ldraw.Ui
 			Gtk.MenuItem fileQuit = new Gtk.MenuItem.with_mnemonic("_Quit");
 			fileMenu.append(fileQuit);
 			fileQuit.activate.connect(() => main_quit());
+			AccelMap.add_entry(fileQuit.get_accel_path(), Gdk.keyval_from_name("Q"), Gdk.ModifierType.CONTROL_MASK);
 
 			var editMenuItem = new Gtk.MenuItem.with_mnemonic("_Edit");
 			menus.append(editMenuItem);
