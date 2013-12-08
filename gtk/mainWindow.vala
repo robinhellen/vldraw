@@ -2,6 +2,7 @@ using Gee;
 using Gtk;
 
 using Ldraw.Ui.Widgets;
+using Ldraw.Export;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Options;
@@ -10,7 +11,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	public class MainWindow : Window, IHaveModel
+	public class MainWindow : Window//, IHaveModel
 	{
 		private LdrawModelFile m_Model;
 		private LdrawObject EditingObject {get; set;}
@@ -263,6 +264,20 @@ namespace Ldraw.Ui
 			modelAddSubModel.activate.connect(ModelAddSubModel_OnActivate);
 			modelMenu.append(modelAddSubModel);
 
+			var modelExport = new Gtk.MenuItem.with_mnemonic("_Export");
+			modelMenu.append(modelExport);
+
+			var modelExportMenu = new Gtk.Menu();
+			modelExport.submenu = modelExportMenu;
+
+			var exportJpg = new Gtk.MenuItem.with_mnemonic("Image file (_Jpeg)");
+			exportJpg.activate.connect(() => ExportJpg());
+			modelExportMenu.append(exportJpg);
+
+			var exportPov = new Gtk.MenuItem.with_mnemonic("Povray");
+			exportPov.activate.connect(() => ExportPov());
+			modelExportMenu.append(exportPov);
+
 			return menus;
 		}
 
@@ -446,6 +461,18 @@ namespace Ldraw.Ui
 				title = @"vldraw - $titleFileName";
 				undoStack.Clear();
 			}
+		}
+
+		private void ExportJpg()
+		{
+			var exporter = new Exporter();
+			exporter.ExportJpg(File.MainObject, File.FileName + ".jpg");
+		}
+
+		private void ExportPov()
+		{
+			var exporter = new Exporter();
+			exporter.ExportPovray(File.MainObject, File.FileName + ".pov");
 		}
 
 		public LdrawObject Model

@@ -1,9 +1,9 @@
-using Ldraw.Lego;
+/*using Ldraw.Lego;
 
 namespace Ldraw
 {
-	public interface IHaveModel : Object
+	private interface IHaveModel : Object
 	{
 		public abstract LdrawObject Model { get; protected set;}
 	}
-}
+}*/

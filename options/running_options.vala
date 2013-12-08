@@ -63,4 +63,10 @@ namespace Ldraw.Options
 
 		public GridSize Grid{get; set;}
 	}
+
+	public class PersistedOptions : Object
+	{
+		public int PreviewColourId{get; set;}
+		public string LastFile {get; set;}
+	}
 }

@@ -9,7 +9,6 @@ namespace Ldraw.Lego
 	{
 		private Bounds m_BoundingBox;
 		private bool m_ChangingSelection;
-		private Gee.List<LdrawNode> flattenedNodes;
 		private Gee.List<LdrawNode> nodes;
 
 		public LdrawObject(string description)
@@ -29,33 +28,6 @@ namespace Ldraw.Lego
 				{
 					observable.row_changed.connect(() => VisibleChange());
 				}
-			}
-		}
-
-		public Gee.List<LdrawNode> FlattenedNodes
-		{
-			get
-			{
-				if(flattenedNodes == null)
-				{
-					flattenedNodes = new LinkedList<LdrawNode>();
-					foreach(var node in Nodes)
-					{
-						var partNode = node as PartNode;
-
-						if(partNode == null)
-						{
-							flattenedNodes.add(node);
-							continue;
-						}
-
-						foreach(var innerNode in partNode.Contents.FlattenedNodes)
-						{
-							flattenedNodes.add(innerNode.TransformNode(partNode.Transform, partNode.Center));
-						}
-					}
-				}
-				return flattenedNodes;
 			}
 		}
 
@@ -179,21 +151,26 @@ namespace Ldraw.Lego
 			newNode.notify["Selected"].connect(() => VisibleChange());
 		}
 
-		public void DeleteSelected()
+		public void RemoveNodes(Collection<LdrawNode> toDelete)
 		{
-			var toDelete = new ArrayList<LdrawNode>();
-			foreach(var node in Nodes)
-			{
-				if(node.Selected)
-					toDelete.add(node);
-			}
-			foreach(var node in toDelete)
-			{
-				Nodes.remove(node);
-			}
+			Nodes.remove_all(toDelete);
 			if(!toDelete.is_empty)
 			{
 				VisibleChange();
+			}
+		}
+
+		public void RemoveNode(LdrawNode node)
+		{
+			Nodes.remove(node);
+			VisibleChange();
+		}
+
+		public void AddNodes(Collection<LdrawNode> nodes)
+		{
+			foreach(var node in nodes)
+			{
+				AddNode(node);
 			}
 		}
 
@@ -220,15 +197,14 @@ namespace Ldraw.Lego
 			m_ChangingSelection = false;
 		}
 
-		public void BuildFromFile(LdrawVisitor builder, bool useFlattened = false)
+		public void BuildFromFile(LdrawVisitor builder)
 		{
-			builder.Visit(this, useFlattened);
+			builder.Visit(this);
 		}
 
 		public virtual signal void VisibleChange()
 		{
 			m_BoundingBox = null;
-			flattenedNodes = null;
 		}
 
 		public signal void SelectionChanged();

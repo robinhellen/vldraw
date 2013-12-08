@@ -10,11 +10,11 @@ namespace Ldraw.Ui
 {
 	public class ToolBarProvider : GLib.Object
 	{
-		private IHaveModel m_ModelContainer;
+		private unowned MainWindow m_ModelContainer;
 		private IOptions m_Options;
 		private UndoStack undoStack;
 
-		public ToolBarProvider(IHaveModel modelContainer, IOptions options, UndoStack undoStack)
+		public ToolBarProvider(MainWindow modelContainer, IOptions options, UndoStack undoStack)
 		{
 			m_ModelContainer = modelContainer;
 			m_Options = options;

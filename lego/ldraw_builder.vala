@@ -4,11 +4,9 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawVisitor : Object
 	{
-		public void Visit(LdrawObject object, bool useFlattened = false)
+		public virtual void Visit(LdrawObject object)
 		{
-			var nodesToVisit = useFlattened ? object.FlattenedNodes : object.Nodes;
-
-			foreach(var node in nodesToVisit)
+			foreach(var node in object.Nodes)
 			{
 				VisitNode(node);
 			}

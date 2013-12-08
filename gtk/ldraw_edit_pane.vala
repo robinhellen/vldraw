@@ -108,7 +108,7 @@ namespace Ldraw.Ui.Widgets
 			}
 			if(event.keyval == delKeyVal)
 			{
-				Model.DeleteSelected();
+				undoStack.ExecuteCommand(new DeleteNodesCommand(Model, Model.Selection));
 				return true;
 			}
 			return false;
@@ -228,8 +228,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 				newNode.Selected = true;
-				Model.ClearSelection();
-				Model.AddNode(newNode, copyPart);
+				undoStack.ExecuteCommand(new AddNodeCommand(Model, newNode, copyPart));
 				drag_finish(context, true, false, time);
 			}
 			else
