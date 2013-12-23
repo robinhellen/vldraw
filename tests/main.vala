@@ -1,5 +1,6 @@
 using GLib.Test;
 
+using Ldraw.Tests.Expressions;
 using Ldraw.Tests.Vectors;
 
 namespace Ldraw.Tests
@@ -12,6 +13,7 @@ namespace Ldraw.Tests
 		rootSuite.add_suite(new VectorTests().get_suite());
 		rootSuite.add_suite(new MatrixTests().get_suite());
 		rootSuite.add_suite(new BoundsTests().get_suite());
+		rootSuite.add_suite(new ExpressionsTests().get_suite());
 
 		Test.run();
 		return 0;

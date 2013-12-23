@@ -41,11 +41,25 @@ namespace Ldraw.Lego
 		{
 			var tokens = Tokenize(line);
 
-			switch(tokens[1])
+			var command = tokens[1];
+			if(command != null && command.has_prefix("!"))
+				command = command.substring(1);
+
+			switch(command)
 			{
 				case "FILE":
 				case "NOFILE":
 					return new MetaCommand(tokens[1], tokens[2: tokens.length]);
+				case "LDRAW_ORG":
+					return new LdrawOrgHeader(tokens[1], tokens[2: tokens.length]);
+				case "ANIM":
+					switch(tokens[2])
+					{
+						case "ROTATE":
+							return new AnimRotateCommand(tokens[1], tokens[2: tokens.length]);
+					}
+					break;
+
 			}
 
 			return new Comment(string.joinv(" ", tokens[1: tokens.length]));

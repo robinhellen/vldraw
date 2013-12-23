@@ -31,6 +31,20 @@ namespace Ldraw.Lego
 			}
 		}
 
+		public Collection<T> NodesOfType<T>()
+		{
+			var typedNodes = new LinkedList<T>();
+			foreach(var node in nodes)
+			{
+                Object obj = (Object)node;
+                if(obj.get_type().is_a(typeof(T)))
+                {
+                    typedNodes.add(node);
+                }
+			}
+			return typedNodes;
+		}
+
 		public string FileName {get; set;}
 
 		public string Description {get; public construct set;}
@@ -144,11 +158,31 @@ namespace Ldraw.Lego
 			{
 				Nodes.insert(Nodes.index_of(after) + 1, newNode);
 			}
-			ComponentsChanged();
-			VisibleChange();
 			m_BoundingBox = null;
 			newNode.notify["ColourId"].connect(() => VisibleChange());
 			newNode.notify["Selected"].connect(() => VisibleChange());
+		}
+
+		public void AddHeaderNode(LdrawNode node)
+		{
+			LdrawNode lastHeader = null;
+			foreach(var n in nodes)
+			{
+				if(!(n is Comment))
+					break;
+				lastHeader = n;
+			}
+			if(lastHeader == null)
+				nodes.add(node);
+
+			else
+				nodes.insert(Nodes.index_of(lastHeader) + 1, node);
+
+			ComponentsChanged();
+			VisibleChange();
+			m_BoundingBox = null;
+			node.notify["ColourId"].connect(() => VisibleChange());
+			node.notify["Selected"].connect(() => VisibleChange());
 		}
 
 		public void RemoveNodes(Collection<LdrawNode> toDelete)

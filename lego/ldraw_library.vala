@@ -18,6 +18,8 @@ namespace Ldraw.Lego
 		private Gee.List<LdrawSubPart> m_SubParts;
 		private Gee.List<LdrawHiresPrimitive> m_HiresPrimitives;
 
+		private MultiMap<string, LdrawPart> partPatterns;
+
 		private TreeSet<string> m_Categories;
 
 		private LdrawLibrary()
@@ -31,6 +33,8 @@ namespace Ldraw.Lego
 			m_Primitives = new ArrayList<LdrawPrimitive>();
 			m_HiresPrimitives = new ArrayList<LdrawHiresPrimitive>();
 			m_SubParts = new ArrayList<LdrawSubPart>();
+
+			partPatterns = new HashMultiMap<string, LdrawPart>();
 
 			m_Categories = new TreeSet<string>();
 		}

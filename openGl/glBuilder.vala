@@ -1,7 +1,10 @@
+
+using Gee;
+using GL;
+
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
-using GL;
 
 namespace Ldraw.OpenGl
 {
@@ -15,6 +18,10 @@ namespace Ldraw.OpenGl
 		private bool m_InvertColour = false;
 
 		private int m_RecursionDepth = 0;
+
+		static float animRotate = 0;
+		private Map<string, float?> variables = new HashMap<string, float?>();
+		Matrix currentRotation = Matrix.Identity;
 
 		public GlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
 					, Vector eyeline, Vector centre, Vector up)
@@ -48,6 +55,9 @@ namespace Ldraw.OpenGl
 
 			glLineWidth(2.0f);
 			glMatrixMode(GL_MODELVIEW);
+
+			variables["ANGLETIME"] = animRotate;
+			animRotate += 0.5f;
 		}
 
 		public void Flush()
@@ -115,7 +125,8 @@ namespace Ldraw.OpenGl
 
 			// apply the current transform to the sub-model's transform and center vector
 			m_Center = m_Transform.TransformVector(part.Center).Add(m_Center);
-			m_Transform = m_Transform.TransformMatrix(part.Transform);
+			m_Transform = currentRotation.TransformMatrix(m_Transform.TransformMatrix(part.Transform));
+			currentRotation = Matrix.Identity;
 
 			if(part.ColourId != 16 && part.ColourId != 24)
 			{
@@ -136,6 +147,16 @@ namespace Ldraw.OpenGl
 			m_Center = oldCenter;
 			m_CurrentColour = oldColour;
 			m_InvertColour = oldInverted;
+		}
+
+		public override void VisitComment(Comment comment)
+		{
+			var animRotateCmd = comment as AnimRotateCommand;
+			if(animRotateCmd != null)
+			{
+				var m = Matrix.ForRotation(animRotateCmd.Axis, animRotateCmd.Angle.Evaluate(variables));
+				currentRotation = m;
+			}
 		}
 
 		public override void VisitCondLine(CondLineNode line)
