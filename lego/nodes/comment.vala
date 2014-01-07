@@ -4,7 +4,7 @@ namespace Ldraw.Lego.Nodes
 {
 	public class Comment : LdrawNode
 	{
-		private string m_CommentText;
+		protected string CommentText;
 
 		class construct
 		{
@@ -13,12 +13,12 @@ namespace Ldraw.Lego.Nodes
 
 		public Comment(string comment)
 		{
-			m_CommentText = comment;
+			CommentText = comment;
 		}
 
-		public override string Description {get {return m_CommentText; } }
+		public override string Description {get {return CommentText; } }
 
-		public override string FileLine{owned get{return @"0 $m_CommentText";}}
+		public override string FileLine{owned get{return @"0 $CommentText";}}
 
 		public override LdrawNode TransformNode(Matrix _, Vector __)
 		{
