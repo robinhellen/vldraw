@@ -76,6 +76,32 @@ namespace Ldraw.Lego.Nodes
 
 			Cyclic = arguments[4] == "CYCLIC";
 			ParameterDescription = string.joinv(" ", arguments[(Cyclic ? 5 : 4) : arguments.length]);
+			notify.connect(OnNotify);
+		}
+
+		private void OnNotify(ParamSpec param)
+		{
+			switch(param.name)
+			{
+				case "Identifier":
+				case "Min":
+				case "Max":
+				case "Cyclic":
+				case "ParameterDescription":
+					UpdateProperties();
+					break;
+			}
+		}
+
+		private void UpdateProperties()
+		{
+			string[] arguments = {"PARAMETER", Identifier, Min.to_string(), Max.to_string()};
+			if(Cyclic)
+				arguments += "CYCLIC";
+
+			arguments += ParameterDescription;
+			Arguments = arguments;
+			CommentText = Command + " " + string.joinv(" ", Arguments);
 		}
 
 		public string Identifier {get; set;}
