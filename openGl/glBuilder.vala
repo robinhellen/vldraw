@@ -11,25 +11,18 @@ namespace Ldraw.OpenGl
 	public class GlBuilder : LdrawVisitor
 	{
 		private Vector m_Eyeline;
-		private Matrix m_Transform;
-		private Vector m_Center;
 
-		private int m_CurrentColour;
-		private bool m_InvertColour = false;
+		private SavedState state = new SavedState();
+		private AnimationState nextObjectAnimationState = new AnimationState();
 
 		private int m_RecursionDepth = 0;
 
-		static float animRotate = 0;
-		private Map<string, float?> variables = new HashMap<string, float?>();
-		Matrix currentRotation = Matrix.Identity;
-
 		public GlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
-					, Vector eyeline, Vector centre, Vector up)
+					, Vector eyeline, Vector centre, Vector up, Map<string, float?> parameters = Map.empty<string, float?>())
 			requires(defaultColour != 24 && defaultColour != 16) // default colour must be an actual colour
 		{
-			m_CurrentColour = defaultColour;
-			m_Transform = Matrix.Identity;
-			m_Center = Vector.NullVector;
+			state.CurrentColour = defaultColour;
+			state.Parameters = parameters;
 
 			// Set up the current openGl area for drawing
 			// Clear the colour and alpha
@@ -55,9 +48,6 @@ namespace Ldraw.OpenGl
 
 			glLineWidth(2.0f);
 			glMatrixMode(GL_MODELVIEW);
-
-			variables["ANGLETIME"] = animRotate;
-			animRotate += 0.5f;
 		}
 
 		public void Flush()
@@ -69,8 +59,8 @@ namespace Ldraw.OpenGl
 		{
 			SetRenderColour(line.ColourId);
 
-			Vector a = m_Transform.TransformVector(line.A).Add(m_Center);
-			Vector b = m_Transform.TransformVector(line.B).Add(m_Center);
+			Vector a = state.Transform.TransformVector(line.A).Add(state.Center);
+			Vector b = state.Transform.TransformVector(line.B).Add(state.Center);
 
 			glBegin(GL_LINES);
 
@@ -84,9 +74,9 @@ namespace Ldraw.OpenGl
 		{
 			SetRenderColour(triangle.ColourId);
 
-			Vector a = m_Transform.TransformVector(triangle.A).Add(m_Center);
-			Vector b = m_Transform.TransformVector(triangle.B).Add(m_Center);
-			Vector c = m_Transform.TransformVector(triangle.C).Add(m_Center);
+			Vector a = state.Transform.TransformVector(triangle.A).Add(state.Center);
+			Vector b = state.Transform.TransformVector(triangle.B).Add(state.Center);
+			Vector c = state.Transform.TransformVector(triangle.C).Add(state.Center);
 
 			glBegin(GL_POLYGON);
 
@@ -101,10 +91,10 @@ namespace Ldraw.OpenGl
 		{
 			SetRenderColour(quad.ColourId);
 
-			Vector a = m_Transform.TransformVector(quad.A).Add(m_Center);
-			Vector b = m_Transform.TransformVector(quad.B).Add(m_Center);
-			Vector c = m_Transform.TransformVector(quad.C).Add(m_Center);
-			Vector d = m_Transform.TransformVector(quad.D).Add(m_Center);
+			Vector a = state.Transform.TransformVector(quad.A).Add(state.Center);
+			Vector b = state.Transform.TransformVector(quad.B).Add(state.Center);
+			Vector c = state.Transform.TransformVector(quad.C).Add(state.Center);
+			Vector d = state.Transform.TransformVector(quad.D).Add(state.Center);
 
 			glBegin(GL_POLYGON);
 
@@ -118,24 +108,27 @@ namespace Ldraw.OpenGl
 
 		public override void VisitSubModel(PartNode part)
 		{
-			Matrix oldTransform = m_Transform;
-			Vector oldCenter = m_Center;
-			int oldColour = m_CurrentColour;
-			bool oldInverted = m_InvertColour;
+			var oldState = state;
+			state = new SavedState();
+			state.ColourInverted = oldState.ColourInverted;
+
+			state.Parameters = nextObjectAnimationState.ParameterValues;
 
 			// apply the current transform to the sub-model's transform and center vector
-			m_Center = m_Transform.TransformVector(part.Center).Add(m_Center);
-			m_Transform = currentRotation.TransformMatrix(m_Transform.TransformMatrix(part.Transform));
-			currentRotation = Matrix.Identity;
+			state.Center = oldState.Transform.TransformVector(part.Center).Add(oldState.Center).Add(nextObjectAnimationState.Translation);
+			state.Transform = nextObjectAnimationState.Rotation.TransformMatrix(oldState.Transform.TransformMatrix(part.Transform));
+
+			// reset the animation
+			nextObjectAnimationState = new AnimationState();
 
 			if(part.ColourId != 16 && part.ColourId != 24)
 			{
-				m_CurrentColour = part.ColourId;
+				state.CurrentColour = part.ColourId;
 			}
 			if(part.Selected)
 			{
-				m_InvertColour = true;
-				RenderBounds(part.Contents.BoundingBox.Transform(m_Transform, m_Center).Scale(1.2f));
+				state.ColourInverted = true;
+				RenderBounds(part.Contents.BoundingBox.Transform(state.Transform, state.Center).Scale(1.2f));
 			}
 
 			m_RecursionDepth++;
@@ -143,10 +136,7 @@ namespace Ldraw.OpenGl
 			Visit(part.Contents);
 			// finally restore the old state
 			m_RecursionDepth--;
-			m_Transform = oldTransform;
-			m_Center = oldCenter;
-			m_CurrentColour = oldColour;
-			m_InvertColour = oldInverted;
+			state = oldState;
 		}
 
 		public override void VisitComment(Comment comment)
@@ -154,19 +144,31 @@ namespace Ldraw.OpenGl
 			var animRotateCmd = comment as AnimRotateCommand;
 			if(animRotateCmd != null)
 			{
-				var m = Matrix.ForRotation(animRotateCmd.Axis, animRotateCmd.Angle.Evaluate(variables));
-				currentRotation = m;
+				var m = Matrix.ForRotation(animRotateCmd.Axis, animRotateCmd.Angle.Evaluate(state.Variables));
+				nextObjectAnimationState.Rotation = m;
+			}
+			var param = comment as AnimParameterCommand;
+			if(param != null)
+			{
+				var identifier = param.Identifier;
+				var p = state.Parameters[identifier];
+				if(p == null || p < param.Min)
+					state.Variables[identifier] = param.Min;
+				else if ( p > param.Max)
+					state.Variables[identifier] = param.Max;
+				else
+					state.Variables[identifier] = p;
 			}
 		}
 
 		public override void VisitCondLine(CondLineNode line)
 		{
 
-			Vector a = m_Transform.TransformVector(line.A).Add(m_Center);
-			Vector b = m_Transform.TransformVector(line.B).Add(m_Center);
+			Vector a = state.Transform.TransformVector(line.A).Add(state.Center);
+			Vector b = state.Transform.TransformVector(line.B).Add(state.Center);
 
-			Vector c1 = m_Transform.TransformVector(line.Control1).Add(m_Center);
-			Vector c2 = m_Transform.TransformVector(line.Control2).Add(m_Center);
+			Vector c1 = state.Transform.TransformVector(line.Control1).Add(state.Center);
+			Vector c2 = state.Transform.TransformVector(line.Control2).Add(state.Center);
 
 			Vector v = a.Subtract(b); // vector along line
 			Vector perpend = v.Cross(m_Eyeline); // vector perpendicular to line in plane of drawing
@@ -195,9 +197,9 @@ namespace Ldraw.OpenGl
 		private void SetRenderColour(int ldrawColour)
 		{
 			bool invert = ldrawColour == 24;
-			int actualColour = (ldrawColour == 24 || ldrawColour == 16) ? m_CurrentColour : ldrawColour;
+			int actualColour = (ldrawColour == 24 || ldrawColour == 16) ? state.CurrentColour : ldrawColour;
 
-			bool actualInvert = (invert && !m_InvertColour) || (!invert && m_InvertColour);
+			bool actualInvert = (invert && !state.ColourInverted) || (!invert && state.ColourInverted);
 			float red, green, blue, alpha;
 			if(actualInvert)
 			{
@@ -254,6 +256,39 @@ namespace Ldraw.OpenGl
 			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MinZ); // (d) - 3
 			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MinZ); // (e) - 3
 			glEnd();
+		}
+
+		private class SavedState
+		{
+			public SavedState()
+			{
+				Transform = Matrix.Identity;
+				Center = Vector.NullVector;
+				CurrentColour = 0;
+				ColourInverted = false;
+				Variables = new HashMap<string, float?>();
+			}
+
+			public Matrix Transform;
+			public Vector Center;
+			public int CurrentColour;
+			public bool ColourInverted;
+			public Map<string, float?> Variables;
+			public Map<string, float?> Parameters;
+		}
+
+		private class AnimationState
+		{
+			public AnimationState()
+			{
+				Rotation = Matrix.Identity;
+				Translation = Vector.NullVector;
+				ParameterValues = new HashMap<string, float?>();
+			}
+
+			public Matrix Rotation;
+			public Vector Translation;
+			public Map<string, float?> ParameterValues;
 		}
 	}
 }

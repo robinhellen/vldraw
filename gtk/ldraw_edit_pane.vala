@@ -17,6 +17,7 @@ namespace Ldraw.Ui.Widgets
 		private PartNode dropItem = null;
 		private IDroppedObjectLocator locator;
 		private UndoStack undoStack;
+		private AnimatedModel model;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws GlError
@@ -36,6 +37,16 @@ namespace Ldraw.Ui.Widgets
 			drag_dest_set_track_motion(this, true);
 		}
 
+		public AnimatedModel AnimModel
+		{
+			set
+			{
+				model = value;
+				model.ParametersUpdated.connect(() => queue_draw());
+				Model = value.Model;
+			}
+		}
+
 		public override bool button_press_event(Gdk.EventButton event)
 		{
 			// if button is right, popup context menu
@@ -45,7 +56,7 @@ namespace Ldraw.Ui.Widgets
 				case 1: // left
 					if((event.state & ModifierType.CONTROL_MASK) != ModifierType.CONTROL_MASK)
 					{
-						Model.ClearSelection();
+						model.Model.ClearSelection();
 					}
 
 					SelectTopMostUnderMouse(event.x, event.y);
@@ -78,37 +89,37 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, 0, m_Settings.CurrentGrid.Z)));
+				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, m_Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, 0, -m_Settings.CurrentGrid.Z)));
+				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, -m_Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(-m_Settings.CurrentGrid.X, 0, 0)));
+				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(-m_Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(m_Settings.CurrentGrid.X, 0, 0)));
+				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(m_Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, m_Settings.CurrentGrid.Y, 0)));
+				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, m_Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(Model.Selection, Vector(0, -m_Settings.CurrentGrid.Y, 0)));
+				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, -m_Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == delKeyVal)
 			{
-				undoStack.ExecuteCommand(new DeleteNodesCommand(Model, Model.Selection));
+				undoStack.ExecuteCommand(new DeleteNodesCommand(model.Model, model.Model.Selection));
 				return true;
 			}
 			return false;
@@ -161,7 +172,7 @@ namespace Ldraw.Ui.Widgets
 			Vector newPosition = Vector.NullVector;
 			int newColour = 0;
 			PartNode copyPart = null;
-			copyPart = Model.LastSelected ?? Model.LastSubFile;
+			copyPart = model.Model.LastSelected ?? model.Model.LastSubFile;
 
 			if(copyPart != null)
 			{
@@ -228,7 +239,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 				newNode.Selected = true;
-				undoStack.ExecuteCommand(new AddNodeCommand(Model, newNode, copyPart));
+				undoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
 				drag_finish(context, true, false, time);
 			}
 			else
@@ -290,6 +301,12 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
+		protected override GlBuilder CreateGlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
+					, Vector eyeline, Vector centre, Vector up)
+		{
+			return new GlBuilder(widthPx, heightPx, defaultColour, viewArea, eyeline, centre, up, model.CurrentParameters);
+		}
+
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
 			Allocation alloc;
@@ -297,7 +314,7 @@ namespace Ldraw.Ui.Widgets
 
 			var fullBounds = CalculateViewArea();
 
-			var modelBounds = Model.BoundingBox;
+			var modelBounds = model.Model.BoundingBox;
 			var radius = modelBounds.Radius;
 			var modelCenterZ = modelBounds.Center().Z;
 
@@ -316,9 +333,9 @@ namespace Ldraw.Ui.Widgets
 			drawable.gl_begin(context);
 
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
-			Model.BuildFromFile(builder);
+			model.Model.BuildFromFile(builder);
 
-			builder.ApplySelection(Model);
+			builder.ApplySelection(model.Model);
 			drawable.gl_end();
 			drawable.wait_gl();
 		}

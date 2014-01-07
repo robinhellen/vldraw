@@ -14,7 +14,7 @@ namespace Ldraw.Ui
 	public class MainWindow : Window//, IHaveModel
 	{
 		private LdrawModelFile m_Model;
-		private LdrawObject EditingObject {get; set;}
+		public AnimatedModel EditingObject {get; set;}
 		private ComboBox m_SubModels;
 		private UndoStack undoStack = new UndoStack();
 
@@ -24,16 +24,18 @@ namespace Ldraw.Ui
 		ModelList m_ModelList;
 		LdrawFileLoader m_Loader;
 		IOptions m_Settings;
+		ParameterValues parameters;
 
 		// trees
 		PartsTree parts;
 		SubModelsTree subModels;
 		DocumentObjectLocator documentLocator;
 
+
 		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null)
 			throws OpenGl.GlError
 		{
-			EditingObject = model.MainObject;
+			EditingObject = new AnimatedModel(model.MainObject);
 			m_Settings = settings;
 			m_Loader = loader;
 
@@ -101,6 +103,10 @@ namespace Ldraw.Ui
 			subModelsBox.pack_start(subModelPreview, false);
 			notebook.append_page(subModelsBox, new Label("Multipart"));
 
+			parameters = new ParameterValues(EditingObject);
+			bind_property("EditingObject", parameters, "Model");
+			notebook.append_page(parameters, new Label("Parameters"));
+
 			Paned treePaned = new HPaned();
 			treePaned.add1(WithFrame(notebook));
 
@@ -109,7 +115,7 @@ namespace Ldraw.Ui
 			m_SubModels = CreateSubModelsDropDown();
 			viewDetails.pack_start(m_SubModels, false, false);
 
-			m_ModelList = new ModelList(EditingObject);
+			m_ModelList = new ModelList(EditingObject.Model);
 			viewDetails.pack_start(m_ModelList.Widget);
 
 			modelPanes.add1(WithFrame(viewDetails));
@@ -157,8 +163,8 @@ namespace Ldraw.Ui
 					cb.get_active_iter(out tIter);
 					LdrawObject object;
 					tModel.get(tIter, 0, out object, -1);
-					EditingObject = object;
-					m_View.Model = object;
+					EditingObject = new AnimatedModel(object);
+					m_View.Model = EditingObject;
 					m_ModelList.Model = object;
 					undoStack.Clear();
 				});
@@ -263,6 +269,14 @@ namespace Ldraw.Ui
 			var modelAddSubModel = new Gtk.MenuItem.with_mnemonic("_Add sub-model");
 			modelAddSubModel.activate.connect(ModelAddSubModel_OnActivate);
 			modelMenu.append(modelAddSubModel);
+
+			var modelParameters = new Gtk.MenuItem.with_mnemonic("_Parameters");
+			modelParameters.activate.connect(() =>
+			{
+				var dlg = new ParametersDialog(EditingObject.Model, this);
+				dlg.Run();
+			});
+			modelMenu.append(modelParameters);
 
 			var modelExport = new Gtk.MenuItem.with_mnemonic("_Export");
 			modelMenu.append(modelExport);
@@ -419,7 +433,7 @@ namespace Ldraw.Ui
 			var nodes = new ObservableList<LdrawNode>();
 			var newObject = (LdrawObject)GLib.Object.new(typeof(LdrawObject), Nodes: nodes, FileName: newFileName);
 			mpdModel.SubModels.add(newObject);
-			EditingObject = newObject;
+			EditingObject = new AnimatedModel(newObject);
 		}
 
 		private void AttachToTable(Table t, Widget w, uint x, uint y)
@@ -436,7 +450,6 @@ namespace Ldraw.Ui
 			set
 			{
 				m_Model = value;
-				m_View.Model = value.MainObject;
 				m_ModelList.Model = value.MainObject;
 				var mpd = value as MultipartModel;
 				if(mpd != null)
@@ -444,17 +457,18 @@ namespace Ldraw.Ui
 					m_SubModels.model = mpd.SubModels;
 					m_SubModels.active = 0;
 					m_SubModels.visible = true;
-					EditingObject = mpd.MainObject;
+					EditingObject = new AnimatedModel(mpd.MainObject);
 					subModels.Models = mpd.SubModels;
 					documentLocator.Objects = mpd.SubModels;
 				}
 				else
 				{
 					m_SubModels.visible = false;
-					EditingObject = value.MainObject;
+					EditingObject = new AnimatedModel(value.MainObject);
 					subModels.Models = new ObservableList<LdrawObject>();
 					documentLocator.Objects = Gee.List.empty<LdrawObject>();
 				}
+				m_View.Model = EditingObject;
 
 				var titleFileName = value.FileName ?? "untitled";
 
@@ -477,8 +491,28 @@ namespace Ldraw.Ui
 
 		public LdrawObject Model
 		{
-			get{return EditingObject;}
+			get{return EditingObject.Model;}
 			protected set{}
 		}
+	}
+
+	public class AnimatedModel : GLib.Object
+	{
+		public AnimatedModel(LdrawObject model)
+		{
+			var map = new HashMap<string, float?>();
+			GLib.Object(Model: model, CurrentParameters: map);
+		}
+
+		public LdrawObject Model {get; construct;}
+		public Map<string, float?> CurrentParameters {get; construct; }
+
+		public void UpdateParameter(string Identifier, float value)
+		{
+			CurrentParameters[Identifier] = value;
+			ParametersUpdated();
+		}
+
+		public signal void ParametersUpdated();
 	}
 }

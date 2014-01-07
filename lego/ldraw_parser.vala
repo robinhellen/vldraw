@@ -57,6 +57,8 @@ namespace Ldraw.Lego
 					{
 						case "ROTATE":
 							return new AnimRotateCommand(tokens[1], tokens[2: tokens.length]);
+						case "PARAMETER":
+							return new AnimParameterCommand(tokens[1], tokens[2: tokens.length]);
 					}
 					break;
 

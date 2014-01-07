@@ -98,13 +98,19 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			GlBuilder builder = new GlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
+			GlBuilder builder = CreateGlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
 
 			BuildModel(builder);
 
 			builder.Flush();
 			drawable.gl_end();
 			drawable.wait_gl();
+		}
+
+		protected virtual GlBuilder CreateGlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
+					, Vector eyeline, Vector centre, Vector up)
+		{
+			return new GlBuilder(widthPx, heightPx, defaultColour, viewArea, eyeline, centre, up);
 		}
 
 		protected virtual void BuildModel(GlBuilder builder)

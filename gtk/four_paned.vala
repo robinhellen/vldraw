@@ -74,14 +74,14 @@ namespace Ldraw.Ui.Widgets
 			bottom_right.RenderingError.connect(x => RenderingError(x));
 		}
 
-		public LdrawObject Model
+		public AnimatedModel Model
 		{
 			set
 			{
-				top_left.Model = value;
-				bottom_left.Model = value;
-				top_right.Model = value;
-				bottom_right.Model = value;
+				top_left.AnimModel = value;
+				bottom_left.AnimModel = value;
+				top_right.AnimModel = value;
+				bottom_right.AnimModel = value;
 			}
 		}
 

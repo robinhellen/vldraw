@@ -122,6 +122,18 @@ namespace Ldraw.Utils
 			return true;
 		}
 
+		public T get_value_for_path(TreePath path)
+		{
+			if(path.get_depth() != 1)
+				return null;
+			var listIndex = path.get_indices()[0];
+
+			if(size <= listIndex)
+				return null;
+
+			return ((Gee.List<T>) this).get(listIndex);
+		}
+
 		public bool iter_has_child(TreeIter iter)
 		{
 			return false;
