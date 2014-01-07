@@ -75,7 +75,7 @@ namespace Ldraw.Lego.Nodes
 			Max = (float)double.parse(arguments[3]);
 
 			Cyclic = arguments[4] == "CYCLIC";
-			ParameterDescription = string.join(" ", arguments[(Cyclic ? 5 : 4) : arguments.length]);
+			ParameterDescription = string.joinv(" ", arguments[(Cyclic ? 5 : 4) : arguments.length]);
 		}
 
 		public string Identifier {get; set;}
