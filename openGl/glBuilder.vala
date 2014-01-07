@@ -111,6 +111,7 @@ namespace Ldraw.OpenGl
 			var oldState = state;
 			state = new SavedState();
 			state.ColourInverted = oldState.ColourInverted;
+			state.CurrentColour = oldState.CurrentColour;
 
 			state.Parameters = nextObjectAnimationState.ParameterValues;
 
