@@ -1,0 +1,8 @@
+vldraw is an editor program for the LDraw system (http://www.ldraw.org) that supports creation of animation.
+
+My first version was written entirely in C, but I now use Vala with some C code.
+It requires GTK+ 2, gtkglext, openGland libgee installed to build.
+
+Currently it will only work on x86/x64 systems as I have used SSE directly.
+
+Some paths are currently hard-coded in and will not work straight away.
