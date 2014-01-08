@@ -23,6 +23,12 @@ namespace Ldraw.Ui.Widgets
 				var observable = new ObservableList<AnimParameterCommand>();
 				observable.add_all(value.Model.NodesOfType<AnimParameterCommand>());
 				this.model = observable;
+				ldrawModel.Model.VisibleChange.connect(() =>
+				{
+					var newObservable = new ObservableList<AnimParameterCommand>();
+					newObservable.add_all(ldrawModel.Model.NodesOfType<AnimParameterCommand>());
+					this.model = newObservable;
+				});
 			}
 		}
 
