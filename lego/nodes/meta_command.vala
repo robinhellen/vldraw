@@ -79,6 +79,18 @@ namespace Ldraw.Lego.Nodes
 			notify.connect(OnNotify);
 		}
 
+		public AnimParameterCommand.Blank()
+		{
+			base("!ANIM", {});
+			Identifier = "";
+			Min = 0;
+			Max = 0;
+
+			Cyclic = false;
+			ParameterDescription = "";
+			notify.connect(OnNotify);
+		}
+
 		private void OnNotify(ParamSpec param)
 		{
 			switch(param.name)

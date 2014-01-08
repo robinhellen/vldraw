@@ -38,6 +38,16 @@ namespace Ldraw.Ui.Widgets
 			InsertColumn(paramList, x => x.Max.to_string(), (x, y) => x.Max = (float)double.parse(y));
 
 			actionArea.pack_start(paramList);
+			var buttonBox = new HButtonBox();
+
+			var addNewButton = new Button.with_label("New");
+			addNewButton.clicked.connect(() =>
+			{
+				model.add(new AnimParameterCommand.Blank());
+			});
+			buttonBox.add(addNewButton);
+
+			actionArea.pack_start(buttonBox);
 		}
 
 		[CCode(has_target = false)]
