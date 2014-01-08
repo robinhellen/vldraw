@@ -52,22 +52,19 @@ namespace Ldraw.Lego
 
 		public class ProxyLdrawObject : LdrawObject
 		{
-			private string m_FileName;
-
 			public ProxyLdrawObject(string filename)
 			{
 				base("");
-				m_FileName = filename;
+				FileName = filename;
 			}
 
 			public void Resolve(Collection<LdrawObject> possibilities)
 			{
 				foreach(LdrawObject object in possibilities)
 				{
-					if(object.FileName.casefold() == m_FileName.casefold())
+					if(object.FileName.casefold() == FileName.casefold())
 					{
 						Nodes = object.Nodes;
-						FileName = m_FileName;
 						Description = object.Description;
 						return;
 					}
