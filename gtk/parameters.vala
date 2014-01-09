@@ -38,7 +38,7 @@ namespace Ldraw.Ui.Widgets
 			InsertColumn("Max", paramList, x => x.Max.to_string(), (x, y) => x.Max = (float)double.parse(y));
 
 			var boolCell = new CellRendererToggle();
-			boolCell.editable = true;
+			boolCell.activatable = true;
 			paramList.insert_column_with_data_func(-1, "Cyclic", boolCell, (col, cell, model, iter) =>
 				{
 					AnimParameterCommand node;
