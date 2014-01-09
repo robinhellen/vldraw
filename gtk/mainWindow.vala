@@ -292,6 +292,27 @@ namespace Ldraw.Ui
 			exportPov.activate.connect(() => ExportPov());
 			modelExportMenu.append(exportPov);
 
+			var selectionMenuItem = new Gtk.MenuItem.with_mnemonic("_Selection");
+			menus.append(selectionMenuItem);
+
+			var selectionMenu = new Gtk.Menu();
+			selectionMenuItem.submenu = selectionMenu;
+
+			var selectAll = new Gtk.MenuItem.with_mnemonic("Select _All");
+			selectAll.activate.connect(() =>
+				{
+					foreach(var node in EditingObject.Model.Nodes)
+					{
+						node.Selected = true;
+					}
+				});
+			selectionMenu.append(selectAll);
+
+			var clearSelection = new Gtk.MenuItem.with_mnemonic("_Clear");
+			clearSelection.activate.connect(() => EditingObject.Model.ClearSelection());
+			selectionMenu.append(clearSelection);
+
+
 			return menus;
 		}
 
