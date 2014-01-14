@@ -114,6 +114,20 @@ namespace Ldraw.Lego
 			}
 		}
 
+		public LdrawNode? GetPreviousNode(LdrawNode node)
+		{
+			LdrawNode previousNode  = null;
+			foreach(var n in nodes)
+			{
+				if(n == node)
+					return previousNode;
+
+				previousNode = n;
+			}
+
+			return previousNode;
+		}
+
 		public PartNode? LastSubFile
 		{
 			get
