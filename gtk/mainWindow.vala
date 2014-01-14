@@ -312,6 +312,14 @@ namespace Ldraw.Ui
 			clearSelection.activate.connect(() => EditingObject.Model.ClearSelection());
 			selectionMenu.append(clearSelection);
 
+			var selectionAnimation = new Gtk.MenuItem.with_mnemonic("_Animation");
+			selectionAnimation.activate.connect(() =>
+				{
+					var dlg = new AnimationDialog(EditingObject, this);
+					dlg.Run();
+				});
+			selectionMenu.append(selectionAnimation);
+
 
 			return menus;
 		}
