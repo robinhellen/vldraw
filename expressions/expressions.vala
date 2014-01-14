@@ -59,6 +59,11 @@ namespace Ldraw.Expressions
 			return root.Evaluate(variables);
 		}
 
+		public bool Equals(Expression other)
+		{
+			return root.Equals(other.root);
+		}
+
 		private static ExpressionItem GetExpressionForTokens(Gee.List<Token?> tokens, int depth = 0)
 			throws ExpressionParseError
 		{
@@ -292,6 +297,8 @@ namespace Ldraw.Expressions
 		public abstract class ExpressionItem : Object
 		{
 			public abstract float Evaluate(Map<string, float?> variables);
+
+			public abstract bool Equals(ExpressionItem other);
 		}
 
 		public enum TokenType
@@ -375,6 +382,16 @@ namespace Ldraw.Expressions
 			{
 				return value;
 			}
+
+			public override bool Equals(ExpressionItem other)
+			{
+				return EqualsInner(other as FloatLiteral);
+			}
+
+			public bool EqualsInner(FloatLiteral other)
+			{
+				return value == other.value;
+			}
 		}
 
 		public class Variable : ExpressionItem
@@ -395,6 +412,16 @@ namespace Ldraw.Expressions
 					return 0;
 				}
 				return actual;
+			}
+
+			public override bool Equals(ExpressionItem other)
+			{
+				return EqualsInner(other as Variable);
+			}
+
+			public bool EqualsInner(Variable other)
+			{
+				return identifier == other.identifier;
 			}
 		}
 
@@ -437,6 +464,18 @@ namespace Ldraw.Expressions
 			public override float Evaluate(Map<string, float?> variables)
 			{
 				return operator(left.Evaluate(variables), right.Evaluate(variables));
+			}
+
+			public override bool Equals(ExpressionItem other)
+			{
+				return EqualsInner(other as MathematicalOperation);
+			}
+
+			public bool EqualsInner(MathematicalOperation other)
+			{
+				return operator == other.operator &&
+						right.Equals(other.right) &&
+						left.Equals(other.left);
 			}
 		}
 	}

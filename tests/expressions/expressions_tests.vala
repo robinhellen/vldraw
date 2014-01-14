@@ -27,6 +27,9 @@ namespace Ldraw.Tests.Expressions
 			add_test("BracketsOverridePrecedence1", () => EvaluateAndCheck("(1 + 2) * 3", 9));
 			add_test("BracketsOverridePrecedence2", () => EvaluateAndCheck("2 * (3 + 1)", 8));
 			add_test("EvaluateWithVariables", EvaluateWithVariables);
+			add_test("ConstantEquality", () => CheckEquality("2"));
+			add_test("VariableEquality", () => CheckEquality("Foo"));
+			add_test("OperatorEquality", () => CheckEquality("1 + Foo"));
 		}
 
 		private void SimpleAddition()
@@ -86,6 +89,11 @@ namespace Ldraw.Tests.Expressions
 			var result = e.Evaluate(variables);
 
 			Assert.AreEqualFloat(12, result);
+		}
+
+		private void CheckEquality(string expression)
+		{
+			assert(new Expression.Parse(expression).Equals(new Expression.Parse(expression)));
 		}
 	}
 }
