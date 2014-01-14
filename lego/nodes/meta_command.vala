@@ -50,6 +50,8 @@ namespace Ldraw.Lego.Nodes
 		}
 
 		public string AnimCommand {get; set;}
+
+		public abstract bool Equals(AnimMetaCommand other);
 	}
 
 	public class AnimRotateCommand : AnimMetaCommand
@@ -63,6 +65,20 @@ namespace Ldraw.Lego.Nodes
 
 		public Vector Axis {get; set;}
 		public Expression Angle {get; set;}
+
+		public override bool Equals(AnimMetaCommand other)
+		{
+			return EqualsInner(other as AnimRotateCommand);
+		}
+
+		public bool EqualsInner(AnimRotateCommand other)
+		{
+			if(other == null)
+				return false;
+
+			return Axis.Subtract(other.Axis).Magnitude == 0 &&
+					Angle.Equals(other.Angle);
+		}
 	}
 
 	public class AnimParameterCommand : AnimMetaCommand
@@ -91,6 +107,14 @@ namespace Ldraw.Lego.Nodes
 			notify.connect(OnNotify);
 		}
 
+		public string Identifier {get; set;}
+		public float Min {get; set;}
+		public float Max {get; set;}
+
+		public bool Cyclic {get; set;}
+
+		public string ParameterDescription {get; set;}
+
 		private void OnNotify(ParamSpec param)
 		{
 			switch(param.name)
@@ -116,12 +140,17 @@ namespace Ldraw.Lego.Nodes
 			CommentText = Command + " " + string.joinv(" ", Arguments);
 		}
 
-		public string Identifier {get; set;}
-		public float Min {get; set;}
-		public float Max {get; set;}
+		public override bool Equals(AnimMetaCommand other)
+		{
+			return EqualsInner(other as AnimParameterCommand);
+		}
 
-		public bool Cyclic {get; set;}
+		public bool EqualsInner(AnimParameterCommand other)
+		{
+			if(other == null)
+				return false;
 
-		public string ParameterDescription {get; set;}
+			return CommentText == other.CommentText;
+		}
 	}
 }
