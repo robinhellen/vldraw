@@ -6,11 +6,6 @@ namespace Ldraw.Tests.Expressions
 {
 	public class ExpressionsTests : TestFixture
 	{
-		construct
-		{
-
-		}
-
 		public ExpressionsTests()
 		{
 			base("ExpressionsTests");
