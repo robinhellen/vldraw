@@ -71,8 +71,10 @@ namespace Ldraw.Ui.Widgets
 				{
 					AnimParameterCommand node;
 					model.get(iter, 0, out node);
+					var renderer = ((CellRendererSpin)cell);
 
-					((CellRendererSpin)cell).text = (Model.CurrentParameters[node.Identifier] ?? node.Min).to_string();
+					renderer.text = (Model.CurrentParameters[node.Identifier] ?? node.Min).to_string();
+					renderer.adjustment = new Adjustment(0, 0, 0, 0, 0, 0);
 				});
 		}
 	}
