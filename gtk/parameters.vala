@@ -73,10 +73,11 @@ namespace Ldraw.Ui.Widgets
 		{
 			var renderer = new CellRendererText();
 			renderer.editable = true;
-			renderer.edited.connect((path, newValue) => {
-				var param = model.get_value_for_path(new TreePath.from_string(path));
-				action(param, newValue);
-			});
+			renderer.edited.connect((path, newValue) =>
+				{
+					var param = model.get_value_for_path(new TreePath.from_string(path));
+					action(param, newValue);
+				});
 			view.insert_column_with_data_func(-1, title, renderer, (col, cell, model, iter) =>
 				{
 					AnimParameterCommand node;
