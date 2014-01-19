@@ -5,16 +5,18 @@ namespace Ldraw.Expressions
 	public class Expression : Object
 	{
 		private ExpressionItem root;
+		private Gee.List<Token?> tokens;
 
 		public Expression.Parse(string expression)
 		{
 			string currentToken = "";
 			TokenType type = TokenType.None;
-			Gee.List<Token?> tokens = new LinkedList<Token?>();
+			tokens = new LinkedList<Token?>();
 
 			for(int i = 0; i < expression.length; i++)
 			{
-				if(type == TokenType.TokenOf(expression[i]))
+				var currentTokenType = TokenType.TokenOf(expression[i]);
+				if(type == currentTokenType)
 				{
 					currentToken += expression[i:i+1];
 				}
@@ -29,26 +31,24 @@ namespace Ldraw.Expressions
 					if(type != TokenType.None)
 						tokens.add(token);
 					currentToken = expression[i:i+1];
-					type = TokenType.TokenOf(expression[i]);
+					type = currentTokenType;
 				}
 			}
 
-			{
-				var token = Token();
-				token.type = type;
-				token.token = currentToken;
-				token.start = expression.length - currentToken.length;
-				token.end = expression.length;
+			var token = Token();
+			token.type = type;
+			token.token = currentToken;
+			token.start = expression.length - currentToken.length;
+			token.end = expression.length;
 
-				if(type != TokenType.None)
-					tokens.add(token);
-			}
+			if(type != TokenType.None)
+				tokens.add(token);
 
 			var interestingTokens = new LinkedList<Token?>();
-			foreach(var token in tokens)
+			foreach(var t in tokens)
 			{
-				if(token.type != TokenType.Whitespace)
-					interestingTokens.add(token);
+				if(t.type != TokenType.Whitespace)
+					interestingTokens.add(t);
 			}
 
 			root = GetExpressionForTokens(interestingTokens);
@@ -62,6 +62,18 @@ namespace Ldraw.Expressions
 		public bool Equals(Expression other)
 		{
 			return root.Equals(other.root);
+		}
+
+		public string to_string()
+		{
+			var strings = new LinkedList<string>();
+			foreach(var token in tokens)
+			{
+				strings.add(token.token);
+			}
+			var stringArray = strings.to_array();
+			stringArray += (null); // workaround Vala bug.
+			return string.joinv("", stringArray);
 		}
 
 		private static ExpressionItem GetExpressionForTokens(Gee.List<Token?> tokens, int depth = 0)
@@ -443,7 +455,7 @@ namespace Ldraw.Expressions
 
 			public MathematicalOperation.Add(ExpressionItem left, ExpressionItem right)
 			{
-				this(left, right, (a, b) => a+b);
+				this(left, right, (a, b) => a + b);
 			}
 
 			public MathematicalOperation.Subtract(ExpressionItem left, ExpressionItem right)
