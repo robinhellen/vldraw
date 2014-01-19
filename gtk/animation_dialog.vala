@@ -39,7 +39,7 @@ namespace Ldraw.Ui
 		{
 			this.model = model;
 
-			dialog = new Dialog.with_buttons("Model details", parent,
+			dialog = new Dialog.with_buttons("Animation details", parent,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
 				Stock.OK, ResponseType.ACCEPT,
 				Stock.CANCEL, ResponseType.REJECT);
@@ -47,6 +47,68 @@ namespace Ldraw.Ui
 			GetOriginalValues(model);
 
 			var contentArea = (VBox)dialog.get_content_area();
+			var animationControlsBox = new VBox(false, 0);
+
+			var rotationAngleEntry = new Entry();
+			rotationAngleEntry.text = rotationAngle == null ? "" : rotationAngle.to_string();
+			rotationAngleEntry.notify["text"].connect(() =>
+				{
+					rotationAngle = new Expression.Parse(rotationAngleEntry.text);
+				});
+			var rotationAxisX = new Entry();
+			rotationAxisX.text = rotationAxis == null ? "" : rotationAxis.X.to_string();
+			rotationAxisX.notify["text"].connect(() =>
+				{
+					rotationAxis = Vector((float)double.parse(rotationAxisX.text), rotationAxis.Y, rotationAxis.Z);
+				});
+
+			var rotationAxisY = new Entry();
+			rotationAxisY.text = rotationAxis == null ? "" : rotationAxis.Y.to_string();
+			rotationAxisY.notify["text"].connect(() =>
+				{
+					rotationAxis = Vector(rotationAxis.X, (float)double.parse(rotationAxisY.text), rotationAxis.Z);
+				});
+
+			var rotationAxisZ = new Entry();
+			rotationAxisZ.text = rotationAxis == null ? "" : rotationAxis.Z.to_string();
+			rotationAxisZ.notify["text"].connect(() =>
+				{
+					rotationAxis = Vector(rotationAxis.X, rotationAxis.Y, (float)double.parse(rotationAxisZ.text));
+				});
+
+
+			var enableRotation = new CheckButton.with_label("Rotate");
+			enableRotation.active = hasRotation;
+			enableRotation.toggled.connect(() =>
+				{
+					var state = enableRotation.active;
+					hasRotation = state;
+					rotationAngleEntry.sensitive = state;
+					rotationAxisX.sensitive = state;
+					rotationAxisY.sensitive = state;
+					rotationAxisZ.sensitive = state;
+				});
+			rotationAngleEntry.sensitive = hasRotation;
+			rotationAxisX.sensitive = hasRotation;
+			rotationAxisY.sensitive = hasRotation;
+			rotationAxisZ.sensitive = hasRotation;
+
+
+			animationControlsBox.pack_start(enableRotation, false, false);
+			animationControlsBox.pack_start(rotationAngleEntry, false, false);
+
+			var rotationAxisHBox = new HBox(false, 0);
+			rotationAxisHBox.pack_start(new Label("Axis: ("), false, false);
+			rotationAxisHBox.pack_start(rotationAxisX, false, false);
+			rotationAxisHBox.pack_start(new Label(", "), false, false);
+			rotationAxisHBox.pack_start(rotationAxisY, false, false);
+			rotationAxisHBox.pack_start(new Label(", "), false, false);
+			rotationAxisHBox.pack_start(rotationAxisZ, false, false);
+			rotationAxisHBox.pack_start(new Label(")"), false, false);
+
+			animationControlsBox.pack_start(rotationAxisHBox, false, false);
+
+			contentArea.pack_start(animationControlsBox, false, false);
 
 		}
 
@@ -56,9 +118,36 @@ namespace Ldraw.Ui
 			var result = dialog.run();
 			if(result == ResponseType.ACCEPT)
 			{
-
+				SetSelectionAnimation();
 			}
 			dialog.destroy();
+		}
+
+		private void SetSelectionAnimation()
+		{
+			stderr.printf("Setting animation for selection\n");
+			foreach(var node in model.Model.Selection)
+			{
+				stderr.printf("Setting animation for node\n");
+				SetNodeAnimation(node);
+			}
+		}
+
+		private void SetNodeAnimation(LdrawNode node)
+		{
+			var originalCommands = GetAnimationFor(node, model.Model);
+			foreach(var command in originalCommands)
+			{
+				model.Model.RemoveNode(command);
+			}
+
+			if(hasRotation)
+			{
+				stderr.printf("Creating animation nodes\n");
+				var newCommand = new AnimRotateCommand.Rotation(rotationAxis, rotationAngle);
+				model.Model.InsertNode(newCommand, node);
+				stderr.printf("Created animation nodes\n");
+			}
 		}
 
 		private void GetOriginalValues(AnimatedModel model)
@@ -66,9 +155,9 @@ namespace Ldraw.Ui
 			hasRotation = false;
 			hasTranslation = false;
 			rotationAngle = null;
-			rotationAxis = Vector.NullVector;
+			rotationAxis = null;
 			translationDistance = null;
-			translationVector = Vector.NullVector;
+			translationVector = null;
 
 			var selection = model.Model.Selection;
 			// selection

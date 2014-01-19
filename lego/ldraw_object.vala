@@ -199,6 +199,12 @@ namespace Ldraw.Lego
 			node.notify["Selected"].connect(() => VisibleChange());
 		}
 
+		public void InsertNode(LdrawNode toInsert, LdrawNode after)
+		{
+			nodes.insert(nodes.index_of(after), toInsert);
+			VisibleChange();
+		}
+
 		public void RemoveNodes(Collection<LdrawNode> toDelete)
 		{
 			Nodes.remove_all(toDelete);

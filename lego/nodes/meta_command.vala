@@ -63,6 +63,13 @@ namespace Ldraw.Lego.Nodes
 			Angle = new Expression.Parse(string.joinv(" ", arguments[4:-1]));
 		}
 
+		public AnimRotateCommand.Rotation(Vector axis, Expression angle)
+		{
+			base("!ANIM", new string[] {"ROTATE", axis.X.to_string(), axis.Y.to_string(), axis.Z.to_string(), angle.to_string()});
+			Axis = axis;
+			Angle = angle;
+		}
+
 		public Vector Axis {get; set;}
 		public Expression Angle {get; set;}
 
