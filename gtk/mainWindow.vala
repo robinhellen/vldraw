@@ -351,7 +351,7 @@ namespace Ldraw.Ui
 				string fileToOpen = dialog.get_filename();
 				try
 				{
-					LdrawModelFile opened = m_Loader.LoadModelFile(fileToOpen, library);
+					LdrawModelFile opened = m_Loader.LoadModelFile(fileToOpen);
 					File = opened;
 				}
 				catch(ParseError e)

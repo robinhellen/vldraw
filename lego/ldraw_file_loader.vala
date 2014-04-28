@@ -6,7 +6,14 @@ namespace Ldraw.Lego
 {
 	public class LdrawFileLoader : Object
 	{
-		public LdrawModelFile LoadModelFile(string filepath, LdrawLibrary library)
+		private LdrawLibrary library;
+
+		public LdrawFileLoader(LdrawLibrary library)
+		{
+			this.library = library;
+		}
+
+		public LdrawModelFile LoadModelFile(string filepath)
 			throws ParseError
 		{
 			File file = File.new_for_path(filepath);

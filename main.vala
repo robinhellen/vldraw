@@ -23,10 +23,10 @@ namespace Ldraw
 				stdout.printf(e.message);
 			}
 			LdrawModelFile model = null;
-			var loader = new LdrawFileLoader();
+			var loader = new LdrawFileLoader(lib);
 			try
 			{
-				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd", lib);
+				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd");
 			}
 			catch(Error e)
 			{
