@@ -6,7 +6,7 @@ namespace Ldraw.Lego
 {
 	public class LdrawFileLoader : Object
 	{
-		public LdrawModelFile LoadModelFile(string filepath)
+		public LdrawModelFile LoadModelFile(string filepath, LdrawLibrary library)
 			throws ParseError
 		{
 			File file = File.new_for_path(filepath);
@@ -14,7 +14,7 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
 			}
-			var parser = new LdrawParser(new LibrarySubFileLocator());
+			var parser = new LdrawParser(new LibrarySubFileLocator(library));
 			var fileReader = new LdrawFileReader(parser);
 			var nodes = fileReader.GetNodesFromFile(file);
 			MultipartSubFileLocator locator = null;
@@ -59,7 +59,7 @@ namespace Ldraw.Lego
 							}
 							if(locator == null)
 							{
-								locator = new MultipartSubFileLocator(new LibrarySubFileLocator());
+								locator = new MultipartSubFileLocator(new LibrarySubFileLocator(library));
 								parser.Locator = locator;
 							}
 

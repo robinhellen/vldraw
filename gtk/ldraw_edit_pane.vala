@@ -366,10 +366,17 @@ namespace Ldraw.Ui.Widgets
 
 	public class LibraryObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
+		private LdrawLibrary library;
+
+		public LibraryObjectLocator(LdrawLibrary library)
+		{
+			this.library = library;
+		}
+
 		public LdrawObject? GetObjectForName(string name)
 		{
 			LdrawPart part;
-			if(!LdrawLibrary.Instance.TryGetPart(name, out part))
+			if(!library.TryGetPart(name, out part))
 			{
 				return null;
 			}

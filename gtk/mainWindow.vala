@@ -23,6 +23,7 @@ namespace Ldraw.Ui
 		LdrawViewPane m_PartDetail;
 		ModelList m_ModelList;
 		LdrawFileLoader m_Loader;
+		LdrawLibrary library;
 		IOptions m_Settings;
 		ParameterValues parameters;
 
@@ -32,12 +33,13 @@ namespace Ldraw.Ui
 		DocumentObjectLocator documentLocator;
 
 
-		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null)
+		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null, LdrawLibrary library)
 			throws OpenGl.GlError
 		{
 			EditingObject = new AnimatedModel(model.MainObject);
 			m_Settings = settings;
 			m_Loader = loader;
+			this.library = library;
 
 			maximize();
 
@@ -66,7 +68,7 @@ namespace Ldraw.Ui
 			documentLocator.Objects = Gee.List.empty<LdrawObject>();
 
 			var locators = new HashMap<string, IDroppedObjectLocator>();
-			locators[""] = new LibraryObjectLocator();
+			locators[""] = new LibraryObjectLocator(library);
 			locators["Document"] = documentLocator;
 
 
@@ -83,7 +85,7 @@ namespace Ldraw.Ui
 			var notebook = new Notebook();
 			// add a list of available parts on the left
 			m_PartDetail = CreatePreviewPane();
-			parts = new PartsTree();
+			parts = new PartsTree(library);
 			var treeDetailBox = new VBox(false, 0);
 
 			parts.DetailView = m_PartDetail;
@@ -349,7 +351,7 @@ namespace Ldraw.Ui
 				string fileToOpen = dialog.get_filename();
 				try
 				{
-					LdrawModelFile opened = m_Loader.LoadModelFile(fileToOpen);
+					LdrawModelFile opened = m_Loader.LoadModelFile(fileToOpen, library);
 					File = opened;
 				}
 				catch(ParseError e)

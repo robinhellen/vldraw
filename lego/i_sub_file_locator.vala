@@ -10,11 +10,16 @@ namespace Ldraw.Lego
 
 	public class LibrarySubFileLocator : Object, ISubFileLocator
 	{
+		private LdrawLibrary library;
+
+		public LibrarySubFileLocator(LdrawLibrary library)
+		{
+			this.library = library;
+		}
+
 		public LdrawObject GetObjectFromReference(string reference)
 		{
-			LdrawLibrary lib = LdrawLibrary.Instance;
-
-			return lib.GetPartByName(reference.substring(0, reference.last_index_of(".")));
+			return library.GetPartByName(reference.substring(0, reference.last_index_of(".")));
 		}
 	}
 
@@ -76,31 +81,31 @@ namespace Ldraw.Lego
 	public class PartialLibrarySubFileLocator : Object, ISubFileLocator
 	{
 		private LibraryObjectTypes m_Types;
+		private LdrawLibrary library;
 
-		public PartialLibrarySubFileLocator(LibraryObjectTypes types)
+		public PartialLibrarySubFileLocator(LibraryObjectTypes types, LdrawLibrary library)
 		{
 			m_Types = types;
+			this.library = library;
 		}
 
 		public LdrawObject GetObjectFromReference(string reference)
 			throws ParseError
 		{
-			LdrawLibrary lib = LdrawLibrary.Instance;
-
 			string[] toks = reference.split_set("/\\");
 			if(toks[0] == "s" && (m_Types & LibraryObjectTypes.SubPart) != 0)
 			{
 				string name = toks[1].substring(0, toks[1].last_index_of("."));
 				LdrawSubPart sp;
-				if(lib.TryGetSubPart(name, out sp))
+				if(library.TryGetSubPart(name, out sp))
 				{
 					return sp.MainObject;
 				}
-				File subPartAttempt = lib.SubPartsDirectory.get_child(toks[1]);
+				File subPartAttempt = library.SubPartsDirectory.get_child(toks[1]);
 				if(subPartAttempt.query_exists())
 				{
-					sp = new LdrawSubPart(toks[1]);
-					lib.RegisterSubPart(sp);
+					sp = new LdrawSubPart(toks[1], library);
+					library.RegisterSubPart(sp);
 					return sp.MainObject;
 				}
 				throw new ParseError.MissingFile(@"Could not locate sub-part at $reference");
@@ -109,16 +114,16 @@ namespace Ldraw.Lego
 			{
 				string name = toks[1].substring(0, toks[1].last_index_of("."));
 				LdrawHiresPrimitive hp;
-				if(lib.TryGetHiresPrimitive(name, out hp))
+				if(library.TryGetHiresPrimitive(name, out hp))
 				{
 					return hp.MainObject;
 				}
 
-				File hiresAttempt = lib.HiresPrimitivesDirectory.get_child(toks[1]);
+				File hiresAttempt = library.HiresPrimitivesDirectory.get_child(toks[1]);
 				if(hiresAttempt.query_exists())
 				{
-					hp = new LdrawHiresPrimitive(toks[1]);
-					lib.RegisterHiresPrimitive(hp);
+					hp = new LdrawHiresPrimitive(toks[1], library);
+					library.RegisterHiresPrimitive(hp);
 					return hp.MainObject;
 				}
 				throw new ParseError.MissingFile(@"Could not locate primitive at $reference");
@@ -129,14 +134,14 @@ namespace Ldraw.Lego
 			if((m_Types & LibraryObjectTypes.Primitive) != 0)
 			{
 				LdrawPrimitive p;
-				if(lib.TryGetPrimitive(name, out p))
+				if(library.TryGetPrimitive(name, out p))
 					return p.MainObject;
 
-				File primitiveAttempt = lib.PrimitivesDirectory.get_child(toks[0]);
+				File primitiveAttempt = library.PrimitivesDirectory.get_child(toks[0]);
 				if(primitiveAttempt.query_exists())
 				{
-					p = new LdrawPrimitive(toks[0]);
-					p = lib.RegisterPrimitive(p);
+					p = new LdrawPrimitive(toks[0], library);
+					p = library.RegisterPrimitive(p);
 					return p.MainObject;
 				}
 			}
@@ -144,14 +149,14 @@ namespace Ldraw.Lego
 			if((m_Types & LibraryObjectTypes.Part) != 0)
 			{
 				LdrawPart part;
-				if(lib.TryGetPart(name, out part))
+				if(library.TryGetPart(name, out part))
 					return part.MainObject;
 
-				File partAttempt = lib.PartsDirectory.get_child(toks[0]);
+				File partAttempt = library.PartsDirectory.get_child(toks[0]);
 				if(partAttempt.query_exists())
 				{
-					part = new LdrawPart(toks[0]);
-					lib.RegisterPart(part);
+					part = new LdrawPart(toks[0], library);
+					library.RegisterPart(part);
 					return part.MainObject;
 				}
 			}

@@ -2,11 +2,8 @@ using Gee;
 
 namespace Ldraw.Lego
 {
-	public class LdrawLibrary : Object // singleton
+	public class LdrawLibrary : Object
 	{
-		private static LdrawLibrary m_Instance;
-		private static Object s_InstanceLock = new Object();
-
 		private File m_LibraryDir;
 		private File m_PartsDirectory;
 		private File m_SubPartsDirectory;
@@ -22,7 +19,7 @@ namespace Ldraw.Lego
 
 		private TreeSet<string> m_Categories;
 
-		private LdrawLibrary()
+		public LdrawLibrary()
 		{
 			m_LibraryDir = File.new_for_path("/home/robin/ldraw");
 			m_PartsDirectory = m_LibraryDir.get_child("parts");
@@ -37,21 +34,6 @@ namespace Ldraw.Lego
 			partPatterns = new HashMultiMap<string, LdrawPart>();
 
 			m_Categories = new TreeSet<string>();
-		}
-
-		public static LdrawLibrary Instance
-		{
-			get
-			{
-				lock(s_InstanceLock)
-				{
-					if(m_Instance == null)
-					{
-						m_Instance = new LdrawLibrary();
-					}
-					return m_Instance;
-				}
-			}
 		}
 
 		public File LibraryDirectory
@@ -248,7 +230,7 @@ namespace Ldraw.Lego
 
 				try
 				{
-					LdrawPart part = new LdrawPart(name);
+					LdrawPart part = new LdrawPart(name, this);
 					m_Parts.add(part);
 					m_Categories.add(part.Category);
 				}
@@ -285,7 +267,7 @@ namespace Ldraw.Lego
 
 				try
 				{
-					LdrawSubPart part = new LdrawSubPart(name);
+					LdrawSubPart part = new LdrawSubPart(name, this);
 					m_SubParts.add(part);
 				}
 				catch (ParseError e)
@@ -320,7 +302,7 @@ namespace Ldraw.Lego
 
 				try
 				{
-					LdrawPrimitive part = new LdrawPrimitive(name);
+					LdrawPrimitive part = new LdrawPrimitive(name, this);
 					m_Primitives.add(part);
 				}
 				catch (ParseError e)
@@ -355,7 +337,7 @@ namespace Ldraw.Lego
 
 				try
 				{
-					LdrawHiresPrimitive part = new LdrawHiresPrimitive(name);
+					LdrawHiresPrimitive part = new LdrawHiresPrimitive(name, this);
 					m_HiresPrimitives.add(part);
 				}
 				catch (ParseError e)
@@ -375,7 +357,7 @@ namespace Ldraw.Lego
 			throws Error, InitializationError
 		{
 			// initialize colours
-			LdrawColour.ReadAllColours();
+			LdrawColour.ReadAllColours(this);
 
 			LoadAllHiresPrimitives();
 			LoadAllPrimitives();

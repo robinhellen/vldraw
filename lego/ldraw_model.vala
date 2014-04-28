@@ -2,7 +2,7 @@ namespace Ldraw.Lego
 {
 	public class LdrawModel : LdrawModelFile
 	{
-		public LdrawModel(string fullFilename)
+		public LdrawModel(string fullFilename, LdrawLibrary library)
 			throws ParseError
 		{
 			File partFile = File.new_for_path(fullFilename);
@@ -10,13 +10,13 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $fullFilename.");
 			}
-			base.FromFile(partFile, new LdrawParser(new LibrarySubFileLocator()));
+			base.FromFile(partFile, new LdrawParser(new LibrarySubFileLocator(library)));
 		}
 
-		public LdrawModel.FromFile(File file)
+		public LdrawModel.FromFile(File file, LdrawLibrary library)
 			throws ParseError
 		{
-			base.FromFile(file, new LdrawParser(new LibrarySubFileLocator()));
+			base.FromFile(file, new LdrawParser(new LibrarySubFileLocator(library)));
 		}
 
 		public LdrawModel.Empty()

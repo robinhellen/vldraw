@@ -69,10 +69,10 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public static void ReadAllColours()
+		public static void ReadAllColours(LdrawLibrary library)
 			throws InitializationError
 		{
-			File ldrawDir = LdrawLibrary.Instance.LibraryDirectory;
+			File ldrawDir = library.LibraryDirectory;
 			File configFile = ldrawDir.get_child("LDConfig.ldr");
 
 			DataInputStream inStream;

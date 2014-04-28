@@ -10,9 +10,9 @@ namespace Ldraw.Ui.Widgets
 		private TreeView m_Tree;
 		private LdrawViewPane m_Detail;
 
-		public PartsTree()
+		public PartsTree(LdrawLibrary library)
 		{
-			m_Tree = new TreeView.with_model(CreateAndPopulateModel());
+			m_Tree = new TreeView.with_model(CreateAndPopulateModel(library));
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 1);
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 2);
 			m_Tree.headers_visible = false;
@@ -29,25 +29,25 @@ namespace Ldraw.Ui.Widgets
 			m_Tree.drag_data_get.connect(Tree_OnDragDataGet);
 		}
 
-		private TreeModel CreateAndPopulateModel()
+		private TreeModel CreateAndPopulateModel(LdrawLibrary library)
 		{
 			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(LdrawPart));
 
-			foreach(string category in LdrawLibrary.Instance.AllCategories)
+			foreach(string category in library.AllCategories)
 			{
-				PopulatePartsForCategory(store, category);
+				PopulatePartsForCategory(store, category, library);
 			}
-			PopulatePartsForCategory(store, null); // add uncategorised items
+			PopulatePartsForCategory(store, null, library); // add uncategorised items
 			return store;
 		}
 
-		private void PopulatePartsForCategory(TreeStore store, string? category)
+		private void PopulatePartsForCategory(TreeStore store, string? category, LdrawLibrary library)
 		{
 			TreeIter categoryIter;
 			store.append(out categoryIter, null);
 			store.set(categoryIter, 0, 0, 1, (category != null) ? category : "Uncategorised", -1);
 
-			Gee.List<LdrawPart> parts = LdrawLibrary.Instance.GetPartsByCategory(category);
+			Gee.List<LdrawPart> parts = library.GetPartsByCategory(category);
 
 			foreach(LdrawPart part in parts)
 			{

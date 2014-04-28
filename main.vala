@@ -13,7 +13,7 @@ namespace Ldraw
 			init(ref args);
 			Gdk.gl_init(ref args);
 
-			LdrawLibrary lib = LdrawLibrary.Instance;
+			LdrawLibrary lib = new LdrawLibrary();
 			try
 			{
 				lib.Initialize();
@@ -26,7 +26,7 @@ namespace Ldraw
 			var loader = new LdrawFileLoader();
 			try
 			{
-				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd");
+				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd", lib);
 			}
 			catch(Error e)
 			{
@@ -36,7 +36,7 @@ namespace Ldraw
 
 			try
 			{
-				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model);
+				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, lib);
 				win.destroy.connect(() => main_quit());
 				win.show_all();
 			}

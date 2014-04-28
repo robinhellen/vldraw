@@ -12,10 +12,10 @@ namespace Ldraw.Lego
 
 		public static int s_Creations = 0;
 
-		public LdrawPrimitive(string filename)
+		public LdrawPrimitive(string filename, LdrawLibrary library)
 			throws ParseError
 		{
-			File partsDir = LdrawLibrary.Instance.PrimitivesDirectory;
+			File partsDir = library.PrimitivesDirectory;
 			File partFile = partsDir.get_child(filename);
 			if(!partFile.query_exists())
 			{
@@ -23,7 +23,7 @@ namespace Ldraw.Lego
 			}
 			base.FromFile(partFile, new LdrawParser(
 						new PartialLibrarySubFileLocator(LibraryObjectTypes.Primitive
-													| LibraryObjectTypes.HiResPrimitive)));
+													| LibraryObjectTypes.HiResPrimitive, library)));
 
 			m_FileName = filename;
 
