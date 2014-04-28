@@ -31,8 +31,8 @@ VALA_PACKAGES = gtk+-2.0 gee-0.8 gl gtkglext-1.0 gdkglext-1.0 gio-2.0 geometry
 
 VALA_PKG_ARGS = $(foreach pkg, $(VALA_PACKAGES), --pkg $(pkg))
 
-VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -O2
-#VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -g
+VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -O2 --library=m
+#VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -g --library=m
 
 EXECUTABLE_NAME = ldraw
 TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
