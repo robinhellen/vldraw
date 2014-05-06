@@ -1,5 +1,7 @@
 using Gee;
 
+using Ldraw;
+
 namespace Ldraw.Lego
 {
 	public class LdrawLibrary : Object
@@ -210,17 +212,22 @@ namespace Ldraw.Lego
 			parts.sort();
 			return parts;
 		}
-		private void LoadAllParts()
+		private void LoadAllParts(IReportProgress progress)
 			throws Error, InitializationError
 		{
+			float parts = GetFileCount(PartsDirectory);
+			stderr.printf(@"Counted $parts parts.\n");
 			FileEnumerator enumer = PartsDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
 			FileInfo info;
 			StringBuilder sb = new StringBuilder("Error loading parts.");
 			bool parseError = false;
+			int processed_count = 0;
 			while((info = enumer.next_file()) != null)
 			{
+				processed_count++;
 				if(info.get_file_type() == FileType.DIRECTORY)
 					continue;
+				progress.Report("Loading parts.", processed_count / parts);
 
 				string name = info.get_name();
 
@@ -247,17 +254,24 @@ namespace Ldraw.Lego
 			}
 		}
 
-		private void LoadAllSubParts()
+		private void LoadAllSubParts(IReportProgress progress)
 			throws Error, InitializationError
 		{
+			float subParts = GetFileCount(SubPartsDirectory);
+			stderr.printf(@"Counted $subParts sub-parts.\n");
+
 			FileEnumerator enumer = SubPartsDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
 			FileInfo info;
 			StringBuilder sb = new StringBuilder("Error loading parts.");
 			bool parseError = false;
+			int processed = 0;
 			while((info = enumer.next_file()) != null)
 			{
+				processed++;
 				if(info.get_file_type() == FileType.DIRECTORY)
 					continue;
+
+				progress.Report("Loading sub-parts", processed / subParts);
 
 				string name = info.get_name();
 
@@ -283,17 +297,24 @@ namespace Ldraw.Lego
 			}
 		}
 
-		private void LoadAllPrimitives()
+		private void LoadAllPrimitives(IReportProgress progress)
 			throws Error, InitializationError
 		{
+			float primitives = GetFileCount(PrimitivesDirectory);
+			stderr.printf(@"Counted $primitives primitives.\n");
+
 			FileEnumerator enumer = PrimitivesDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
 			FileInfo info;
 			StringBuilder sb = new StringBuilder("Error loading parts.");
 			bool parseError = false;
+			int processed = 0;
 			while((info = enumer.next_file()) != null)
 			{
+				processed++;
 				if(info.get_file_type() == FileType.DIRECTORY)
 					continue;
+
+				progress.Report("Loading primitives.", processed / primitives);
 
 				string name = info.get_name();
 				LdrawPrimitive p;
@@ -318,17 +339,24 @@ namespace Ldraw.Lego
 			}
 		}
 
-		private void LoadAllHiresPrimitives()
+		private void LoadAllHiresPrimitives(IReportProgress progress)
 			throws Error, InitializationError
 		{
+			float hiresPrimitives = GetFileCount(HiresPrimitivesDirectory);
+			stderr.printf(@"Counted $hiresPrimitives high-res primitives.\n");
+
 			FileEnumerator enumer = HiresPrimitivesDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
 			FileInfo info;
 			StringBuilder sb = new StringBuilder("Error loading parts.");
 			bool parseError = false;
+			int processed = 0;
 			while((info = enumer.next_file()) != null)
 			{
+				processed++;
 				if(info.get_file_type() == FileType.DIRECTORY)
 					continue;
+
+				progress.Report("Loading high-resolution primitives.", processed / hiresPrimitives);
 
 				string name = info.get_name();
 				LdrawHiresPrimitive p;
@@ -353,16 +381,26 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public void Initialize()
+		public void Initialize(IReportProgress progress)
 			throws Error, InitializationError
 		{
 			// initialize colours
 			LdrawColour.ReadAllColours(this);
 
-			LoadAllHiresPrimitives();
-			LoadAllPrimitives();
-			LoadAllSubParts();
-			LoadAllParts();
+			LoadAllHiresPrimitives(progress);
+			LoadAllPrimitives(progress);
+			LoadAllSubParts(progress);
+			LoadAllParts(progress);
+		}
+
+		private int GetFileCount(File directory)
+			throws Error
+		{
+			FileEnumerator enumer = directory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
+			int count = 0;
+			while(enumer.next_file() != null) count++;
+
+			return count;
 		}
 	}
 
