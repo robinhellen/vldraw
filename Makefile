@@ -15,11 +15,12 @@ LEGO_PARTS_SOURCES=	$(wildcard lego/partsLib/*.vala)
 LEGO_NODES_SOURCES=	$(wildcard lego/nodes/*.vala)
 LEGO_SOURCES=		$(wildcard lego/*.vala) $(LEGO_PARTS_SOURCES) $(LEGO_NODES_SOURCES)
 OPTIONS_SOURCES=	$(wildcard options/*.vala)
+PEERON_SOURCES=		$(wildcard peeron/*.vala)
 WIDGETS_SOURCES=	$(wildcard gtk/widgets/*.vala)
 UNDO_SOURCES=		$(wildcard gtk/undo/*.vala)
 GTK_SOURCES=		$(wildcard gtk/*.vala) $(WIDGETS_SOURCES) $(UNDO_SOURCES)
 
-ENGINE_SOURCES=$(POVRAY_SOURCES) $(LEGO_SOURCES) $(OPTIONS_SOURCES) $(UTILS_SOURCES) $(EXPRESSIONS_SOURCES)
+ENGINE_SOURCES=$(POVRAY_SOURCES) $(LEGO_SOURCES) $(OPTIONS_SOURCES) $(UTILS_SOURCES) $(EXPRESSIONS_SOURCES) $(PEERON_SOURCES)
 
 ENGINE_C_SOURCES=$(MATHS_SOURCES)
 
@@ -27,12 +28,12 @@ SOURCES=$(wildcard *.vala) $(ENGINE_SOURCES) $(OPENGL_SOURCES) $(GTK_SOURCES) $(
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES) i_report_progress.vala
 
-VALA_PACKAGES = gtk+-2.0 gee-0.8 gl gtkglext-1.0 gdkglext-1.0 gio-2.0 geometry
+VALA_PACKAGES = gtk+-2.0 gee-0.8 gl gtkglext-1.0 gdkglext-1.0 gio-2.0 geometry libsoup-2.4 libxml-2.0
 
 VALA_PKG_ARGS = $(foreach pkg, $(VALA_PACKAGES), --pkg $(pkg))
 
-VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -O2 -X -lm
-#VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -g -X -lm
+VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -X -O2
+#VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -g
 
 EXECUTABLE_NAME = ldraw
 TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
