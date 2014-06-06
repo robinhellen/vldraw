@@ -212,173 +212,89 @@ namespace Ldraw.Lego
 			parts.sort();
 			return parts;
 		}
-		private void LoadAllParts(IReportProgress progress)
+
+		delegate bool Finder<T>(string name, out T result);
+		delegate T Creator<T>(string name, LdrawLibrary library) throws ParseError;
+		delegate void Store<T>(T object);
+
+		private void LoadAllInFolder<T>(File folder, IReportProgress progress, string friendlyName
+									, Finder<T> tryGet, Creator<T> creator, Store<T> store)
 			throws Error, InitializationError
 		{
-			float parts = GetFileCount(PartsDirectory);
-			stderr.printf(@"Counted $parts parts.\n");
-			FileEnumerator enumer = PartsDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
-			FileInfo info;
-			StringBuilder sb = new StringBuilder("Error loading parts.");
+			float files = GetFileCount(folder);
+			stderr.printf(@"counted $files $friendlyName.\n");
+			var children = folder.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
+			unowned StringBuilder errors = new StringBuilder("Error loading ").append(friendlyName).append(".");
 			bool parseError = false;
-			int processed_count = 0;
-			while((info = enumer.next_file()) != null)
+			int processed_files = 0;
+			FileInfo current_file;
+			while((current_file = children.next_file()) != null)
 			{
-				processed_count++;
-				if(info.get_file_type() == FileType.DIRECTORY)
+				processed_files++;
+				if(current_file.get_file_type() == FileType.DIRECTORY)
 					continue;
-				progress.Report("Loading parts.", processed_count / parts);
+				progress.Report(@"Loading $friendlyName.", processed_files / files);
+				string name = current_file.get_name();
 
-				string name = info.get_name();
-
-				LdrawPart sp;
-				if(TryGetPart(name.substring(0, name.last_index_of(".")), out sp))
+				T parsed;
+				if(tryGet(name.substring(0, name.last_index_of(".")), out parsed))
 					continue;
 
 				try
 				{
-					LdrawPart part = new LdrawPart(name, this);
-					m_Parts.add(part);
-					m_Categories.add(part.Category);
+					var t = creator(name, this);
+					store(t);
 				}
-				catch (ParseError e)
+				catch(ParseError e)
 				{
 					parseError = true;
-					string message = e.message;
-					sb.append(@"\n$name: $message");
+					errors.append(@"\n$name: $(e.message)");
 				}
 			}
 			if(parseError)
 			{
-				throw new InitializationError.LoadingParts(sb.str);
+				throw new InitializationError.LoadingParts(errors.str);
 			}
+		}
+
+		private void LoadAllParts(IReportProgress progress)
+			throws Error, InitializationError
+		{
+			LoadAllInFolder<LdrawPart>(PartsDirectory, progress, "parts",
+				TryGetPart,
+				(s, l) => new LdrawPart(s, l),
+				p => {m_Parts.add(p); m_Categories.add(p.Category);}
+			);
 		}
 
 		private void LoadAllSubParts(IReportProgress progress)
 			throws Error, InitializationError
 		{
-			float subParts = GetFileCount(SubPartsDirectory);
-			stderr.printf(@"Counted $subParts sub-parts.\n");
-
-			FileEnumerator enumer = SubPartsDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
-			FileInfo info;
-			StringBuilder sb = new StringBuilder("Error loading parts.");
-			bool parseError = false;
-			int processed = 0;
-			while((info = enumer.next_file()) != null)
-			{
-				processed++;
-				if(info.get_file_type() == FileType.DIRECTORY)
-					continue;
-
-				progress.Report("Loading sub-parts", processed / subParts);
-
-				string name = info.get_name();
-
-				LdrawSubPart sp;
-				if(TryGetSubPart(name.substring(0, name.last_index_of(".")), out sp))
-					continue;
-
-				try
-				{
-					LdrawSubPart part = new LdrawSubPart(name, this);
-					m_SubParts.add(part);
-				}
-				catch (ParseError e)
-				{
-					parseError = true;
-					string message = e.message;
-					sb.append(@"\n$name: $message");
-				}
-			}
-			if(parseError)
-			{
-				throw new InitializationError.LoadingParts(sb.str);
-			}
+			LoadAllInFolder<LdrawSubPart>(SubPartsDirectory, progress, "sub-parts",
+				TryGetSubPart,
+				(s, l) => new LdrawSubPart(s, l),
+				p => m_SubParts.add(p)
+			);
 		}
 
 		private void LoadAllPrimitives(IReportProgress progress)
 			throws Error, InitializationError
 		{
-			float primitives = GetFileCount(PrimitivesDirectory);
-			stderr.printf(@"Counted $primitives primitives.\n");
-
-			FileEnumerator enumer = PrimitivesDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
-			FileInfo info;
-			StringBuilder sb = new StringBuilder("Error loading parts.");
-			bool parseError = false;
-			int processed = 0;
-			while((info = enumer.next_file()) != null)
-			{
-				processed++;
-				if(info.get_file_type() == FileType.DIRECTORY)
-					continue;
-
-				progress.Report("Loading primitives.", processed / primitives);
-
-				string name = info.get_name();
-				LdrawPrimitive p;
-				if(TryGetPrimitive(name.substring(0, name.last_index_of(".")), out p))
-					continue;
-
-				try
-				{
-					LdrawPrimitive part = new LdrawPrimitive(name, this);
-					m_Primitives.add(part);
-				}
-				catch (ParseError e)
-				{
-					parseError = true;
-					string message = e.message;
-					sb.append(@"\n$name: $message");
-				}
-			}
-			if(parseError)
-			{
-				throw new InitializationError.LoadingParts(sb.str);
-			}
+			LoadAllInFolder<LdrawPrimitive>(PrimitivesDirectory, progress, "primitives",
+				TryGetPrimitive,
+				(s, l) => new LdrawPrimitive(s, l),
+				p => m_Primitives.add(p)
+			);
 		}
 
 		private void LoadAllHiresPrimitives(IReportProgress progress)
 			throws Error, InitializationError
 		{
-			float hiresPrimitives = GetFileCount(HiresPrimitivesDirectory);
-			stderr.printf(@"Counted $hiresPrimitives high-res primitives.\n");
-
-			FileEnumerator enumer = HiresPrimitivesDirectory.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
-			FileInfo info;
-			StringBuilder sb = new StringBuilder("Error loading parts.");
-			bool parseError = false;
-			int processed = 0;
-			while((info = enumer.next_file()) != null)
-			{
-				processed++;
-				if(info.get_file_type() == FileType.DIRECTORY)
-					continue;
-
-				progress.Report("Loading high-resolution primitives.", processed / hiresPrimitives);
-
-				string name = info.get_name();
-				LdrawHiresPrimitive p;
-				if(TryGetHiresPrimitive(name.substring(0, name.last_index_of(".")), out p))
-					continue;
-
-				try
-				{
-					LdrawHiresPrimitive part = new LdrawHiresPrimitive(name, this);
-					m_HiresPrimitives.add(part);
-				}
-				catch (ParseError e)
-				{
-					parseError = true;
-					string message = e.message;
-					sb.append(@"\n$name: $message");
-				}
-			}
-			if(parseError)
-			{
-				throw new InitializationError.LoadingParts(sb.str);
-			}
+			LoadAllInFolder<LdrawHiresPrimitive>(HiresPrimitivesDirectory, progress, "high-res primitives",
+				TryGetHiresPrimitive,
+				(s, l) => new LdrawHiresPrimitive(s, l),
+				p => m_HiresPrimitives.add(p)
+			);
 		}
 
 		public void Initialize(IReportProgress progress)
