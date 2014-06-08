@@ -541,28 +541,13 @@ namespace Ldraw.Ui
 			var parts = new PartGroup.FromModel(File);
 			var list = new ObservableList<PartGroupItem>();
 			list.add_all(parts.Items);
-			var view = new TreeView.with_model(list);
-			view.insert_column_with_data_func(-1, "Colour", new CellRendererText(),
-					(col, cell, model, iter) =>
-					{
-						PartGroupItem item;
-						model.get(iter, 0, out item);
-						((CellRendererText)cell).text = item.Colour.Name;
-					});
-			view.insert_column_with_data_func(-1, "Part Name", new CellRendererText(),
-					(col, cell, model, iter) =>
-					{
-						PartGroupItem item;
-						model.get(iter, 0, out item);
-						((CellRendererText)cell).text = item.Part.Name;
-					});
-			view.insert_column_with_data_func(-1, "Quantity", new CellRendererText(),
-					(col, cell, model, iter) =>
-					{
-						PartGroupItem item;
-						model.get(iter, 0, out item);
-						((CellRendererText)cell).text = item.Quantity.to_string();
-					});
+			var view = new SimpleList<PartGroupItem>.with_model(list);
+			view.insert_text_column_with_data_func(-1, "Colour",
+					item => item.Colour.Name);
+			view.insert_text_column_with_data_func(-1, "Part Name",
+					item => item.Part.Name);
+			view.insert_text_column_with_data_func(-1, "Quantity",
+					item => item.Quantity.to_string());
 
 			content.pack_start(WithScrolls(view));
 
