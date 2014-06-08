@@ -8,6 +8,7 @@ namespace Ldraw.Lego
 		private string m_Category = null;
 		private string m_FileName;
 		private string m_Name;
+		private string m_BaseName;
 		private Gee.List<string> m_Keywords = new ArrayList<string>();
 
 		public static int s_Creations = 0;
@@ -30,6 +31,14 @@ namespace Ldraw.Lego
 			m_FileName = filename;
 
 			m_Name = filename.substring(0, filename.last_index_of_char('.'));
+			m_BaseName = "";
+			foreach(char c in m_Name.to_utf8())
+			{
+				if(c.isdigit())
+					m_BaseName += c.to_string();
+				else
+					break;
+			}
 
 			s_Creations++;
 		}
@@ -95,6 +104,27 @@ namespace Ldraw.Lego
 		public int compare_to(LdrawPart part)
 		{
 			return strcmp(m_Description, part.m_Description);
+		}
+
+		public bool IsVariant
+		{
+			get
+			{
+				return BaseName != Name;
+			}
+		}
+
+		public bool IsVariantOf(LdrawPart other)
+		{
+			return !other.IsVariant && BaseName == other.BaseName;
+		}
+
+		private string BaseName
+		{
+			get
+			{
+				return m_BaseName;
+			}
 		}
 	}
 }

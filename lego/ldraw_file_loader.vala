@@ -83,7 +83,9 @@ namespace Ldraw.Lego
 			if(mainObject == null)
 			{
 				mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: currentObject, FileName: filename);
-				return (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
+				var model = (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
+				mainObject.File = model;
+				return model;
 			}
 			else
 			{
@@ -97,8 +99,13 @@ namespace Ldraw.Lego
 					else
 						subObjs.add(foo);
 				}
+				var modelFile = (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: subObjs, FileName: filename, FilePath: filepath);
+				foreach(var o in subObjs)
+				{
+					o.File = modelFile;
+				}
 				locator.ResolveAll(subObjs);
-				return (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: subObjs, FileName: filename, FilePath: filepath);
+				return modelFile;
 			}
 		}
 	}

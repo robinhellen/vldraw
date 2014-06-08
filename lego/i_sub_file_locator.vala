@@ -59,7 +59,7 @@ namespace Ldraw.Lego
 		{
 			public ProxyLdrawObject(string filename)
 			{
-				base("");
+				base("", null);
 				FileName = filename;
 			}
 
@@ -71,6 +71,7 @@ namespace Ldraw.Lego
 					{
 						Nodes = object.Nodes;
 						Description = object.Description;
+						File = object.File;
 						return;
 					}
 				}

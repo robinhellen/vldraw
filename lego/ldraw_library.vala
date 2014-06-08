@@ -213,6 +213,20 @@ namespace Ldraw.Lego
 			return parts;
 		}
 
+		public Gee.List<LdrawPart> GetVariantsOf(LdrawPart part)
+		{
+			ArrayList<LdrawPart> parts = new ArrayList<LdrawPart>();
+			foreach(LdrawPart p in m_Parts)
+			{
+				if(p.IsVariantOf(part))
+				{
+					parts.add(p);
+				}
+			}
+			parts.sort();
+			return parts;
+		}
+
 		delegate bool Finder<T>(string name, out T result);
 		delegate T Creator<T>(string name, LdrawLibrary library) throws ParseError;
 		delegate void Store<T>(T object);

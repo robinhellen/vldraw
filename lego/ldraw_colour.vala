@@ -1,6 +1,6 @@
 namespace Ldraw.Lego
 {
-	public struct LdrawColour
+	public class LdrawColour : Object
 	{
 		private string m_Name;
 		private int m_Code;
@@ -97,7 +97,7 @@ namespace Ldraw.Lego
 						continue; // ignore blank lines
 					if(line.contains("!COLOUR"))
 					{
-						LdrawColour parsed = LdrawColour(line);
+						LdrawColour parsed = new LdrawColour(line);
 						s_Colours[parsed.m_Code] = parsed;
 					}
 				}
@@ -153,5 +153,8 @@ namespace Ldraw.Lego
 
 			return (uint8) (highNibble * 16 + lowNibble);
 		}
+
+		public string Name {get {return m_Name;}}
+		public int Code {get {return m_Code;}}
 	}
 }

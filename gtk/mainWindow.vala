@@ -268,6 +268,10 @@ namespace Ldraw.Ui
 			var modelProperties = new Gtk.MenuItem.with_mnemonic("_Properties");
 			modelMenu.append(modelProperties);
 
+			var modelPartsList = new Gtk.MenuItem.with_mnemonic("Parts _List");
+			modelPartsList.activate.connect(ShowPartsList);
+			modelMenu.append(modelPartsList);
+
 			var modelAddSubModel = new Gtk.MenuItem.with_mnemonic("_Add sub-model");
 			modelAddSubModel.activate.connect(ModelAddSubModel_OnActivate);
 			modelMenu.append(modelAddSubModel);
@@ -332,6 +336,13 @@ namespace Ldraw.Ui
 			frame.add(widget);
 			frame.shadow_type = ShadowType.IN;
 			return frame;
+		}
+
+		private Widget WithScrolls(Widget widget)
+		{
+			ScrolledWindow win = new ScrolledWindow(null, null);
+			win.add(widget);
+			return win;
 		}
 
 		private void FileOpen_OnActivate()
@@ -518,6 +529,49 @@ namespace Ldraw.Ui
 		{
 			var exporter = new Exporter();
 			exporter.ExportPovray(File.MainObject, File.FileName + ".pov");
+		}
+
+		private void ShowPartsList()
+		{
+			var dialog = new Dialog.with_buttons("Model details", this,
+				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
+				Stock.OK, ResponseType.ACCEPT);
+
+			var content = (Box) dialog.get_content_area();
+			var parts = new PartGroup.FromModel(File);
+			var list = new ObservableList<PartGroupItem>();
+			list.add_all(parts.Items);
+			var view = new TreeView.with_model(list);
+			view.insert_column_with_data_func(-1, "Colour", new CellRendererText(),
+					(col, cell, model, iter) =>
+					{
+						PartGroupItem item;
+						model.get(iter, 0, out item);
+						((CellRendererText)cell).text = item.Colour.Name;
+					});
+			view.insert_column_with_data_func(-1, "Part Name", new CellRendererText(),
+					(col, cell, model, iter) =>
+					{
+						PartGroupItem item;
+						model.get(iter, 0, out item);
+						((CellRendererText)cell).text = item.Part.Name;
+					});
+			view.insert_column_with_data_func(-1, "Quantity", new CellRendererText(),
+					(col, cell, model, iter) =>
+					{
+						PartGroupItem item;
+						model.get(iter, 0, out item);
+						((CellRendererText)cell).text = item.Quantity.to_string();
+					});
+
+			content.pack_start(WithScrolls(view));
+
+			dialog.show_all();
+
+			dialog.run();
+
+			dialog.destroy();
+
 		}
 
 		public LdrawObject Model

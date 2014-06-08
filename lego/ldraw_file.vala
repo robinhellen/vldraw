@@ -11,13 +11,13 @@ namespace Ldraw.Lego
 
 		public LdrawFile()
 		{
-			MainObject = new LdrawObject("");
+			MainObject = new LdrawObject("", this);
 		}
 
 		public LdrawFile.FromFile(File file, LdrawParser parser)
 			throws ParseError
 		{
-			MainObject = new LdrawObject("");
+			MainObject = new LdrawObject("", this);
 			// actually open and parse the file
 			try
 			{
