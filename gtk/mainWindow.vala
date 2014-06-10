@@ -110,7 +110,7 @@ namespace Ldraw.Ui
 			bind_property("EditingObject", parameters, "Model");
 			notebook.append_page(parameters, new Label("Parameters"));
 
-			var setList = new SetList(library, new InventoryReader());
+			var setList = new SetList(library, new InventoryReader(), new ColourChart());
 			bind_property("File", setList, "ModelFile");
 			notebook.append_page(setList, new Label("Sets"));
 

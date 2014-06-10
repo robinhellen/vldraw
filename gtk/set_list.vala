@@ -13,14 +13,16 @@ namespace Ldraw.Ui
 		private PartGroupUsage usage;
 		private LdrawLibrary library;
 		private InventoryReader inventoryReader;
+		private ColourChart colourChart;
 		private LdrawModelFile modelFile;
 		private SimpleList<PartGroupItem> partsView;
 
-		public SetList(LdrawLibrary library, InventoryReader inventoryReader)
+		public SetList(LdrawLibrary library, InventoryReader inventoryReader, ColourChart colourChart)
 		{
 			sets = new ObservableList<Inventory>();
 			this.library = library;
 			this.inventoryReader = inventoryReader;
+			this.colourChart = colourChart;
 
 			InitializeControls();
 		}
@@ -123,7 +125,7 @@ namespace Ldraw.Ui
 				lib.TryGetPart(line.PartNumber , out p);
 				items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
 						Part: p,
-						Colour: LdrawColour.GetColourByName(line.Colour),
+						Colour: colourChart.GetColourFromName(line.Colour),
 						Quantity: line.Quantity));
 			}
 			return (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
