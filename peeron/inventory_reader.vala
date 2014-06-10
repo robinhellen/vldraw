@@ -34,7 +34,7 @@ namespace Ldraw.Peeron
 				//var col6 = col5->next;
 
 				var qty = int.parse(col1->children->content);
-				var partNo = col2->children->children->content;
+				var partNo = col2->children->children->content; // the part number is a link
 				var colour = col3->children->content;
 
 				var line = (InventoryLine)GLib.Object.new(typeof(InventoryLine), PartNumber: partNo, Quantity: qty, Colour: colour);
