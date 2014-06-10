@@ -6,6 +6,7 @@ using Ldraw.Export;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Options;
+using Ldraw.Peeron;
 using Ldraw.Ui.Commands;
 using Ldraw.Utils;
 
@@ -108,6 +109,10 @@ namespace Ldraw.Ui
 			parameters = new ParameterValues(EditingObject);
 			bind_property("EditingObject", parameters, "Model");
 			notebook.append_page(parameters, new Label("Parameters"));
+
+			var setList = new SetList(library, new InventoryReader());
+			bind_property("File", setList, "ModelFile");
+			notebook.append_page(setList, new Label("Sets"));
 
 			Paned treePaned = new HPaned();
 			treePaned.add1(WithFrame(notebook));
@@ -336,13 +341,6 @@ namespace Ldraw.Ui
 			frame.add(widget);
 			frame.shadow_type = ShadowType.IN;
 			return frame;
-		}
-
-		private Widget WithScrolls(Widget widget)
-		{
-			ScrolledWindow win = new ScrolledWindow(null, null);
-			win.add(widget);
-			return win;
 		}
 
 		private void FileOpen_OnActivate()
@@ -584,5 +582,12 @@ namespace Ldraw.Ui
 		}
 
 		public signal void ParametersUpdated();
+	}
+
+	private Widget WithScrolls(Widget widget)
+	{
+		ScrolledWindow win = new ScrolledWindow(null, null);
+		win.add(widget);
+		return win;
 	}
 }

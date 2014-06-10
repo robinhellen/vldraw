@@ -6,6 +6,9 @@ namespace Ldraw.Ui
 {
 	public class SimpleList<T> : TreeView
 	{
+		public SimpleList()
+		{}
+
 		public SimpleList.with_model(ObservableList<T> model)
 		{
 			GLib.Object(model: model);

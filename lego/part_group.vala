@@ -76,7 +76,7 @@ namespace Ldraw.Lego
 	public class PartGroupItem : Object
 	{
 		public LdrawPart Part {get; construct;}
-		public int Quantity {get; construct;}
+		public int Quantity {get; construct set;}
 		public LdrawColour Colour {get; construct;}
 
 		public PartGroupItem(PartGroupItem other)
