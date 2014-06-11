@@ -15,7 +15,7 @@ namespace Ldraw.Ui
 		private InventoryReader inventoryReader;
 		private ColourChart colourChart;
 		private LdrawModelFile modelFile;
-		private SimpleList<PartGroupItem> partsView;
+		private TreeView partsView;
 
 		public SetList(LdrawLibrary library, InventoryReader inventoryReader, ColourChart colourChart)
 		{
@@ -40,8 +40,7 @@ namespace Ldraw.Ui
 		{
 			var availableParts = Aggregate(ToPartGroups(sets, library));
 			usage = new PartGroupUsage(availableParts, new PartGroup.FromModel(modelFile));
-			var list = new ObservableList<PartGroupItem>();
-			list.add_all(usage.Used.Items);
+			var list = new PartUsageViewModel(usage);
 			partsView.model = list;
 		}
 
@@ -81,11 +80,31 @@ namespace Ldraw.Ui
 			setControls.pack_start(WithScrolls(setsView));
 			setControls.pack_start(setButtons);
 			add1(setControls);
-			partsView = new SimpleList<PartGroupItem>();
-			partsView.insert_text_column_with_data_func(-1, "Quantity",
-				pgi => pgi.Quantity.to_string());
-			partsView.insert_text_column_with_data_func(-1, "Number", pgi => pgi.Part.Name);
-			partsView.insert_text_column_with_data_func(-1, "Colour", pgi => pgi.Colour.Name);
+			partsView = new TreeView();
+			partsView.insert_column_with_data_func(-1, "", new CellRendererText(),
+					(col, cell, model, iter) =>
+					{
+						Value rowTypeValue;
+						model.get_value(iter, 0, out rowTypeValue);
+						var rowType = rowTypeValue.get_int();
+						if(rowType == 0)
+						{
+							Value str;
+							model.get_value(iter, 1, out str);
+							((CellRendererText) cell).text = str.get_string();
+						}
+						else if(rowType == 1)
+						{
+							Value pgi;
+							model.get_value(iter, 2, out pgi);
+							var item = (PartGroupItem)pgi.get_object();
+							if(item == null)
+								return;
+							var desc = item.Part.Description;
+							var name = item.Part.Name;
+							((CellRendererText) cell).text = @"$desc ($name)";
+						}
+					});
 			add2(WithScrolls(partsView));
 		}
 
