@@ -105,7 +105,32 @@ namespace Ldraw.Ui
 							((CellRendererText) cell).text = @"$desc ($name)";
 						}
 					});
+
+			append_column_for_children_only(partsView, new CellRendererText(),
+					(cell, item) => ((CellRendererText)cell).text = @"$(item.Quantity) x $(item.Colour.Name)");
 			add2(WithScrolls(partsView));
+		}
+
+		private delegate void RenderDelegate(CellRenderer cell, PartGroupItem item);
+
+		private void append_column_for_children_only(TreeView view, CellRenderer cell, RenderDelegate renderer)
+		{
+			view.insert_column_with_data_func(-1, "", cell,
+					(col, cell, model, iter) =>
+					{
+						Value rowTypeValue;
+						model.get_value(iter, 0, out rowTypeValue);
+						var rowType = rowTypeValue.get_int();
+						if(rowType == 1)
+						{
+							Value pgi;
+							model.get_value(iter, 2, out pgi);
+							var item = (PartGroupItem)pgi.get_object();
+							if(item == null)
+								return;
+							renderer(cell, item);
+						}
+					});
 		}
 
 		private PartGroup Aggregate(Collection<PartGroup> sets)
@@ -141,11 +166,17 @@ namespace Ldraw.Ui
 			foreach(var line in i.Lines)
 			{
 				LdrawPart p;
-				lib.TryGetPart(line.PartNumber , out p);
-				items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
-						Part: p,
-						Colour: colourChart.GetColourFromName(line.Colour),
-						Quantity: line.Quantity));
+				if(lib.TryGetPart(line.PartNumber , out p))
+				{
+					items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
+							Part: p,
+							Colour: colourChart.GetColourFromName(line.Colour),
+							Quantity: line.Quantity));
+				}
+				else
+				{
+					stderr.printf(@"Unable to find part $(line.PartNumber) in library.\n");
+				}
 			}
 			return (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
 		}
