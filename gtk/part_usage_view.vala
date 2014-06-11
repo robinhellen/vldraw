@@ -114,7 +114,20 @@ namespace Ldraw.Ui
 
 		public bool iter_has_child(TreeIter iter)
 		{
-			return iter.user_data == 0.to_pointer();
+			if((int)iter.user_data != 0)
+				return false;
+
+			switch((int) iter.user_data2)
+			{
+				case 0:
+					return !unused.is_empty;
+				case 1:
+					return !used.is_empty;
+				case 2:
+					return !extra.is_empty;
+				default:
+					return false;
+			}
 		}
 
 		public bool iter_children(out TreeIter child, TreeIter? parent)
