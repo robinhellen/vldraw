@@ -12,16 +12,21 @@ namespace Ldraw.Lego
 
 	public class LibrarySubFileLocator : Object, ISubFileLocator
 	{
-		private LdrawLibrary library;
+		private IDatFileCache library;
 
-		public LibrarySubFileLocator(LdrawLibrary library)
+		public LibrarySubFileLocator(IDatFileCache library)
 		{
 			this.library = library;
 		}
 
 		public LdrawObject GetObjectFromReference(string reference)
+			throws ParseError
 		{
-			return library.GetPartByName(reference.substring(0, reference.last_index_of(".")));
+			LdrawPart part;
+			if(library.TryGetPart(reference, out part))
+				return part.MainObject;
+
+			throw new ParseError.MissingFile(@"No such object '$reference'.");
 		}
 	}
 

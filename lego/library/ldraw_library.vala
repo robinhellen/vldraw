@@ -4,7 +4,7 @@ using Ldraw;
 
 namespace Ldraw.Lego.Library
 {
-	public class LdrawLibrary : Object, ILibrary
+	public class LdrawLibrary : Object, ILibrary, ILdrawFolders, IDatFileCache
 	{
 		private File m_LibraryDir;
 		private File m_PartsDirectory;
