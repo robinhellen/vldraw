@@ -12,7 +12,7 @@ namespace Ldraw.Ui.Widgets
 		private TreeView m_Tree;
 		private LdrawViewPane m_Detail;
 
-		public PartsTree(LdrawLibrary library)
+		public PartsTree(ILibrary library)
 		{
 			m_Tree = new TreeView.with_model(CreateAndPopulateModel(library));
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 1);
@@ -31,7 +31,7 @@ namespace Ldraw.Ui.Widgets
 			m_Tree.drag_data_get.connect(Tree_OnDragDataGet);
 		}
 
-		private TreeModel CreateAndPopulateModel(LdrawLibrary library)
+		private TreeModel CreateAndPopulateModel(ILibrary library)
 		{
 			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(LdrawPart));
 
@@ -43,7 +43,7 @@ namespace Ldraw.Ui.Widgets
 			return store;
 		}
 
-		private void PopulatePartsForCategory(TreeStore store, string? category, LdrawLibrary library)
+		private void PopulatePartsForCategory(TreeStore store, string? category, ILibrary library)
 		{
 			TreeIter categoryIter;
 			store.append(out categoryIter, null);

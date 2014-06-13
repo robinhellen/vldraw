@@ -4,7 +4,7 @@ using Ldraw;
 
 namespace Ldraw.Lego.Library
 {
-	public class LdrawLibrary : Object
+	public class LdrawLibrary : Object, ILibrary
 	{
 		private File m_LibraryDir;
 		private File m_PartsDirectory;
@@ -199,7 +199,7 @@ namespace Ldraw.Lego.Library
 			}
 		}
 
-		public Gee.List<LdrawPart> GetPartsByCategory(string? category)
+		public Collection<LdrawPart> GetPartsByCategory(string? category)
 		{
 			ArrayList<LdrawPart> parts = new ArrayList<LdrawPart>();
 			foreach(LdrawPart part in m_Parts)
@@ -213,7 +213,7 @@ namespace Ldraw.Lego.Library
 			return parts;
 		}
 
-		public Gee.List<LdrawPart> GetVariantsOf(LdrawPart part)
+		public Collection<LdrawPart> GetVariantsOf(LdrawPart part)
 		{
 			ArrayList<LdrawPart> parts = new ArrayList<LdrawPart>();
 			foreach(LdrawPart p in m_Parts)
