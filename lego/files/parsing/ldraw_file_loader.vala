@@ -79,7 +79,15 @@ namespace Ldraw.Lego
 				currentObject.add(node);
 			}
 
-			string filename = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
+			string filename;
+			try
+			{
+				filename = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
+			}
+			catch(Error e)
+			{
+				throw new ParseError.CorruptFile(@"Unable to load from filepath: $(e.message)");
+			}
 
 			if(mainObject == null)
 			{

@@ -60,7 +60,6 @@ namespace Ldraw.Ui
 
 		public bool get_iter(out TreeIter iter, TreePath path)
 		{
-			iter = TreeIter();
 			var section = path.get_indices()[0];
 
 			switch(path.get_depth())
@@ -70,6 +69,7 @@ namespace Ldraw.Ui
 				case 2:
 					return get_iter_for_item(out iter, section, path.get_indices()[1]);
 				default:
+					iter = TreeIter();
 					return false;
 			}
 		}
@@ -77,8 +77,12 @@ namespace Ldraw.Ui
 		private bool get_iter_for_section(out TreeIter iter, int sectionIndex)
 		{
 			if(sectionIndex < 0 || sectionIndex > 2)
+			{
+				iter = TreeIter();
 				return false;
+			}
 
+			iter = TreeIter();
 			iter.stamp = c_IteratorStamp;
 			iter.user_data = 0.to_pointer();
 			iter.user_data2 = sectionIndex.to_pointer();
@@ -97,6 +101,7 @@ namespace Ldraw.Ui
 				case 2:
 					sectionList = extra; break;
 				default:
+					iter = TreeIter();
 					return false;
 			}
 
@@ -105,6 +110,7 @@ namespace Ldraw.Ui
 			if(!sectionList.get_iter(out childIter, pathForChild))
 				return false;
 
+			iter = TreeIter();
 			iter.stamp = c_IteratorStamp;
 			iter.user_data = 1.to_pointer();
 			iter.user_data2 = sectionIndex.to_pointer();

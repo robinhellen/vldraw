@@ -75,11 +75,6 @@ namespace Ldraw.Ui.Widgets
 			m_Detail.Model = current;
 		}
 
-		private void Tree_OnDragBegin(DragContext context)
-		{
-			drag_set_icon_default(context);
-		}
-
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
 			string currentName = "Document::" + Current.FileName;
