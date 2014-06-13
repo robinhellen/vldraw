@@ -1,6 +1,6 @@
 using Gee;
 
-namespace Ldraw.Lego
+namespace Ldraw.Lego.Library
 {
 	public class LdrawSubPart : LdrawFile
 	{

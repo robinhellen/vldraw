@@ -1,5 +1,7 @@
 using Gee;
 
+using Ldraw.Lego.Library;
+
 namespace Ldraw.Lego
 {
 	public interface ISubFileLocator : Object

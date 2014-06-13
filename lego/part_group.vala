@@ -1,5 +1,6 @@
 using Gee;
 
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 
 namespace Ldraw.Lego

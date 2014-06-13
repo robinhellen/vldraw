@@ -2,6 +2,7 @@ using Gee;
 using GLib.Math;
 
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 

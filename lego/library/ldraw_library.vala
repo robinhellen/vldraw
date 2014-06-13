@@ -2,7 +2,7 @@ using Gee;
 
 using Ldraw;
 
-namespace Ldraw.Lego
+namespace Ldraw.Lego.Library
 {
 	public class LdrawLibrary : Object
 	{

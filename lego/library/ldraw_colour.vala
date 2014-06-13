@@ -1,4 +1,4 @@
-namespace Ldraw.Lego
+namespace Ldraw.Lego.Library
 {
 	public class LdrawColour : Object
 	{

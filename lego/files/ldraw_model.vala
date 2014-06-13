@@ -1,3 +1,5 @@
+using Ldraw.Lego.Library;
+
 namespace Ldraw.Lego
 {
 	public class LdrawModel : LdrawModelFile

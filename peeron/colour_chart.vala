@@ -3,7 +3,7 @@ using Soup;
 using Html;
 using Xml.XPath;
 
-using Ldraw.Lego;
+using Ldraw.Lego.Library;
 
 namespace Ldraw.Peeron
 {
