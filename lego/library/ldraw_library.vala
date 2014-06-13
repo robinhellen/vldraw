@@ -78,18 +78,6 @@ namespace Ldraw.Lego.Library
 			}
 		}
 
-		public LdrawObject? GetPartByName(string name)
-		{
-			foreach(LdrawPart part in m_Parts)
-			{
-				if(part.Name == name)
-				{
-					return part.MainObject;
-				}
-			}
-			return null;
-		}
-
 		public bool TryGetPrimitive(string name, out LdrawPrimitive primitive)
 		{
 			foreach(LdrawPrimitive prim in m_Primitives)
