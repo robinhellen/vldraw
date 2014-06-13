@@ -2,6 +2,7 @@ using Gee;
 using Gtk;
 
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Maths;
 using Ldraw.Options;
 using Ldraw.Ui.Commands;
@@ -115,7 +116,7 @@ namespace Ldraw.Ui
 			Gdk.Pixbuf data = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
 
 			float red, green, blue, alpha;
-			Ldraw.Lego.LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
+			LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
 
 			uint32 fillColour = ((int)(red * 255) << 24)
 							  | ((int)(green * 255) << 16)
@@ -281,7 +282,7 @@ namespace Ldraw.Ui
 					Gdk.Pixbuf data = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 16, 16);
 
 					float red, green, blue, alpha;
-					Ldraw.Lego.LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
+					LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
 
 					uint32 fillColour = ((int)(red * 255) << 24)
 									  | ((int)(green * 255) << 16)

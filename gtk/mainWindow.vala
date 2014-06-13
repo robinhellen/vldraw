@@ -4,6 +4,7 @@ using Gtk;
 using Ldraw.Ui.Widgets;
 using Ldraw.Export;
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Options;
 using Ldraw.Peeron;

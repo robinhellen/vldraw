@@ -3,6 +3,7 @@ using Gdk;
 using Gee;
 
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.OpenGl;
 using Ldraw.Maths;

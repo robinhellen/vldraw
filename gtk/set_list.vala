@@ -2,6 +2,7 @@ using Gee;
 using Gtk;
 
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Peeron;
 using Ldraw.Utils;
 

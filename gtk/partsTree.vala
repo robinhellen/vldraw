@@ -1,6 +1,8 @@
 using Gdk;
 using Gtk;
+
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 
 namespace Ldraw.Ui.Widgets
 {
@@ -47,7 +49,7 @@ namespace Ldraw.Ui.Widgets
 			store.append(out categoryIter, null);
 			store.set(categoryIter, 0, 0, 1, (category != null) ? category : "Uncategorised", -1);
 
-			Gee.List<LdrawPart> parts = library.GetPartsByCategory(category);
+			var parts = library.GetPartsByCategory(category);
 
 			foreach(LdrawPart part in parts)
 			{
