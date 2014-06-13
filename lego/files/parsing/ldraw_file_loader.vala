@@ -7,9 +7,9 @@ namespace Ldraw.Lego
 {
 	public class LdrawFileLoader : Object
 	{
-		private LdrawLibrary library;
+		private IDatFileCache library;
 
-		public LdrawFileLoader(LdrawLibrary library)
+		public LdrawFileLoader(IDatFileCache library)
 		{
 			this.library = library;
 		}
