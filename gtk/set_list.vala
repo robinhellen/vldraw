@@ -12,13 +12,13 @@ namespace Ldraw.Ui
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
-		private LdrawLibrary library;
+		private IDatFileCache library;
 		private InventoryReader inventoryReader;
 		private ColourChart colourChart;
 		private LdrawModelFile modelFile;
 		private TreeView partsView;
 
-		public SetList(LdrawLibrary library, InventoryReader inventoryReader, ColourChart colourChart)
+		public SetList(IDatFileCache library, InventoryReader inventoryReader, ColourChart colourChart)
 		{
 			sets = new ObservableList<Inventory>();
 			this.library = library;
@@ -161,7 +161,7 @@ namespace Ldraw.Ui
 			}
 		}
 
-		private PartGroup ToPartGroup(Inventory i, LdrawLibrary lib)
+		private PartGroup ToPartGroup(Inventory i, IDatFileCache lib)
 		{
 			var items = new ArrayList<PartGroupItem>();
 			foreach(var line in i.Lines)
@@ -182,7 +182,7 @@ namespace Ldraw.Ui
 			return (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
 		}
 
-		private Collection<PartGroup> ToPartGroups(Collection<Inventory> sets, LdrawLibrary lib)
+		private Collection<PartGroup> ToPartGroups(Collection<Inventory> sets, IDatFileCache lib)
 		{
 			var result = new ArrayList<PartGroup>();
 			foreach(var inventory in sets)

@@ -367,9 +367,9 @@ namespace Ldraw.Ui.Widgets
 
 	public class LibraryObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
-		private LdrawLibrary library;
+		private IDatFileCache library;
 
-		public LibraryObjectLocator(LdrawLibrary library)
+		public LibraryObjectLocator(IDatFileCache library)
 		{
 			this.library = library;
 		}

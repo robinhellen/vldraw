@@ -25,7 +25,8 @@ namespace Ldraw.Ui
 		LdrawViewPane m_PartDetail;
 		ModelList m_ModelList;
 		LdrawFileLoader m_Loader;
-		LdrawLibrary library;
+		ILibrary library;
+		IDatFileCache fileCache;
 		IOptions m_Settings;
 		ParameterValues parameters;
 
@@ -42,6 +43,7 @@ namespace Ldraw.Ui
 			m_Settings = settings;
 			m_Loader = loader;
 			this.library = library;
+			fileCache = library;
 
 			maximize();
 
@@ -70,7 +72,7 @@ namespace Ldraw.Ui
 			documentLocator.Objects = Gee.List.empty<LdrawObject>();
 
 			var locators = new HashMap<string, IDroppedObjectLocator>();
-			locators[""] = new LibraryObjectLocator(library);
+			locators[""] = new LibraryObjectLocator(fileCache);
 			locators["Document"] = documentLocator;
 
 
@@ -111,7 +113,7 @@ namespace Ldraw.Ui
 			bind_property("EditingObject", parameters, "Model");
 			notebook.append_page(parameters, new Label("Parameters"));
 
-			var setList = new SetList(library, new InventoryReader(), new ColourChart());
+			var setList = new SetList(fileCache, new InventoryReader(), new ColourChart());
 			bind_property("File", setList, "ModelFile");
 			notebook.append_page(setList, new Label("Sets"));
 
