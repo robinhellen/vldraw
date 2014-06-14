@@ -36,14 +36,18 @@ namespace Ldraw.Ui
 		DocumentObjectLocator documentLocator;
 
 
-		public MainWindow.WithModel(IOptions settings, LdrawFileLoader loader, LdrawModelFile? model = null, LdrawLibrary library)
+		public MainWindow.WithModel(IOptions settings,
+									LdrawFileLoader loader,
+									LdrawModelFile? model = null,
+									ILibrary library,
+									IDatFileCache fileCache)
 			throws OpenGl.GlError
 		{
 			EditingObject = new AnimatedModel(model.MainObject);
 			m_Settings = settings;
 			m_Loader = loader;
 			this.library = library;
-			fileCache = library;
+			this.fileCache = fileCache;
 
 			maximize();
 

@@ -39,7 +39,7 @@ namespace Ldraw
 
 			try
 			{
-				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, lib);
+				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, lib, lib);
 				win.destroy.connect(() => main_quit());
 				win.show_all();
 			}
