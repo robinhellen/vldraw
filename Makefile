@@ -7,7 +7,8 @@ TEST_SOURCES= $(TEST_FRAMEWORK_SOURCES) $(TEST_MATHS_SOURCES) $(TEST_EXPR_SOURCE
 
 EXPORT_SOURCES=		$(wildcard export/*.vala)
 EXPRESSIONS_SOURCES=$(wildcard expressions/*.vala)
-UTILS_SOURCES=		$(wildcard utils/*.vala)
+UTILS_DI_SOURCES=	$(wildcard utils/di/*.vala)
+UTILS_SOURCES=		$(wildcard utils/*.vala) $(UTILS_DI_SOURCES)
 OPENGL_SOURCES=		$(wildcard openGl/*.vala)
 POVRAY_SOURCES=		$(wildcard povray/*.vala)
 MATHS_SOURCES=		$(wildcard maths/*.c)
