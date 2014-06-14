@@ -6,7 +6,7 @@ using Ldraw.Lego.Library;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class PartsTree
+	public class PartsTree : GLib.Object
 	{
 		private ScrolledWindow m_Scrolled;
 		private TreeView m_Tree;
@@ -14,7 +14,17 @@ namespace Ldraw.Ui.Widgets
 
 		public PartsTree(ILibrary library)
 		{
-			m_Tree = new TreeView.with_model(CreateAndPopulateModel(library));
+			GLib.Object(Library: library);
+		}
+
+		public ILibrary Library
+		{
+			construct; get;
+		}
+
+		construct
+		{
+			m_Tree = new TreeView.with_model(CreateAndPopulateModel(Library));
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 1);
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 2);
 			m_Tree.headers_visible = false;
