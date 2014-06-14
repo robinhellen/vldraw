@@ -38,6 +38,19 @@ namespace Ldraw.Utils.Di
             return new RegistrationContext(maker);
         }
 
+        public RegistrationContext RegisterInstance<T>(T instance)
+        {
+			var t = typeof(T);
+			var maker = new Maker.Instance(t, (Object)instance);
+            registrations[t] = maker;
+            if(!all_registrations.has_key(t))
+            {
+                all_registrations[t] = new ArrayList<Maker>();
+            }
+            all_registrations[t].add(maker);
+            return new RegistrationContext(maker);
+		}
+
         public DependencyResolutionContext Build()
         {
             return new Creator(registrations.read_only_view, all_registrations.read_only_view);

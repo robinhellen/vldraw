@@ -3,8 +3,10 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
-using Ldraw.Ui;
 using Ldraw.Options;
+using Ldraw.Ui;
+using Ldraw.Ui.Widgets;
+using Ldraw.Utils.Di;
 
 namespace Ldraw
 {
@@ -12,11 +14,20 @@ namespace Ldraw
 	{
 		public static int main(string[] args)
 		{
+			LdrawLibrary lib = new LdrawLibrary();
+
+			var builder = new CreatorBuilder();
+
+			builder.RegisterInstance<ILibrary>(lib);
+			builder.Register<PartsTree>();
+
+			var container = builder.Build();
+
+
 			// initialize Gtk and OpenGL
 			init(ref args);
 			Gdk.gl_init(ref args);
 
-			LdrawLibrary lib = new LdrawLibrary();
 			try
 			{
 				lib.Initialize(new TextProgress());
@@ -39,7 +50,7 @@ namespace Ldraw
 
 			try
 			{
-				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, lib, lib);
+				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, lib, container);
 				win.destroy.connect(() => main_quit());
 				win.show_all();
 			}

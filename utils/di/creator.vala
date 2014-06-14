@@ -155,6 +155,14 @@ namespace Ldraw.Utils.Di
             cache = Value(t);
         }
 
+        public Maker.Instance(Type t, Object instance)
+        {
+			this.t = t;
+			cache = Value(t);
+			cache.set_object(instance);
+			Cache = true;
+		}
+
         public bool Cache {get; set; default = true;}
 
         public Object Make(Creator c)

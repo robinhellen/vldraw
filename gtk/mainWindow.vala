@@ -10,6 +10,7 @@ using Ldraw.Options;
 using Ldraw.Peeron;
 using Ldraw.Ui.Commands;
 using Ldraw.Utils;
+using Ldraw.Utils.Di;
 
 namespace Ldraw.Ui
 {
@@ -39,22 +40,23 @@ namespace Ldraw.Ui
 		public MainWindow.WithModel(IOptions settings,
 									LdrawFileLoader loader,
 									LdrawModelFile? model = null,
-									ILibrary library,
-									IDatFileCache fileCache)
+									IDatFileCache fileCache,
+									DependencyResolutionContext context)
 			throws OpenGl.GlError
 		{
+			var library = context.Resolve<ILibrary>();
 			GLib.Object(Library: library, Loader: loader, FileCache: fileCache, Settings: settings);
 
 			EditingObject = new AnimatedModel(model.MainObject);
 
 			maximize();
 
-			SetUpControls();
+			SetUpControls(context);
 			File = model;
 			SetUpErrorReporting();
 		}
 
-		private void SetUpControls()
+		private void SetUpControls(DependencyResolutionContext context)
 			throws OpenGl.GlError
 		{
 			var toolbarProvider = new ToolBarProvider(this, Settings, undoStack);
@@ -91,7 +93,7 @@ namespace Ldraw.Ui
 			var notebook = new Notebook();
 			// add a list of available parts on the left
 			m_PartDetail = CreatePreviewPane();
-			parts = new PartsTree(Library);
+			parts = context.Resolve<PartsTree>();
 			var treeDetailBox = new VBox(false, 0);
 
 			parts.DetailView = m_PartDetail;
