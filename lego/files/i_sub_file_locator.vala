@@ -6,7 +6,7 @@ namespace Ldraw.Lego
 {
 	public interface ISubFileLocator : Object
 	{
-		public abstract LdrawObject GetObjectFromReference(string reference)
+		public abstract LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError;
 	}
 
@@ -19,14 +19,16 @@ namespace Ldraw.Lego
 			this.library = library;
 		}
 
-		public LdrawObject GetObjectFromReference(string reference)
+		public LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
 		{
+			var partName = reference.substring(0, reference.last_index_of("."));
+
 			LdrawPart part;
-			if(library.TryGetPart(reference, out part))
+			if(library.TryGetPart(partName, out part))
 				return part.MainObject;
 
-			throw new ParseError.MissingFile(@"No such object '$reference'.");
+			return null;
 		}
 	}
 
@@ -41,7 +43,7 @@ namespace Ldraw.Lego
 			m_Proxies = new ArrayList<ProxyLdrawObject>();
 		}
 
-		public LdrawObject GetObjectFromReference(string reference)
+		public LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			var baseVal = m_Locator.GetObjectFromReference(reference);
@@ -97,7 +99,7 @@ namespace Ldraw.Lego
 			this.library = library;
 		}
 
-		public LdrawObject GetObjectFromReference(string reference)
+		public LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			string[] toks = reference.split_set("/\\");
