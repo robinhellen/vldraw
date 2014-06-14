@@ -12,11 +12,6 @@ namespace Ldraw.Ui.Widgets
 		private TreeView m_Tree;
 		private LdrawViewPane m_Detail;
 
-		public PartsTree(ILibrary library)
-		{
-			GLib.Object(Library: library);
-		}
-
 		public ILibrary Library
 		{
 			construct; get;
