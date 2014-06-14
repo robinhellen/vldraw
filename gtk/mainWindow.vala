@@ -24,10 +24,6 @@ namespace Ldraw.Ui
 		EditPanes m_View;
 		LdrawViewPane m_PartDetail;
 		ModelList m_ModelList;
-		LdrawFileLoader m_Loader;
-		ILibrary library;
-		IDatFileCache fileCache;
-		IOptions m_Settings;
 		ParameterValues parameters;
 
 		// trees
@@ -35,6 +31,10 @@ namespace Ldraw.Ui
 		SubModelsTree subModels;
 		DocumentObjectLocator documentLocator;
 
+		public IOptions Settings {construct; private get;}
+		public LdrawFileLoader Loader {construct; private get;}
+		public ILibrary Library {construct; private get;}
+		public IDatFileCache FileCache {construct; private get;}
 
 		public MainWindow.WithModel(IOptions settings,
 									LdrawFileLoader loader,
@@ -43,11 +43,9 @@ namespace Ldraw.Ui
 									IDatFileCache fileCache)
 			throws OpenGl.GlError
 		{
+			GLib.Object(Library: library, Loader: loader, FileCache: fileCache, Settings: settings);
+
 			EditingObject = new AnimatedModel(model.MainObject);
-			m_Settings = settings;
-			m_Loader = loader;
-			this.library = library;
-			this.fileCache = fileCache;
 
 			maximize();
 
@@ -59,7 +57,7 @@ namespace Ldraw.Ui
 		private void SetUpControls()
 			throws OpenGl.GlError
 		{
-			var toolbarProvider = new ToolBarProvider(this, m_Settings, undoStack);
+			var toolbarProvider = new ToolBarProvider(this, Settings, undoStack);
 
 			// start with a menubar as that runs across the whole window
 			var accelerators = SetUpAccelerators();
@@ -76,13 +74,13 @@ namespace Ldraw.Ui
 			documentLocator.Objects = Gee.List.empty<LdrawObject>();
 
 			var locators = new HashMap<string, IDroppedObjectLocator>();
-			locators[""] = new LibraryObjectLocator(fileCache);
+			locators[""] = new LibraryObjectLocator(FileCache);
 			locators["Document"] = documentLocator;
 
 
 			try
 			{
-				m_View = new EditPanes(m_Settings, new CombinedObjectLocator(locators), undoStack);
+				m_View = new EditPanes(Settings, new CombinedObjectLocator(locators), undoStack);
 			}
 			catch(OpenGl.GlError e)
 			{
@@ -93,7 +91,7 @@ namespace Ldraw.Ui
 			var notebook = new Notebook();
 			// add a list of available parts on the left
 			m_PartDetail = CreatePreviewPane();
-			parts = new PartsTree(library);
+			parts = new PartsTree(Library);
 			var treeDetailBox = new VBox(false, 0);
 
 			parts.DetailView = m_PartDetail;
@@ -117,7 +115,7 @@ namespace Ldraw.Ui
 			bind_property("EditingObject", parameters, "Model");
 			notebook.append_page(parameters, new Label("Parameters"));
 
-			var setList = new SetList(fileCache, new InventoryReader(), new ColourChart());
+			var setList = new SetList(FileCache, new InventoryReader(), new ColourChart());
 			bind_property("File", setList, "ModelFile");
 			notebook.append_page(setList, new Label("Sets"));
 
@@ -154,8 +152,8 @@ namespace Ldraw.Ui
 				return null;
 			}
 			previewPane.set_size_request(200, 200);
-			previewPane.DefaultColour = m_Settings.PreviewColourId;
-			m_Settings.notify["PreviewColourId"].connect(() => previewPane.DefaultColour = m_Settings.PreviewColourId);
+			previewPane.DefaultColour = Settings.PreviewColourId;
+			Settings.notify["PreviewColourId"].connect(() => previewPane.DefaultColour = Settings.PreviewColourId);
 			return previewPane;
 		}
 
@@ -367,7 +365,7 @@ namespace Ldraw.Ui
 				string fileToOpen = dialog.get_filename();
 				try
 				{
-					LdrawModelFile opened = m_Loader.LoadModelFile(fileToOpen);
+					LdrawModelFile opened = Loader.LoadModelFile(fileToOpen);
 					File = opened;
 				}
 				catch(ParseError e)
