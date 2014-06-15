@@ -367,17 +367,12 @@ namespace Ldraw.Ui.Widgets
 
 	public class LibraryObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
-		private IDatFileCache library;
-
-		public LibraryObjectLocator(IDatFileCache library)
-		{
-			this.library = library;
-		}
+		public IDatFileCache Library {construct; private get;}
 
 		public LdrawObject? GetObjectForName(string name)
 		{
 			LdrawPart part;
-			if(!library.TryGetPart(name, out part))
+			if(!Library.TryGetPart(name, out part))
 			{
 				return null;
 			}

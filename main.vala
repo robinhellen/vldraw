@@ -31,6 +31,8 @@ namespace Ldraw
 			builder.Register<PartsTree>();
 			builder.Register<SetList>();
 
+			builder.Register<LibraryObjectLocator>();
+
 			var container = builder.Build();
 
 
@@ -60,7 +62,7 @@ namespace Ldraw
 
 			try
 			{
-				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, lib, container);
+				Window win = new MainWindow.WithModel(new RunningOptions(new DefaultOptions()), loader, model, container);
 				win.destroy.connect(() => main_quit());
 				win.show_all();
 			}

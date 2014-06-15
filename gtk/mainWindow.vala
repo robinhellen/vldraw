@@ -34,16 +34,14 @@ namespace Ldraw.Ui
 
 		public IOptions Settings {construct; private get;}
 		public LdrawFileLoader Loader {construct; private get;}
-		public IDatFileCache FileCache {construct; private get;}
 
 		public MainWindow.WithModel(IOptions settings,
 									LdrawFileLoader loader,
 									LdrawModelFile? model = null,
-									IDatFileCache fileCache,
 									DependencyResolutionContext context)
 			throws OpenGl.GlError
 		{
-			GLib.Object(Loader: loader, FileCache: fileCache, Settings: settings);
+			GLib.Object(Loader: loader, Settings: settings);
 
 			EditingObject = new AnimatedModel(model.MainObject);
 
@@ -74,7 +72,7 @@ namespace Ldraw.Ui
 			documentLocator.Objects = Gee.List.empty<LdrawObject>();
 
 			var locators = new HashMap<string, IDroppedObjectLocator>();
-			locators[""] = new LibraryObjectLocator(FileCache);
+			locators[""] = context.Resolve<LibraryObjectLocator>();
 			locators["Document"] = documentLocator;
 
 
