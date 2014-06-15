@@ -115,7 +115,7 @@ namespace Ldraw.Ui
 			bind_property("EditingObject", parameters, "Model");
 			notebook.append_page(parameters, new Label("Parameters"));
 
-			var setList = new SetList(FileCache, new InventoryReader(), new ColourChart());
+			var setList = context.Resolve<SetList>();
 			bind_property("File", setList, "ModelFile");
 			notebook.append_page(setList, new Label("Sets"));
 

@@ -4,6 +4,7 @@ using Gtk;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Options;
+using Ldraw.Peeron;
 using Ldraw.Ui;
 using Ldraw.Ui.Widgets;
 using Ldraw.Utils.Di;
@@ -18,8 +19,17 @@ namespace Ldraw
 
 			var builder = new CreatorBuilder();
 
+			// Parts library
 			builder.RegisterInstance<ILibrary>(lib);
+			builder.RegisterInstance<IDatFileCache>(lib);
+
+			// Peeron communication
+			builder.Register<InventoryReader>();
+			builder.Register<ColourChart>();
+
+			// UI components
 			builder.Register<PartsTree>();
+			builder.Register<SetList>();
 
 			var container = builder.Build();
 
