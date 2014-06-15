@@ -16,8 +16,11 @@ namespace Ldraw.Utils.Di
 
         public T Resolve<T>()
             throws DependencyResolutionError
-            requires(registrations.has_key(typeof(T)))
         {
+			if(!registrations.has_key(typeof(T)))
+			{
+				throw new DependencyResolutionError.NotRegistered(@"'$(typeof(T).name())' was not registered");
+			}
             var o = registrations[typeof(T)].Make(this);
             all_constructed[typeof(T)] = ObjectValue(typeof(T), o);
             return (T)o;
