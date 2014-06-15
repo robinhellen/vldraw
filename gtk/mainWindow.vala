@@ -34,7 +34,6 @@ namespace Ldraw.Ui
 
 		public IOptions Settings {construct; private get;}
 		public LdrawFileLoader Loader {construct; private get;}
-		public ILibrary Library {construct; private get;}
 		public IDatFileCache FileCache {construct; private get;}
 
 		public MainWindow.WithModel(IOptions settings,
@@ -44,8 +43,7 @@ namespace Ldraw.Ui
 									DependencyResolutionContext context)
 			throws OpenGl.GlError
 		{
-			var library = context.Resolve<ILibrary>();
-			GLib.Object(Library: library, Loader: loader, FileCache: fileCache, Settings: settings);
+			GLib.Object(Loader: loader, FileCache: fileCache, Settings: settings);
 
 			EditingObject = new AnimatedModel(model.MainObject);
 
