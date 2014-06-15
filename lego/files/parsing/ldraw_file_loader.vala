@@ -7,12 +7,7 @@ namespace Ldraw.Lego
 {
 	public class LdrawFileLoader : Object
 	{
-		private IDatFileCache library;
-
-		public LdrawFileLoader(IDatFileCache library)
-		{
-			this.library = library;
-		}
+		public IDatFileCache Library{construct; private get;}
 
 		public LdrawModelFile LoadModelFile(string filepath)
 			throws ParseError
@@ -22,7 +17,7 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
 			}
-			var parser = new LdrawParser(new LibrarySubFileLocator(library));
+			var parser = new LdrawParser(new LibrarySubFileLocator(Library));
 			var fileReader = new LdrawFileReader(parser);
 			var nodes = fileReader.GetNodesFromFile(file);
 			MultipartSubFileLocator locator = null;
@@ -67,7 +62,7 @@ namespace Ldraw.Lego
 							}
 							if(locator == null)
 							{
-								locator = new MultipartSubFileLocator(new LibrarySubFileLocator(library));
+								locator = new MultipartSubFileLocator(new LibrarySubFileLocator(Library));
 								parser.Locator = locator;
 							}
 

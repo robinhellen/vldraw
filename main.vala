@@ -23,6 +23,9 @@ namespace Ldraw
 			builder.RegisterInstance<ILibrary>(lib);
 			builder.RegisterInstance<IDatFileCache>(lib);
 
+			// Model file handling
+			builder.Register<LdrawFileLoader>();
+
 			// Peeron communication
 			builder.Register<InventoryReader>();
 			builder.Register<ColourChart>();
@@ -49,7 +52,7 @@ namespace Ldraw
 				stdout.printf(e.message);
 			}
 			LdrawModelFile model = null;
-			var loader = new LdrawFileLoader(lib);
+			var loader = container.Resolve<LdrawFileLoader>();
 			try
 			{
 				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd");
