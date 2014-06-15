@@ -12,18 +12,21 @@ namespace Ldraw.Ui
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
-		private IDatFileCache library;
-		private InventoryReader inventoryReader;
-		private ColourChart colourChart;
 		private LdrawModelFile modelFile;
 		private TreeView partsView;
 
+		public IDatFileCache Library {private get; construct;}
+		public InventoryReader InventoryReader {private get; construct;}
+		public ColourChart ColourChart {private get; construct;}
+
 		public SetList(IDatFileCache library, InventoryReader inventoryReader, ColourChart colourChart)
 		{
+			GLib.Object(Library: library, InventoryReader: inventoryReader, ColourChart: colourChart);
+		}
+
+		construct
+		{
 			sets = new ObservableList<Inventory>();
-			this.library = library;
-			this.inventoryReader = inventoryReader;
-			this.colourChart = colourChart;
 
 			InitializeControls();
 		}
@@ -39,7 +42,7 @@ namespace Ldraw.Ui
 
 		private void UpdateUsage()
 		{
-			var availableParts = Aggregate(ToPartGroups(sets, library));
+			var availableParts = Aggregate(ToPartGroups(sets, Library));
 			usage = new PartGroupUsage(availableParts, new PartGroup.FromModel(modelFile));
 			var list = new PartUsageViewModel(usage);
 			partsView.model = list;
@@ -71,7 +74,7 @@ namespace Ldraw.Ui
 					if(response != ResponseType.ACCEPT)
 						return;
 
-					sets.add(inventoryReader.GetInventoryFor(setname));
+					sets.add(InventoryReader.GetInventoryFor(setname));
 					UpdateUsage();
 				});
 				setButtons.pack_start(addButton);
@@ -171,7 +174,7 @@ namespace Ldraw.Ui
 				{
 					items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
 							Part: p,
-							Colour: colourChart.GetColourFromName(line.Colour),
+							Colour: ColourChart.GetColourFromName(line.Colour),
 							Quantity: line.Quantity));
 				}
 				else
