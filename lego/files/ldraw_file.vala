@@ -50,19 +50,6 @@ namespace Ldraw.Lego
 				throw new ParseError.CorruptFile(@"Unable to read the file.\n$innerMessage");
 			}
 		}
-
-		public string FileName
-		{
-			get
-			{
-				return m_FileName;
-			}
-			set
-			{
-				m_FileName = value;
-			}
-		}
-
 		public string FilePath {get; set;}
 
 		// return true to indicate that all processing on this line is done,
@@ -79,5 +66,8 @@ namespace Ldraw.Lego
 	public abstract class LdrawModelFile : LdrawFile
 	{
 		public abstract void Save();
+
+		public string FileName { get; construct set; }
+
 	}
 }
