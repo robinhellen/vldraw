@@ -22,7 +22,7 @@ namespace Ldraw.Lego.Library
 		public abstract bool TryGetSubPart(string name, out LdrawSubPart part);
 	}
 
-	public interface ILdrawFolders
+	public interface ILdrawFolders : Object
 	{
 		public abstract File LibraryDirectory { get; }
 
