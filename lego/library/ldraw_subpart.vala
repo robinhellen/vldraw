@@ -34,8 +34,6 @@ namespace Ldraw.Lego.Library
 			s_Creations++;
 		}
 
-		public override string Description { get{ return m_Description;}}
-
 		public string Category
 		{
 			get

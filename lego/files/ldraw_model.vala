@@ -26,14 +26,6 @@ namespace Ldraw.Lego
 			base();
 		}
 
-		public override string Description
-		{
-			get
-			{
-				return "";
-			}
-		}
-
 		public override void Save()
 		{
 			try

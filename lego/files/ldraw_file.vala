@@ -51,8 +51,6 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public abstract string Description {get;}
-
 		public string FileName
 		{
 			get

@@ -9,8 +9,6 @@ namespace Ldraw.Lego
 	{
 		public ObservableList<LdrawObject> SubModels {get; construct;}
 
-		public override string Description{get{return "";}}
-
 		public override void Save()
 		{
 			try
