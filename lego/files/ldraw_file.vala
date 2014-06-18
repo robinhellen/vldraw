@@ -6,7 +6,6 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawFile : Object
 	{
-		private const string c_LdrawDirectory = "/home/robin/ldraw";
 		private string m_FileName;
 
 		public LdrawFile()
