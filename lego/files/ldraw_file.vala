@@ -6,8 +6,6 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawFile : Object
 	{
-		private string m_FileName;
-
 		public LdrawFile()
 		{
 			MainObject = new LdrawObject("", this);
@@ -36,8 +34,7 @@ namespace Ldraw.Lego
 							continue;
 					MainObject.AddNode(nodeForLine);
 				}
-				m_FileName = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
-				MainObject.FileName = m_FileName;
+				MainObject.FileName = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
 			}
 			catch(IOError e)
 			{
@@ -50,7 +47,6 @@ namespace Ldraw.Lego
 				throw new ParseError.CorruptFile(@"Unable to read the file.\n$innerMessage");
 			}
 		}
-		public string FilePath {get; set;}
 
 		// return true to indicate that all processing on this line is done,
 		// false to create a node for this comment.
@@ -60,7 +56,7 @@ namespace Ldraw.Lego
 			return false;
 		}
 
-		public LdrawObject MainObject {get; set;}
+		public LdrawObject MainObject {get; construct set;}
 	}
 
 	public abstract class LdrawModelFile : LdrawFile
@@ -69,5 +65,6 @@ namespace Ldraw.Lego
 
 		public string FileName { get; construct set; }
 
+		public string FilePath {get; construct set;}
 	}
 }
