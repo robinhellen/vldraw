@@ -305,10 +305,10 @@ namespace Ldraw.Lego.Library
 			// initialize colours
 			LdrawColour.ReadAllColours(this);
 
-			LoadAllHiresPrimitives(progress);
+			/*LoadAllHiresPrimitives(progress);
 			LoadAllPrimitives(progress);
 			LoadAllSubParts(progress);
-			LoadAllParts(progress);
+			LoadAllParts(progress);*/
 		}
 
 		private int GetFileCount(File directory)

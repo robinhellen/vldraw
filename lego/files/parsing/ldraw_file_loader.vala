@@ -2,14 +2,23 @@ using Gee;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Utils;
+using Ldraw.Utils.Di;
 
 namespace Ldraw.Lego
 {
 	public class LdrawFileLoader : Object
 	{
-		public IDatFileCache Library{construct; private get;}
+		public IDatFileCache Library {construct; private get;}
+		public LdrawParser Parser {construct; private get;}
+		public IIndex<ReferenceLoadStrategy, ISubFileLocator> Locators {construct; private get;}
 
-		public LdrawModelFile LoadModelFile(string filepath)
+		static construct
+		{
+			var cls = (ObjectClass)typeof(LdrawFileLoader).class_ref();
+			SetIndexedInjection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
+		}
+
+		public LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy)
 			throws ParseError
 		{
 			File file = File.new_for_path(filepath);
@@ -17,9 +26,8 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
 			}
-			var parser = new LdrawParser(new LibrarySubFileLocator(Library));
-			var fileReader = new LdrawFileReader(parser);
-			var nodes = fileReader.GetNodesFromFile(file);
+			var fileReader = new LdrawFileReader(Parser);
+			var nodes = fileReader.GetNodesFromFile(file, strategy);
 			MultipartSubFileLocator locator = null;
 
 			ObservableList<LdrawNode> currentObject = new ObservableList<LdrawNode>();
@@ -62,8 +70,8 @@ namespace Ldraw.Lego
 							}
 							if(locator == null)
 							{
-								locator = new MultipartSubFileLocator(new LibrarySubFileLocator(Library));
-								parser.Locator = locator;
+								locator = new MultipartSubFileLocator(Locators[strategy]);
+								Parser.OverrideLocator = locator;
 							}
 
 							currentObject = new ObservableList<LdrawNode>();

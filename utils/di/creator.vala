@@ -6,12 +6,13 @@ namespace Ldraw.Utils.Di
     {
         private Map<Type, Maker> registrations = new HashMap<Type, Maker>();
         private Map<Type, Collection<Maker>> all_registrations = new HashMap<Type, Collection<Maker>>();
-        private MultiMap<Type, Value?> all_constructed = new HashMultiMap<Type, Value?>();
+        private MultiMap<Type, Registration> contexts;
 
-        public Creator(Map<Type, Maker> registrations, Map<Type, Collection<Maker>> all_registrations)
+        public Creator(Map<Type, Maker> registrations, Map<Type, Collection<Maker>> all_registrations, MultiMap<Type, Registration> contexts)
         {
             this.registrations = registrations;
             this.all_registrations = all_registrations;
+            this.contexts = contexts;
         }
 
         public T Resolve<T>()
@@ -22,7 +23,6 @@ namespace Ldraw.Utils.Di
 				throw new DependencyResolutionError.NotRegistered(@"'$(typeof(T).name())' was not registered");
 			}
             var o = registrations[typeof(T)].Make(this);
-            all_constructed[typeof(T)] = ObjectValue(typeof(T), o);
             return (T)o;
         }
 
@@ -33,7 +33,6 @@ namespace Ldraw.Utils.Di
                 throw new DependencyResolutionError.NotRegistered(@"The type '$(t.name())' was not registered.");
 
             var constructed = registrations[t].Make(this);
-            all_constructed[t] = ObjectValue(t, constructed);
             return constructed;
         }
 
@@ -53,7 +52,6 @@ namespace Ldraw.Utils.Di
             {
                 output.add(maker.Make(this));
                 var o = maker.Make(this);
-                all_constructed[typeof(T)] = ObjectValue(typeof(T), o);
                 output.add((T)o);
             }
             return output.read_only_view;
@@ -86,18 +84,7 @@ namespace Ldraw.Utils.Di
             }
 
             var o = registrations[typeof(T)].MakeWith(this, resolvers);
-            all_constructed[typeof(T)] = ObjectValue(typeof(T), o);
             return o;
-        }
-
-        public Collection<T> AllCreated<T>()
-        {
-            var result = new ArrayList<T>();
-            foreach(var val in all_constructed[typeof(T)])
-            {
-                result.add((T)val.get_object());
-            }
-            return result;
         }
 
         public Object CreateObj(Type t, Map<string, Resolver> resolvers)
@@ -112,116 +99,152 @@ namespace Ldraw.Utils.Di
             var params = new Parameter[] {};
             foreach(var prop in properties)
             {
-                var flags = prop.flags;
-                if(  ((flags & ParamFlags.CONSTRUCT) == ParamFlags.CONSTRUCT)
-                  || ((flags & ParamFlags.CONSTRUCT_ONLY) == ParamFlags.CONSTRUCT_ONLY))
+                if(CanInjectProperty(prop))
                 {
-                    var p = Parameter();
-                    p.name = prop.name;
+					Parameter p;
+					if(
+						ResolversIncludes(prop, resolvers, out p) ||
+						IsIndex(prop, out p) ||
+						CanCreate(prop, out p)
+					)
+					{
+						params += p;
+					}
+					else
+					{
+						if((prop.flags & ParamFlags.CONSTRUCT_ONLY) == ParamFlags.CONSTRUCT_ONLY)
+							throw new DependencyResolutionError.InnerResolutionError(@"Unable to resolve $(prop.value_type.name()) for property $(prop.name) when creating $(t.name()):\n\tNo matching regstrations found.");
 
-                    if(resolvers.has_key(p.name))
-                    {
-                        Resolver r = resolvers[p.name];
-                        p.value = r(this);
-                    }
-                    else
-                    {
-                        p.value = Value(prop.value_type);
-                        try
-                        {
-                            p.value.set_object(Create(prop.value_type));
-                        }
-                        catch(DependencyResolutionError e)
-                        {
-                            if((flags & ParamFlags.CONSTRUCT_ONLY) == ParamFlags.CONSTRUCT_ONLY)
-                                throw new DependencyResolutionError.InnerResolutionError(@"Unable to resolve $(prop.value_type.name()) for property $(p.name) when creating $(t.name()):\n\t$(e.message)");
-                        }
-                    }
-                    params += p;
+					}
                 }
             }
             var o = Object.newv(t, params);
             return o;
         }
 
-    }
-
-    public class Maker : Object
-    {
-        private Type t;
-        private Map<string, Resolver> resolvers = new HashMap<string, Resolver>();
-        private Value cache;
-
-        public Maker(Type t)
+        private bool CanInjectProperty(ParamSpec p)
         {
-            this.t = t;
-            cache = Value(t);
-        }
-
-        public Maker.Instance(Type t, Object instance)
-        {
-			this.t = t;
-			cache = Value(t);
-			cache.set_object(instance);
-			Cache = true;
+			var flags = p.flags;
+			return (  ((flags & ParamFlags.CONSTRUCT) == ParamFlags.CONSTRUCT)
+			  || ((flags & ParamFlags.CONSTRUCT_ONLY) == ParamFlags.CONSTRUCT_ONLY));
 		}
 
-        public bool Cache {get; set; default = true;}
+		private bool ResolversIncludes(ParamSpec prop, Map<string, Resolver> resolvers, out Parameter p)
+			throws DependencyResolutionError
+		{
+			p = Parameter();
+			if(!resolvers.has_key(prop.name))
+			{
+				return false;
+			}
 
-        public Object Make(Creator c)
-            throws DependencyResolutionError
-        {
-            return MakeWith(c, Map.empty<string, Resolver>());
-        }
+			p.name = prop.name;
 
-        public Object MakeWith(Creator c, Map<string, Resolver> extraResolvers)
-            throws DependencyResolutionError
-        {
-            if(Cache && cache.get_object() != null)
-                return cache.get_object();
+			Resolver r = resolvers[p.name];
+			p.value = r(this);
+			return true;
+		}
 
-            var finalResolvers = new HashMap<string, Resolver>();
-            foreach(var key in resolvers.keys)
+		private bool CanCreate(ParamSpec prop, out Parameter p)
+			throws DependencyResolutionError
+		{
+			p = Parameter();
+			var t = prop.value_type;
+            if(!registrations.has_key(t))
             {
-                finalResolvers[key] = resolvers[key];
-            }
-            foreach(var key in extraResolvers.keys)
-            {
-                finalResolvers[key] = extraResolvers[key];
-            }
+				return false;
+			}
 
-            var o = c.CreateObj(t, finalResolvers);
-            cache.set_object(o);
-            return o;
-        }
+			p.name = prop.name;
 
-        public void AddResolver(string name, Resolver resolver)
-        {
-            resolvers[name] = resolver;
-        }
+			p.value = Value(t);
+			try
+			{
+				p.value.set_object(Create(t));
+			}
+			catch(DependencyResolutionError e)
+			{
+				if((prop.flags & ParamFlags.CONSTRUCT_ONLY) == ParamFlags.CONSTRUCT_ONLY)
+					throw new DependencyResolutionError.InnerResolutionError(@"Unable to resolve $(prop.value_type.name()) for property $(p.name) when creating $(t.name()):\n\t$(e.message)");
+
+			}
+			return true;
+		}
+
+		private bool IsIndex(ParamSpec property, out Parameter p)
+		{
+			p = Parameter();
+			if(property.value_type != typeof(IIndex))
+			{
+				return false;
+			}
+
+			p.name = property.name;
+
+			p.value = Value(property.value_type);
+			var indexData = (IndexPropertyData)property.get_qdata(Quark.from_string("di_indexed"));
+
+			p.value.set_object(CreateIndex(indexData));
+			return true;
+		}
+
+		private Object CreateIndex(IndexPropertyData data)
+		{
+			var keyType = data.Key;
+			var dependencyType = data.Dependency;
+
+			var keyedRegistrations = new HashMap<Value?, Registration>();
+
+			foreach(var registration in contexts.get_values())
+			{
+				var keys = registration.GetKeysFor(dependencyType);
+				foreach (var key in keys)
+				{
+					if(key.holds(keyType))
+					{
+						keyedRegistrations[key] = registration;
+					}
+				}
+			}
+
+			var index = (MakerIndex<Object, Object>)Object.new(typeof(MakerIndex), Creator: this, tkey_type: keyType, tdependency_type: dependencyType);
+			index.Initialize(keyedRegistrations);
+			return index;
+		}
     }
 
-    public class RegistrationContext : Object
-    {
-        private Maker maker;
+	public class MakerIndex<TKey, TDependency> : IIndex<TKey, TDependency>, Object
+	{
+		private Map<TKey, Maker> Makers {set; get;}
+		public Creator Creator {construct; private get;}
 
-        public RegistrationContext(Maker maker)
-        {
-            this.maker = maker;
-        }
+		public new TDependency @get(TKey key)
+		{
+			return Makers[key].Make(Creator);
+		}
 
-        public RegistrationContext WithProperty(string propertyName, Resolver func)
-        {
-            maker.AddResolver(propertyName, func);
-            return this;
-        }
+		public void Initialize(Map<Value?, Registration> registrations)
+		{
+			Makers = new HashMap<TKey, Maker>();
+			foreach(var entry in registrations.entries)
+			{
+				var v = entry.key;
 
-        public RegistrationContext InstancePerDependency()
-        {
-            maker.Cache = false;
-            return this;
-        }
-    }
+				Makers[ExtractKey(v)] = entry.value.Maker;
+			}
+		}
+
+		private TKey ExtractKey(Value v)
+		{
+			var valueType = v.type();
+			if(valueType.is_enum())
+			{
+				var key = (TKey)v.get_enum();
+				return key;
+			}
+			return (TKey)v.get_pointer;
+		}
+	}
 
     public errordomain DependencyResolutionError
     {

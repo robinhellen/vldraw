@@ -363,7 +363,7 @@ namespace Ldraw.Ui
 				string fileToOpen = dialog.get_filename();
 				try
 				{
-					LdrawModelFile opened = Loader.LoadModelFile(fileToOpen);
+					LdrawModelFile opened = Loader.LoadModelFile(fileToOpen, ReferenceLoadStrategy.PartsOnly);
 					File = opened;
 				}
 				catch(ParseError e)

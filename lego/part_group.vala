@@ -32,6 +32,10 @@ namespace Ldraw.Lego
 
 			public override void VisitSubModel(PartNode node)
 			{
+				if(node.Contents.File == null)
+				{
+					return;
+				}
 				if(node.Contents.File is LdrawPart)
 				{
 					parts.add(node);

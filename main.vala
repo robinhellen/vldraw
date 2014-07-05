@@ -21,10 +21,12 @@ namespace Ldraw
 
 			// Parts library
 			builder.RegisterInstance<ILibrary>(lib);
-			builder.RegisterInstance<IDatFileCache>(lib);
+			builder.RegisterInstance<ILdrawFolders>(lib);
+			//builder.RegisterInstance<IDatFileCache>(lib);
 
 			// Model file handling
 			builder.Register<LdrawFileLoader>();
+			builder.Register<LdrawParser>().InstancePerDependency();
 
 			// Peeron communication
 			builder.Register<InventoryReader>();
@@ -34,7 +36,12 @@ namespace Ldraw
 			builder.Register<PartsTree>();
 			builder.Register<SetList>();
 
-			builder.Register<LibraryObjectLocator>();
+			builder.Register<LibrarySubFileLocator>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.PartsOnly);
+			builder.Register<OnDemandSubFileLoader>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.SubPartsAndPrimitives);
+
+			builder.RegisterAsInterface<OnDemandPartLoader, IDatFileCache>();
+
+			builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
 
 			var container = builder.Build();
 
@@ -55,7 +62,7 @@ namespace Ldraw
 			var loader = container.Resolve<LdrawFileLoader>();
 			try
 			{
-				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd");
+				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd", ReferenceLoadStrategy.PartsOnly);
 			}
 			catch(Error e)
 			{

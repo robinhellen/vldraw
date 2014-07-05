@@ -28,7 +28,7 @@ namespace Ldraw.Lego
 					if(line == "")
 						continue; // ignore blank lines
 
-					LdrawNode nodeForLine = parser.ParseLine(line);
+					LdrawNode nodeForLine = parser.ParseLine(line, ReferenceLoadStrategy.PartsOnly);
 					if(nodeForLine is Comment)
 						if(HandleCommentLine(line))
 							continue;

@@ -12,12 +12,7 @@ namespace Ldraw.Lego
 
 	public class LibrarySubFileLocator : Object, ISubFileLocator
 	{
-		private IDatFileCache library;
-
-		public LibrarySubFileLocator(IDatFileCache library)
-		{
-			this.library = library;
-		}
+		public IDatFileCache Library {construct; private get;}
 
 		public LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
@@ -25,7 +20,7 @@ namespace Ldraw.Lego
 			var partName = reference.substring(0, reference.last_index_of("."));
 
 			LdrawPart part;
-			if(library.TryGetPart(partName, out part))
+			if(Library.TryGetPart(partName, out part))
 				return part.MainObject;
 
 			return null;
@@ -183,4 +178,9 @@ namespace Ldraw.Lego
 		HiResPrimitive = 8,
 	}
 
+	public enum ReferenceLoadStrategy
+	{
+		PartsOnly,
+		SubPartsAndPrimitives,
+	}
 }

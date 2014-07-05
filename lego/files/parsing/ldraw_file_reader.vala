@@ -12,21 +12,23 @@ namespace Ldraw.Lego
 			m_Parser = parser;
 		}
 
-		public Generator<LdrawNode> GetNodesFromFile(File file)
+		public Generator<LdrawNode> GetNodesFromFile(File file, ReferenceLoadStrategy strategy)
 			throws ParseError
 		{
-			return new NodeGenerator(file, m_Parser);
+			return new NodeGenerator(file, m_Parser, strategy);
 		}
 
 		private class NodeGenerator : Generator<LdrawNode>
 		{
 			private File m_File;
 			private LdrawParser m_Parser;
+			private ReferenceLoadStrategy strategy;
 
-			public NodeGenerator(File file, LdrawParser parser)
+			public NodeGenerator(File file, LdrawParser parser, ReferenceLoadStrategy strategy)
 			{
 				m_File = file;
 				m_Parser = parser;
+				this.strategy = strategy;
 				helper.begin();
 			}
 
@@ -44,7 +46,7 @@ namespace Ldraw.Lego
 						if(line == "")
 							continue; // ignore blank lines
 
-						LdrawNode nodeForLine = m_Parser.ParseLine(line);
+						LdrawNode nodeForLine = m_Parser.ParseLine(line, strategy);
 						if(nodeForLine != null)
 							yield feed(nodeForLine);
 					}

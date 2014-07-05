@@ -22,11 +22,7 @@ namespace Ldraw.Lego.Library
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filename.");
 			}
-			base.FromFile(partFile, new LdrawParser(
-						new PartialLibrarySubFileLocator(LibraryObjectTypes.Part
-													| LibraryObjectTypes.SubPart
-													| LibraryObjectTypes.Primitive
-													| LibraryObjectTypes.HiResPrimitive, library)));
+			base.FromFile(partFile, new LdrawParser());
 
 			m_FileName = filename;
 
