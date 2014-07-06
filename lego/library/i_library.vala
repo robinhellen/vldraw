@@ -6,9 +6,17 @@ namespace Ldraw.Lego.Library
 	{
 		public abstract Set<string> AllCategories {	owned get;}
 
-		public abstract Collection<LdrawPart> GetPartsByCategory(string? category);
+		public abstract Collection<IPartMetadata> GetPartsByCategory(string? category);
 
-		public abstract Collection<LdrawPart> GetVariantsOf(LdrawPart part);
+		//public abstract Collection<LdrawPart> GetVariantsOf(LdrawPart part);
+	}
+
+	public interface IPartMetadata : Object
+	{
+		public abstract string Name {get;}
+		public abstract string Category {get;}
+		public abstract string Description {get;}
+		public abstract Collection<string> Keywords {get;}
 	}
 
 	public interface IDatFileCache : Object

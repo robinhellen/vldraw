@@ -56,7 +56,7 @@ namespace Ldraw.Ui.Widgets
 
 			var parts = library.GetPartsByCategory(category);
 
-			foreach(LdrawPart part in parts)
+			foreach(IPartMetadata part in parts)
 			{
 				TreeIter partIter;
 				store.append(out partIter, categoryIter);
@@ -87,7 +87,7 @@ namespace Ldraw.Ui.Widgets
 				return;
 			}
 
-			LdrawPart current = CurrentPart;
+			LdrawPart current = CurrentPart as LdrawPart;
 			if(current == null)
 				return;
 
@@ -96,12 +96,12 @@ namespace Ldraw.Ui.Widgets
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
-			LdrawPart current = CurrentPart;
+			IPartMetadata current = CurrentPart;
 			string currentName = current.Name;
 			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
 		}
 
-		private LdrawPart? CurrentPart
+		private IPartMetadata? CurrentPart
 		{
 			get
 			{
@@ -122,7 +122,7 @@ namespace Ldraw.Ui.Widgets
 					Value partVal ;
 					model.get_value(active, 3, out partVal);
 					GLib.Object partObj = partVal.get_object();
-					return partObj as LdrawPart;
+					return partObj as IPartMetadata;
 				}
 				return null;
 			}

@@ -187,9 +187,9 @@ namespace Ldraw.Lego.Library
 			}
 		}
 
-		public Collection<LdrawPart> GetPartsByCategory(string? category)
+		public Collection<IPartMetadata> GetPartsByCategory(string? category)
 		{
-			ArrayList<LdrawPart> parts = new ArrayList<LdrawPart>();
+			ArrayList<IPartMetadata> parts = new ArrayList<IPartMetadata>();
 			foreach(LdrawPart part in m_Parts)
 			{
 				if(part.Category == category)

@@ -2,7 +2,7 @@ using Gee;
 
 namespace Ldraw.Lego.Library
 {
-	public class LdrawPart : LdrawFile, Comparable<LdrawPart>
+	public class LdrawPart : LdrawFile, Comparable<LdrawPart>, IPartMetadata
 	{
 		private string m_Description = null;
 		private string m_Category = null;
@@ -10,8 +10,6 @@ namespace Ldraw.Lego.Library
 		private string m_Name;
 		private string m_BaseName;
 		private Gee.List<string> m_Keywords = new ArrayList<string>();
-
-		public static int s_Creations = 0;
 
 		public LdrawPart(string filename, LdrawLibrary library)
 			throws ParseError
@@ -35,8 +33,6 @@ namespace Ldraw.Lego.Library
 				else
 					break;
 			}
-
-			s_Creations++;
 		}
 
 		public string Description { get{ return m_Description;}}
@@ -50,6 +46,14 @@ namespace Ldraw.Lego.Library
 					m_Category = m_Description.split(" ")[0];
 				}
 				return m_Category;
+			}
+		}
+
+		public Collection<string> Keywords
+		{
+			get
+			{
+				return m_Keywords;
 			}
 		}
 
