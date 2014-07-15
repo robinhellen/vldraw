@@ -60,7 +60,6 @@ namespace Ldraw.Lego.Library
 					continue;
 
 				string name = current_file.get_name();
-				stderr.printf(@"loading $name.\n");
 
 				LdrawPart part;
 				PartFiles.TryGetPart(name.substring(0, name.last_index_of(".")), out part);
@@ -78,12 +77,10 @@ namespace Ldraw.Lego.Library
 			{
 				categories = new HashMultiMap<string, IPartMetadata>();
 				var reader = new Reader(parser.get_root());
-				stderr.printf("Loading part metadata from file.\n");
 				foreach(string member in reader.list_members())
 				{
 					if(reader.read_member(member))
 					{
-						stderr.printf(@"loading category: $member.\n");
 						int i = 0;
 						while(reader.read_element(i++))
 						{
@@ -104,10 +101,8 @@ namespace Ldraw.Lego.Library
 			string category = null;
 			Collection<string> keywords = new ArrayList<string>();
 
-			stderr.printf("reading metadata.\n");
 			foreach(string member in reader.list_members())
 			{
-				stderr.printf(@"reading member: $member.\n");
 				reader.read_member(member);
 				switch(member)
 				{

@@ -11,7 +11,6 @@ namespace Ldraw.Export
 	{
 		public void ExportJpg(LdrawObject model, string filename)
 		{
-			stderr.printf(@"Exporting a model to $filename.\n");
 			var angle = Ui.Widgets.ViewAngle.Ortho;
 
 			var pixmap = new Pixmap(null, 800, 600, 24);

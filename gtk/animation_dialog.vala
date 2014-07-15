@@ -125,10 +125,8 @@ namespace Ldraw.Ui
 
 		private void SetSelectionAnimation()
 		{
-			stderr.printf("Setting animation for selection\n");
 			foreach(var node in model.Model.Selection)
 			{
-				stderr.printf("Setting animation for node\n");
 				SetNodeAnimation(node);
 			}
 		}
@@ -143,10 +141,8 @@ namespace Ldraw.Ui
 
 			if(hasRotation)
 			{
-				stderr.printf("Creating animation nodes\n");
 				var newCommand = new AnimRotateCommand.Rotation(rotationAxis, rotationAngle);
 				model.Model.InsertNode(newCommand, node);
-				stderr.printf("Created animation nodes\n");
 			}
 		}
 
