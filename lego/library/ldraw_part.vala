@@ -1,12 +1,13 @@
 using Gee;
 
+using Ldraw.Lego.Nodes;
+
 namespace Ldraw.Lego.Library
 {
 	public class LdrawPart : LdrawFile, Comparable<LdrawPart>, IPartMetadata
 	{
 		private string m_Description = null;
 		private string m_Category = null;
-		private string m_FileName;
 		private string m_Name;
 		private string m_BaseName;
 		private Gee.List<string> m_Keywords = new ArrayList<string>();
@@ -22,7 +23,7 @@ namespace Ldraw.Lego.Library
 			}
 			base.FromFile(partFile, new LdrawParser());
 
-			m_FileName = filename;
+			FileName = filename;
 
 			m_Name = filename.substring(0, filename.last_index_of_char('.'));
 			m_BaseName = "";
@@ -35,15 +36,39 @@ namespace Ldraw.Lego.Library
 			}
 		}
 
-		public string Description { get{ return m_Description;}}
+		public string Description
+		{
+			get
+			{
+				if(m_Description == null)
+				{
+					foreach(var comment in MainObject.NodesOfType<Comment>())
+					{
+						m_Description = comment.Description;
+						break;
+					}
+				}
+				return m_Description;
+			}
+		}
 
 		public string Category
 		{
 			get
 			{
-				if(m_Category == null && m_Description != null)
+				if(m_Category == null)
+					foreach(var comment in MainObject.NodesOfType<Comment>())
+					{
+						var words = comment.Description.split(" ");
+						if(words[0] == "!CATEGORY")
+						{
+							m_Category = words[1];
+							break;
+						}
+					}
+				if(m_Category == null)
 				{
-					m_Category = m_Description.split(" ")[0];
+					m_Category = Description.split(" ")[0];
 				}
 				return m_Category;
 			}
@@ -72,7 +97,7 @@ namespace Ldraw.Lego.Library
 				string category = line.substring(12);
 				if(m_Category != null)
 				{
-					string s = "Part '" + m_FileName + @"' has two category lines. \nFirst: $m_Category\n Second: $category";
+					string s = "Part '" + FileName + @"' has two category lines. \nFirst: $m_Category\n Second: $category";
 					throw new ParseError.InvalidComment(s);
 				}
 				m_Category = category;
@@ -97,6 +122,9 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
+				if(m_Name == null)
+					m_Name = FileName.substring(0, FileName.last_index_of_char('.'));
+
 				return m_Name;
 			}
 		}

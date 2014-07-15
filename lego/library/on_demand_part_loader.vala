@@ -69,14 +69,15 @@ namespace Ldraw.Lego.Library
 		{
 			var reader = new LdrawFileReader(Parser);
 
-			var nodeIter = reader.GetNodesFromFile(folder.get_child(name + ".dat"), ReferenceLoadStrategy.SubPartsAndPrimitives);
+			string filename = name + ".dat";
+			var nodeIter = reader.GetNodesFromFile(folder.get_child(filename), ReferenceLoadStrategy.SubPartsAndPrimitives);
 			var nodes = new ArrayList<LdrawNode>();
 			foreach(var node in nodeIter)
 			{
 				nodes.add(node);
 			}
-			var object = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: name + ".dat");
-			return (T)Object.new(typeof(T), MainObject: object);
+			var object = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: filename);
+			return (T)Object.new(typeof(T), MainObject: object, FileName: filename);
 		}
 	}
 

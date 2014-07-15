@@ -20,9 +20,9 @@ namespace Ldraw
 			var builder = new CreatorBuilder();
 
 			// Parts library
-			builder.RegisterInstance<ILibrary>(lib);
+			//builder.RegisterInstance<ILibrary>(lib);
 			builder.RegisterInstance<ILdrawFolders>(lib);
-			//builder.RegisterInstance<IDatFileCache>(lib);
+			//Sbuilder.RegisterInstance<IDatFileCache>(lib);
 
 			// Model file handling
 			builder.Register<LdrawFileLoader>();
@@ -40,6 +40,7 @@ namespace Ldraw
 			builder.Register<OnDemandSubFileLoader>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 
 			builder.RegisterAsInterface<OnDemandPartLoader, IDatFileCache>();
+			builder.RegisterAsInterface<FileCachedLibrary, ILibrary>().AsInterface<ILibrary>();
 
 			builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
 

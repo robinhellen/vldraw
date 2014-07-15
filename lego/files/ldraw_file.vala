@@ -57,13 +57,13 @@ namespace Ldraw.Lego
 		}
 
 		public LdrawObject MainObject {get; construct set;}
+
+		public string FileName {get; construct set;}
 	}
 
 	public abstract class LdrawModelFile : LdrawFile
 	{
 		public abstract void Save();
-
-		public string FileName { get; construct set; }
 
 		public string FilePath {get; construct set;}
 	}
