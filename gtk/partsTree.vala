@@ -38,7 +38,7 @@ namespace Ldraw.Ui.Widgets
 
 		private TreeModel CreateAndPopulateModel(ILibrary library)
 		{
-			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(LdrawPart));
+			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(IPartMetadata));
 
 			foreach(string category in library.AllCategories)
 			{
