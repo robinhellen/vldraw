@@ -69,7 +69,7 @@ namespace Ldraw.Lego.Library
 			}
 		}
 
-		public static void ReadAllColours(LdrawLibrary library)
+		public static void ReadAllColours(ILdrawFolders library)
 			throws InitializationError
 		{
 			File ldrawDir = library.LibraryDirectory;

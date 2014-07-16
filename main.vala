@@ -15,13 +15,10 @@ namespace Ldraw
 	{
 		public static int main(string[] args)
 		{
-			LdrawLibrary lib = new LdrawLibrary();
-			LdrawColour.ReadAllColours(lib);
-
 			var builder = new CreatorBuilder();
 
 			// Parts library
-			builder.RegisterInstance<ILdrawFolders>(lib);
+			builder.RegisterAsInterface<LdrawLibrary, ILdrawFolders>().AsInterface<ILdrawFolders>();
 
 			// Model file handling
 			builder.Register<LdrawFileLoader>();
@@ -45,7 +42,8 @@ namespace Ldraw
 
 			var container = builder.Build();
 
-
+			// load up the colours
+			LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
 			// initialize Gtk and OpenGL
 			init(ref args);
 			Gdk.gl_init(ref args);

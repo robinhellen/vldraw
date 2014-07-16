@@ -12,7 +12,7 @@ namespace Ldraw.Lego.Library
 		private File m_PrimitivesDirectory;
 		private File m_HiresPrimitivesDirectory;
 
-		public LdrawLibrary()
+		construct
 		{
 			m_LibraryDir = File.new_for_path("/home/robin/ldraw");
 			m_PartsDirectory = m_LibraryDir.get_child("parts");
