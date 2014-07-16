@@ -1,4 +1,5 @@
 using Gdk;
+using Gee;
 using Gtk;
 
 using Ldraw.Lego;
@@ -40,7 +41,10 @@ namespace Ldraw.Ui.Widgets
 		{
 			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(IPartMetadata));
 
-			foreach(string category in library.AllCategories)
+			var categories = new LinkedList<string>();
+			categories.add_all(library.AllCategories);
+			categories.sort();
+			foreach(string category in categories)
 			{
 				PopulatePartsForCategory(store, category, library);
 			}
