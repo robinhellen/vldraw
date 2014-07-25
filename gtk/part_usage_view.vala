@@ -5,7 +5,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	public class PartUsageViewModel : TreeModel, GLib.Object
+	public class PartUsageViewModel : TreeModel, TreeDragSource, GLib.Object
 	{
 		private ObservableList<PartGroupItem> used;
 		private ObservableList<PartGroupItem> unused;
@@ -427,6 +427,25 @@ namespace Ldraw.Ui
 				default:
 					assert_not_reached();
 			}
+		}
+
+		public bool drag_data_delete(TreePath path)
+		{
+			return false;
+		}
+
+		public bool drag_data_get(TreePath path, SelectionData selData)
+		{
+			return false;
+		}
+
+		public bool row_draggable(TreePath path)
+		{
+			if(path.get_depth() != 2)
+				return false;
+			if(path.get_indices()[0] != 0)
+				return false;
+			return true;
 		}
 	}
 }

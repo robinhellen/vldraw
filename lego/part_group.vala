@@ -32,16 +32,17 @@ namespace Ldraw.Lego
 
 			public override void VisitSubModel(PartNode node)
 			{
-				if(node.Contents.File == null)
+				var file = node.Contents.File;
+				if(file == null)
 				{
 					return;
 				}
-				if(node.Contents.File is LdrawPart)
+				if(file is LdrawPart)
 				{
 					parts.add(node);
 				}
-				else if(node.Contents.File is LdrawModel
-						|| node.Contents.File is MultipartModel)
+				else if(file is LdrawModel
+						|| file is MultipartModel)
 				{
 					node.Contents.BuildFromFile(this);
 				}
@@ -54,12 +55,15 @@ namespace Ldraw.Lego
 			public Collection<PartGroupItem> GetItems()
 			{
 				var result = new ArrayList<PartGroupItem>();
-				var map = new TreeMap<LdrawPart, MultiMap<LdrawColour?, PartNode>>();
+				var map = new HashMap<LdrawPart, MultiMap<LdrawColour?, PartNode>>();
 				foreach(var p in parts)
 				{
-					if(map[p.Contents.File as LdrawPart] == null)
-						map[p.Contents.File as LdrawPart] = new HashMultiMap<LdrawColour?, PartNode>();
-					map[p.Contents.File as LdrawPart][LdrawColour.GetColour(p.ColourId)] = p;
+					var partFile = p.Contents.File as LdrawPart;
+					if(map[partFile] == null)
+					{
+						map[partFile] = new HashMultiMap<LdrawColour?, PartNode>();
+					}
+					map[partFile][LdrawColour.GetColour(p.ColourId)] = p;
 				}
 				foreach(LdrawPart p in map.keys)
 				{

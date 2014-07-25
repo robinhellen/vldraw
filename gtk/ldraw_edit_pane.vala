@@ -160,7 +160,14 @@ namespace Ldraw.Ui.Widgets
 				get_pointer(out x, out y);
 			}
 
+			int? colourCode = null;
 			string partName = (string)selection_data.data;
+			if(partName.contains(","))
+			{
+				var sections = partName.split(",");
+				partName = sections[0];
+				colourCode = int.parse(sections[1]);
+			}
 
 			var droppedObject = locator.GetObjectForName(partName);
 
@@ -179,7 +186,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				newTransform = copyPart.Transform;
 				newPosition = copyPart.Center;
-				newColour = copyPart.ColourId;
+				newColour = colourCode ?? copyPart.ColourId;
 			}
 
 			Allocation alloc;

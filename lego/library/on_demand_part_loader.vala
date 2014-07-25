@@ -14,7 +14,6 @@ namespace Ldraw.Lego.Library
 		private Map<string, LdrawPart> partsCache = new HashMap<string, LdrawPart>();
 		private Map<string, LdrawSubPart> subpartsCache = new HashMap<string, LdrawSubPart>();
 
-
 		public bool TryGetPrimitive(string name, out LdrawPrimitive primitive)
 		{
 			return TryGetFile(name, primitivesCache, Folders.PrimitivesDirectory, out primitive);
@@ -38,12 +37,15 @@ namespace Ldraw.Lego.Library
 		private bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
 		{
 			if(InCache(name, cache, out result))
+			{
 				return true;
+			}
 
 			if(!FolderHasFile(folder, name))
 				return false;
 
 			result = LoadFile(name, folder);
+			cache[name] = result;
 			return true;
 		}
 
@@ -77,7 +79,9 @@ namespace Ldraw.Lego.Library
 				nodes.add(node);
 			}
 			var object = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: filename);
-			return (T)Object.new(typeof(T), MainObject: object, FileName: filename);
+			var file = (T)Object.new(typeof(T), MainObject: object, FileName: filename);
+			object.File = (LdrawFile) file;
+			return file;
 		}
 	}
 

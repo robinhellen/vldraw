@@ -110,16 +110,49 @@ namespace Ldraw.Ui
 						}
 					});
 
-			append_column_for_children_only(partsView, new CellRendererText(),
-					(cell, item) => ((CellRendererText)cell).text = @"$(item.Quantity) x $(item.Colour.Name)");
+			append_column_for_children_only<CellRendererText>(partsView, new CellRendererText(),
+					(cell, item) => cell.text = @"$(item.Quantity) x $(item.Colour.Name)",
+					cell => cell.text = "");
 			add2(WithScrolls(partsView));
+
+			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
+			partsView.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
+			partsView.drag_data_get.connect((context, data, info, time) =>
+				{
+					TreeIter active;
+					TreeSelection sel = partsView.get_selection();
+					TreeModel model;
+					if(!sel.get_selected(out model, out active))
+					{
+						return; // no selection
+					}
+
+					Value val;
+					model.get_value(active, 0, out val);
+					int rowType = val.get_int();
+
+					if(rowType != 1)
+						return;
+
+					Value partVal ;
+					model.get_value(active, 2, out partVal);
+					GLib.Object partObj = partVal.get_object();
+					var current = partObj as PartGroupItem;
+
+					string currentName = current.Part.Name;
+					var colourId = current.Colour.Code;
+					var dragData = @"$currentName,$colourId";
+					data.set(Gdk.Atom.intern("LdrawFile", false), 8, dragData.data);
+				});
 		}
 
-		private delegate void RenderDelegate(CellRenderer cell, PartGroupItem item);
+		private delegate void RenderDelegate<T>(T cell, PartGroupItem item);
+		private delegate void EmptyRenderDelegate<T>(T cell);
 
-		private void append_column_for_children_only(TreeView view, CellRenderer cell, RenderDelegate renderer)
+		private void append_column_for_children_only<T>(TreeView view, T cell, RenderDelegate<T> renderer, EmptyRenderDelegate<T> emptyCellRenderer)
+			requires(typeof(T).is_a(typeof(CellRenderer)))
 		{
-			view.insert_column_with_data_func(-1, "", cell,
+			view.insert_column_with_data_func(-1, "", (CellRenderer)cell,
 					(col, cell, model, iter) =>
 					{
 						Value rowTypeValue;
@@ -133,6 +166,10 @@ namespace Ldraw.Ui
 							if(item == null)
 								return;
 							renderer(cell, item);
+						}
+						else
+						{
+							emptyCellRenderer(cell);
 						}
 					});
 		}
