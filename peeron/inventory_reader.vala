@@ -11,10 +11,11 @@ namespace Ldraw.Peeron
 			throws GLib.Error
 		{
 			var url = @"http://peeron.com/inv/sets/$setNumber";
-			var session = new SessionSync();
+			var session = new Session();
 			var rq = session.request(url);
 
-			var stream = new DataInputStream(rq.send());
+			var rawStream = yield rq.send_async(null);
+			var stream = new DataInputStream(rawStream);
 			var data = stream.read_upto("\0", 1, null);
 
 			var doc = Doc.read_doc(data, url, null);
