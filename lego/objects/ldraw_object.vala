@@ -177,6 +177,7 @@ namespace Ldraw.Lego
 			m_BoundingBox = null;
 			newNode.notify["ColourId"].connect(() => VisibleChange());
 			newNode.notify["Selected"].connect(() => VisibleChange());
+			VisibleChange();
 		}
 
 		public void AddHeaderNode(LdrawNode node)
