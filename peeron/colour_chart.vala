@@ -19,7 +19,7 @@ namespace Ldraw.Peeron
 				return;
 
 			var url = @"http://peeron.com/inv/colors";
-			var session = new SessionSync();
+			var session = new Session();
 			var rq = session.request(url);
 
 			var stream = new DataInputStream(rq.send());
