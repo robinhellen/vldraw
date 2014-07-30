@@ -74,8 +74,12 @@ namespace Ldraw.Ui
 					if(response != ResponseType.ACCEPT)
 						return;
 
-					sets.add(InventoryReader.GetInventoryFor(setname));
-					UpdateUsage();
+					InventoryReader.GetInventoryFor.begin(setname,
+						(obj, res) =>
+					{
+						sets.add(InventoryReader.GetInventoryFor.end(res));
+						UpdateUsage();
+					});
 				});
 				setButtons.pack_start(addButton);
 

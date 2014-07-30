@@ -7,7 +7,7 @@ namespace Ldraw.Peeron
 {
 	public class InventoryReader : GLib.Object
 	{
-		public Inventory GetInventoryFor(string setNumber)
+		public async Inventory GetInventoryFor(string setNumber)
 			throws GLib.Error
 		{
 			var url = @"http://peeron.com/inv/sets/$setNumber";
