@@ -18,6 +18,11 @@ namespace Ldraw.Ui.Widgets
 			construct; get;
 		}
 
+		public IDatFileCache DatFileCache
+		{
+			construct; get;
+		}
+
 		construct
 		{
 			m_Tree = new TreeView.with_model(CreateAndPopulateModel(Library));
@@ -91,11 +96,13 @@ namespace Ldraw.Ui.Widgets
 				return;
 			}
 
-			LdrawPart current = CurrentPart as LdrawPart;
+			var current = CurrentPart;
 			if(current == null)
 				return;
 
-			m_Detail.Model = current.MainObject;
+			LdrawPart part;
+			if(DatFileCache.TryGetPart(current.Name, out part))
+				m_Detail.Model = part.MainObject;
 		}
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
