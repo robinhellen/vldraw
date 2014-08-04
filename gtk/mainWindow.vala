@@ -34,6 +34,7 @@ namespace Ldraw.Ui
 
 		public IOptions Settings {construct; private get;}
 		public LdrawFileLoader Loader {construct; private get;}
+		public ILdrawFolders LdrawFolders {construct; private get;}
 
 		public MainWindow.WithModel(IOptions settings,
 									LdrawFileLoader loader,
@@ -41,7 +42,8 @@ namespace Ldraw.Ui
 									DependencyResolutionContext context)
 			throws OpenGl.GlError
 		{
-			GLib.Object(Loader: loader, Settings: settings);
+			var folders = context.Resolve<ILdrawFolders>();
+			GLib.Object(Loader: loader, Settings: settings, LdrawFolders: folders);
 
 			EditingObject = new AnimatedModel(model.MainObject);
 
@@ -355,8 +357,7 @@ namespace Ldraw.Ui
 			FileFilter filter = new FileFilter();
 			filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
 
-			string modelsFolder = "/home/robin/ldraw/MODELS";
-			dialog.set_current_folder(modelsFolder);
+			dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
 
 			if(dialog.run() == ResponseType.ACCEPT)
 			{
@@ -398,8 +399,7 @@ namespace Ldraw.Ui
 			FileFilter filter = new FileFilter();
 			filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
 
-			string modelsFolder = "/home/robin/ldraw/models";
-			dialog.set_current_folder(modelsFolder);
+			dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
 
 			if(dialog.run() == ResponseType.ACCEPT)
 			{

@@ -11,6 +11,7 @@ namespace Ldraw.Lego.Library
 		private File m_SubPartsDirectory;
 		private File m_PrimitivesDirectory;
 		private File m_HiresPrimitivesDirectory;
+		private File m_ModelsDirectory;
 
 		construct
 		{
@@ -19,6 +20,12 @@ namespace Ldraw.Lego.Library
 			m_SubPartsDirectory = m_PartsDirectory.get_child("s");
 			m_PrimitivesDirectory = m_LibraryDir.get_child("p");
 			m_HiresPrimitivesDirectory = m_PrimitivesDirectory.get_child("48");
+
+			m_ModelsDirectory = m_LibraryDir.get_child("models");
+			if(!m_ModelsDirectory.query_exists())
+			{
+				m_ModelsDirectory = m_LibraryDir.get_child("MODELS");
+			}
 		}
 
 		public File LibraryDirectory
@@ -60,6 +67,8 @@ namespace Ldraw.Lego.Library
 				return m_HiresPrimitivesDirectory;
 			}
 		}
+
+		public File ModelsDirectory {get{return m_ModelsDirectory;}}
 	}
 
 	public errordomain InitializationError

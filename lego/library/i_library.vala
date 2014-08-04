@@ -41,5 +41,7 @@ namespace Ldraw.Lego.Library
 		public abstract File PrimitivesDirectory { get; }
 
 		public abstract File HiresPrimitivesDirectory { get; }
+
+		public abstract File ModelsDirectory {get;}
 	}
 }
