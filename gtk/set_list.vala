@@ -36,6 +36,7 @@ namespace Ldraw.Ui
 			set
 			{
 				modelFile = value;
+				modelFile.MainObject.VisibleChange.connect(UpdateUsage);
 				UpdateUsage();
 			}
 		}
