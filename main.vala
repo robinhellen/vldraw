@@ -81,21 +81,4 @@ namespace Ldraw
 			return 0;
 		}
 	}
-
-	public class TextProgress : GLib.Object, IReportProgress
-	{
-		private Map<string, int> last_values = new HashMap<string, int>();
-
-		public void Report(string event, float progress)
-		{
-			var last_value = last_values[event];
-			var currentD = (progress * 100);
-			var current = (int)currentD;
-			if(last_value == current)
-				return;
-
-			stdout.printf(@"$event: $current%\n");
-			last_values[event] = current;
-		}
-	}
 }
