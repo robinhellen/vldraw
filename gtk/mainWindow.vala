@@ -563,7 +563,6 @@ namespace Ldraw.Ui
 		public LdrawObject Model
 		{
 			get{return EditingObject.Model;}
-			protected set{}
 		}
 	}
 
