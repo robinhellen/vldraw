@@ -73,7 +73,12 @@ namespace Ldraw.Ui.Widgets
 					model.get(iter, 0, out node);
 					var renderer = ((CellRendererSpin)cell);
 
-					renderer.text = (Model.CurrentParameters[node.Identifier] ?? node.Min).to_string();
+					var defaultValue = 0.0F;
+					if(node.Min > 0)
+						defaultValue = node.Min;
+					if(node.Max < 0)
+						defaultValue = node.Max;
+					renderer.text = (Model.CurrentParameters[node.Identifier] ?? defaultValue).to_string();
 					renderer.adjustment = new Adjustment(0, 0, 0, 0, 0, 0);
 				});
 		}

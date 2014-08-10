@@ -154,7 +154,9 @@ namespace Ldraw.OpenGl
 			{
 				var identifier = param.Identifier;
 				var p = state.Parameters[identifier];
-				if(p == null || p < param.Min)
+				if(p == null)
+					p = 0;
+				if(p < param.Min)
 					state.Variables[identifier] = param.Min;
 				else if ( p > param.Max)
 					state.Variables[identifier] = param.Max;
