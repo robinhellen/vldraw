@@ -14,7 +14,7 @@ using Ldraw.Utils.Di;
 
 namespace Ldraw.Ui
 {
-	public class MainWindow : Window//, IHaveModel
+	public class MainWindow : Window
 	{
 		private LdrawModelFile m_Model;
 		public AnimatedModel EditingObject {get; set;}
@@ -140,6 +140,7 @@ namespace Ldraw.Ui
 		}
 
 		private LdrawViewPane CreatePreviewPane()
+			throws OpenGl.GlError
 		{
 			LdrawViewPane previewPane;
 			try
@@ -149,7 +150,7 @@ namespace Ldraw.Ui
 			catch(OpenGl.GlError e)
 			{
 				stderr.printf(e.message);
-				return null;
+				throw e;
 			}
 			previewPane.set_size_request(200, 200);
 			previewPane.DefaultColour = Settings.PreviewColourId;
