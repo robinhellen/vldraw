@@ -24,8 +24,8 @@ namespace Ldraw.Ui.Widgets
 
 			dialog = new Dialog.with_buttons("Model details", parent,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-				Stock.OK, ResponseType.ACCEPT,
-				Stock.CANCEL, ResponseType.REJECT);
+				"_OK", ResponseType.ACCEPT,
+				"_Cancel", ResponseType.REJECT);
 
 			var actionArea = (VBox)dialog.get_content_area();
 			var paramList = new TreeView.with_model(model);

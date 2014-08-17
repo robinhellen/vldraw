@@ -51,15 +51,15 @@ namespace Ldraw.Ui
 
 		private void InitializeControls()
 		{
-			var setControls = new VBox(false, 0);
-			var setButtons = new HBox(true, 2);
+			var setControls = new Box(Orientation.VERTICAL, 0);
+			var setButtons = new Box(Orientation.HORIZONTAL, 2);
 			var addButton = new Button.with_label("Add");
 			addButton.clicked.connect(() =>
 				{
 					var dialog = new Dialog.with_buttons("Set number", null,
 						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						Stock.OK, ResponseType.ACCEPT,
-						Stock.CANCEL, ResponseType.REJECT);
+						("_OK"), ResponseType.ACCEPT,
+						("_Cancel"), ResponseType.REJECT);
 
 					var content = (Box) dialog.get_content_area();
 					var setnameEntry = new Entry();

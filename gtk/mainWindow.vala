@@ -62,7 +62,7 @@ namespace Ldraw.Ui
 			// start with a menubar as that runs across the whole window
 			var accelerators = SetUpAccelerators();
 			MenuBar menus = CreateMenus(accelerators);
-			VBox bigVBox = new VBox(false, 0);
+			var bigVBox = new Box(Orientation.VERTICAL, 0);
 			bigVBox.pack_start(menus, false, false);
 
 			Toolbar tools = toolbarProvider.GetMovementToolbar();
@@ -92,7 +92,7 @@ namespace Ldraw.Ui
 			// add a list of available parts on the left
 			m_PartDetail = CreatePreviewPane();
 			parts = context.Resolve<PartsTree>();
-			var treeDetailBox = new VBox(false, 0);
+			var treeDetailBox = new Box(Orientation.VERTICAL, 0);
 
 			parts.DetailView = m_PartDetail;
 
@@ -101,7 +101,7 @@ namespace Ldraw.Ui
 			notebook.append_page(treeDetailBox, new Label("Parts"));
 
 
-			var subModelsBox = new VBox(false, 0);
+			var subModelsBox = new Box(Orientation.VERTICAL, 0);
 			var subModelPreview = CreatePreviewPane();
 
 			subModels = new SubModelsTree();
@@ -119,11 +119,11 @@ namespace Ldraw.Ui
 			bind_property("File", setList, "ModelFile");
 			notebook.append_page(setList, new Label("Sets"));
 
-			Paned treePaned = new HPaned();
+			var treePaned = new Paned(Orientation.HORIZONTAL);
 			treePaned.add1(WithFrame(notebook));
 
-			Paned modelPanes = new VPaned();
-			VBox viewDetails = new VBox(false, 2);
+			var modelPanes = new Paned(Orientation.VERTICAL);
+			var viewDetails = new Box(Orientation.VERTICAL, 2);
 			m_SubModels = CreateSubModelsDropDown();
 			viewDetails.pack_start(m_SubModels, false, false);
 
@@ -352,8 +352,8 @@ namespace Ldraw.Ui
 		private void FileOpen_OnActivate()
 		{
 			FileChooserDialog dialog = new FileChooserDialog("Open File", this, FileChooserAction.OPEN
-												, Stock.CANCEL, ResponseType.CANCEL
-												, Stock.OPEN, ResponseType.ACCEPT);
+												, "_Cancel", ResponseType.CANCEL
+												, "_Open", ResponseType.ACCEPT);
 
 			FileFilter filter = new FileFilter();
 			filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
@@ -394,8 +394,8 @@ namespace Ldraw.Ui
 		private void FileSaveAs_OnActivate()
 		{
 			FileChooserDialog dialog = new FileChooserDialog("Save File As", this, FileChooserAction.SAVE
-												, Stock.CANCEL, ResponseType.CANCEL
-												, Stock.SAVE, ResponseType.ACCEPT);
+												, "_Cancel", ResponseType.CANCEL
+												, "_Save", ResponseType.ACCEPT);
 
 			FileFilter filter = new FileFilter();
 			filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
@@ -428,8 +428,8 @@ namespace Ldraw.Ui
 		{
 			var dialog = new Dialog.with_buttons("Model details", this,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-				Stock.OK, ResponseType.ACCEPT,
-				Stock.CANCEL, ResponseType.REJECT);
+				"_OK", ResponseType.ACCEPT,
+				"_Cancel", ResponseType.REJECT);
 
 			var content = (Box) dialog.get_content_area();
 			var table = new Table(3, 2, false);
@@ -537,7 +537,7 @@ namespace Ldraw.Ui
 		{
 			var dialog = new Dialog.with_buttons("Model details", this,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-				Stock.OK, ResponseType.ACCEPT);
+				"_OK", ResponseType.ACCEPT);
 
 			var content = (Box) dialog.get_content_area();
 			var parts = new PartGroup.FromModel(File);

@@ -13,8 +13,8 @@ namespace Ldraw.Ui.Widgets
 
 		public FourPaned()
 		{
-			left = new VPaned();
-			right = new VPaned();
+			left = new Paned(Orientation.VERTICAL);
+			right = new Paned(Orientation.VERTICAL);
 
 			add1(left);
 			add2(right);
