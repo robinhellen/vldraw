@@ -157,7 +157,7 @@ namespace Ldraw.Ui.Widgets
 			if(!finishDrag)
 			{
 				// this is the drag motion, so the provided mouse coordinates are bunkum
-				get_pointer(out x, out y);
+				get_window().get_device_position(get_current_event_device(), out x, out y, null);
 			}
 
 			int? colourCode = null;

@@ -128,10 +128,13 @@ namespace Ldraw.Lego.Library
 			return null;
 		}
 
-		public static string GetName(int code)
+		public static string? GetName(int code)
 			requires (code <= 512 && code >= 0)
 		{
-			return s_Colours[code].m_Name;
+			var colour = s_Colours[code];
+			if(colour == null)
+				return null;
+			return colour.m_Name;
 		}
 
 		public static void SurfaceColour(int code, out float red, out float green, out float blue, out float alpha)

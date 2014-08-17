@@ -219,7 +219,7 @@ namespace Ldraw.Ui
 
 		public ColourChooser()
 		{
-			var grid = new Table(4, 8, true);
+			var grid = new Grid();
 			for(int i = 0; i < 32; i++)
 			{
 				var button = new Button();
@@ -229,7 +229,7 @@ namespace Ldraw.Ui
 						ChosenColour = 32 * page + x;
 					});
 
-				grid.attach_defaults(button, i % 8, i % 8 + 1, i / 8, i / 8 + 1);
+				grid.attach(button, i % 8, i / 8 + 1, 1, 1);
 
 				buttons[i] = button;
 
@@ -274,7 +274,8 @@ namespace Ldraw.Ui
 			{
 				var colourId = page * 32 + i;
 				var button = buttons[i];
-				//button.remove(button.child);
+
+				button.remove(button.get_child());
 
 				var colourName = LdrawColour.GetName(colourId);
 				if(colourName != null)
@@ -293,13 +294,13 @@ namespace Ldraw.Ui
 					var image = new Image.from_pixbuf(data);
 
 					button.sensitive = true;
-					button.add(image);
+					button.child = (image);
 					button.set_tooltip_text(colourName);
 				}
 				else
 				{
 					button.sensitive = false;
-					button.add(new Image.from_icon_name("process-stop", IconSize.BUTTON));
+					button.child = (new Image.from_icon_name("process-stop", IconSize.BUTTON));
 					button.set_tooltip_text("Not defined");
 				}
 			}

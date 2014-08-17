@@ -432,16 +432,18 @@ namespace Ldraw.Ui
 				"_Cancel", ResponseType.REJECT);
 
 			var content = (Box) dialog.get_content_area();
-			var table = new Table(3, 2, false);
-			AttachToTable(table, new Label("Filename"), 0, 0);
-			AttachToTable(table, new Label("Sub-model name"), 0, 1);
-			AttachToTable(table, new Label("Description"), 0, 2);
+			var table = new Grid();
+			table.attach(new Label("Filename"), 0, 0, 1, 1);
+			table.attach(new Label("Sub-model name"), 0, 1, 1, 1);
+			table.attach(new Label("Description"), 0, 2, 1, 1);
+
 			var filenameEntry = new Entry();
 			var nameEntry = new Entry();
 			var descriptionEntry = new Entry();
-			AttachToTable(table, filenameEntry, 1, 0);
-			AttachToTable(table, nameEntry, 1, 1);
-			AttachToTable(table, descriptionEntry, 1, 2);
+
+			table.attach(filenameEntry, 1, 0, 1, 1);
+			table.attach(nameEntry, 1, 1, 1, 1);
+			table.attach(descriptionEntry, 1, 2, 1, 1);
 			content.pack_start(table);
 
 			dialog.show_all();
@@ -478,11 +480,6 @@ namespace Ldraw.Ui
 			var newObject = (LdrawObject)GLib.Object.new(typeof(LdrawObject), Nodes: nodes, FileName: newFileName);
 			mpdModel.SubModels.add(newObject);
 			EditingObject = new AnimatedModel(newObject);
-		}
-
-		private void AttachToTable(Table t, Widget w, uint x, uint y)
-		{
-			t.attach(w, x, x + 1, y, y + 1, AttachOptions.EXPAND, AttachOptions.EXPAND, 5, 5);
 		}
 
 		protected LdrawModelFile File
