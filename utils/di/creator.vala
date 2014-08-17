@@ -36,13 +36,6 @@ namespace Ldraw.Utils.Di
             return constructed;
         }
 
-        private Value ObjectValue(Type t, Object o)
-        {
-            var v = Value(t);
-            v.set_object(o);
-            return v;
-        }
-
         public Collection<T> ResolveAll<T>()
             throws DependencyResolutionError
             requires(all_registrations.has_key(typeof(T)))

@@ -285,11 +285,6 @@ namespace Ldraw.Expressions
 			public int start;
 			public int end;
 
-			public string to_string()
-			{
-				return @"'$token': $type";
-			}
-
 			public bool equals(Token other)
 			{
 				var retval = (type == other.type) &&

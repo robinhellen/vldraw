@@ -108,7 +108,10 @@ namespace Ldraw.Ui
 			var pathForChild = new TreePath.from_indices(itemIndex);
 			TreeIter childIter;
 			if(!sectionList.get_iter(out childIter, pathForChild))
+			{
+				iter = TreeIter();
 				return false;
+			}
 
 			iter = TreeIter();
 			iter.stamp = c_IteratorStamp;
