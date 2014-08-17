@@ -161,7 +161,7 @@ namespace Ldraw.Ui.Widgets
 			}
 
 			int? colourCode = null;
-			string partName = (string)selection_data.data;
+			string partName = (string)selection_data.get_data();
 			if(partName.contains(","))
 			{
 				var sections = partName.split(",");
@@ -253,7 +253,7 @@ namespace Ldraw.Ui.Widgets
 			else
 			{
 				dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
-				drag_status(context, context.suggested_action, time);
+				drag_status(context, context.get_suggested_action(), time);
 			}
 		}
 
@@ -334,18 +334,10 @@ namespace Ldraw.Ui.Widgets
 									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y - 0.5f) / alloc.height),
 									 modelCenterZ - radius * 100));
 
-			GLWindow drawableWin = widget_get_gl_window(this);
-			GLDrawable drawable = (GLDrawable)drawableWin;
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
-
-			drawable.gl_begin(context);
-
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
 			model.Model.BuildFromFile(builder);
 
 			builder.ApplySelection(model.Model);
-			drawable.gl_end();
-			drawable.wait_gl();
 		}
 
 		private float ScaleBetween(float start, float end, float ratio)

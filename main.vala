@@ -46,7 +46,7 @@ namespace Ldraw
 			LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
 			// initialize Gtk and OpenGL
 			init(ref args);
-			Gdk.gl_init(ref args);
+
 			LdrawModelFile model = null;
 			var loader = container.Resolve<LdrawFileLoader>();
 			try

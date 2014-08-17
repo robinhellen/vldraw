@@ -274,7 +274,7 @@ namespace Ldraw.Ui
 			{
 				var colourId = page * 32 + i;
 				var button = buttons[i];
-				button.remove(button.child);
+				//button.remove(button.child);
 
 				var colourName = LdrawColour.GetName(colourId);
 				if(colourName != null)

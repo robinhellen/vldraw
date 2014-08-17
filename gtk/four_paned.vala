@@ -19,6 +19,10 @@ namespace Ldraw.Ui.Widgets
 			add1(left);
 			add2(right);
 
+			left.set_position(300);
+			right.set_position(300);
+			set_position(300);
+
 			left.notify["position"].connect(() => right.set_position(left.position));
 			right.notify["position"].connect(() => left.set_position(right.position));
 		}

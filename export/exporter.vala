@@ -11,7 +11,7 @@ namespace Ldraw.Export
 	{
 		public void ExportJpg(LdrawObject model, string filename)
 		{
-			var angle = Ui.Widgets.ViewAngle.Ortho;
+			/*var angle = Ui.Widgets.ViewAngle.Ortho;
 
 			var pixmap = new Pixmap(null, 800, 600, 24);
 			var glPixmap = new GLPixmap(new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA), pixmap, 0);
@@ -36,7 +36,7 @@ namespace Ldraw.Export
 			drawable.wait_gl();
 
 			var pixbuf = pixbuf_get_from_drawable(null, pixmap, null, 0, 0, 0, 0, 800, 600);
-			pixbuf.save(filename, "jpeg");
+			pixbuf.save(filename, "jpeg");*/
 		}
 
 		public void ExportPovray(LdrawObject model, string filename)

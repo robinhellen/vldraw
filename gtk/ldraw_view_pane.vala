@@ -4,6 +4,7 @@ using Ldraw.Lego;
 using Ldraw.OpenGl;
 using Ldraw.Maths;
 using GL;
+using GLX;
 
 namespace Ldraw.Ui.Widgets
 {
@@ -20,6 +21,10 @@ namespace Ldraw.Ui.Widgets
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
 
+		private unowned X.Display xDisp;
+		private Context context;
+		private XVisualInfo xvInfo;
+
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
 		{
@@ -28,14 +33,19 @@ namespace Ldraw.Ui.Widgets
 			m_Eyeline = m_Center = m_Up = null;
 
 			// initialize this control for OpenGl rendering
-			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA);
-			if(!widget_set_gl_capability(this, config, null, true, GLRenderType.RGBA_TYPE))
-			{
-				throw new GlError.InitializationError("Unable to initialize a drawing area for OpenGL rendering.");
-			}
+			int[] attrlist = {
+				GLX_RGBA,
+				GLX_RED_SIZE, 1,
+				GLX_GREEN_SIZE, 1,
+				GLX_BLUE_SIZE, 1,
+				GLX_DOUBLEBUFFER, 0
+			};
+			xDisp = x11_get_default_xdisplay();
+			xvInfo = glXChooseVisual(xDisp, Gdk.x11_get_default_screen(), attrlist);
+			set_double_buffered(false);
 
 			// minimum size 100 px square
-			set_size_request(100, 100);
+			set_size_request(300, 300);
 
 		}
 
@@ -78,19 +88,13 @@ namespace Ldraw.Ui.Widgets
 				return;
 			}
 
+			context = glXCreateContext(xDisp, xvInfo, null, true);
+			glXMakeCurrent(xDisp, Gdk.X11Window.get_xid(get_window()), context );
+
 			m_LastRedraw = new DateTime.now_utc();
-			GLWindow drawableWin = widget_get_gl_window(this);
-			if(!(drawableWin is GLDrawable))
-			{
-				throw new GlError.InvalidWidget("GtkGlExt library is playing silly beggars");
-			}
-			GLDrawable drawable = (GLDrawable)drawableWin;
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
 
-			drawable.gl_begin(context);
-
-			int width = 0; int height = 0;
-			drawable.get_size(out width, out height);
+			int width = get_allocated_width();
+			int height = get_allocated_height();
 
 			if(m_Eyeline == null)
 			{
@@ -103,8 +107,7 @@ namespace Ldraw.Ui.Widgets
 			BuildModel(builder);
 
 			builder.Flush();
-			drawable.gl_end();
-			drawable.wait_gl();
+			glXSwapBuffers(xDisp, Gdk.X11Window.get_xid(get_window()));
 		}
 
 		protected virtual GlBuilder CreateGlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
@@ -118,7 +121,7 @@ namespace Ldraw.Ui.Widgets
 			m_Model.BuildFromFile(builder);
 		}
 
-		public override bool configure_event(Gdk.EventConfigure event)
+		/*public override bool configure_event(Gdk.EventConfigure event)
 		{
 			try
 			{
@@ -129,9 +132,9 @@ namespace Ldraw.Ui.Widgets
 				RenderingError(@"OpenGL error during window resize: \n $(e.message).");
 			}
 			return false;
-		}
+		}*/
 
-		public override bool expose_event(Gdk.EventExpose event)
+		public override bool draw (Cairo.Context cr)
 		{
 			try
 			{
@@ -144,7 +147,7 @@ namespace Ldraw.Ui.Widgets
 			return false;
 		}
 
-		public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
+		/*public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
 		{
 			m_Hadj = hadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
 			m_Hadj.lower = -3000;
@@ -173,7 +176,7 @@ namespace Ldraw.Ui.Widgets
 					});
 
 			SetAdjustmentRanges();
-		}
+		}*/
 
 		private void SetAdjustmentRanges()
 			requires(m_Hadj != null)
@@ -238,6 +241,7 @@ namespace Ldraw.Ui.Widgets
 			Allocation alloc;
 			get_allocation(out alloc);
 
+			stderr.printf(@"A ($(alloc.width), $(alloc.height))\n");
 			return m_Angle.GetViewBounds(alloc.width, alloc.height, m_Scale, m_Center);
 		}
 	}
@@ -322,10 +326,3 @@ namespace Ldraw.Ui.Widgets
 		}
 	}
 }
-
-// extra methods for gdkglext / x11
-
-/*
-public static extern void* GetXDisplayForConfig(Gdk.GLConfig config);
-public static extern int GetScreenForConfig(Gdk.GLConfig config);
-*/
