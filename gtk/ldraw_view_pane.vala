@@ -38,15 +38,12 @@ namespace Ldraw.Ui.Widgets
 				GLX_RED_SIZE, 1,
 				GLX_GREEN_SIZE, 1,
 				GLX_BLUE_SIZE, 1,
+				GLX_DEPTH_SIZE, 1,
 				GLX_DOUBLEBUFFER, 0
 			};
 			xDisp = x11_get_default_xdisplay();
 			xvInfo = glXChooseVisual(xDisp, Gdk.x11_get_default_screen(), attrlist);
 			set_double_buffered(false);
-
-			// minimum size 100 px square
-			set_size_request(300, 300);
-
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
