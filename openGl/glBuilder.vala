@@ -79,7 +79,7 @@ namespace Ldraw.OpenGl
 			Vector b = state.Transform.TransformVector(triangle.B).Add(state.Center);
 			Vector c = state.Transform.TransformVector(triangle.C).Add(state.Center);
 
-			glBegin(GL_POLYGON);
+			glBegin(GL_TRIANGLES);
 
 			glVertex3fv(a.value_vector());
 			glVertex3fv(b.value_vector());
@@ -97,7 +97,7 @@ namespace Ldraw.OpenGl
 			Vector c = state.Transform.TransformVector(quad.C).Add(state.Center);
 			Vector d = state.Transform.TransformVector(quad.D).Add(state.Center);
 
-			glBegin(GL_POLYGON);
+			glBegin(GL_QUADS);
 
 			glVertex3fv(a.value_vector());
 			glVertex3fv(b.value_vector());
