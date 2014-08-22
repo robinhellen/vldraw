@@ -8,7 +8,7 @@ using GLX;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class LdrawViewPane : Layout
+	public class LdrawViewPane : Layout, Scrollable
 	{
 		private LdrawObject m_Model;
 		private ViewAngle m_Angle;
@@ -17,9 +17,6 @@ namespace Ldraw.Ui.Widgets
 		protected Vector? m_Center = null;
 		protected Vector? m_Up = null;
 		private DateTime m_LastRedraw = null;
-
-		private Adjustment m_Hadj = null;
-		private Adjustment m_Vadj = null;
 
 		private unowned X.Display xDisp;
 		private Context context;
@@ -44,6 +41,8 @@ namespace Ldraw.Ui.Widgets
 			xDisp = x11_get_default_xdisplay();
 			xvInfo = glXChooseVisual(xDisp, Gdk.x11_get_default_screen(), attrlist);
 			set_double_buffered(false);
+
+			set_size_request(6000, 6000);
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
@@ -69,7 +68,6 @@ namespace Ldraw.Ui.Widgets
 				m_Model.VisibleChange.connect(() => queue_draw());
 				m_Model.SelectionChanged.connect(() => queue_draw());
 				m_Eyeline = m_Center = m_Up = null;
-				SetAdjustmentRanges();
 
 				queue_draw();
 			}
@@ -118,7 +116,7 @@ namespace Ldraw.Ui.Widgets
 			m_Model.BuildFromFile(builder);
 		}
 
-		/*public override bool configure_event(Gdk.EventConfigure event)
+		public override bool configure_event(Gdk.EventConfigure event)
 		{
 			try
 			{
@@ -129,7 +127,7 @@ namespace Ldraw.Ui.Widgets
 				RenderingError(@"OpenGL error during window resize: \n $(e.message).");
 			}
 			return false;
-		}*/
+		}
 
 		public override bool draw (Cairo.Context cr)
 		{
@@ -144,26 +142,61 @@ namespace Ldraw.Ui.Widgets
 			return false;
 		}
 
-		/*public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
+		public Adjustment hadjustment
 		{
-			m_Hadj = hadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
-			m_Hadj.lower = -3000;
-			m_Hadj.upper = 3000;
-			m_Hadj.page_increment = 150;
-			m_Hadj.step_increment = 30;
-			m_Hadj.value_changed.connect(adj =>
+			get
+			{
+				return hadj;
+			}
+			construct set
+			{
+				hadj = value;
+				if(hadj != null)
+					OnUpdateHadj(value);
+			}
+		}
+
+		public Adjustment vadjustment
+		{
+			get
+			{
+				return vadj;
+			}
+			construct set
+			{
+				vadj = value;
+				if(vadj != null)
+					OnUpdateVadj(value);
+			}
+		}
+
+		private Adjustment hadj;
+		private Adjustment vadj;
+
+		public void OnUpdateHadj(Adjustment hadj)
+		{
+			hadj = hadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
+			hadj.lower = -3000;
+			hadj.upper = 3000;
+			hadj.page_increment = 150;
+			hadj.step_increment = 30;
+			hadj.value = -m_Center.X;
+			hadj.value_changed.connect(adj =>
 					{
 						float dx = -(float)adj.value - m_Center.X;
 						m_Center = m_Center.Add(Vector(dx, 0, 0));
 						m_Eyeline = m_Eyeline.Add(Vector(dx, 0, 0));
 						queue_draw();
 					});
-			m_Vadj = vadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
-			m_Vadj.lower = -3000;
-			m_Vadj.upper = 3000;
-			m_Vadj.page_increment = 150;
-			m_Vadj.step_increment = 30;
-			m_Vadj.value_changed.connect(adj =>
+		}
+
+		public void OnUpdateVadj(Adjustment vadj)
+		{
+			vadj.lower = -3000;
+			vadj.upper = 3000;
+			vadj.page_increment = 150;
+			vadj.step_increment = 30;
+			vadj.value_changed.connect(adj =>
 					{
 						float dy = -(float)adj.value - m_Center.Y;
 
@@ -171,19 +204,7 @@ namespace Ldraw.Ui.Widgets
 						m_Eyeline = m_Eyeline.Add(Vector(0, dy, 0));
 						queue_draw();
 					});
-
-			SetAdjustmentRanges();
-		}*/
-
-		private void SetAdjustmentRanges()
-			requires(m_Hadj != null)
-		{
-			if(m_Center == null)
-				return;
-
-			m_Hadj.value = -m_Center.X;
-
-			m_Vadj.value = -m_Center.Y;
+			vadj.value = -m_Center.Y;
 		}
 
 		public ViewAngle Angle
@@ -196,10 +217,6 @@ namespace Ldraw.Ui.Widgets
 			{
 				m_Angle = value;
 				m_Eyeline = m_Center = m_Up = null;
-				if(m_Hadj != null)
-				{
-					SetAdjustmentRanges();
-				}
 				queue_draw();
 			}
 		}
@@ -229,8 +246,6 @@ namespace Ldraw.Ui.Widgets
 			m_Scale = Math.fmaxf(m_Scale, 0.25f);
 
 			m_Up = m_Angle.GetCameraUp();
-
-			SetAdjustmentRanges();
 		}
 
 		protected Bounds CalculateViewArea()
@@ -238,7 +253,6 @@ namespace Ldraw.Ui.Widgets
 			Allocation alloc;
 			get_allocation(out alloc);
 
-			stderr.printf(@"A ($(alloc.width), $(alloc.height))\n");
 			return m_Angle.GetViewBounds(alloc.width, alloc.height, m_Scale, m_Center);
 		}
 	}
