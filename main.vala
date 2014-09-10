@@ -5,80 +5,81 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Options;
 using Ldraw.Peeron;
+using Ldraw.Refactoring;
 using Ldraw.Ui;
 using Ldraw.Ui.Widgets;
 using Ldraw.Utils.Di;
 
 namespace Ldraw
 {
-	public class LdrawApp
-	{
-		public static int main(string[] args)
-		{
-			var builder = new CreatorBuilder();
+    public class LdrawApp
+    {
+        public static int main(string[] args)
+        {
+            var builder = new CreatorBuilder();
 
-			// Parts library
-			builder.RegisterAsInterface<LdrawLibrary, ILdrawFolders>().AsInterface<ILdrawFolders>();
+            // Parts library
+            builder.RegisterAsInterface<LdrawLibrary, ILdrawFolders>().AsInterface<ILdrawFolders>();
 
-			// Model file handling
-			builder.Register<LdrawFileLoader>();
-			builder.Register<LdrawParser>().InstancePerDependency();
+            // Model file handling
+            builder.Register<LdrawFileLoader>();
+            builder.Register<LdrawParser>().InstancePerDependency();
 
-			// Peeron communication
-			builder.Register<InventoryReader>();
-			builder.Register<ColourChart>();
+            // Peeron communication
+            builder.Register<InventoryReader>();
+            builder.Register<ColourChart>();
 
-			// UI components
-			builder.Register<PartsTree>();
-			builder.Register<SetList>();
+            // UI components
+            builder.Register<PartsTree>();
+            builder.Register<SetList>();
 
-			builder.Register<LibrarySubFileLocator>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.PartsOnly);
-			builder.Register<OnDemandSubFileLoader>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.SubPartsAndPrimitives);
+            builder.Register<LibrarySubFileLocator>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.PartsOnly);
+            builder.Register<OnDemandSubFileLoader>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 
-			builder.RegisterAsInterface<OnDemandPartLoader, IDatFileCache>();
-			builder.RegisterAsInterface<FileCachedLibrary, ILibrary>().AsInterface<ILibrary>();
+            builder.RegisterAsInterface<OnDemandPartLoader, IDatFileCache>();
+            builder.RegisterAsInterface<FileCachedLibrary, ILibrary>().AsInterface<ILibrary>();
 
-			builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
+            builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
 
-			var container = builder.Build();
+            builder.Register<RunningOptions>().AsInterface<IOptions>();
 
-			// load up the colours
-			LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
-			// initialize Gtk and OpenGL
-			init(ref args);
-			Gdk.gl_init(ref args);
-			LdrawModelFile model = null;
-			var loader = container.Resolve<LdrawFileLoader>();
-			try
-			{
-				model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd", ReferenceLoadStrategy.PartsOnly);
-			}
-			catch(Error e)
-			{
-				stdout.printf(e.message);
-				return 1;
-			}
+            var container = builder.Build();
 
-			try
-			{
-				Window win = new MainWindow.WithModel(
-								new RunningOptions(new DefaultOptions()),
-								loader,
-								model,
-								container
-							);
-				win.destroy.connect(() => main_quit());
-				win.show_all();
-			}
-			catch(OpenGl.GlError e)
-			{
-				stderr.printf(@"Unable to initialize OpenGl displays: $(e.message).\n");
-				return -1;
-			}
+            // load up the colours
+            LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
+            // initialize Gtk and OpenGL
+            init(ref args);
+            Gdk.gl_init(ref args);
+            LdrawModelFile model = null;
+            var loader = container.Resolve<LdrawFileLoader>();
+            try
+            {
+                model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd", ReferenceLoadStrategy.PartsOnly);
+            }
+            catch(Error e)
+            {
+                stdout.printf(e.message);
+                return 1;
+            }
 
-			Gtk.main();
+            try
+            {
+                Window win = new MainWindow.WithModel(
+                                model,
+                                container
+                            );
+                win.destroy.connect(() => main_quit());
+                win.show_all();
+            }
+            catch(OpenGl.GlError e)
+            {
+                stderr.printf(@"Unable to initialize OpenGl displays: $(e.message).\n");
+                return -1;
+            }
 
-			return 0;
-		}
-	}
+            Gtk.main();
+
+            return 0;
+        }
+    }
 }
