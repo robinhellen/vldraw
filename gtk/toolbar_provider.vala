@@ -99,7 +99,7 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateGridButton(GridSize size, string iconName, ref unowned SList<RadioToolButton>? group)
 		{
-			string icon = "/home/robin/projects/ldraw_vala/icons/" + iconName + ".xpm";
+			string icon = "/home/robin/git/vldraw/icons/" + iconName + ".xpm";
 			var button = CreateToggleButtonFromImageFile(icon, ref group);
 			button.active = size == m_Options.Grid;
 
