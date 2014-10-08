@@ -41,7 +41,7 @@ namespace Ldraw
 
             builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
 
-            builder.Register<RunningOptions>().AsInterface<IOptions>();
+            builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
 
             var container = builder.Build();
 
