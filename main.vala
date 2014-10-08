@@ -54,7 +54,7 @@ namespace Ldraw
             var loader = container.Resolve<LdrawFileLoader>();
             try
             {
-                model = loader.LoadModelFile("/home/robin/ldraw/models/Technic (old)/8825.mpd", ReferenceLoadStrategy.PartsOnly);
+                model = loader.LoadModelFile("/home/robin/ldraw/models/car.dat", ReferenceLoadStrategy.PartsOnly);
             }
             catch(Error e)
             {
