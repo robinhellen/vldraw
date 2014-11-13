@@ -81,9 +81,10 @@ namespace Ldraw.Lego.Library
 				{
 					if(reader.read_member(member))
 					{
-						int i = 0;
-						while(reader.read_element(i++))
+						var elements = reader.count_elements();
+						for(int i = 0; i < elements; i++)
 						{
+							reader.read_element(i);
 							var metadata = ReadMetaData(reader);
 							categories[member] = metadata;
 							reader.end_element();
@@ -117,16 +118,18 @@ namespace Ldraw.Lego.Library
 						break;
 					case "keywords":
 						int i = 0;
+						if(reader.count_elements() > 0)
 						while(reader.read_element(i++))
 						{
 							keywords.add(reader.get_string_value());
 							reader.end_element();
 						}
+						reader.end_element();
 						break;
 				}
 				reader.end_member();
 			}
-
+			
 			return new PartMetaData(name, description, category, keywords);
 		}
 
@@ -166,6 +169,7 @@ namespace Ldraw.Lego.Library
 			builder.end_object();
 
 			var generator = new Generator();
+			generator.pretty = true;
 			generator.set_root(builder.get_root());
 
 			var stream = file.append_to(FileCreateFlags.REPLACE_DESTINATION);
