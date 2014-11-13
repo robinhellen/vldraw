@@ -135,7 +135,7 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateTranslateButton(Axis axis, bool positive)
 		{
-			string icon = "/home/robin/projects/ldraw_vala/icons/" + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
+			string icon = "/home/robin/git/vldraw/icons/" + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
 
 			button.clicked.connect(() =>
@@ -157,7 +157,7 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateRotateButton(Axis axis, bool positive)
 		{
-			string icon = "/home/robin/projects/ldraw_vala/icons/rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
+			string icon = "/home/robin/git/vldraw/icons/rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
 
 			Vector rotationAxis = Vector(axis == Axis.X ? 1.0f : 0.0f, axis == Axis.Y ? 1.0f : 0.0f, axis == Axis.Z ? 1.0f : 0.0f);
