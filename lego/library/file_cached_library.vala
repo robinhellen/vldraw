@@ -19,14 +19,37 @@ namespace Ldraw.Lego.Library
 			owned get
 			{
 				EnsureLoaded();
-				return categories.get_keys();
+				var keys = categories.get_keys();
+				var filtered = new HashSet<string>();
+				foreach(var key in keys)
+				{
+					switch(key[0])
+					{
+						case '=':
+						case '_':
+							break;
+						default:
+							filtered.add(key);
+							break;
+					}
+				}
+				return filtered;
 			}
 		}
 
 		public Collection<IPartMetadata> GetPartsByCategory(string? category)
 		{
 			EnsureLoaded();
-			return categories[category];
+			var parts = categories[category];
+			var categoryParts = new LinkedList<IPartMetadata>();
+			foreach(var part in parts)
+			{
+				categoryParts.add(part);
+			}
+			
+			categoryParts.sort((a, b) => strcmp(a.Description, b.Description));
+			
+			return categoryParts;
 		}
 
 		private void EnsureLoaded()
@@ -117,14 +140,13 @@ namespace Ldraw.Lego.Library
 						description = reader.get_string_value();
 						break;
 					case "keywords":
-						int i = 0;
-						if(reader.count_elements() > 0)
-						while(reader.read_element(i++))
+						var elements = reader.count_elements();
+						for(int i = 0; i < elements; i++)
 						{
+							reader.read_element(i);
 							keywords.add(reader.get_string_value());
 							reader.end_element();
 						}
-						reader.end_element();
 						break;
 				}
 				reader.end_member();
