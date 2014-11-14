@@ -26,7 +26,7 @@ namespace Ldraw.Lego
 			Object(Items: builder.GetItems());
 		}
 
-		private class GroupBuilder : LdrawVisitor
+		private class GroupBuilder : LdrawVisitor<void>
 		{
 			private Collection<PartNode> parts = new ArrayList<PartNode>();
 

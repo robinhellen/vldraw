@@ -1,7 +1,7 @@
 
 namespace Ldraw.Lego
 {
-	public class LdrFileBuilder : LdrawVisitor
+	public class LdrFileBuilder : LdrawVisitor<void>
 	{
 		private File m_File;
 		private FileOutputStream m_OutStream;

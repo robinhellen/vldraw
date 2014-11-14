@@ -8,7 +8,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.Povray
 {
-	public class PovrayVisitor : LdrawVisitor
+	public class PovrayVisitor : LdrawVisitor<void>
 	{
 		private string currentObjectSdl = "";
 		private bool writingMesh = false;

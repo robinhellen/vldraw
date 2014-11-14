@@ -6,7 +6,7 @@ using GL;
 
 namespace Ldraw.OpenGl
 {
-	public class GlSelectorBuilder : LdrawVisitor
+	public class GlSelectorBuilder : LdrawVisitor<void>
 	{
 		private Vector m_Eyeline;
 		private Matrix m_Transform;

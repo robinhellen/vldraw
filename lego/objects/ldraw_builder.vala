@@ -2,7 +2,7 @@ using Ldraw.Lego.Nodes;
 
 namespace Ldraw.Lego
 {
-	public abstract class LdrawVisitor : Object
+	public abstract class LdrawVisitor<T> : Object
 	{
 		public virtual void Visit(LdrawObject object)
 		{

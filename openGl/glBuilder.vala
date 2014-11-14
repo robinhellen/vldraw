@@ -9,7 +9,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.OpenGl
 {
-	public class GlBuilder : LdrawVisitor
+	public class GlBuilder : LdrawVisitor<void>
 	{
 		private Vector m_Eyeline;
 
