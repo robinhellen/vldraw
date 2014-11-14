@@ -115,7 +115,7 @@ namespace Ldraw.Ui.Widgets
 
 		protected virtual void BuildModel(GlBuilder builder)
 		{
-			m_Model.BuildFromFile(builder);
+			m_Model.BuildFromFile<void>(builder);
 		}
 
 		public override bool configure_event(Gdk.EventConfigure event)

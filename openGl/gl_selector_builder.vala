@@ -181,7 +181,7 @@ namespace Ldraw.OpenGl
 
 			m_RecursionDepth++;
 			// recurse into the current builder
-			part.Contents.BuildFromFile(this);
+			part.Contents.BuildFromFile<void>(this);
 			// finally restore the old state
 			m_RecursionDepth--;
 			m_Transform = oldTransform;

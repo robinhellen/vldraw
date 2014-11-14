@@ -4,12 +4,14 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawVisitor<T> : Object
 	{
-		public virtual void Visit(LdrawObject object)
+		public virtual T? Visit(LdrawObject object)
 		{
+			Initialize();
 			foreach(var node in object.Nodes)
 			{
 				VisitNode(node);
 			}
+			return GetResult();
 		}
 
 		public virtual void VisitNode(LdrawNode node)
@@ -23,5 +25,8 @@ namespace Ldraw.Lego
 		public virtual void VisitCondLine(CondLineNode line) {}
 		public virtual void VisitSubModel(PartNode line) {}
 		public virtual void VisitComment(Comment line) {}
+		
+		protected virtual void Initialize() {}
+		protected virtual T? GetResult() {return null;}
 	}
 }

@@ -22,7 +22,7 @@ namespace Ldraw.Lego
 		public PartGroup.FromModel(LdrawModelFile model)
 		{
 			var builder = new GroupBuilder();
-			model.MainObject.BuildFromFile(builder);
+			model.MainObject.BuildFromFile<void>(builder);
 			Object(Items: builder.GetItems());
 		}
 
@@ -44,7 +44,7 @@ namespace Ldraw.Lego
 				else if(file is LdrawModel
 						|| file is MultipartModel)
 				{
-					node.Contents.BuildFromFile(this);
+					node.Contents.BuildFromFile<void>(this);
 				}
 				else
 				{

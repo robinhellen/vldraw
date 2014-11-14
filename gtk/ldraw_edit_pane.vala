@@ -341,7 +341,7 @@ namespace Ldraw.Ui.Widgets
 			drawable.gl_begin(context);
 
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
-			model.Model.BuildFromFile(builder);
+			model.Model.BuildFromFile<void>(builder);
 
 			builder.ApplySelection(model.Model);
 			drawable.gl_end();

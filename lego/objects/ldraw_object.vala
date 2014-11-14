@@ -254,9 +254,9 @@ namespace Ldraw.Lego
 			m_ChangingSelection = false;
 		}
 
-		public void BuildFromFile(LdrawVisitor builder)
+		public T? BuildFromFile<T>(LdrawVisitor<T> builder)
 		{
-			builder.Visit(this);
+			return builder.Visit(this);
 		}
 
 		public virtual signal void VisibleChange()
