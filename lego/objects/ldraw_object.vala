@@ -1,6 +1,7 @@
 using Gee;
 using Ldraw.Maths;
 using Ldraw.Lego.Nodes;
+using Ldraw.Lego.Objects;
 using Ldraw.Utils;
 
 namespace Ldraw.Lego
@@ -65,39 +66,7 @@ namespace Ldraw.Lego
 
 		protected Bounds CalculateBounds()
 		{
-			Bounds bounds = new Bounds();
-			foreach(LdrawNode node in Nodes)
-			{
-				if(node is PartNode)
-				{
-					PartNode part = (PartNode)node;
-					bounds.IncludeBounds(part.Contents.BoundingBox, part.Transform, part.Center);
-				}
-				else if(node is LineNode)
-				{
-					bounds.Union(((LineNode)node).A);
-					bounds.Union(((LineNode)node).B);
-				}
-				else if(node is TriangleNode)
-				{
-					bounds.Union(((TriangleNode)node).A);
-					bounds.Union(((TriangleNode)node).B);
-					bounds.Union(((TriangleNode)node).C);
-				}
-				else if(node is QuadNode)
-				{
-					bounds.Union(((QuadNode)node).A);
-					bounds.Union(((QuadNode)node).B);
-					bounds.Union(((QuadNode)node).C);
-					bounds.Union(((QuadNode)node).D);
-				}
-				else if(node is CondLineNode)
-				{
-					bounds.Union(((CondLineNode)node).A);
-					bounds.Union(((CondLineNode)node).B);
-				}
-			}
-			return bounds;
+			return new BoundingBoxVisitor().Visit(this);
 		}
 
 		public Collection<LdrawNode> Selection
