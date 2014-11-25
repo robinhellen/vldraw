@@ -148,6 +148,7 @@ namespace Ldraw.Ui.Widgets
 		public override void drag_leave(DragContext context, uint time)
 		{
 			dropItem = null;
+			queue_draw();
 		}
 
 		public override void drag_data_received (DragContext context, int x, int y,
@@ -172,7 +173,9 @@ namespace Ldraw.Ui.Widgets
 			var droppedObject = locator.GetObjectForName(partName);
 
 			if(droppedObject == null)
+			{
 				return;
+			}
 
 			// rotation is same as last or selected part, or no rotation
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
@@ -254,6 +257,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
 				drag_status(context, context.suggested_action, time);
+				queue_draw();
 			}
 		}
 

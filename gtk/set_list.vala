@@ -1,3 +1,4 @@
+using Gdk;
 using Gee;
 using Gtk;
 
@@ -126,6 +127,11 @@ namespace Ldraw.Ui
 			append_column_for_children_only<CellRendererText>(partsView, new CellRendererText(),
 					(cell, item) => cell.text = @"$(item.Quantity) x $(item.Colour.Name)",
 					cell => cell.text = "");
+			partsView.drag_begin.connect_after((context) => {
+				var icon = new Pixbuf(Colorspace.RGB, true, 8, 4, 4);
+				icon.fill(0);
+				drag_set_icon_pixbuf(context, icon, 2, 2);
+			});
 			add2(WithScrolls(partsView));
 
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
