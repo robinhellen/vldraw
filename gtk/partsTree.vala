@@ -38,8 +38,12 @@ namespace Ldraw.Ui.Widgets
 			// set up for drag and drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
 			m_Tree.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
-			//m_Tree.drag_begin.connect_after(Tree_OnDragBegin);
 			m_Tree.drag_data_get.connect(Tree_OnDragDataGet);
+			m_Tree.drag_begin.connect_after((context) => {
+				var icon = new Pixbuf(Colorspace.RGB, true, 8, 4, 4);
+				icon.fill(0);
+				drag_set_icon_pixbuf(context, icon, 2, 2);
+			});
 		}
 
 		private TreeModel CreateAndPopulateModel(ILibrary library)
