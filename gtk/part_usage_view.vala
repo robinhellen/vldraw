@@ -1,3 +1,4 @@
+using Gee;
 using Gtk;
 
 using Ldraw.Lego;
@@ -19,6 +20,90 @@ namespace Ldraw.Ui
 			unused.add_all(usage.Unused.Items);
 			extra = new ObservableList<PartGroupItem>();
 			extra.add_all(usage.Extra.Items);
+		}
+		
+		public void Update(PartGroupUsage usage)
+		{
+			UpdateList(unused, usage.Unused.Items, 0);
+			UpdateList(used, usage.Used.Items, 1);
+			UpdateList(extra, usage.Extra.Items, 2);
+		}
+		
+		private void UpdateList(ObservableList<PartGroupItem> original, Collection<PartGroupItem> updated, int firstIndex)
+		{
+			var updatedList = new ArrayList<PartGroupItem>();
+			updatedList.add_all(updated);			
+			
+			// lists should be sorted, so I can step both
+			int i = 0;
+			int j = 0;
+			while(i < original.size && j < updatedList.size)
+			{
+				var originalItem = ((Gee.List<PartGroupItem>)original)[i];
+				var updatedItem = updatedList[j];
+				
+				var relation = PartGroupItem.SortFunc(originalItem, updatedItem);
+				if(relation == 0)
+				{
+					if(originalItem.Quantity != updatedItem.Quantity)
+					{
+						originalItem.Quantity = updatedItem.Quantity;
+						TreeIter iter;
+						var path = new TreePath.from_indices(firstIndex, i);
+						get_iter(out iter, path);
+						row_changed(path, iter);
+					}
+					i++; j++;
+				}
+				else if(relation < 0)
+				{
+					original.insert(i, updatedItem);
+					TreeIter iter;
+					var path = new TreePath.from_indices(firstIndex, i);
+					get_iter(out iter, path);
+					row_inserted(path, iter);
+					if(original.size == 1)
+					{
+						path = new TreePath.from_indices(firstIndex);
+						get_iter(out iter, path);		
+						row_has_child_toggled(path, iter);				
+					}
+					i++; j++;
+				}
+				else if(relation > 0)
+				{
+					original.remove_at(i);
+					var path = new TreePath.from_indices(firstIndex, i);
+					row_deleted(path);
+				}
+				else
+				{
+					assert_not_reached();
+				}
+			}
+			
+			// any further items 
+			while(i < original.size)
+			{
+				original.remove_at(i);
+				var path = new TreePath.from_indices(firstIndex, i);
+				row_deleted(path);
+			}
+			while(j < updatedList.size)
+			{
+				var path = new TreePath.from_indices(firstIndex, original.size);
+				original.add(updatedList[j]);
+				TreeIter iter;
+				get_iter(out iter, path);
+				row_inserted(path, iter);
+				if(original.size == 1)
+				{
+					path = new TreePath.from_indices(firstIndex);
+					get_iter(out iter, path);		
+					row_has_child_toggled(path, iter);				
+				}
+				j++;
+			}
 		}
 
 		// implementation of TreeModel

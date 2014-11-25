@@ -14,6 +14,7 @@ namespace Ldraw.Ui
 		private PartGroupUsage usage;
 		private LdrawModelFile modelFile;
 		private TreeView partsView;
+		private PartUsageViewModel usageViewModel;
 
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
@@ -36,17 +37,24 @@ namespace Ldraw.Ui
 			set
 			{
 				modelFile = value;
-				modelFile.MainObject.VisibleChange.connect(UpdateUsage);
-				UpdateUsage();
+				modelFile.MainObject.VisibleChange.connect(() => UpdateUsage(false));
+				UpdateUsage(true);
 			}
 		}
 
-		private void UpdateUsage()
+		private void UpdateUsage(bool reset)
 		{
 			var availableParts = Aggregate(ToPartGroups(sets, Library));
 			usage = new PartGroupUsage(availableParts, new PartGroup.FromModel(modelFile));
-			var list = new PartUsageViewModel(usage);
-			partsView.model = list;
+			if(reset)
+			{
+				usageViewModel = new PartUsageViewModel(usage);
+				partsView.model = usageViewModel;
+			}
+			else
+			{
+				usageViewModel.Update(usage);
+			}
 		}
 
 		private void InitializeControls()
@@ -79,7 +87,7 @@ namespace Ldraw.Ui
 						(obj, res) =>
 					{
 						sets.add(InventoryReader.GetInventoryFor.end(res));
-						UpdateUsage();
+						UpdateUsage(true);
 					});
 				});
 				setButtons.pack_start(addButton);
