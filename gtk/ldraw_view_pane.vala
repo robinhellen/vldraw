@@ -224,7 +224,7 @@ namespace Ldraw.Ui.Widgets
 			Allocation alloc;
 			get_allocation(out alloc);
 			int size = (alloc.height > alloc.width) ? alloc.width : alloc.height;
-			m_Scale = (modelRadius) / size;
+			m_Scale = (2 * modelRadius) / size;
 			if(m_Scale < 0.0f) {m_Scale = -m_Scale;}
 			m_Scale = Math.fmaxf(m_Scale, 0.25f);
 
