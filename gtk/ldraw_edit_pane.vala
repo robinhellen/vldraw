@@ -160,23 +160,7 @@ namespace Ldraw.Ui.Widgets
 				// this is the drag motion, so the provided mouse coordinates are bunkum
 				get_pointer(out x, out y);
 			}
-
-			int? colourCode = null;
-			string partName = (string)selection_data.data;
-			if(partName.contains(","))
-			{
-				var sections = partName.split(",");
-				partName = sections[0];
-				colourCode = int.parse(sections[1]);
-			}
-
-			var droppedObject = locator.GetObjectForName(partName);
-
-			if(droppedObject == null)
-			{
-				return;
-			}
-
+			
 			// rotation is same as last or selected part, or no rotation
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
 			Matrix newTransform = Matrix.Identity;
@@ -189,9 +173,26 @@ namespace Ldraw.Ui.Widgets
 			{
 				newTransform = copyPart.Transform;
 				newPosition = copyPart.Center;
-				newColour = colourCode ?? copyPart.ColourId;
+				newColour = copyPart.ColourId;
 			}
 
+			// get the part from the drag data
+			string partName = (string)selection_data.data;
+			if(partName.contains(","))
+			{
+				var sections = partName.split(",");
+				partName = sections[0];
+				// set the colour from the drag data. This should override any colour copied from another part.
+				newColour = int.parse(sections[1]);
+			}
+
+			var droppedObject = locator.GetObjectForName(partName);
+
+			if(droppedObject == null)
+			{
+				return;
+			}
+			
 			Allocation alloc;
 			get_allocation(out alloc);
 			int deltaXPx = x - (alloc.width / 2);
@@ -245,7 +246,7 @@ namespace Ldraw.Ui.Widgets
 					newPosition = Vector.NullVector;
 					break;
 			}
-
+			
 			if(finishDrag)
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
