@@ -99,6 +99,11 @@ namespace Ldraw.Ui
 			setControls.pack_start(setButtons);
 			add1(setControls);
 			partsView = new TreeView();
+			
+			append_column_for_children_only<CellRendererPixbuf>(partsView, new CellRendererPixbuf(),
+					(cell, item) => cell.pixbuf = GetPixbufImageForColour(item.Colour),
+					cell => cell.pixbuf = null);
+					
 			partsView.insert_column_with_data_func(-1, "", new CellRendererText(),
 					(col, cell, model, iter) =>
 					{
@@ -124,9 +129,6 @@ namespace Ldraw.Ui
 						}
 					});
 
-			append_column_for_children_only<CellRendererText>(partsView, new CellRendererText(),
-					(cell, item) => cell.text = @"$(item.Quantity) x $(item.Colour.Name)",
-					cell => cell.text = "");
 			partsView.drag_begin.connect_after((context) => {
 				var icon = new Pixbuf(Colorspace.RGB, true, 8, 4, 4);
 				icon.fill(0);
@@ -163,6 +165,23 @@ namespace Ldraw.Ui
 					var dragData = @"$currentName,$colourId";
 					data.set(Gdk.Atom.intern("LdrawFile", false), 8, dragData.data);
 				});
+		}
+		
+		private Pixbuf GetPixbufImageForColour(LdrawColour colour)
+		{
+			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 16, 16);
+			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 14, 14);
+			float red, green, blue, alpha;
+			LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
+
+			uint32 fillColour = ((int)(red * 255) << 24)
+							  | ((int)(green * 255) << 16)
+							  | ((int)(blue * 255) << 8)
+							  | ((int)(alpha * 255));
+			swatch.fill(fillColour);
+			image.fill((uint32)255);
+			swatch.copy_area(0, 0, 14, 14, image, 1, 1);
+			return image;
 		}
 
 		private delegate void RenderDelegate<T>(T cell, PartGroupItem item);
