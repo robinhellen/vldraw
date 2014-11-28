@@ -113,8 +113,9 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateColourButton(int colourId)
 		{
-			Gdk.Pixbuf data = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
-
+			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
+			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);
+			
 			float red, green, blue, alpha;
 			LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
 
@@ -122,9 +123,11 @@ namespace Ldraw.Ui
 							  | ((int)(green * 255) << 16)
 							  | ((int)(blue * 255) << 8)
 							  | ((int)(alpha * 255));
-			data.fill(fillColour);
-
-			var button = new ToolButton(new Image.from_pixbuf(data), null);
+			swatch.fill(fillColour);
+			image.fill((uint32) 255);
+			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
+			
+			var button = new ToolButton(new Image.from_pixbuf(image), null);
 			button.clicked.connect(() =>
 				{
 					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Model.Selection, colourId));
