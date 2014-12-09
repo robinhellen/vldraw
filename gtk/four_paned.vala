@@ -11,7 +11,7 @@ namespace Ldraw.Ui.Widgets
 		private Paned left;
 		private Paned right;
 
-		public FourPaned()
+		construct
 		{
 			left = new VPaned();
 			right = new VPaned();
