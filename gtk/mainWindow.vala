@@ -58,7 +58,7 @@ namespace Ldraw.Ui
         private void SetUpControls(DependencyResolutionContext context)
             throws OpenGl.GlError
         {
-            var toolbarProvider = new ToolBarProvider(this, Settings, undoStack);
+            var toolbarProvider = new ToolBarProvider(this, Settings, UndoStack);
 
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();
@@ -179,7 +179,7 @@ namespace Ldraw.Ui
                     EditingObject = new AnimatedModel(object);
                     m_View.Model = EditingObject;
                     m_ModelList.Model = object;
-                    undoStack.Clear();
+                    UndoStack.Clear();
                 });
             return cb;
         }
@@ -257,16 +257,16 @@ namespace Ldraw.Ui
             editMenu.set_accel_path("<Ldraw>/Edit");
 
             var editUndo = new Gtk.MenuItem.with_mnemonic("_Undo");
-            editUndo.activate.connect(() => undoStack.UndoSingle());
-            undoStack.notify["HasUndoItems"].connect(() => editUndo.sensitive = undoStack.HasUndoItems);
-            editUndo.sensitive = undoStack.HasUndoItems;
+            editUndo.activate.connect(() => UndoStack.UndoSingle());
+            UndoStack.notify["HasUndoItems"].connect(() => editUndo.sensitive = UndoStack.HasUndoItems);
+            editUndo.sensitive = UndoStack.HasUndoItems;
             editMenu.append(editUndo);
             AccelMap.add_entry(editUndo.get_accel_path(), Gdk.keyval_from_name("Z"), Gdk.ModifierType.CONTROL_MASK);
 
             var editRedo = new Gtk.MenuItem.with_mnemonic("_Redo");
-            editRedo.activate.connect(() => undoStack.RedoSingle());
-            undoStack.notify["HasRedoItems"].connect(() => editRedo.sensitive = undoStack.HasRedoItems);
-            editRedo.sensitive = undoStack.HasRedoItems;
+            editRedo.activate.connect(() => UndoStack.RedoSingle());
+            UndoStack.notify["HasRedoItems"].connect(() => editRedo.sensitive = UndoStack.HasRedoItems);
+            editRedo.sensitive = UndoStack.HasRedoItems;
             editMenu.append(editRedo);
             AccelMap.add_entry(editRedo.get_accel_path(), Gdk.keyval_from_name("Y"), Gdk.ModifierType.CONTROL_MASK);
 
@@ -517,7 +517,7 @@ namespace Ldraw.Ui
                 var titleFileName = value.FileName ?? "untitled";
 
                 title = @"vldraw - $titleFileName";
-                undoStack.Clear();
+                UndoStack.Clear();
             }
         }
 
