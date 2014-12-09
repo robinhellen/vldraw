@@ -7,6 +7,7 @@ using Ldraw.Options;
 using Ldraw.Peeron;
 using Ldraw.Refactoring;
 using Ldraw.Ui;
+using Ldraw.Ui.Commands;
 using Ldraw.Ui.Widgets;
 using Ldraw.Utils.Di;
 
@@ -42,6 +43,8 @@ namespace Ldraw
             builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
 
             builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
+
+            builder.Register<UndoStack>();
 
             var container = builder.Build();
 

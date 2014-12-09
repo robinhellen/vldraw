@@ -19,7 +19,6 @@ namespace Ldraw.Ui
         private LdrawModelFile m_Model;
         public AnimatedModel EditingObject {get; set;}
         private ComboBox m_SubModels;
-        private UndoStack undoStack = new UndoStack();
 
         // controls
         EditPanes m_View;
@@ -35,6 +34,7 @@ namespace Ldraw.Ui
         public IOptions Settings {construct; private get;}
         public LdrawFileLoader Loader {construct; private get;}
         public ILdrawFolders LdrawFolders {construct; private get;}
+		public UndoStack UndoStack {construct; private get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
                                     DependencyResolutionContext context)
@@ -43,7 +43,8 @@ namespace Ldraw.Ui
             var folders = context.Resolve<ILdrawFolders>();
             var settings = context.Resolve<IOptions>();
             var loader = context.Resolve<LdrawFileLoader>();
-            GLib.Object(Loader: loader, Settings: settings, LdrawFolders: folders);
+            var undoStack = context.Resolve<UndoStack>();
+            GLib.Object(Loader: loader, Settings: settings, LdrawFolders: folders, UndoStack: undoStack);
 
             EditingObject = new AnimatedModel(model.MainObject);
 
@@ -80,7 +81,7 @@ namespace Ldraw.Ui
 
             try
             {
-                m_View = new EditPanes(Settings, new CombinedObjectLocator(locators), undoStack);
+                m_View = new EditPanes(Settings, new CombinedObjectLocator(locators), UndoStack);
             }
             catch(OpenGl.GlError e)
             {
