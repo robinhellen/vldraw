@@ -46,42 +46,45 @@ namespace Ldraw.Ui.Widgets
 
 	public class EditPanes : FourPaned
 	{
-		private LdrawEditPane top_left;
-		private LdrawEditPane bottom_left;
-		private LdrawEditPane top_right;
-		private LdrawEditPane bottom_right;
+		public LdrawEditPane TopLeft {construct; private get;}
+		public LdrawEditPane BottomLeft {construct; private get;}
+		public LdrawEditPane TopRight {construct; private get;}
+		public LdrawEditPane BottomRight {construct; private get;}
 
 		public EditPanes(IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws OpenGl.GlError
 		{
-			base();
+			GLib.Object(
+				TopLeft		: new LdrawEditPane(ViewAngle.Front, settings, locator, undoStack),
+				BottomLeft	: new LdrawEditPane(ViewAngle.Top, settings, locator, undoStack),
 
-			top_left 	= new LdrawEditPane(ViewAngle.Front, settings, locator, undoStack);
-			bottom_left = new LdrawEditPane(ViewAngle.Top, settings, locator, undoStack);
+				TopRight	: new LdrawEditPane(ViewAngle.Right, settings, locator, undoStack),
+				BottomRight : new LdrawEditPane(ViewAngle.Ortho, settings, locator, undoStack)	
+			);	
+		}
+		
+		construct
+		{
+			add_top_left(WithScrolls(TopLeft));
+			add_bottom_left(WithScrolls(BottomLeft));
+			add_top_right(WithScrolls(TopRight));
+			add_bottom_right(WithScrolls(BottomRight));
 
-			top_right 	 = new LdrawEditPane(ViewAngle.Right, settings, locator, undoStack);
-			bottom_right = new LdrawEditPane(ViewAngle.Ortho, settings, locator, undoStack);
+			TopLeft.RenderingError.connect(x => RenderingError(x));
+			BottomLeft.RenderingError.connect(x => RenderingError(x));
 
-			add_top_left(WithScrolls(top_left));
-			add_bottom_left(WithScrolls(bottom_left));
-			add_top_right(WithScrolls(top_right));
-			add_bottom_right(WithScrolls(bottom_right));
-
-			top_left.RenderingError.connect(x => RenderingError(x));
-			bottom_left.RenderingError.connect(x => RenderingError(x));
-
-			top_right.RenderingError.connect(x => RenderingError(x));
-			bottom_right.RenderingError.connect(x => RenderingError(x));
+			TopRight.RenderingError.connect(x => RenderingError(x));
+			BottomRight.RenderingError.connect(x => RenderingError(x));
 		}
 
 		public AnimatedModel Model
 		{
 			set
 			{
-				top_left.AnimModel = value;
-				bottom_left.AnimModel = value;
-				top_right.AnimModel = value;
-				bottom_right.AnimModel = value;
+				TopLeft.AnimModel = value;
+				BottomLeft.AnimModel = value;
+				TopRight.AnimModel = value;
+				BottomRight.AnimModel = value;
 			}
 		}
 
