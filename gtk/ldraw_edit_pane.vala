@@ -419,10 +419,20 @@ namespace Ldraw.Ui.Widgets
 		public LdrawObject? GetObjectForName(string name)
 		{
 			var separatorIndex = name.index_of("::");
+			string source;
+			string objectName;
 			if(separatorIndex == -1)
-				return locators[""].GetObjectForName(name);
+			{
+				source = "";
+				objectName = name;
+			}
+			else
+			{
+				source = name.substring(0, separatorIndex);
+				objectName = name.substring(separatorIndex + 2);
+			}
 
-			return locators[name.substring(0, separatorIndex)].GetObjectForName(name.substring(separatorIndex + 2));
+			return locators[source].GetObjectForName(objectName);
 		}
 	}
 }
