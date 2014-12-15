@@ -40,8 +40,12 @@ namespace Ldraw
             builder.RegisterAsInterface<OnDemandPartLoader, IDatFileCache>();
             builder.RegisterAsInterface<FileCachedLibrary, ILibrary>().AsInterface<ILibrary>();
 
-            builder.Register<LibraryObjectLocator>().AsInterface<IDroppedObjectLocator>();
-
+            builder.Register<LibraryObjectLocator>().Keyed<ObjectDropType, IDroppedObjectLocator>(ObjectDropType.Library);
+            builder.Register<DocumentObjectLocator>().Keyed<ObjectDropType, IDroppedObjectLocator>(ObjectDropType.Document);
+            
+            //builder.Register<CombinedObjectLocator>().AsInterface<IDroppedObjectLocator>();
+            builder.RegisterAsInterface<CombinedObjectLocator, IDroppedObjectLocator>();
+			
             builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
 
             builder.Register<UndoStack>();

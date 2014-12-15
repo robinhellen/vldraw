@@ -74,14 +74,11 @@ namespace Ldraw.Ui
             documentLocator = new DocumentObjectLocator();
             documentLocator.Objects = Gee.List.empty<LdrawObject>();
 
-            var locators = new HashMap<string, IDroppedObjectLocator>();
-            locators[""] = context.Resolve<LibraryObjectLocator>();
-            locators["Document"] = documentLocator;
-
+			var locator = context.Resolve<IDroppedObjectLocator>();
 
             try
             {
-                m_View = new EditPanes(Settings, new CombinedObjectLocator(locators), UndoStack);
+                m_View = new EditPanes(Settings, locator, UndoStack);
             }
             catch(OpenGl.GlError e)
             {

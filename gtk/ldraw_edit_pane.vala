@@ -9,6 +9,7 @@ using Ldraw.OpenGl;
 using Ldraw.Maths;
 using Ldraw.Options;
 using Ldraw.Ui.Commands;
+using Ldraw.Utils.Di;
 
 namespace Ldraw.Ui.Widgets
 {
@@ -394,7 +395,7 @@ namespace Ldraw.Ui.Widgets
 
 	public class DocumentObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
-		public Collection<LdrawObject> Objects {get; construct set; }
+		public Collection<LdrawObject> Objects {get; construct set; default = Gee.List.empty<LdrawObject>();}
 
 		public LdrawObject? GetObjectForName(string name)
 		{
@@ -409,11 +410,12 @@ namespace Ldraw.Ui.Widgets
 
 	public class CombinedObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
-		private Map<string, IDroppedObjectLocator> locators;
-
-		public CombinedObjectLocator(Map<string, IDroppedObjectLocator> locators)
+		public IIndex<ObjectDropType, IDroppedObjectLocator> Locators {construct; private get;}
+		
+		static construct
 		{
-			this.locators = locators;
+			var cls = (ObjectClass)typeof(CombinedObjectLocator).class_ref();
+			SetIndexedInjection<ObjectDropType, IDroppedObjectLocator>(cls, "Locators");
 		}
 
 		public LdrawObject? GetObjectForName(string name)
@@ -431,8 +433,39 @@ namespace Ldraw.Ui.Widgets
 				source = name.substring(0, separatorIndex);
 				objectName = name.substring(separatorIndex + 2);
 			}
-
-			return locators[source].GetObjectForName(objectName);
+			
+			return Locators[ObjectDropType.FromString(source)].GetObjectForName(objectName);
+		}
+	}
+	
+	public enum ObjectDropType
+	{
+		Library = 1,
+		Document;
+		
+		public static ObjectDropType FromString(string dropSource)
+		{
+			switch(dropSource)
+			{
+				case "":
+					return Library;
+				case "Document":
+					return Document;
+			}
+			assert_not_reached();
+		}
+		
+		public string AsString()
+		{
+			switch(this)
+			{
+				case Library:
+					return "";
+				case Document:
+					return "Document";
+					
+			}
+			assert_not_reached();
 		}
 	}
 }
