@@ -8,6 +8,7 @@ using Ldraw.Lego.Nodes;
 using Ldraw.OpenGl;
 using Ldraw.Maths;
 using Ldraw.Options;
+using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
 using Ldraw.Utils.Di;
 
@@ -371,101 +372,5 @@ namespace Ldraw.Ui.Widgets
 		private uint m_HomeKeyVal = Gdk.keyval_from_name("Home");
 		private uint m_EndKeyVal = Gdk.keyval_from_name("End");
 		private uint delKeyVal = Gdk.keyval_from_name("Delete");
-	}
-
-	public interface IDroppedObjectLocator : GLib.Object
-	{
-		public abstract LdrawObject? GetObjectForName(string name);
-	}
-
-	public class LibraryObjectLocator : IDroppedObjectLocator, GLib.Object
-	{
-		public IDatFileCache Library {construct; private get;}
-
-		public LdrawObject? GetObjectForName(string name)
-		{
-			LdrawPart part;
-			if(!Library.TryGetPart(name, out part))
-			{
-				return null;
-			}
-			return part.MainObject;
-		}
-	}
-
-	public class DocumentObjectLocator : IDroppedObjectLocator, GLib.Object
-	{
-		public Collection<LdrawObject> Objects {get; construct set; default = Gee.List.empty<LdrawObject>();}
-
-		public LdrawObject? GetObjectForName(string name)
-		{
-			foreach(var obj in Objects)
-			{
-				if(obj.FileName == name)
-					return obj;
-			}
-			return null;
-		}
-	}
-
-	public class CombinedObjectLocator : IDroppedObjectLocator, GLib.Object
-	{
-		public IIndex<ObjectDropType, IDroppedObjectLocator> Locators {construct; private get;}
-		
-		static construct
-		{
-			var cls = (ObjectClass)typeof(CombinedObjectLocator).class_ref();
-			SetIndexedInjection<ObjectDropType, IDroppedObjectLocator>(cls, "Locators");
-		}
-
-		public LdrawObject? GetObjectForName(string name)
-		{
-			var separatorIndex = name.index_of("::");
-			string source;
-			string objectName;
-			if(separatorIndex == -1)
-			{
-				source = "";
-				objectName = name;
-			}
-			else
-			{
-				source = name.substring(0, separatorIndex);
-				objectName = name.substring(separatorIndex + 2);
-			}
-			
-			return Locators[ObjectDropType.FromString(source)].GetObjectForName(objectName);
-		}
-	}
-	
-	public enum ObjectDropType
-	{
-		Library = 1,
-		Document;
-		
-		public static ObjectDropType FromString(string dropSource)
-		{
-			switch(dropSource)
-			{
-				case "":
-					return Library;
-				case "Document":
-					return Document;
-			}
-			assert_not_reached();
-		}
-		
-		public string AsString()
-		{
-			switch(this)
-			{
-				case Library:
-					return "";
-				case Document:
-					return "Document";
-					
-			}
-			assert_not_reached();
-		}
 	}
 }

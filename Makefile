@@ -21,9 +21,10 @@ LEGO_SOURCES=		$(wildcard lego/*.vala) $(LEGO_LIBRARY_SOURCES) $(LEGO_OBJECTS_SO
 OPTIONS_SOURCES=	$(wildcard options/*.vala)
 PEERON_SOURCES=		$(wildcard peeron/*.vala)
 REFACTORING_SOURCES=$(wildcard refactoring/*.vala)
+DRAG_AND_DROP_SOURCES=	$(wildcard gtk/drag_and_drop/*.vala)
 WIDGETS_SOURCES=	$(wildcard gtk/widgets/*.vala)
 UNDO_SOURCES=		$(wildcard gtk/undo/*.vala)
-GTK_SOURCES=		$(wildcard gtk/*.vala) $(WIDGETS_SOURCES) $(UNDO_SOURCES)
+GTK_SOURCES=		$(wildcard gtk/*.vala) $(WIDGETS_SOURCES) $(UNDO_SOURCES) $(DRAG_AND_DROP_SOURCES)
 
 ENGINE_SOURCES=$(POVRAY_SOURCES) $(LEGO_SOURCES) $(OPTIONS_SOURCES) $(UTILS_SOURCES) $(EXPRESSIONS_SOURCES) $(PEERON_SOURCES)
 

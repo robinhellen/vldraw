@@ -7,6 +7,7 @@ using Ldraw.Options;
 using Ldraw.Peeron;
 using Ldraw.Refactoring;
 using Ldraw.Ui;
+using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Widgets;
 using Ldraw.Utils.Di;
