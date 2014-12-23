@@ -60,6 +60,13 @@ namespace Ldraw.Utils.Di
             all_registrations[t].add(maker);
             return new Registration(maker, t2);
 		}
+		
+		public void RegisterModule<T>()
+			requires(typeof(T).is_a(typeof(Module)))
+		{
+			var module = (Module) Object.new(typeof(T));
+			module.Load(this);
+		}
 
         public DependencyResolutionContext Build()
         {
