@@ -99,17 +99,6 @@ namespace Ldraw.Ui.Widgets
 			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model);
 		}
 
-		protected virtual GlBuilder CreateGlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
-					, Vector eyeline, Vector centre, Vector up)
-		{
-			return new GlBuilder(widthPx, heightPx, defaultColour, viewArea, eyeline, centre, up);
-		}
-
-		protected virtual void BuildModel(GlBuilder builder)
-		{
-			m_Model.BuildFromFile<void>(builder);
-		}
-
 		public override bool configure_event(Gdk.EventConfigure event)
 		{
 			try

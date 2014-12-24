@@ -306,22 +306,6 @@ namespace Ldraw.Ui.Widgets
 			return menu;
 		}
 
-		protected override void BuildModel(GlBuilder builder)
-		{
-			base.BuildModel(builder);
-			if(dropItem != null)
-			{
-				var part = dropItem;
-				builder.RenderBounds(part.Contents.BoundingBox.Transform(part.Transform, part.Center));
-			}
-		}
-
-		protected override GlBuilder CreateGlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
-					, Vector eyeline, Vector centre, Vector up)
-		{
-			return new GlBuilder(widthPx, heightPx, defaultColour, viewArea, eyeline, centre, up, model.CurrentParameters);
-		}
-
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
 			Allocation alloc;
