@@ -19,6 +19,8 @@ namespace Ldraw.Ui.Widgets
 
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
+		
+		public GlRenderer renderer;
 
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
@@ -36,7 +38,8 @@ namespace Ldraw.Ui.Widgets
 
 			// minimum size 100 px square
 			set_size_request(100, 100);
-
+			
+			renderer = new GlRenderer();
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
@@ -84,13 +87,8 @@ namespace Ldraw.Ui.Widgets
 			{
 				throw new GlError.InvalidWidget("GtkGlExt library is playing silly beggars");
 			}
-			GLDrawable drawable = (GLDrawable)drawableWin;
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
-
-			drawable.gl_begin(context);
-
-			int width = 0; int height = 0;
-			drawable.get_size(out width, out height);
+			
+			var drawable = (GLDrawable)drawableWin;
 
 			if(m_Eyeline == null)
 			{
@@ -98,13 +96,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			GlBuilder builder = CreateGlBuilder(width, height, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up);
-
-			BuildModel(builder);
-
-			builder.Flush();
-			drawable.gl_end();
-			drawable.wait_gl();
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model);
 		}
 
 		protected virtual GlBuilder CreateGlBuilder(int widthPx, int heightPx, int defaultColour, Bounds viewArea
