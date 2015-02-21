@@ -269,43 +269,24 @@ namespace Ldraw.Ui.Widgets
 		private Gtk.Menu CreateContextMenu()
 		{
 			Gtk.Menu menu = new Gtk.Menu();
-
-			Gtk.MenuItem frontAngle  = new Gtk.MenuItem.with_label("Front");
-			frontAngle.activate.connect(() => Angle = ViewAngle.Front);
-			frontAngle.show();
-			menu.append(frontAngle);
-
-			Gtk.MenuItem backAngle   = new Gtk.MenuItem.with_label("Back");
-			backAngle.activate.connect(() => Angle = ViewAngle.Back);
-			menu.append(backAngle);
-			backAngle.show();
-
-			Gtk.MenuItem leftAngle   = new Gtk.MenuItem.with_label("Left");
-			leftAngle.activate.connect(() => Angle = ViewAngle.Left);
-			menu.append(leftAngle);
-			leftAngle.show();
-
-			Gtk.MenuItem rightAngle  = new Gtk.MenuItem.with_label("Right");
-			rightAngle.activate.connect(() => Angle = ViewAngle.Right);
-			menu.append(rightAngle);
-			rightAngle.show();
-
-			Gtk.MenuItem topAngle    = new Gtk.MenuItem.with_label("Top");
-			topAngle.activate.connect(() => Angle = ViewAngle.Top);
-			menu.append(topAngle);
-			topAngle.show();
-
-			Gtk.MenuItem bottomAngle = new Gtk.MenuItem.with_label("Bottom");
-			bottomAngle.activate.connect(() => Angle = ViewAngle.Bottom);
-			menu.append(bottomAngle);
-			bottomAngle.show();
-
-			Gtk.MenuItem orthoAngle  = new Gtk.MenuItem.with_label("3D");
-			orthoAngle.activate.connect(() => Angle = ViewAngle.Ortho);
-			menu.append(orthoAngle);
-			orthoAngle.show();
+			
+			AppendMenuFor(ViewAngle.Front, "Front", menu);
+			AppendMenuFor(ViewAngle.Back, "Back", menu);
+			AppendMenuFor(ViewAngle.Left, "Left", menu);
+			AppendMenuFor(ViewAngle.Right, "Right", menu);
+			AppendMenuFor(ViewAngle.Top, "Top", menu);
+			AppendMenuFor(ViewAngle.Bottom, "Bottom", menu);
+			AppendMenuFor(ViewAngle.Ortho, "3D", menu);
 
 			return menu;
+		}
+		
+		private void AppendMenuFor(ViewAngle angle, string label, Gtk.Menu parent)
+		{
+			var item = new Gtk.MenuItem.with_label(label);
+			item.activate.connect(() => Angle = angle);
+			parent.append(item);
+			item.show();
 		}
 
 		private void SelectTopMostUnderMouse(double x, double y)
