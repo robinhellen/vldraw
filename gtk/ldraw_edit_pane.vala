@@ -16,19 +16,18 @@ namespace Ldraw.Ui.Widgets
 {
 	public class LdrawEditPane : LdrawViewPane
 	{
-		private IOptions m_Settings;
+		public IOptions Settings {construct; private get;}
+		public IDroppedObjectLocator Locator {construct; private get;}
+		public UndoStack UndoStack {construct; private get;}
+		
 		private PartNode dropItem = null;
-		private IDroppedObjectLocator locator;
-		private UndoStack undoStack;
+		
 		private AnimatedModel model;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws GlError
 		{
-			base(angle);
-			m_Settings = settings;
-			this.locator = locator;
-			this.undoStack = undoStack;
+			GLib.Object(Angle: angle, Settings: settings, Locator: locator, UndoStack: undoStack);
 		}
 
 		construct
@@ -95,37 +94,37 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, m_Settings.CurrentGrid.Z)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, -m_Settings.CurrentGrid.Z)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, -Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(-m_Settings.CurrentGrid.X, 0, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(-Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(m_Settings.CurrentGrid.X, 0, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, m_Settings.CurrentGrid.Y, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
-				undoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, -m_Settings.CurrentGrid.Y, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, -Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == delKeyVal)
 			{
-				undoStack.ExecuteCommand(new DeleteNodesCommand(model.Model, model.Model.Selection));
+				UndoStack.ExecuteCommand(new DeleteNodesCommand(model.Model, model.Model.Selection));
 				return true;
 			}
 			return false;
@@ -191,7 +190,7 @@ namespace Ldraw.Ui.Widgets
 				newColour = int.parse(sections[1]);
 			}
 
-			var droppedObject = locator.GetObjectForName(partName);
+			var droppedObject = Locator.GetObjectForName(partName);
 
 			if(droppedObject == null)
 			{
@@ -213,39 +212,39 @@ namespace Ldraw.Ui.Widgets
 					break; // do not adjust in the 3D view as that is PAINFUL
 				case ViewAngle.Front:
 					newPosition = Vector(
-						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.X),
-						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
+						SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
+						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
 						newPosition.Z);
 					break;
 				case ViewAngle.Back:
 					newPosition = Vector(
-						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.X),
-						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
+						SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
+						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
 						newPosition.Z);
 					break;
 				case ViewAngle.Left:
 					newPosition = Vector(
 						newPosition.X,
-						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
-						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.Z));
+						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
+						SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Right:
 					newPosition = Vector(
 						newPosition.X,
-						SnapTo(-m_Center.Y + deltaY, m_Settings.CurrentGrid.Y),
-						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.Z));
+						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
+						SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Top:
 					newPosition = Vector(
-						SnapTo(m_Center.X + deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
 						newPosition.Y,
-						SnapTo(m_Center.Y - deltaY, m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
 					break;
 				case ViewAngle.Bottom:
 					newPosition = Vector(
-						SnapTo(-m_Center.X - deltaX, m_Settings.CurrentGrid.X),
+						SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
 						newPosition.Y,
-						SnapTo(m_Center.Y - deltaY, m_Settings.CurrentGrid.Z));
+						SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
 					break;
 				default:
 					newPosition = Vector.NullVector;
@@ -256,7 +255,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 				newNode.Selected = true;
-				undoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
+				UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
 				drag_finish(context, true, false, time);
 			}
 			else

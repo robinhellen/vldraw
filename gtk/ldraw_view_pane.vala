@@ -25,13 +25,12 @@ namespace Ldraw.Ui.Widgets
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
 		{
-			m_Angle = angle;
+			GLib.Object(Angle: angle);
 		}
 
 		construct
 		{
 			m_Model = null;
-			m_Eyeline = m_Center = m_Up = null;
 
 			// initialize this control for OpenGl rendering
 			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA);
@@ -174,7 +173,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				return m_Angle;
 			}
-			protected set
+			protected construct set
 			{
 				m_Angle = value;
 				m_Eyeline = m_Center = m_Up = null;
