@@ -10,6 +10,7 @@ namespace Ldraw.OpenGl
 	public class GlRenderer : Object
 	{
 		public void Render(GLDrawable drawable, int defaultColour, Bounds viewArea, Vector eyeline, Vector center, Vector up, LdrawObject model)
+			throws GlError
 		{
 			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
 
