@@ -79,16 +79,6 @@ namespace Ldraw.Ui
 			
 			m_View = context.Resolve<EditPanes>();
 
-            try
-            {
-                m_View = new EditPanes(Settings, locator, UndoStack);
-            }
-            catch(OpenGl.GlError e)
-            {
-                stdout.printf(e.message);
-                throw e;
-            }
-
             var notebook = new Notebook();
             // add a list of available parts on the left
             m_PartDetail = CreatePreviewPane();

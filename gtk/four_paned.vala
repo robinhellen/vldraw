@@ -51,18 +51,6 @@ namespace Ldraw.Ui.Widgets
 		public LdrawEditPane BottomLeft {construct; private get;}
 		public LdrawEditPane TopRight {construct; private get;}
 		public LdrawEditPane BottomRight {construct; private get;}
-
-		public EditPanes(IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
-			throws OpenGl.GlError
-		{
-			GLib.Object(
-				TopLeft		: new LdrawEditPane(ViewAngle.Front, settings, locator, undoStack),
-				BottomLeft	: new LdrawEditPane(ViewAngle.Top, settings, locator, undoStack),
-
-				TopRight	: new LdrawEditPane(ViewAngle.Right, settings, locator, undoStack),
-				BottomRight : new LdrawEditPane(ViewAngle.Ortho, settings, locator, undoStack)	
-			);	
-		}
 		
 		construct
 		{
