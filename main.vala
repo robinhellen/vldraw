@@ -33,7 +33,10 @@ namespace Ldraw
 
             // UI components
             builder.Register<PartsTree>();
-            builder.Register<SetList>();
+            builder.Register<SetList>();            
+            builder.Register<EditPanes>();
+            builder.Register<LdrawEditPane>().InstancePerDependency();
+            builder.Register<LdrawViewPane>().InstancePerDependency();
 
             builder.Register<LibrarySubFileLocator>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.PartsOnly);
             builder.Register<OnDemandSubFileLoader>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.SubPartsAndPrimitives);
@@ -46,10 +49,6 @@ namespace Ldraw
             builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
 
             builder.Register<UndoStack>();
-            
-            builder.Register<EditPanes>();
-            builder.Register<LdrawEditPane>().InstancePerDependency();
-            builder.Register<LdrawViewPane>().InstancePerDependency();
 
             var container = builder.Build();
 
