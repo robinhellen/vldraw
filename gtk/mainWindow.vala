@@ -22,8 +22,6 @@ namespace Ldraw.Ui
         private ComboBox m_SubModels;
 
         // controls
-        EditPanes m_View;
-        LdrawViewPane m_PartDetail;
         ModelList m_ModelList;
         ParameterValues parameters;
 
@@ -36,6 +34,9 @@ namespace Ldraw.Ui
         public LdrawFileLoader Loader {construct; private get;}
         public ILdrawFolders LdrawFolders {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
+		public EditPanes View {construct; private get;}
+		public LdrawViewPane PartsPreview {construct; private get;}
+		public LdrawViewPane SubModelsPreview {construct; private get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
                                     DependencyResolutionContext context)
@@ -45,7 +46,18 @@ namespace Ldraw.Ui
             var settings = context.Resolve<IOptions>();
             var loader = context.Resolve<LdrawFileLoader>();
             var undoStack = context.Resolve<UndoStack>();
-            GLib.Object(Loader: loader, Settings: settings, LdrawFolders: folders, UndoStack: undoStack);
+            var view = context.Resolve<EditPanes>();
+            var preview1 = context.Resolve<LdrawViewPane>();
+            var preview2 = context.Resolve<LdrawViewPane>();
+            GLib.Object(
+				Loader: loader, 
+				Settings: settings, 
+				LdrawFolders: folders, 
+				UndoStack: undoStack,
+				View: view,
+				PartsPreview: preview1,
+				SubModelsPreview : preview2
+			);
 
             EditingObject = new AnimatedModel(model.MainObject);
 
@@ -55,6 +67,19 @@ namespace Ldraw.Ui
             File = model;
             SetUpErrorReporting();
         }
+        
+        construct
+        {
+			PartsPreview.Angle = ViewAngle.Ortho;
+			PartsPreview.set_size_request(200, 200);
+            PartsPreview.DefaultColour = Settings.PreviewColourId;
+            Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = Settings.PreviewColourId);
+			
+			SubModelsPreview.Angle = ViewAngle.Ortho;
+			SubModelsPreview.set_size_request(200, 200);
+            SubModelsPreview.DefaultColour = Settings.PreviewColourId;
+            Settings.notify["PreviewColourId"].connect(() => SubModelsPreview.DefaultColour = Settings.PreviewColourId);
+		}
 
         private void SetUpControls(DependencyResolutionContext context)
             throws OpenGl.GlError
@@ -73,33 +98,27 @@ namespace Ldraw.Ui
             bigVBox.pack_start(tools, false, false);
 
             documentLocator = new DocumentObjectLocator();
-            documentLocator.Objects = Gee.List.empty<LdrawObject>();
-
-			var locator = context.Resolve<IDroppedObjectLocator>();
-			
-			m_View = context.Resolve<EditPanes>();
+            documentLocator.Objects = Gee.List.empty<LdrawObject>();			
 
             var notebook = new Notebook();
             // add a list of available parts on the left
-            m_PartDetail = CreatePreviewPane();
             parts = context.Resolve<PartsTree>();
             var treeDetailBox = new VBox(false, 0);
 
-            parts.DetailView = m_PartDetail;
+            parts.DetailView = PartsPreview;
 
             treeDetailBox.pack_start(parts.Widget);
-            treeDetailBox.pack_start(m_PartDetail, false);
+            treeDetailBox.pack_start(PartsPreview, false);
             notebook.append_page(treeDetailBox, new Label("Parts"));
 
 
             var subModelsBox = new VBox(false, 0);
-            var subModelPreview = CreatePreviewPane();
 
             subModels = new SubModelsTree();
-            subModels.DetailView = subModelPreview;
+            subModels.DetailView = SubModelsPreview;
 
             subModelsBox.pack_start(subModels.Widget);
-            subModelsBox.pack_start(subModelPreview, false);
+            subModelsBox.pack_start(SubModelsPreview, false);
             notebook.append_page(subModelsBox, new Label("Multipart"));
 
             parameters = new ParameterValues(EditingObject);
@@ -122,30 +141,12 @@ namespace Ldraw.Ui
             viewDetails.pack_start(m_ModelList.Widget);
 
             modelPanes.add1(WithFrame(viewDetails));
-            modelPanes.add2(WithFrame(m_View));
+            modelPanes.add2(WithFrame(View));
 
             treePaned.add2(modelPanes);
 
             bigVBox.pack_start(treePaned, true, true);
             add(bigVBox);
-        }
-
-        private LdrawViewPane CreatePreviewPane()
-        {
-            LdrawViewPane previewPane;
-            try
-            {
-                previewPane = new LdrawViewPane.WithModel(ViewAngle.Ortho, new LdrawModel.Empty().MainObject);
-            }
-            catch(OpenGl.GlError e)
-            {
-                stderr.printf(e.message);
-                return null;
-            }
-            previewPane.set_size_request(200, 200);
-            previewPane.DefaultColour = Settings.PreviewColourId;
-            Settings.notify["PreviewColourId"].connect(() => previewPane.DefaultColour = Settings.PreviewColourId);
-            return previewPane;
         }
 
         private ComboBox CreateSubModelsDropDown()
@@ -167,7 +168,7 @@ namespace Ldraw.Ui
                     LdrawObject object;
                     tModel.get(tIter, 0, out object, -1);
                     EditingObject = new AnimatedModel(object);
-                    m_View.Model = EditingObject;
+                    View.Model = EditingObject;
                     m_ModelList.Model = object;
                     UndoStack.Clear();
                 });
@@ -176,14 +177,21 @@ namespace Ldraw.Ui
 
         private void SetUpErrorReporting()
         {
-            m_View.RenderingError.connect(x =>
+            View.RenderingError.connect(x =>
                             {
                                 MessageDialog msg = new MessageDialog(this, DialogFlags.DESTROY_WITH_PARENT, MessageType.ERROR, ButtonsType.CLOSE,
                                             "Error rendering main model: %s", x);
                                 msg.run();
 
                             });
-            m_PartDetail.RenderingError.connect(x =>
+            SubModelsPreview.RenderingError.connect(x =>
+                            {
+                                MessageDialog msg = new MessageDialog(this, DialogFlags.DESTROY_WITH_PARENT, MessageType.ERROR, ButtonsType.CLOSE,
+                                            "Error rendering part detail: %s", x);
+                                msg.run();
+
+                            });
+            PartsPreview.RenderingError.connect(x =>
                             {
                                 MessageDialog msg = new MessageDialog(this, DialogFlags.DESTROY_WITH_PARENT, MessageType.ERROR, ButtonsType.CLOSE,
                                             "Error rendering part detail: %s", x);
@@ -502,7 +510,7 @@ namespace Ldraw.Ui
                     subModels.Models = new ObservableList<LdrawObject>();
                     documentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
-                m_View.Model = EditingObject;
+                View.Model = EditingObject;
 
                 var titleFileName = value.FileName ?? "untitled";
 

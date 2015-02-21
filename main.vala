@@ -49,6 +49,7 @@ namespace Ldraw
             
             builder.Register<EditPanes>();
             builder.Register<LdrawEditPane>().InstancePerDependency();
+            builder.Register<LdrawViewPane>().InstancePerDependency();
 
             var container = builder.Build();
 
