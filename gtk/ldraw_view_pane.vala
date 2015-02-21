@@ -173,7 +173,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				return m_Angle;
 			}
-			protected construct set
+			public construct set
 			{
 				m_Angle = value;
 				m_Eyeline = m_Center = m_Up = null;

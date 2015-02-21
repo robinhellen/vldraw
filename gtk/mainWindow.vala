@@ -76,6 +76,8 @@ namespace Ldraw.Ui
             documentLocator.Objects = Gee.List.empty<LdrawObject>();
 
 			var locator = context.Resolve<IDroppedObjectLocator>();
+			
+			m_View = context.Resolve<EditPanes>();
 
             try
             {

@@ -76,6 +76,12 @@ namespace Ldraw.Ui.Widgets
 
 			TopRight.RenderingError.connect(x => RenderingError(x));
 			BottomRight.RenderingError.connect(x => RenderingError(x));
+			
+			TopLeft.Angle = ViewAngle.Front;
+			TopRight.Angle = ViewAngle.Right;
+			
+			BottomLeft.Angle = ViewAngle.Top;
+			BottomRight.Angle = ViewAngle.Ortho;
 		}
 
 		public AnimatedModel Model

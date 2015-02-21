@@ -46,6 +46,9 @@ namespace Ldraw
             builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
 
             builder.Register<UndoStack>();
+            
+            builder.Register<EditPanes>();
+            builder.Register<LdrawEditPane>().InstancePerDependency();
 
             var container = builder.Build();
 
