@@ -29,7 +29,10 @@ namespace Ldraw.Ui.Widgets
 			m_Settings = settings;
 			this.locator = locator;
 			this.undoStack = undoStack;
+		}
 
+		construct
+		{
 			can_focus = true;
 			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
 			events |= Gdk.EventMask.KEY_PRESS_MASK;

@@ -25,16 +25,17 @@ namespace Ldraw.Ui.Widgets
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
 		{
-			m_Model = null;
 			m_Angle = angle;
+		}
+
+		construct
+		{
+			m_Model = null;
 			m_Eyeline = m_Center = m_Up = null;
 
 			// initialize this control for OpenGl rendering
 			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA);
-			if(!widget_set_gl_capability(this, config, null, true, GLRenderType.RGBA_TYPE))
-			{
-				throw new GlError.InitializationError("Unable to initialize a drawing area for OpenGL rendering.");
-			}
+			widget_set_gl_capability(this, config, null, true, GLRenderType.RGBA_TYPE);
 
 			// minimum size 100 px square
 			set_size_request(100, 100);
