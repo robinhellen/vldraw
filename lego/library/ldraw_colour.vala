@@ -139,11 +139,18 @@ namespace Ldraw.Lego.Library
 			requires (code != 24)
 		{
 			LdrawColour colour = GetColour(code);
-			red = colour.m_Red / 256.0f;
-			green = colour.m_Green / 256.0f;
-			blue = colour.m_Blue / 256.0f;
+			if(colour == null)
+			{
+				red = green = blue = alpha = 0f;
+			}
+			else
+			{
+				red = colour.m_Red / 256.0f;
+				green = colour.m_Green / 256.0f;
+				blue = colour.m_Blue / 256.0f;
 
-			alpha = 1.0f - colour.m_Alpha / 255.0f;
+				alpha = 1.0f - colour.m_Alpha / 255.0f;
+			}
 		}
 
 		public static void EdgeColour(int code, out float red, out float green, out float blue, out float alpha)
@@ -151,11 +158,18 @@ namespace Ldraw.Lego.Library
 			requires (code != 24)
 		{
 			LdrawColour colour = GetColour(code);
-			red = colour.m_EdgeRed / 256.0f;
-			green = colour.m_EdgeGreen / 256.0f;
-			blue = colour.m_EdgeBlue / 256.0f;
+			if(colour == null)
+			{
+				red = green = blue = alpha = 0f;
+			}
+			else
+			{
+				red = colour.m_EdgeRed / 256.0f;
+				green = colour.m_EdgeGreen / 256.0f;
+				blue = colour.m_EdgeBlue / 256.0f;
 
-			alpha = 1.0f - colour.m_Alpha / 255.0f;
+				alpha = 1.0f - colour.m_Alpha / 255.0f;
+			}
 		}
 
 		private uint8 ParseHex(char c1, char c2)
