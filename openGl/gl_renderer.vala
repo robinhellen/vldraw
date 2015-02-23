@@ -9,6 +9,14 @@ namespace Ldraw.OpenGl
 {
 	public class GlRenderer : Object
 	{
+		public IRenderModel ModelRenderer {construct; private get;}
+		
+		public GlRenderer()
+		{
+			var m = new StandardModelRenderer();
+			Object(ModelRenderer: m);
+		}
+		
 		public void Render(GLDrawable drawable, int defaultColour, Bounds viewArea, Vector eyeline, Vector center, Vector up, LdrawObject model)
 			throws GlError
 		{
@@ -46,11 +54,8 @@ namespace Ldraw.OpenGl
 			glLineWidth(2.0f);
 			glMatrixMode(GL_MODELVIEW);
 
-			GlBuilder builder = new GlBuilder(defaultColour, finalEyeline);
+			ModelRenderer.RenderModel(model, defaultColour, finalEyeline);
 
-			model.BuildFromFile<void>(builder);
-
-			builder.Flush();
 			drawable.gl_end();
 			drawable.wait_gl();
 		}
@@ -70,5 +75,21 @@ namespace Ldraw.OpenGl
 
 			return center.Subtract(eye);
 		}
+	}
+	
+	public class StandardModelRenderer : Object, IRenderModel
+	{
+		public void RenderModel(LdrawObject model, int colour, Vector finalEyeline)
+		{
+			GlBuilder builder = new GlBuilder(colour, finalEyeline);
+			model.BuildFromFile<void>(builder);	
+			
+			builder.Flush();		
+		}
+	}
+	
+	public interface IRenderModel : Object
+	{
+		public abstract void RenderModel(LdrawObject object, int colour, Vector finalEyeline);		
 	}
 }
