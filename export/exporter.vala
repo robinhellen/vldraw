@@ -24,16 +24,9 @@ namespace Ldraw.Export
 			var viewBounds = angle.GetViewBounds(800, 600, scale, angle.GetViewCenter(model.BoundingBox.Center()));
 
 			GLDrawable drawable = (GLDrawable)glPixmap;
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
-
-			drawable.gl_begin(context);
-
-			var builder = new GlBuilder(800, 600, 0, viewBounds, eyeline, center, up);
-			builder.Visit(model);
-
-			builder.Flush();
-			drawable.gl_end();
-			drawable.wait_gl();
+			
+			var renderer = new GlRenderer();
+			renderer.Render(drawable, 0, viewBounds, eyeline, center, up, model);
 
 			var pixbuf = pixbuf_get_from_drawable(null, pixmap, null, 0, 0, 0, 0, 800, 600);
 			pixbuf.save(filename, "jpeg");
