@@ -10,18 +10,21 @@ namespace Ldraw.OpenGl
 	public class GlRenderer : Object
 	{
 		public IRenderModel ModelRenderer {construct; private get;}
+		private static GLContext sharingContext;		
 		
 		public GlRenderer()
 		{
-			var m = new StandardModelRenderer();
+			var m = new FromFlatRenderer();
 			Object(ModelRenderer: m);
 		}
 		
 		public void Render(GLDrawable drawable, int defaultColour, Bounds viewArea, Vector eyeline, Vector center, Vector up, LdrawObject model)
 			throws GlError
 		{
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
-
+			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
+			if(sharingContext == null)
+				sharingContext = context;
+				
 			drawable.gl_begin(context);
 
 			int width = 0; int height = 0;
@@ -57,7 +60,7 @@ namespace Ldraw.OpenGl
 			ModelRenderer.RenderModel(model, defaultColour, finalEyeline);
 
 			drawable.gl_end();
-			drawable.wait_gl();
+			//drawable.wait_gl();
 		}
 
 		private Vector lookAt(Vector eye, Vector center, Vector up)

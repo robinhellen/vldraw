@@ -13,6 +13,14 @@ namespace Ldraw.Lego
 			}
 			return GetResult();
 		}
+		
+		protected void VisitInner(LdrawObject object)
+		{
+			foreach(var node in object.Nodes)
+			{
+				VisitNode(node);
+			}
+		}
 
 		public virtual void VisitNode(LdrawNode node)
 		{
