@@ -64,7 +64,6 @@ namespace Ldraw.OpenGl
 		{
 			float red, green, blue, alpha;
 			LdrawColour.SurfaceColour(c.Code, out red, out green, out blue, out alpha);
-			stderr.printf("building render colour from %s\n", c.Name);
 			Object(Red:red, Green:green, Blue:blue, Alpha:alpha);
 		}
 		
@@ -72,7 +71,6 @@ namespace Ldraw.OpenGl
 		{
 			float red, green, blue, alpha;
 			LdrawColour.EdgeColour(c.Code, out red, out green, out blue, out alpha);
-			stderr.printf("building render edge colour from %s\n", c.Name);
 			Object(Red:red, Green:green, Blue:blue, Alpha:alpha);			
 		}
 		
