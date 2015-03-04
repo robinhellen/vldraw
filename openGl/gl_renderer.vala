@@ -54,12 +54,13 @@ namespace Ldraw.OpenGl
 			//glScalef(1.0f, 1.0f, -1.0f);
 			glLoadIdentity();
 
-			glLineWidth(2.0f);
+			glLineWidth(3.0f);
 			glMatrixMode(GL_MODELVIEW);
 
 			ModelRenderer.RenderModel(model, defaultColour, finalEyeline);
 
 			drawable.gl_end();
+			drawable.swap_buffers();
 			//drawable.wait_gl();
 		}
 
