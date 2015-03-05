@@ -11,10 +11,12 @@ namespace Ldraw.OpenGl
 	public class FromFlatRenderer : Object, IRenderModel
 	{
 		public IRenderModel InnerRenderer {private get; construct;}
+		public IRenderModel SelectedRenderer {private get; construct;}
 		
 		construct
 		{
 			InnerRenderer = new FromFlatPartRenderer();
+			SelectedRenderer = new FromFlatInversePartRenderer();
 		}
 		
 		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline)
@@ -33,7 +35,10 @@ namespace Ldraw.OpenGl
 							 m[0,1], m[1,1], m[2,1], 0,
 							 m[0,2], m[1,2], m[2,2], 0,
 							 0,		 0,		 0,		 1});
-				InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
+				if(part.Selected)
+					SelectedRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
+				else
+					InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
 				glPopMatrix();
 			}
 		}		
@@ -105,7 +110,7 @@ namespace Ldraw.OpenGl
 			glVertex3fv(b.value_vector());
 		}
 		
-		private void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, LdrawColour defaultColour)
+		protected virtual void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, LdrawColour defaultColour)
 		{
 			glBegin(drawType);
 			foreach(var colour in nodes.get_keys())
@@ -121,6 +126,27 @@ namespace Ldraw.OpenGl
 			}
 			glEnd();			
 		}
-		private delegate void RenderAction<T>(T t);		
+		protected delegate void RenderAction<T>(T t);		
+	}
+	
+	public class FromFlatInversePartRenderer : FromFlatPartRenderer
+	{
+		protected override void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, LdrawColour defaultColour)
+		{
+			glBegin(drawType);
+			foreach(var colour in nodes.get_keys())
+			{
+				colour.UseColour((r,g,b,a) => glColor4f(1-r,1-g,1-b,a), defaultColour);
+				
+				// render the vertices
+				var nodeList = nodes[colour];
+				foreach(var node in nodeList)
+				{
+					render(node);
+				}
+			}
+			glEnd();			
+		}
+		protected delegate void RenderAction<T>(T t);		
 	}
 }
