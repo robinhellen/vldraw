@@ -21,6 +21,16 @@ namespace Ldraw.OpenGl
 		
 		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline)
 		{
+			// Action taken depends upon file type:
+			var file = model.File;
+			if(file is LdrawModelFile)
+				RenderBuiltModel(model, defaultColour, finalEyeline);
+			else
+				RenderLibraryPart(model, defaultColour, finalEyeline);
+		}
+		
+		public void RenderBuiltModel(LdrawObject model, int defaultColour, Vector finalEyeline)
+		{
 			foreach(var node in model.Nodes)
 			{
 				var part = node as PartNode;
@@ -41,6 +51,11 @@ namespace Ldraw.OpenGl
 					InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
 				glPopMatrix();
 			}
+		}
+		
+		public void RenderLibraryPart(LdrawObject model, int defaultColour, Vector finalEyeline)
+		{
+			InnerRenderer.RenderModel(model, defaultColour, finalEyeline);
 		}
 		
 		public void RenderBoundsFor(PartNode part)
