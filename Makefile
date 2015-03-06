@@ -6,27 +6,17 @@ TEST_FRAMEWORK_SOURCES= $(wildcard tests/*.vala)
 TEST_SOURCES= $(TEST_FRAMEWORK_SOURCES) $(TEST_MATHS_SOURCES) $(TEST_EXPR_SOURCES)
 
 EXPORT_SOURCES=		$(wildcard export/*.vala)
-EXPRESSIONS_SOURCES=$(wildcard expressions/*.vala)
-UTILS_DI_SOURCES=	$(wildcard utils/di/*.vala)
-UTILS_SOURCES=		$(wildcard utils/*.vala) $(UTILS_DI_SOURCES)
 OPENGL_SOURCES=		$(wildcard openGl/*.vala)
-POVRAY_SOURCES=		$(wildcard povray/*.vala)
 MATHS_SOURCES=		$(wildcard maths/*.c)
-LEGO_FILES_PARSING_SOURCES=	$(wildcard lego/files/parsing/*.vala)
-LEGO_FILES_SOURCES=	$(wildcard lego/files/*.vala) $(LEGO_FILES_PARSING_SOURCES)
-LEGO_LIBRARY_SOURCES=	$(wildcard lego/library/*.vala)
-LEGO_OBJECTS_NODES_SOURCES=	$(wildcard lego/objects/nodes/*.vala)
-LEGO_OBJECTS_SOURCES=	$(wildcard lego/objects/*.vala) $(LEGO_OBJECTS_NODES_SOURCES)
-LEGO_SOURCES=		$(wildcard lego/*.vala) $(LEGO_LIBRARY_SOURCES) $(LEGO_OBJECTS_SOURCES) $(LEGO_FILES_SOURCES)
-OPTIONS_SOURCES=	$(wildcard options/*.vala)
-PEERON_SOURCES=		$(wildcard peeron/*.vala)
 REFACTORING_SOURCES=$(wildcard refactoring/*.vala)
-DRAG_AND_DROP_SOURCES=	$(wildcard gtk/drag_and_drop/*.vala)
-WIDGETS_SOURCES=	$(wildcard gtk/widgets/*.vala)
-UNDO_SOURCES=		$(wildcard gtk/undo/*.vala)
-GTK_SOURCES=		$(wildcard gtk/*.vala) $(WIDGETS_SOURCES) $(UNDO_SOURCES) $(DRAG_AND_DROP_SOURCES)
 
-ENGINE_SOURCES=$(POVRAY_SOURCES) $(LEGO_SOURCES) $(OPTIONS_SOURCES) $(UTILS_SOURCES) $(EXPRESSIONS_SOURCES) $(PEERON_SOURCES)
+ENGINE_SOURCE_FOLDERS= expressions utils/di utils povray \
+		lego/files/parsing lego/files lego/library lego/objects/nodes lego/objects lego \
+		options peeron
+UI_SOURCE_FOLDERS= drag_and_drop widgets undo .
+
+ENGINE_SOURCES= $(foreach folder, $(ENGINE_SOURCE_FOLDERS), $(wildcard $(folder)/*.vala))
+GTK_SOURCES= $(foreach folder, $(UI_SOURCE_FOLDERS), $(wildcard gtk/$(folder)/*.vala))
 
 ENGINE_C_SOURCES=$(MATHS_SOURCES)
 
@@ -46,7 +36,7 @@ TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 
 all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
 	./$(TEST_EXECUTABLE_NAME)
-	
+
 debug: $(SOURCES) $(ENGINE_C_SOURCES)
 	valac-0.24 $(VALA_DEBUG_OPTS) $(SOURCES) $(ENGINE_C_SOURCES) -o $(EXECUTABLE_NAME)_debug
 
