@@ -20,8 +20,6 @@ namespace Ldraw.Ui.Widgets
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		
-		private PartNode dropItem = null;
-		
 		private AnimatedModel model;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)

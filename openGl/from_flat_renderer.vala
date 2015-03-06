@@ -41,6 +41,39 @@ namespace Ldraw.OpenGl
 					InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
 				glPopMatrix();
 			}
+		}
+		
+		public void RenderBoundsFor(PartNode part)
+		{		
+			glPushMatrix();
+
+			glTranslatef(part.Center.X, part.Center.Y, part.Center.Z);
+			var m = part.Transform;	
+			var bounds = part.Contents.BoundingBox;
+			glColor3f(0.0f, 0.0f, 0.0f);
+
+			glBegin(GL_LINE_STRIP);
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MinZ); // (a) - 1
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MaxZ); // (b) - 2
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MaxZ); // (c) - 2
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MinZ); // (d) - 2
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MinZ); // (a) - 3
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MinZ); // (h) - 2
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MinZ); // (e) - 2
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MaxZ); // (f) - 2
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MaxZ); // (g) - 2
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MinZ); // (h) - 3
+			glEnd();
+
+			glBegin(GL_LINES);
+			glVertex3f(bounds.MaxX, bounds.MinY, bounds.MaxZ); // (g) - 3
+			glVertex3f(bounds.MinX, bounds.MinY, bounds.MaxZ); // (b) - 3
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MaxZ); // (c) - 3
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MaxZ); // (f) - 3
+			glVertex3f(bounds.MinX, bounds.MaxY, bounds.MinZ); // (d) - 3
+			glVertex3f(bounds.MaxX, bounds.MaxY, bounds.MinZ); // (e) - 3
+			glEnd();
+			glPopMatrix();
 		}		
 	}
 	

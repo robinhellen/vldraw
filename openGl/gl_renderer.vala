@@ -3,6 +3,7 @@ using Gdk;
 using GL;
 
 using Ldraw.Lego;
+using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 
 namespace Ldraw.OpenGl
@@ -18,7 +19,10 @@ namespace Ldraw.OpenGl
 			Object(ModelRenderer: m);
 		}
 		
-		public void Render(GLDrawable drawable, int defaultColour, Bounds viewArea, Vector eyeline, Vector center, Vector up, LdrawObject model)
+		public void Render(
+				GLDrawable drawable, int defaultColour, 
+				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
+				LdrawObject model, PartNode? extraBounds)
 			throws GlError
 		{
 			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
@@ -58,6 +62,8 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_MODELVIEW);
 
 			ModelRenderer.RenderModel(model, defaultColour, finalEyeline);
+			if(extraBounds != null)
+				ModelRenderer.RenderBoundsFor(extraBounds);			
 
 			drawable.gl_end();
 			drawable.swap_buffers();
@@ -94,6 +100,7 @@ namespace Ldraw.OpenGl
 	
 	public interface IRenderModel : Object
 	{
-		public abstract void RenderModel(LdrawObject object, int colour, Vector finalEyeline);		
+		public abstract void RenderModel(LdrawObject object, int colour, Vector finalEyeline);			
+		public virtual void RenderBoundsFor(PartNode part)	{}
 	}
 }

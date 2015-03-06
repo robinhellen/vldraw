@@ -26,7 +26,7 @@ namespace Ldraw.Export
 			GLDrawable drawable = (GLDrawable)glPixmap;
 			
 			var renderer = new GlRenderer();
-			renderer.Render(drawable, 0, viewBounds, eyeline, center, up, model);
+			renderer.Render(drawable, 0, viewBounds, eyeline, center, up, model, null);
 
 			var pixbuf = pixbuf_get_from_drawable(null, pixmap, null, 0, 0, 0, 0, 800, 600);
 			pixbuf.save(filename, "jpeg");
