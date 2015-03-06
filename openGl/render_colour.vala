@@ -80,6 +80,8 @@ namespace Ldraw.OpenGl
 		public float Alpha {get; construct;}
 		
 		public virtual void UseColour(UseColourFunc u, LdrawColour defaultColour)
+			requires(defaultColour.Code != 16)
+			requires(defaultColour.Code != 24)
 		{
 			u(Red, Green, Blue, Alpha);
 		}
@@ -87,6 +89,8 @@ namespace Ldraw.OpenGl
 		private class DefaultEdge : RenderColour
 		{			
 			public override void UseColour(UseColourFunc u, LdrawColour defaultColour)
+				requires(defaultColour.Code != 16)
+				requires(defaultColour.Code != 24)
 			{
 				FromLdrawEdgeColour(defaultColour).UseColour(u, defaultColour);
 			}
@@ -95,6 +99,8 @@ namespace Ldraw.OpenGl
 		private class DefaultSurface : RenderColour
 		{		
 			public override void UseColour(UseColourFunc u, LdrawColour defaultColour)
+				requires(defaultColour.Code != 16)
+				requires(defaultColour.Code != 24)
 			{
 				FromLdrawColour(defaultColour).UseColour(u, defaultColour);
 			}			
