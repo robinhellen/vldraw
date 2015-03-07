@@ -160,9 +160,10 @@ namespace Ldraw.Ui.Widgets
 		}
 
 		private void SetAdjustmentRanges()
-			requires(m_Hadj != null)
 		{
-			if(m_Center == null)
+			if(m_Center == null
+				|| m_Hadj == null
+				|| m_Vadj == null)
 				return;
 
 			m_Hadj.value = -m_Center.X;
