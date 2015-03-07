@@ -471,9 +471,15 @@ namespace Ldraw.Ui
                             FilePath: File.FilePath);
 
                 File = mpdModel;
+                File.MainObject.File = mpdModel;
             }
             var nodes = new ObservableList<LdrawNode>();
-            var newObject = (LdrawObject)GLib.Object.new(typeof(LdrawObject), Nodes: nodes, FileName: newFileName);
+            var newObject = (LdrawObject)GLib.Object.new(
+						typeof(LdrawObject), 
+						Nodes: nodes, 
+						FileName: newFileName,
+						File: mpdModel
+					);
             mpdModel.SubModels.add(newObject);
             EditingObject = new AnimatedModel(newObject);
         }
