@@ -104,6 +104,7 @@ namespace Ldraw.OpenGl
 				var flats = FlattenedNodes.FlatForObject(model);
 				cache[model] = flats;
 				cached = flats;
+				model.VisibleChange.connect(() => cache.unset(model));
 			}
 			
 			var c = LdrawColour.GetColour(defaultColour);
