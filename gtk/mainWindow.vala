@@ -60,7 +60,8 @@ namespace Ldraw.Ui
 			);
 
             EditingObject = new AnimatedModel(model.MainObject);
-
+			documentLocator = context.Resolve<DocumentObjectLocator>();
+			
             maximize();
 
             SetUpControls(context);
@@ -96,8 +97,7 @@ namespace Ldraw.Ui
             Toolbar colourTools = toolbarProvider.GetColoursToolbar(this);
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
-
-            documentLocator = new DocumentObjectLocator();
+            
             documentLocator.Objects = Gee.List.empty<LdrawObject>();			
 
             var notebook = new Notebook();
