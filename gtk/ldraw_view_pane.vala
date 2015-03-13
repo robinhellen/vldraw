@@ -74,7 +74,7 @@ namespace Ldraw.Ui.Widgets
 
 		public int DefaultColour {get; set; default = 0;}
 
-		public void Redraw()
+		public virtual void Redraw()
 			throws GlError
 		{
 			if(m_Model == null)
@@ -187,7 +187,7 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		private void InitializeView()
+		protected void InitializeView()
 		{
 			var modelBounds = new Bounds.Clone(m_Model.BoundingBox);
 			if(modelBounds.Radius == 0)

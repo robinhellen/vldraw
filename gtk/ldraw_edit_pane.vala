@@ -20,7 +20,6 @@ namespace Ldraw.Ui.Widgets
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		
-		
 		private AnimatedModel model;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
@@ -49,6 +48,31 @@ namespace Ldraw.Ui.Widgets
 				model.ParametersUpdated.connect(() => queue_draw());
 				Model = value.Model;
 			}
+		}
+		
+		public override void Redraw()
+			throws GlError
+		{
+			if(model == null)
+			{
+				return;
+			}
+
+			GLWindow drawableWin = widget_get_gl_window(this);
+			if(!(drawableWin is GLDrawable))
+			{
+				throw new GlError.InvalidWidget("GtkGlExt library is playing silly beggars");
+			}
+			
+			var drawable = (GLDrawable)drawableWin;
+
+			if(m_Eyeline == null)
+			{
+				// setup viewing area.
+				InitializeView();
+			}
+
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, dropItem, model.Selection);
 		}
 
 		public override bool button_press_event(Gdk.EventButton event)
