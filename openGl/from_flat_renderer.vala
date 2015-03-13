@@ -19,17 +19,17 @@ namespace Ldraw.OpenGl
 			SelectedRenderer = new FromFlatInversePartRenderer();
 		}
 		
-		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline)
+		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			// Action taken depends upon file type:
 			var file = model.File;
 			if(file is LdrawModelFile)
-				RenderBuiltModel(model, defaultColour, finalEyeline);
+				RenderBuiltModel(model, defaultColour, finalEyeline, selection);
 			else
-				RenderLibraryPart(model, defaultColour, finalEyeline);
+				RenderLibraryPart(model, defaultColour, finalEyeline, selection);
 		}
 		
-		public void RenderBuiltModel(LdrawObject model, int defaultColour, Vector finalEyeline)
+		public void RenderBuiltModel(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			foreach(var node in model.Nodes)
 			{
@@ -45,17 +45,18 @@ namespace Ldraw.OpenGl
 							 m[0,1], m[1,1], m[2,1], 0,
 							 m[0,2], m[1,2], m[2,2], 0,
 							 0,		 0,		 0,		 1});
-				if(part.Selected)
-					SelectedRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
+							 
+				if(part in selection)
+					SelectedRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline, Set.empty<LdrawNode>());
 				else
-					InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline);
+					InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline, Set.empty<LdrawNode>());
 				glPopMatrix();
 			}
 		}
 		
-		public void RenderLibraryPart(LdrawObject model, int defaultColour, Vector finalEyeline)
+		public void RenderLibraryPart(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
-			InnerRenderer.RenderModel(model, defaultColour, finalEyeline);
+			InnerRenderer.RenderModel(model, defaultColour, finalEyeline, selection);
 		}
 		
 		public void RenderBoundsFor(PartNode part)
@@ -96,7 +97,7 @@ namespace Ldraw.OpenGl
 	{
 		static Map<LdrawObject, FlattenedNodes> cache = new HashMap<LdrawObject, FlattenedNodes>();
 		
-		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline)
+		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			var cached = cache[model];
 			if(cached == null)

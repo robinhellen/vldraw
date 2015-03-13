@@ -85,7 +85,7 @@ namespace Ldraw.Ui
         private void SetUpControls(DependencyResolutionContext context)
             throws OpenGl.GlError
         {
-            var toolbarProvider = new ToolBarProvider(this, Settings, UndoStack);
+            var toolbarProvider = new ToolBarProvider(EditingObject, Settings, UndoStack);
 
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();
@@ -316,15 +316,12 @@ namespace Ldraw.Ui
             var selectAll = new Gtk.MenuItem.with_mnemonic("Select _All");
             selectAll.activate.connect(() =>
                 {
-                    foreach(var node in EditingObject.Model.Nodes)
-                    {
-                        node.Selected = true;
-                    }
+					EditingObject.Selection.add_all(EditingObject.Model.Nodes);
                 });
             selectionMenu.append(selectAll);
 
             var clearSelection = new Gtk.MenuItem.with_mnemonic("_Clear");
-            clearSelection.activate.connect(() => EditingObject.Model.ClearSelection());
+            clearSelection.activate.connect(() => EditingObject.Selection.clear());
             selectionMenu.append(clearSelection);
 
             var selectionAnimation = new Gtk.MenuItem.with_mnemonic("_Animation");
@@ -577,11 +574,17 @@ namespace Ldraw.Ui
         public AnimatedModel(LdrawObject model)
         {
             var map = new HashMap<string, float?>();
-            GLib.Object(Model: model, CurrentParameters: map);
+            var selection = new HashSet<LdrawNode>();
+            GLib.Object(
+				Model: model, 
+				CurrentParameters: map,
+				Selection: selection
+			);
         }
 
         public LdrawObject Model {get; construct;}
         public Map<string, float?> CurrentParameters {get; construct; }
+        public Set<LdrawNode> Selection {get; construct;}
 
         public void UpdateParameter(string Identifier, float value)
         {

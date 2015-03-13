@@ -125,7 +125,7 @@ namespace Ldraw.Ui
 
 		private void SetSelectionAnimation()
 		{
-			foreach(var node in model.Model.Selection)
+			foreach(var node in model.Selection)
 			{
 				SetNodeAnimation(node);
 			}
@@ -155,7 +155,7 @@ namespace Ldraw.Ui
 			translationDistance = null;
 			translationVector = null;
 
-			var selection = model.Model.Selection;
+			var selection = model.Selection;
 			// selection
 			//   .Select(n => GetAnimationFor(n))
 			//   .Distinct() // May need equality func

@@ -22,7 +22,8 @@ namespace Ldraw.OpenGl
 		public void Render(
 				GLDrawable drawable, int defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
-				LdrawObject model, PartNode? extraBounds)
+				LdrawObject model, PartNode? extraBounds,
+				Gee.Set<LdrawNode> selection)
 			throws GlError
 		{
 			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
@@ -61,7 +62,7 @@ namespace Ldraw.OpenGl
 			glLineWidth(3.0f);
 			glMatrixMode(GL_MODELVIEW);
 
-			ModelRenderer.RenderModel(model, defaultColour, finalEyeline);
+			ModelRenderer.RenderModel(model, defaultColour, finalEyeline, selection);
 			if(extraBounds != null)
 				ModelRenderer.RenderBoundsFor(extraBounds);			
 
@@ -89,9 +90,9 @@ namespace Ldraw.OpenGl
 	
 	public class StandardModelRenderer : Object, IRenderModel
 	{
-		public void RenderModel(LdrawObject model, int colour, Vector finalEyeline)
+		public void RenderModel(LdrawObject model, int colour, Vector finalEyeline, Gee.Set<LdrawNode> selection)
 		{
-			GlBuilder builder = new GlBuilder(colour, finalEyeline);
+			GlBuilder builder = new GlBuilder(colour, finalEyeline, Gee.Map.empty<string, float?>(), selection);
 			model.BuildFromFile<void>(builder);	
 			
 			builder.Flush();		
@@ -100,7 +101,7 @@ namespace Ldraw.OpenGl
 	
 	public interface IRenderModel : Object
 	{
-		public abstract void RenderModel(LdrawObject object, int colour, Vector finalEyeline);			
+		public abstract void RenderModel(LdrawObject object, int colour, Vector finalEyeline, Gee.Set<LdrawNode> selection);			
 		public virtual void RenderBoundsFor(PartNode part)	{}
 	}
 }

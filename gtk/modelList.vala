@@ -13,7 +13,6 @@ namespace Ldraw.Ui.Widgets
 		public ModelList(LdrawObject model)
 		{
 			m_Model = model;
-			//m_Model.VisibleChange.connect(Model_OnVisibleChange);
 			// initialise list
 			CreateList();
 
@@ -70,7 +69,6 @@ namespace Ldraw.Ui.Widgets
 
 			TreeSelection selection = m_ListView.get_selection();
 			selection.set_mode(SelectionMode.MULTIPLE);
-			selection.changed.connect_after(List_OnCursorChanged);
 		}
 
 		public LdrawObject Model
@@ -79,8 +77,6 @@ namespace Ldraw.Ui.Widgets
 			{
 				m_Model = value;
 				m_ListView.model = m_Model.Nodes as ObservableList;
-				m_Model.ClearSelection();
-				//m_Model.VisibleChange.connect(Model_OnVisibleChange);
 			}
 		}
 
@@ -90,19 +86,6 @@ namespace Ldraw.Ui.Widgets
 			{
 				return m_Widget;
 			}
-		}
-
-		private void List_OnCursorChanged(TreeSelection selection)
-		{
-			m_Model.ClearSelection();
-			selection.selected_foreach((model, path, iter) =>
-					{
-						Value val;
-						model.get_value(iter, 0, out val);
-						GLib.Object valObj = val.get_object();
-						LdrawNode node = valObj as LdrawNode;
-						node.Selected = true;
-					});
 		}
 	}
 }

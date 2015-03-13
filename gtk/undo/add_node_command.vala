@@ -15,8 +15,6 @@ namespace Ldraw.Ui.Commands
 
 		public override void Execute()
 		{
-			Model.ClearSelection();
-			NewNode.Selected = true;
 			Model.AddNode(NewNode, InsertAfter);
 		}
 

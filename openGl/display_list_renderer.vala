@@ -10,7 +10,7 @@ namespace Ldraw.OpenGl
 {
 	public class DisplayListRenderer : Object, IRenderModel
 	{
-		public void RenderModel(LdrawObject object, int code, Vector finalEyeline)
+		public void RenderModel(LdrawObject object, int code, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			var colour = LdrawColour.GetColour(code);
 			EnsureDisplayListExists(object, colour);				

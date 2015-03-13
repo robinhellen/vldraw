@@ -3,6 +3,7 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
+using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 using Ldraw.Options;
 using Ldraw.Ui.Commands;
@@ -11,11 +12,11 @@ namespace Ldraw.Ui
 {
 	public class ToolBarProvider : GLib.Object
 	{
-		private unowned MainWindow m_ModelContainer;
+		private unowned AnimatedModel m_ModelContainer;
 		private IOptions m_Options;
 		private UndoStack undoStack;
 
-		public ToolBarProvider(MainWindow modelContainer, IOptions options, UndoStack undoStack)
+		public ToolBarProvider(AnimatedModel modelContainer, IOptions options, UndoStack undoStack)
 		{
 			m_ModelContainer = modelContainer;
 			m_Options = options;
@@ -87,7 +88,7 @@ namespace Ldraw.Ui
 						return;
 					}
 
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Model.Selection, chooser.ChosenColour));
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
 					dialog.destroy();
 				});
 			moreButton.set_tooltip_text("More colours");
@@ -130,7 +131,7 @@ namespace Ldraw.Ui
 			var button = new ToolButton(new Image.from_pixbuf(image), null);
 			button.clicked.connect(() =>
 				{
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Model.Selection, colourId));
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, colourId));
 				});
 			button.set_tooltip_text(LdrawColour.GetName(colourId));
 			return button;
@@ -152,7 +153,7 @@ namespace Ldraw.Ui
 					if(!positive)
 						displacement = displacement.Scale(-1.0f);
 
-					undoStack.ExecuteCommand(new MoveNodesCommand(m_ModelContainer.Model.Selection, displacement));
+					undoStack.ExecuteCommand(new MoveNodesCommand(m_ModelContainer.Selection, displacement));
 				});
 
 			return button;
@@ -171,7 +172,13 @@ namespace Ldraw.Ui
 
 			button.clicked.connect(() =>
 				{
-					m_ModelContainer.Model.TransformSelectedNodes(Matrix.ForRotation(rotationAxis, 22.5f));
+					foreach(var node in m_ModelContainer.Selection)
+					{
+						var partNode = node as PartNode;
+						if(partNode == null)
+							continue;
+						partNode.TransformPart(Matrix.ForRotation(rotationAxis, 22.5f));
+					}
 				});
 
 			return button;

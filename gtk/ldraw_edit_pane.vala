@@ -20,6 +20,7 @@ namespace Ldraw.Ui.Widgets
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		
+		
 		private AnimatedModel model;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
@@ -59,7 +60,7 @@ namespace Ldraw.Ui.Widgets
 				case 1: // left
 					if((event.state & ModifierType.CONTROL_MASK) != ModifierType.CONTROL_MASK)
 					{
-						model.Model.ClearSelection();
+						model.Selection.clear();
 					}
 
 					SelectTopMostUnderMouse(event.x, event.y);
@@ -92,37 +93,37 @@ namespace Ldraw.Ui.Widgets
 			// if button is right, popup context menu
 			if(event.keyval == m_UpKeyVal) // right mouse button
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, Settings.CurrentGrid.Z)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_DownKeyVal) // right mouse button
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, 0, -Settings.CurrentGrid.Z)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, -Settings.CurrentGrid.Z)));
 				return true;
 			}
 			if(event.keyval == m_LeftKeyVal) // right mouse button
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(-Settings.CurrentGrid.X, 0, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(-Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_RightKeyVal) // right mouse button
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(Settings.CurrentGrid.X, 0, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(Settings.CurrentGrid.X, 0, 0)));
 				return true;
 			}
 			if(event.keyval == m_EndKeyVal) // right mouse button
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, Settings.CurrentGrid.Y, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == m_HomeKeyVal) // right mouse button
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Model.Selection, Vector(0, -Settings.CurrentGrid.Y, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, -Settings.CurrentGrid.Y, 0)));
 				return true;
 			}
 			if(event.keyval == delKeyVal)
 			{
-				UndoStack.ExecuteCommand(new DeleteNodesCommand(model.Model, model.Model.Selection));
+				UndoStack.ExecuteCommand(new DeleteNodesCommand(model.Model, model.Selection));
 				return true;
 			}
 			return false;
@@ -168,8 +169,7 @@ namespace Ldraw.Ui.Widgets
 			Matrix newTransform = Matrix.Identity;
 			Vector newPosition = Vector.NullVector;
 			int newColour = 0;
-			PartNode copyPart = null;
-			copyPart = model.Model.LastSelected ?? model.Model.LastSubFile;
+			PartNode copyPart = model.Model.LastSubFile;
 
 			if(copyPart != null)
 			{
@@ -252,7 +252,8 @@ namespace Ldraw.Ui.Widgets
 			if(finishDrag)
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
-				newNode.Selected = true;
+				model.Selection.clear();
+				model.Selection.add(newNode);
 				UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
 				drag_finish(context, true, false, time);
 			}
@@ -314,8 +315,10 @@ namespace Ldraw.Ui.Widgets
 
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
 			model.Model.BuildFromFile<void>(builder);
-
-			builder.ApplySelection(model.Model);
+			
+			var selected = builder.ApplySelection(model.Model);
+			if(selected != null)
+				model.Selection.add(selected);
 			drawable.gl_end();
 			drawable.wait_gl();
 		}

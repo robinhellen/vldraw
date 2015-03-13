@@ -9,7 +9,6 @@ namespace Ldraw.Lego
 	public class LdrawObject : Object
 	{
 		private Bounds m_BoundingBox;
-		private bool m_ChangingSelection;
 		private Gee.List<LdrawNode> nodes;
 
 		public LdrawObject(string description, LdrawFile? file)
@@ -69,22 +68,6 @@ namespace Ldraw.Lego
 			return new BoundingBoxVisitor().Visit(this);
 		}
 
-		public Collection<LdrawNode> Selection
-		{
-			owned get
-			{
-				var selectedList = new ArrayList<LdrawNode>();
-
-				foreach(var node in Nodes)
-				{
-					if(node.Selected)
-						selectedList.add(node);
-				}
-
-				return selectedList;
-			}
-		}
-
 		public LdrawNode? GetPreviousNode(LdrawNode node)
 		{
 			LdrawNode previousNode  = null;
@@ -116,23 +99,6 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public PartNode? LastSelected
-		{
-			get
-			{
-				weak PartNode lastSubFile = null;
-				foreach(LdrawNode node in Nodes)
-				{
-					if(!(node is PartNode) || !node.Selected)
-					{
-						continue;
-					}
-					lastSubFile = node as PartNode;
-				}
-				return lastSubFile;
-			}
-		}
-
 		public void AddNode(LdrawNode newNode, LdrawNode? after = null)
 		{
 			if(after == null)
@@ -145,7 +111,6 @@ namespace Ldraw.Lego
 			}
 			m_BoundingBox = null;
 			newNode.notify["ColourId"].connect(() => VisibleChange());
-			newNode.notify["Selected"].connect(() => VisibleChange());
 			VisibleChange();
 		}
 
@@ -168,7 +133,6 @@ namespace Ldraw.Lego
 			VisibleChange();
 			m_BoundingBox = null;
 			node.notify["ColourId"].connect(() => VisibleChange());
-			node.notify["Selected"].connect(() => VisibleChange());
 		}
 
 		public void InsertNode(LdrawNode toInsert, LdrawNode after)
@@ -200,29 +164,6 @@ namespace Ldraw.Lego
 			}
 		}
 
-		public void TransformSelectedNodes(Matrix transform)
-		{
-			foreach(LdrawNode node in Nodes)
-			{
-				if(!node.Selected || !(node is PartNode))
-					continue;
-
-				PartNode part = (PartNode)node;
-				part.TransformPart(transform);
-			}
-			VisibleChange();
-		}
-
-		public void ClearSelection()
-		{
-			m_ChangingSelection = true;
-			foreach(LdrawNode node in Nodes)
-			{
-				node.Selected = false;
-			}
-			m_ChangingSelection = false;
-		}
-
 		public T? BuildFromFile<T>(LdrawVisitor<T> builder)
 		{
 			return builder.Visit(this);
@@ -232,8 +173,6 @@ namespace Ldraw.Lego
 		{
 			m_BoundingBox = null;
 		}
-
-		public signal void SelectionChanged();
 
 		public signal void ComponentsChanged();
 	}

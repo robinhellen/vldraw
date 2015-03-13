@@ -51,7 +51,6 @@ namespace Ldraw.Ui.Widgets
 			this(angle);
 			m_Model = model;
 			m_Model.VisibleChange.connect(() => queue_draw());
-			m_Model.SelectionChanged.connect(() => queue_draw());
 		}
 
 		public signal void RenderingError(string description);
@@ -66,7 +65,6 @@ namespace Ldraw.Ui.Widgets
 			{
 				m_Model = value;
 				m_Model.VisibleChange.connect(() => queue_draw());
-				m_Model.SelectionChanged.connect(() => queue_draw());
 				m_Eyeline = m_Center = m_Up = null;
 				SetAdjustmentRanges();
 
@@ -99,7 +97,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, dropItem);
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, dropItem, Gee.Set.empty<LdrawNode>());
 		}
 
 		public override bool configure_event(Gdk.EventConfigure event)

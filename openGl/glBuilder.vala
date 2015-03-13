@@ -12,18 +12,22 @@ namespace Ldraw.OpenGl
 	public class GlBuilder : LdrawVisitor<void>
 	{
 		private Vector m_Eyeline;
+		private Set<LdrawNode> selection;
 
 		private SavedState state = new SavedState();
 		private AnimationState nextObjectAnimationState = new AnimationState();
 
 		private int m_RecursionDepth = 0;
 
-		public GlBuilder(int defaultColour, Vector eyeline, Map<string, float?> parameters = Map.empty<string, float?>())
+		public GlBuilder(int defaultColour, Vector eyeline, 
+				Map<string, float?> parameters = Map.empty<string, float?>(),
+				Set<LdrawNode> selection = Set.empty<LdrawNode>())
 			requires(defaultColour != 24 && defaultColour != 16) // default colour must be an actual colour
 		{
 			state.CurrentColour = defaultColour;
 			state.Parameters = parameters;
 			m_Eyeline = eyeline;
+			this.selection = selection;
 		}
 
 		public void Flush()
@@ -102,7 +106,7 @@ namespace Ldraw.OpenGl
 			{
 				state.CurrentColour = part.ColourId;
 			}
-			if(part.Selected)
+			if(part in selection)
 			{
 				state.ColourInverted = true;
 				RenderBounds(part.Contents.BoundingBox.Transform(state.Transform, state.Center).Scale(1.2f));

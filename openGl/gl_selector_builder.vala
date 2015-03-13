@@ -59,14 +59,14 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_MODELVIEW);
 		}
 
-		public void ApplySelection(LdrawObject model)
+		public LdrawNode ApplySelection(LdrawObject model)
 		{
 			glFlush();
 
 			var hits = glRenderMode(GL_RENDER);
 
 			if(hits == 0)
-				return;
+				return null;
 
 			var currentMinZ = uint.MAX;
 			uint currentFrontName = 0;
@@ -87,8 +87,7 @@ namespace Ldraw.OpenGl
 			}
 
 			var rawNode = model.Nodes[(int)currentFrontName];
-			rawNode.Selected = true;
-			model.VisibleChange();
+			return rawNode;
 		}
 
 		public override void VisitLine(LineNode line)

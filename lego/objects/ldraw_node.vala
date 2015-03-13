@@ -6,8 +6,6 @@ namespace Ldraw.Lego
 	{
 		public int ColourId {get; set; default = 0;}
 
-		public bool Selected { get; set; default = false;}
-
 		public virtual string Geometry() {return "";}
 
 		public virtual string Name { get {return "";} }
