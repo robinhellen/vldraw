@@ -18,7 +18,6 @@ namespace Ldraw.Ui
     public class MainWindow : Window
     {
         private LdrawModelFile m_Model;
-        public AnimatedModel EditingObject {get; set;}
         private ComboBox m_SubModels;
 
         // controls
@@ -37,6 +36,7 @@ namespace Ldraw.Ui
 		public EditPanes View {construct; private get;}
 		public LdrawViewPane PartsPreview {construct; private get;}
 		public LdrawViewPane SubModelsPreview {construct; private get;}
+		public AnimatedModel EditingObject {construct; get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
                                     DependencyResolutionContext context)
@@ -49,6 +49,7 @@ namespace Ldraw.Ui
             var view = context.Resolve<EditPanes>();
             var preview1 = context.Resolve<LdrawViewPane>();
             var preview2 = context.Resolve<LdrawViewPane>();
+            var editObject = context.Resolve<AnimatedModel>();
             GLib.Object(
 				Loader: loader, 
 				Settings: settings, 
@@ -56,10 +57,11 @@ namespace Ldraw.Ui
 				UndoStack: undoStack,
 				View: view,
 				PartsPreview: preview1,
-				SubModelsPreview : preview2
+				SubModelsPreview : preview2,
+				EditingObject: editObject
 			);
 
-            EditingObject = new AnimatedModel(model.MainObject);
+            EditingObject.Load(model.MainObject);
 			documentLocator = context.Resolve<DocumentObjectLocator>();
 			
             maximize();
@@ -167,8 +169,7 @@ namespace Ldraw.Ui
                     cb.get_active_iter(out tIter);
                     LdrawObject object;
                     tModel.get(tIter, 0, out object, -1);
-                    EditingObject = new AnimatedModel(object);
-                    View.Model = EditingObject;
+                    EditingObject.Load(object);
                     m_ModelList.Model = object;
                     UndoStack.Clear();
                 });
@@ -321,7 +322,7 @@ namespace Ldraw.Ui
             selectionMenu.append(selectAll);
 
             var clearSelection = new Gtk.MenuItem.with_mnemonic("_Clear");
-            clearSelection.activate.connect(() => EditingObject.Selection.clear());
+            clearSelection.activate.connect(() => EditingObject.ClearSelection());
             selectionMenu.append(clearSelection);
 
             var selectionAnimation = new Gtk.MenuItem.with_mnemonic("_Animation");
@@ -478,7 +479,7 @@ namespace Ldraw.Ui
 						File: mpdModel
 					);
             mpdModel.SubModels.add(newObject);
-            EditingObject = new AnimatedModel(newObject);
+            EditingObject.Load(newObject);
         }
 
         private void AttachToTable(Table t, Widget w, uint x, uint y)
@@ -502,18 +503,17 @@ namespace Ldraw.Ui
                     m_SubModels.model = mpd.SubModels;
                     m_SubModels.active = 0;
                     m_SubModels.visible = true;
-                    EditingObject = new AnimatedModel(mpd.MainObject);
+                    EditingObject.Load(mpd.MainObject);
                     subModels.Models = mpd.SubModels;
                     documentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
                     m_SubModels.visible = false;
-                    EditingObject = new AnimatedModel(value.MainObject);
+                    EditingObject.Load(value.MainObject);
                     subModels.Models = new ObservableList<LdrawObject>();
                     documentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
-                View.Model = EditingObject;
 
                 var titleFileName = value.FileName ?? "untitled";
 
@@ -567,32 +567,6 @@ namespace Ldraw.Ui
             get{return EditingObject.Model;}
             protected set{}
         }
-    }
-
-    public class AnimatedModel : GLib.Object
-    {
-        public AnimatedModel(LdrawObject model)
-        {
-            var map = new HashMap<string, float?>();
-            var selection = new HashSet<LdrawNode>();
-            GLib.Object(
-				Model: model, 
-				CurrentParameters: map,
-				Selection: selection
-			);
-        }
-
-        public LdrawObject Model {get; construct;}
-        public Map<string, float?> CurrentParameters {get; construct; }
-        public Set<LdrawNode> Selection {get; construct;}
-
-        public void UpdateParameter(string Identifier, float value)
-        {
-            CurrentParameters[Identifier] = value;
-            ParametersUpdated();
-        }
-
-        public signal void ParametersUpdated();
     }
 
     private Widget WithScrolls(Widget widget)

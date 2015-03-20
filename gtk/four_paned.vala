@@ -72,17 +72,6 @@ namespace Ldraw.Ui.Widgets
 			BottomRight.Angle = ViewAngle.Ortho;
 		}
 
-		public AnimatedModel Model
-		{
-			set
-			{
-				TopLeft.AnimModel = value;
-				BottomLeft.AnimModel = value;
-				TopRight.AnimModel = value;
-				BottomRight.AnimModel = value;
-			}
-		}
-
 		public signal void RenderingError(string description);
 
 		private Widget WithScrolls(Widget widget)

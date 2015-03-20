@@ -19,8 +19,7 @@ namespace Ldraw.Ui.Widgets
 		public IOptions Settings {construct; private get;}
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
-		
-		private AnimatedModel model;
+		public AnimatedModel model {construct; private get;}
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws GlError
@@ -38,16 +37,8 @@ namespace Ldraw.Ui.Widgets
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
 			drag_dest_set(this, (DestDefaults)0, {LdrawDragData}, DragAction.COPY);
 			drag_dest_set_track_motion(this, true);
-		}
-
-		public AnimatedModel AnimModel
-		{
-			set
-			{
-				model = value;
-				model.ParametersUpdated.connect(() => queue_draw());
-				Model = value.Model;
-			}
+			model.bind_property("Model", this, "Model");
+			model.view_changed.connect(() => queue_draw());
 		}
 		
 		public override void Redraw()
@@ -84,7 +75,7 @@ namespace Ldraw.Ui.Widgets
 				case 1: // left
 					if((event.state & ModifierType.CONTROL_MASK) != ModifierType.CONTROL_MASK)
 					{
-						model.Selection.clear();
+						model.ClearSelection();
 					}
 
 					SelectTopMostUnderMouse(event.x, event.y);
@@ -276,8 +267,8 @@ namespace Ldraw.Ui.Widgets
 			if(finishDrag)
 			{
 				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
-				model.Selection.clear();
-				model.Selection.add(newNode);
+				model.ClearSelection();
+				model.Select(newNode);
 				UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
 				drag_finish(context, true, false, time);
 			}
@@ -342,7 +333,7 @@ namespace Ldraw.Ui.Widgets
 			
 			var selected = builder.ApplySelection(model.Model);
 			if(selected != null)
-				model.Selection.add(selected);
+				model.Select(selected);
 			drawable.gl_end();
 			drawable.wait_gl();
 		}

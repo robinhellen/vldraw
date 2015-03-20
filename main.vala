@@ -49,6 +49,7 @@ namespace Ldraw
             builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
 
             builder.Register<UndoStack>();
+            builder.RegisterInstance<AnimatedModel>(new AnimatedModel(null));
 
             var container = builder.Build();
 
