@@ -3,6 +3,8 @@ DEFAULT: all
 .SECONDEXPANSION:
 
 VALACC=valac-0.24
+gee=gee-0.8
+gtk=gtk+-2.0
 
 TEST_EXPR_SOURCES=		$(wildcard tests/expressions/*.vala)
 TEST_MATHS_SOURCES=		$(wildcard tests/vector/*.vala)
@@ -15,7 +17,7 @@ OPENGL_SOURCES=		$(wildcard openGl/*.vala)
 MATHS_SOURCES=		$(wildcard maths/*.c)
 REFACTORING_SOURCES=$(wildcard refactoring/*.vala)
 
-ENGINE_SOURCE_FOLDERS= expressions utils povray \
+ENGINE_SOURCE_FOLDERS= povray \
 		lego/files/parsing lego/files lego/library lego/objects/nodes lego/objects lego \
 		options peeron
 UI_SOURCE_FOLDERS= drag_and_drop widgets undo .
@@ -27,7 +29,13 @@ ENGINE_C_SOURCES=$(MATHS_SOURCES)
 
 SOURCES=$(wildcard *.vala) $(ENGINE_SOURCES) $(OPENGL_SOURCES) $(GTK_SOURCES) $(EXPORT_SOURCES) $(REFACTORING_SOURCES)
 di_sources= $(wildcard utils/di/*.vala)
-di_packages= gee-0.8
+di_packages=$(gee)
+utils_sources= $(wildcard utils/*.vala)
+utils_packages=$(gee) $(gtk)
+expressions_sources=$(wildcard expressions/*.vala)
+expressions_packages=$(gee)
+
+INTERNAL_LIBS=di utils expressions
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
 
@@ -47,13 +55,11 @@ all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
 debug: $(SOURCES) $(ENGINE_C_SOURCES)
 	$(VALACC) $(VALA_DEBUG_OPTS) $(SOURCES) $(ENGINE_C_SOURCES) -o $(EXECUTABLE_NAME)_debug
 
-INTERNAL_LIBS=di
-
 $(EXECUTABLE_NAME): $(SOURCES) $(ENGINE_C_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(SOURCES) $(ENGINE_C_SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 
-$(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES)
-	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME)
+$(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
+	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 	
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources)
 	$(VALACC) $($*_sources) $(foreach pkg, $($*_packages), --pkg $(pkg)) --library=$* -H h/$*.h -X -fpic -X -shared -g -o lib/$*.so -X -w --vapi vapi/$*.vapi
