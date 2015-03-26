@@ -20,8 +20,8 @@ namespace Ldraw.OpenGl
 		private int m_RecursionDepth = 0;
 
 		public GlBuilder(int defaultColour, Vector eyeline, 
-				Map<string, float?> parameters = Map.empty<string, float?>(),
-				Set<LdrawNode> selection = Set.empty<LdrawNode>())
+				Map<string, float?> parameters,
+				Set<LdrawNode> selection)
 			requires(defaultColour != 24 && defaultColour != 16) // default colour must be an actual colour
 		{
 			state.CurrentColour = defaultColour;

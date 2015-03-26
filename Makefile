@@ -11,14 +11,7 @@ soup=libsoup-2.4
 
 TEST_SOURCES= $(foreach folder, . expressions vector, $(wildcard tests/$(folder)/*.vala))
 
-EXPORT_SOURCES=		$(wildcard export/*.vala)
-OPENGL_SOURCES=		$(wildcard openGl/*.vala)
-
-UI_SOURCE_FOLDERS= .
-
-GTK_SOURCES= $(foreach folder, $(UI_SOURCE_FOLDERS), $(wildcard gtk/$(folder)/*.vala))
-
-SOURCES=$(wildcard *.vala) $(OPENGL_SOURCES) $(GTK_SOURCES) $(EXPORT_SOURCES)
+SOURCES=$(wildcard *.vala)
 
 di_sources= $(wildcard utils/di/*.vala)
 di_packages=$(gee)
@@ -50,8 +43,16 @@ drag_and_drop_sources=$(wildcard gtk/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) $(gtk)
 drag_and_drop_internal_packages=lego maths expressions utils di
 
+gl_render_sources=$(wildcard openGl/*.vala)
+gl_render_packages=gl gdkglext-1.0 $(gee) $(gtk)
+gl_render_internal_packages=lego maths expressions utils di
+
+ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala)
+ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0
+ui_widgets_internal_packages= gl_render utils lego maths expressions utils di options undo part_group peeron drag_and_drop povray
+
 INTERNAL_LIBS=di utils expressions maths options lego peeron povray part_group
-UI_LIBS=drag_and_drop undo
+UI_LIBS=drag_and_drop undo gl_render ui_widgets
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
