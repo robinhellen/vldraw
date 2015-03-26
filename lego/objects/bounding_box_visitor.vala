@@ -1,9 +1,9 @@
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 
-namespace Ldraw.Lego.Objects
+namespace Ldraw.Lego
 {
-	public class BoundingBoxVisitor : LdrawVisitor<Bounds>
+	private class BoundingBoxVisitor : LdrawVisitor<Bounds>
 	{
 		private Bounds BoundingBox {get; set;}
 		private Matrix Transform {get; set;}

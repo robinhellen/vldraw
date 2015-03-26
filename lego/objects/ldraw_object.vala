@@ -1,8 +1,6 @@
 using Gee;
 using Ldraw.Maths;
 using Ldraw.Lego.Nodes;
-using Ldraw.Lego.Objects;
-using Ldraw.Utils;
 
 namespace Ldraw.Lego
 {
@@ -23,11 +21,6 @@ namespace Ldraw.Lego
 			protected construct set
 			{
 				nodes = value;
-				var observable = nodes as ObservableList<LdrawNode>;
-				if(observable != null)
-				{
-					observable.row_changed.connect(() => VisibleChange());
-				}
 			}
 		}
 

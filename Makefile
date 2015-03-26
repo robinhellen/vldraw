@@ -22,9 +22,18 @@ expressions_packages=$(gee)
 maths_sources=$(wildcard maths/*.vala)
 options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
+
+lego_objects_sources=$(foreach n, comment cond_line_node line_node part_node quad_node triangle_node, lego/objects/nodes/$n.vala) \
+					$(foreach f, ldraw_node ldraw_object ldraw_builder bounding_box_visitor, lego/objects/$f.vala) \
+					lego/files/ldraw_file.vala lego/files/parsing/parse_error.vala
+lego_objects_packages=$(gee) gio-2.0
+lego_objects_internal_packages=maths
+
 lego_sources=$(foreach folder, objects objects/nodes files files/parsing library, $(wildcard lego/$(folder)/*.vala))
 lego_packages=$(gee) $(gtk) $(json)
 lego_internal_packages=maths expressions utils di
+					
+
 peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) $(gtk) $(soup) $(xml)
 peeron_internal_packages=lego maths expressions utils di
