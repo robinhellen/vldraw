@@ -49,7 +49,7 @@ gl_render_internal_packages=lego maths expressions utils di
 
 ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0
-ui_widgets_internal_packages= gl_render utils lego maths expressions utils di options undo part_group peeron drag_and_drop povray
+ui_widgets_internal_packages= gl_render lego maths expressions utils di options undo part_group peeron drag_and_drop povray
 
 INTERNAL_LIBS=di utils expressions maths options lego peeron povray part_group
 UI_LIBS=drag_and_drop undo gl_render ui_widgets
