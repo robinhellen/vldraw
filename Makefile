@@ -19,7 +19,7 @@ REFACTORING_SOURCES=$(wildcard refactoring/*.vala)
 
 ENGINE_SOURCE_FOLDERS= povray \
 		lego/files/parsing lego/files lego/library lego/objects/nodes lego/objects lego \
-		options peeron
+		peeron
 UI_SOURCE_FOLDERS= drag_and_drop widgets undo .
 
 ENGINE_SOURCES= $(foreach folder, $(ENGINE_SOURCE_FOLDERS), $(wildcard $(folder)/*.vala))
@@ -42,7 +42,7 @@ INTERNAL_LIBS=di utils expressions maths options
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
 
-VALA_PACKAGES = gtk+-2.0 gee-0.8 gl gtkglext-1.0 gdkglext-1.0 gio-2.0 geometry libsoup-2.4 libxml-2.0 json-glib-1.0
+VALA_PACKAGES = gtk+-2.0 gee-0.8 gl gtkglext-1.0 gdkglext-1.0 gio-2.0 libsoup-2.4 libxml-2.0 json-glib-1.0
 
 VALA_PKG_ARGS = $(foreach pkg, $(VALA_PACKAGES), --pkg $(pkg))
 
@@ -55,14 +55,14 @@ TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
 	./$(TEST_EXECUTABLE_NAME)
 
-debug: $(SOURCES) $(ENGINE_C_SOURCES)
-	$(VALACC) $(VALA_DEBUG_OPTS) $(SOURCES) $(ENGINE_C_SOURCES) -o $(EXECUTABLE_NAME)_debug
+debug: $(SOURCES)
+	$(VALACC) $(VALA_DEBUG_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME)_debug
 
-$(EXECUTABLE_NAME): $(SOURCES) $(ENGINE_C_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
-	$(VALACC) $(VALA_OPTS) $(SOURCES) $(ENGINE_C_SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
+$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
+	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 
 $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
-	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
+	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 	
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h lib/$$(lib).so vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \

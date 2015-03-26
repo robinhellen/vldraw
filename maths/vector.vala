@@ -91,5 +91,11 @@ namespace Ldraw.Maths
 		{
 			return @"( $(m_Values[0]), $(m_Values[1]), $(m_Values[2]) )";
 		}
+		
+		[CCode(array_length = false)]
+		public unowned float[] value_vector()
+		{
+			return m_Values;
+		}
 	}
 }
