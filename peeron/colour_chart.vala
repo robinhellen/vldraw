@@ -3,6 +3,7 @@ using Soup;
 using Html;
 using Xml.XPath;
 
+using Ldraw.Lego;
 using Ldraw.Lego.Library;
 
 namespace Ldraw.Peeron
@@ -52,7 +53,7 @@ namespace Ldraw.Peeron
 			Loaded = true;
 		}
 
-		public LdrawColour GetColourFromName(string name)
+		public Colour GetColourFromName(string name)
 		{
 			return LdrawColour.GetColour(GetColourIdFromName(name));
 		}

@@ -4,7 +4,7 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawNode : Object
 	{
-		public int ColourId {get; set; default = 0;}
+		public Colour Colour {get; set;}
 
 		public virtual string Geometry() {return "";}
 

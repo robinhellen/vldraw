@@ -10,14 +10,13 @@ namespace Ldraw.OpenGl
 {
 	public class DisplayListRenderer : Object, IRenderModel
 	{
-		public void RenderModel(LdrawObject object, int code, Vector finalEyeline, Set<LdrawNode> selection)
+		public void RenderModel(LdrawObject object, Colour colour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
-			var colour = LdrawColour.GetColour(code);
 			EnsureDisplayListExists(object, colour);				
 			CallDisplayList(object, colour);
 		}
 		
-		private void EnsureDisplayListExists(LdrawObject object, LdrawColour colour)
+		private void EnsureDisplayListExists(LdrawObject object, Colour colour)
 		{
 			var storage = GetDisplayListsForObject(object);
 			if(!storage.HasListForColour(colour))
@@ -26,10 +25,10 @@ namespace Ldraw.OpenGl
 			}
 		}
 		
-		private void CallDisplayList(LdrawObject object, LdrawColour colour)
+		private void CallDisplayList(LdrawObject object, Colour colour)
 		{
 			var storage = GetDisplayListsForObject(object);
-			var listId = storage.ListForColour(colour.Code);
+			var listId = storage.ListForColour(colour);
 			
 			glCallList(listId);
 		}
@@ -45,7 +44,7 @@ namespace Ldraw.OpenGl
 			return storage;		
 		}
 		
-		private void CreateDisplayList(LdrawObject object, LdrawColour colour)
+		private void CreateDisplayList(LdrawObject object, Colour colour)
 		{
 			// ensure all sub-objects have display lists
 			foreach(var node in object.Nodes)
@@ -54,7 +53,7 @@ namespace Ldraw.OpenGl
 				if(partNode == null)
 					continue;
 					
-				var innerColour = (partNode.ColourId == 16 || partNode.ColourId == 24) ? colour : LdrawColour.GetColour(partNode.ColourId);
+				var innerColour = (partNode.Colour.Code == 16 || partNode.Colour.Code == 24) ? colour : partNode.Colour;
 				EnsureDisplayListExists(partNode.Contents, innerColour);
 			}
 			
@@ -82,12 +81,12 @@ namespace Ldraw.OpenGl
 	
 	public class DisplayListRenderVisitor : LdrawVisitor<void>
 	{
-		private LdrawColour colour;
+		private Colour colour;
 		
-		public delegate int DisplayListFunc(LdrawObject object, int colour);
+		public delegate int DisplayListFunc(LdrawObject object, Colour colour);
 		public DisplayListFunc getDisplayList;
 		
-		public DisplayListRenderVisitor(LdrawColour colour, DisplayListFunc getDisplayList)
+		public DisplayListRenderVisitor(Colour colour, DisplayListFunc getDisplayList)
 		{
 			this.colour = colour;
 			this.getDisplayList = getDisplayList;
@@ -96,7 +95,7 @@ namespace Ldraw.OpenGl
 		public override void VisitLine(LineNode line)
 		{
 			glPushAttrib(GL_CURRENT_BIT);
-			SetRenderColour(line.ColourId);
+			SetRenderColour(line.Colour);
 
 			glBegin(GL_LINES);
 
@@ -110,7 +109,7 @@ namespace Ldraw.OpenGl
 		public override void VisitTriangle(TriangleNode triangle)
 		{
 			glPushAttrib(GL_CURRENT_BIT);
-			SetRenderColour(triangle.ColourId);
+			SetRenderColour(triangle.Colour);
 
 			glBegin(GL_POLYGON);
 
@@ -125,7 +124,7 @@ namespace Ldraw.OpenGl
 		public override void VisitQuad(QuadNode quad)
 		{
 			glPushAttrib(GL_CURRENT_BIT);
-			SetRenderColour(quad.ColourId);
+			SetRenderColour(quad.Colour);
 
 			glBegin(GL_POLYGON);
 
@@ -150,10 +149,10 @@ namespace Ldraw.OpenGl
 						 m[0,2], m[1,2], m[2,2], 0,
 						 0,		 0,		 0,		 1});
 						 
-			var partColour = part.ColourId;
-			if(partColour == 16 || partColour == 24)
+			var partColour = part.Colour;
+			if(partColour.Code == 16 || partColour.Code == 24)
 			{
-				partColour = colour.Code;
+				partColour = colour;
 			}
 			glCallList(getDisplayList(part.Contents, partColour));
 
@@ -161,10 +160,10 @@ namespace Ldraw.OpenGl
 			glPopAttrib();
 		}
 
-		private void SetRenderColour(int ldrawColour)
+		private void SetRenderColour(Colour ldrawColour)
 		{
 			float red, green, blue, alpha;
-			switch(ldrawColour)
+			switch(ldrawColour.Code)
 			{
 				case 16:
 					LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
@@ -173,7 +172,7 @@ namespace Ldraw.OpenGl
 					LdrawColour.EdgeColour(colour.Code, out red, out green, out blue, out alpha);
 					break;
 				default:
-					LdrawColour.SurfaceColour(ldrawColour, out red, out green, out blue, out alpha);
+					LdrawColour.SurfaceColour(ldrawColour.Code, out red, out green, out blue, out alpha);
 					break;
 			}
 
@@ -183,19 +182,19 @@ namespace Ldraw.OpenGl
 	
 	public class DisplayListStorage : Object
 	{
-		private Map<LdrawColour, int?> colours = new HashMap<LdrawColour, int?>();
+		private Map<Colour, int?> colours = new HashMap<Colour, int?>();
 				
-		public bool HasListForColour(LdrawColour colour)
+		public bool HasListForColour(Colour colour)
 		{
 			return colours.has_key(colour);
 		}
 		
-		public int ListForColour(int colourCode)
+		public int ListForColour(Colour colour)
 		{
-			return colours[LdrawColour.GetColour(colourCode)];
+			return colours[colour];
 		}
 		
-		public void StoreListForColour(LdrawColour colour, int listId)
+		public void StoreListForColour(Colour colour, int listId)
 		{
 			colours[colour] = listId;
 		}

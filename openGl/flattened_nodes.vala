@@ -86,9 +86,9 @@ namespace Ldraw.OpenGl
 				state.Center = oldState.Transform.TransformVector(part.Center).Add(oldState.Center);
 				state.Transform = oldState.Transform.TransformMatrix(part.Transform);
 
-				if(part.ColourId != 16 && part.ColourId != 24)
+				if(part.Colour.Code != 16 && part.Colour.Code != 24)
 				{
-					state.CurrentColour = part.ColourId;
+					state.CurrentColour = part.Colour;
 				}
 				// recurse into the current builder
 				VisitInner(part.Contents);
@@ -114,26 +114,26 @@ namespace Ldraw.OpenGl
 				{
 					Transform = Matrix.Identity;
 					Center = Vector.NullVector;
-					CurrentColour = 16;
+					CurrentColour = LdrawColour.GetColour(16);
 					ColourInverted = false;
 				}
 
 				public Matrix Transform;
 				public Vector Center;
-				public int CurrentColour;
+				public Colour CurrentColour;
 				public bool ColourInverted;
 			}
 			
 			private RenderColour GetColour(LdrawNode n)
 			{
 				
-				if(n.ColourId == 16)
-					return RenderColour.FromLdrawColour(LdrawColour.GetColour(state.CurrentColour));
+				if(n.Colour.Code == 16)
+					return RenderColour.FromLdrawColour(state.CurrentColour);
 				
-				if(n.ColourId == 24)
-					return RenderColour.FromLdrawEdgeColour(LdrawColour.GetColour(state.CurrentColour));
+				if(n.Colour.Code == 24)
+					return RenderColour.FromLdrawEdgeColour(state.CurrentColour);
 					
-				return RenderColour.FromLdrawColour(LdrawColour.GetColour(n.ColourId));
+				return RenderColour.FromLdrawColour(n.Colour);
 			}
 		}
 	}

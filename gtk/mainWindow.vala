@@ -75,13 +75,13 @@ namespace Ldraw.Ui
         {
 			PartsPreview.Angle = ViewAngle.Ortho;
 			PartsPreview.set_size_request(200, 200);
-            PartsPreview.DefaultColour = Settings.PreviewColourId;
-            Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = Settings.PreviewColourId);
+            PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
+            Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
 			
 			SubModelsPreview.Angle = ViewAngle.Ortho;
 			SubModelsPreview.set_size_request(200, 200);
-            SubModelsPreview.DefaultColour = Settings.PreviewColourId;
-            Settings.notify["PreviewColourId"].connect(() => SubModelsPreview.DefaultColour = Settings.PreviewColourId);
+            SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
+            Settings.notify["PreviewColourId"].connect(() => SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
 		}
 
         private void SetUpControls(DependencyResolutionContext context)

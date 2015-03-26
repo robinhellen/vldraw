@@ -24,7 +24,7 @@ options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
 
 lego_objects_sources=$(foreach n, comment cond_line_node line_node part_node quad_node triangle_node, lego/objects/nodes/$n.vala) \
-					$(foreach f, ldraw_node ldraw_object ldraw_builder bounding_box_visitor, lego/objects/$f.vala) \
+					$(wildcard  lego/objects/*.vala) \
 					lego/files/ldraw_file.vala lego/files/parsing/parse_error.vala
 lego_objects_packages=$(gee) gio-2.0
 lego_objects_internal_packages=maths

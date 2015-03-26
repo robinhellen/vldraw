@@ -12,7 +12,7 @@ namespace Ldraw.OpenGl
 		private Matrix m_Transform;
 		private Vector m_Center;
 
-		private int m_CurrentColour;
+		private Colour m_CurrentColour;
 		private bool m_InvertColour = false;
 
 		private int m_RecursionDepth = 0;
@@ -101,7 +101,7 @@ namespace Ldraw.OpenGl
 			Vector a = m_Transform.TransformVector(line.A).Add(m_Center);
 			Vector b = m_Transform.TransformVector(line.B).Add(m_Center);
 
-			SetRenderColour(line.ColourId);
+			SetRenderColour(line.Colour);
 			glBegin(GL_LINES);
 
 			glVertex3f(a.X, a.Y, a.Z);
@@ -122,7 +122,7 @@ namespace Ldraw.OpenGl
 			Vector b = m_Transform.TransformVector(triangle.B).Add(m_Center);
 			Vector c = m_Transform.TransformVector(triangle.C).Add(m_Center);
 
-			SetRenderColour(triangle.ColourId);
+			SetRenderColour(triangle.Colour);
 			glBegin(GL_POLYGON);
 
 			glVertex3f(a.X, a.Y, a.Z);
@@ -145,7 +145,7 @@ namespace Ldraw.OpenGl
 			Vector c = m_Transform.TransformVector(quad.C).Add(m_Center);
 			Vector d = m_Transform.TransformVector(quad.D).Add(m_Center);
 
-			SetRenderColour(quad.ColourId);
+			SetRenderColour(quad.Colour);
 			glBegin(GL_POLYGON);
 
 			glVertex3f(a.X, a.Y, a.Z);
@@ -166,16 +166,16 @@ namespace Ldraw.OpenGl
 
 			Matrix oldTransform = m_Transform;
 			Vector oldCenter = m_Center;
-			int oldColour = m_CurrentColour;
+			Colour oldColour = m_CurrentColour;
 			bool oldInverted = m_InvertColour;
 
 			// apply the current transform to the sub-model's transform and center vector
 			m_Center = m_Transform.TransformVector(part.Center).Add(m_Center);
 			m_Transform = m_Transform.TransformMatrix(part.Transform);
 
-			if(part.ColourId != 16 && part.ColourId != 24)
+			if(part.Colour.Code != 16 && part.Colour.Code != 24)
 			{
-				m_CurrentColour = part.ColourId;
+				m_CurrentColour = part.Colour;
 			}
 
 			m_RecursionDepth++;
@@ -218,7 +218,7 @@ namespace Ldraw.OpenGl
 				return; // different signs means different sides
 			}
 
-			SetRenderColour(line.ColourId);
+			SetRenderColour(line.Colour);
 			glBegin(GL_LINES);
 
 			glVertex3f(a.X, a.Y, a.Z);
@@ -252,22 +252,22 @@ namespace Ldraw.OpenGl
 			return center.Subtract(eye);
 		}
 
-		private void SetRenderColour(int ldrawColour)
+		private void SetRenderColour(Colour ldrawColour)
 		{
-			bool invert = ldrawColour == 24;
-			int actualColour = (ldrawColour == 24 || ldrawColour == 16) ? m_CurrentColour : ldrawColour;
+			bool invert = ldrawColour.Code == 24;
+			Colour actualColour = (ldrawColour.Code == 24 || ldrawColour.Code == 16) ? m_CurrentColour : ldrawColour;
 
 			bool actualInvert = (invert && !m_InvertColour) || (!invert && m_InvertColour);
 			float red, green, blue, alpha;
 			if(actualInvert)
 			{
-				LdrawColour.EdgeColour(actualColour, out red, out green, out blue, out alpha);
+				LdrawColour.EdgeColour(actualColour.Code, out red, out green, out blue, out alpha);
 				// get line colour
 			}
 			else
 			{
 				// get flat colour
-				LdrawColour.SurfaceColour(actualColour, out red, out green, out blue, out alpha);
+				LdrawColour.SurfaceColour(actualColour.Code, out red, out green, out blue, out alpha);
 			}
 
 			glColor4f(red, green, blue, alpha);

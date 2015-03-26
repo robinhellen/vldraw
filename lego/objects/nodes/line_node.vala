@@ -12,9 +12,9 @@ namespace Ldraw.Lego.Nodes
 			Type = "Comment";
 		}
 
-		public LineNode(int colour, Vector a, Vector b)
+		public LineNode(Colour colour, Vector a, Vector b)
 		{
-			ColourId = colour;
+			Colour = colour;
 			m_A = a;
 			m_B = b;
 		}
@@ -25,14 +25,14 @@ namespace Ldraw.Lego.Nodes
 
 		public Vector B { get {return m_B;}}
 
-		public override string FileLine{owned get{return @"2 $ColourId $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z)";}}
+		public override string FileLine{owned get{return @"2 $(Colour.Code) $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z)";}}
 
 		public override LdrawNode TransformNode(Matrix transform, Vector center)
 		{
 			var a = transform.TransformVector(m_A).Add(center);
 			var b = transform.TransformVector(m_B).Add(center);
 
-			return new LineNode(ColourId, a, b);
+			return new LineNode(Colour, a, b);
 		}
 
 		public override void Accept(LdrawVisitor visitor)

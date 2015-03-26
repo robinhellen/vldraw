@@ -14,9 +14,9 @@ namespace Ldraw.Lego.Nodes
 			Type = "Conditional Line";
 		}
 
-		public CondLineNode(int colour, Vector a, Vector b, Vector control1, Vector control2)
+		public CondLineNode(Colour colour, Vector a, Vector b, Vector control1, Vector control2)
 		{
-			ColourId = colour;
+			Colour = colour;
 			m_A = a;
 			m_B = b;
 			m_Control1 = control1;
@@ -33,7 +33,7 @@ namespace Ldraw.Lego.Nodes
 
 		public Vector Control2 { get {return m_Control2;}}
 
-		public override string FileLine{owned get{return @"5 $ColourId $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z) $(m_Control1.X) $(m_Control1.Y) $(m_Control1.Z) $(m_Control2.X) $(m_Control2.Y) $(m_Control2.Z)";}}
+		public override string FileLine{owned get{return @"5 $(Colour.Code) $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z) $(m_Control1.X) $(m_Control1.Y) $(m_Control1.Z) $(m_Control2.X) $(m_Control2.Y) $(m_Control2.Z)";}}
 
 		public override LdrawNode TransformNode(Matrix transform, Vector center)
 		{
@@ -42,7 +42,7 @@ namespace Ldraw.Lego.Nodes
 			var c = transform.TransformVector(m_Control1).Add(center);
 			var d = transform.TransformVector(m_Control2).Add(center);
 
-			return new CondLineNode(ColourId, a, b, c, d);
+			return new CondLineNode(Colour, a, b, c, d);
 		}
 
 		public override void Accept(LdrawVisitor visitor)

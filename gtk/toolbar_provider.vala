@@ -117,8 +117,10 @@ namespace Ldraw.Ui
 			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
 			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);
 			
+			var colour = LdrawColour.GetColour(colourId);
+			
 			float red, green, blue, alpha;
-			LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
+			LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
 
 			uint32 fillColour = ((int)(red * 255) << 24)
 							  | ((int)(green * 255) << 16)
@@ -131,7 +133,7 @@ namespace Ldraw.Ui
 			var button = new ToolButton(new Image.from_pixbuf(image), null);
 			button.clicked.connect(() =>
 				{
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, colourId));
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, colour));
 				});
 			button.set_tooltip_text(LdrawColour.GetName(colourId));
 			return button;
@@ -236,7 +238,7 @@ namespace Ldraw.Ui
 				int x = i;
 				button.clicked.connect(() =>
 					{
-						ChosenColour = 32 * page + x;
+						ChosenColour = LdrawColour.GetColour(32 * page + x);
 					});
 
 				grid.attach_defaults(button, i % 8, i % 8 + 1, i / 8, i / 8 + 1);
@@ -317,6 +319,6 @@ namespace Ldraw.Ui
 			queue_draw();
 		}
 
-		public int ChosenColour {get; private set;}
+		public Colour ChosenColour {get; private set;}
 	}
 }

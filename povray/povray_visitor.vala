@@ -17,7 +17,7 @@ namespace Ldraw.Povray
 
 		private Set<string> exportedFiles = new HashSet<string>();
 		private Set<string> emptyObjects = new HashSet<string>();
-		private Set<int>	exportedColours = new HashSet<int>();
+		private Set<Colour>	exportedColours = new HashSet<Colour>();
 
 		private File file;
 		private FileOutputStream outStream;
@@ -92,7 +92,7 @@ namespace Ldraw.Povray
 				currentObjectHasNonLines = true;
 				currentDistinctObjs++;
 
-				var colourSdl = SdlForColour(node.ColourId);
+				var colourSdl = SdlForColour(node.Colour);
 
 				currentObjectSdl += @"\tobject { $(EscapeFilename(node.Contents.FileName)) matrix $(SdlMatrixFor(node.Transform, node.Center)) $colourSdl }\n";
 			}
@@ -222,32 +222,32 @@ light_source {
 			return @"<$(m[0,0]), $(m[1,0]), $(m[2,0]), $(m[0,1]), $(m[1,1]), $(m[2,1]), $(m[0,2]), $(m[1,2]), $(m[2,2]), $(v.X), $(v.Y), $(v.Z) >";
 		}
 
-		public string SdlForColour(int colourId)
+		public string SdlForColour(Colour colour)
 		{
-			if(colourId == 24 || colourId == 16)
+			if(colour.Code == 24 || colour.Code == 16)
 			{
 				return "";
 			}
 
-			if(!(colourId in exportedColours))
+			if(!(colour in exportedColours))
 			{
 				float red, green, blue, alpha;
-				LdrawColour.SurfaceColour(colourId, out red, out green, out blue, out alpha);
+				LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
 
 				var filter = alpha == 1 ? "" : @"filter $alpha ";
 
 				var colourDefSdl =
-@"#declare Colour$colourId = material { texture {
+@"#declare Colour$(colour.Code) = material { texture {
 	pigment { rgb <$red,$green,$blue> $filter}
 	finish { ambient 0.4 diffuse 0.4 }
 	finish { phong 0.5 phong_size 40 reflection 0.08 }
 } }
 ";
 				Append(colourDefSdl);
-				exportedColours.add(colourId);
+				exportedColours.add(colour);
 			}
 
-			return @"material { Colour$colourId } ";
+			return @"material { Colour$(colour.Code) } ";
 		}
 
 		public string EscapeFilename(string filename)

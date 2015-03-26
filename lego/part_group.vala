@@ -9,7 +9,7 @@ namespace Ldraw.Lego
 	{
 		public Collection<PartGroupItem> Items {get; construct;}
 
-		public PartGroupItem? GetItemFor(LdrawPart part, LdrawColour colour)
+		public PartGroupItem? GetItemFor(LdrawPart part, Colour colour)
 		{
 			foreach(var i in Items)
 			{
@@ -55,19 +55,19 @@ namespace Ldraw.Lego
 			public Collection<PartGroupItem> GetItems()
 			{
 				var result = new ArrayList<PartGroupItem>();
-				var map = new HashMap<LdrawPart, MultiMap<LdrawColour?, PartNode>>();
+				var map = new HashMap<LdrawPart, MultiMap<Colour?, PartNode>>();
 				foreach(var p in parts)
 				{
 					var partFile = p.Contents.File as LdrawPart;
 					if(map[partFile] == null)
 					{
-						map[partFile] = new HashMultiMap<LdrawColour?, PartNode>();
+						map[partFile] = new HashMultiMap<Colour?, PartNode>();
 					}
-					map[partFile][LdrawColour.GetColour(p.ColourId)] = p;
+					map[partFile][p.Colour] = p;
 				}
 				foreach(LdrawPart p in map.keys)
 				{
-					foreach(LdrawColour c in map[p].get_keys())
+					foreach(Colour c in map[p].get_keys())
 					{
 						var item = (PartGroupItem)Object.new(typeof(PartGroupItem),
 									Part: p,
@@ -86,7 +86,7 @@ namespace Ldraw.Lego
 	{
 		public LdrawPart Part {get; construct;}
 		public int Quantity {get; construct set;}
-		public LdrawColour Colour {get; construct;}
+		public Colour Colour {get; construct;}
 
 		public PartGroupItem(PartGroupItem other)
 		{

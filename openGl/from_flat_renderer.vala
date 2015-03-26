@@ -19,7 +19,7 @@ namespace Ldraw.OpenGl
 			SelectedRenderer = new FromFlatInversePartRenderer();
 		}
 		
-		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
+		public void RenderModel(LdrawObject model, Colour defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			// Action taken depends upon file type:
 			var file = model.File;
@@ -29,7 +29,7 @@ namespace Ldraw.OpenGl
 				RenderLibraryPart(model, defaultColour, finalEyeline, selection);
 		}
 		
-		public void RenderBuiltModel(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
+		public void RenderBuiltModel(LdrawObject model, Colour defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			foreach(var node in model.Nodes)
 			{
@@ -47,14 +47,14 @@ namespace Ldraw.OpenGl
 							 0,		 0,		 0,		 1});
 							 
 				if(part in selection)
-					SelectedRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline, Set.empty<LdrawNode>());
+					SelectedRenderer.RenderModel(part.Contents, part.Colour, finalEyeline, Set.empty<LdrawNode>());
 				else
-					InnerRenderer.RenderModel(part.Contents, part.ColourId, finalEyeline, Set.empty<LdrawNode>());
+					InnerRenderer.RenderModel(part.Contents, part.Colour, finalEyeline, Set.empty<LdrawNode>());
 				glPopMatrix();
 			}
 		}
 		
-		public void RenderLibraryPart(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
+		public void RenderLibraryPart(LdrawObject model, Colour defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			InnerRenderer.RenderModel(model, defaultColour, finalEyeline, selection);
 		}
@@ -97,7 +97,7 @@ namespace Ldraw.OpenGl
 	{
 		static Map<LdrawObject, FlattenedNodes> cache = new HashMap<LdrawObject, FlattenedNodes>();
 		
-		public void RenderModel(LdrawObject model, int defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
+		public void RenderModel(LdrawObject model, Colour defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
 			var cached = cache[model];
 			if(cached == null)
@@ -108,7 +108,7 @@ namespace Ldraw.OpenGl
 				model.VisibleChange.connect(() => cache.unset(model));
 			}
 			
-			var c = LdrawColour.GetColour(defaultColour);
+			var c = (defaultColour);
 			
 			RenderType<Triangle>(cached.Triangles, RenderTriangle, GL_TRIANGLES, c);
 			RenderType<Quad>(cached.Quads, RenderQuad, GL_QUADS, c);
@@ -160,7 +160,7 @@ namespace Ldraw.OpenGl
 			glVertex3fv(b.value_vector());
 		}
 		
-		protected virtual void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, LdrawColour defaultColour)
+		protected virtual void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, Colour defaultColour)
 		{
 			glBegin(drawType);
 			foreach(var colour in nodes.get_keys())
@@ -181,7 +181,7 @@ namespace Ldraw.OpenGl
 	
 	public class FromFlatInversePartRenderer : FromFlatPartRenderer
 	{
-		protected override void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, LdrawColour defaultColour)
+		protected override void RenderType<T>(MultiMap<RenderColour, T> nodes, RenderAction<T> render, GLenum drawType, Colour defaultColour)
 		{
 			glBegin(drawType);
 			foreach(var colour in nodes.get_keys())

@@ -13,7 +13,7 @@ namespace Ldraw.Lego.Nodes
 
 		public Comment(string comment)
 		{
-			CommentText = comment;
+			CommentText = comment;			
 		}
 
 		public override string Description {get {return CommentText; } }

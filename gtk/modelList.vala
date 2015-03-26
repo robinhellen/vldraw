@@ -40,7 +40,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				LdrawNode node;
 				model.get(iter, 0, out node);
-				((CellRendererText)cell).text = node.ColourId.to_string();
+				((CellRendererText)cell).text = (node.Colour) == null ? "" : node.Colour.Code.to_string();
 			});
 			renderer = new CellRendererText();
 			renderer.size_points = 6.0;

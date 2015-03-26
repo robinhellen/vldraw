@@ -7,11 +7,11 @@ namespace Ldraw.Ui.Commands
 	public class ChangeColourCommand : Command
 	{
 		private Collection<LdrawNode> selection;
-		private Map<LdrawNode, int> oldColours = new HashMap<LdrawNode, int>();
+		private Map<LdrawNode, Colour> oldColours = new HashMap<LdrawNode, Colour>();
 
-		public ChangeColourCommand(Collection<LdrawNode> selection, int newColourId)
+		public ChangeColourCommand(Collection<LdrawNode> selection, Colour newColour)
 		{
-			Object(Selection: selection, NewColourId: newColourId);
+			Object(Selection: selection, NewColour: newColour);
 		}
 
 		public Collection<LdrawNode> Selection
@@ -25,17 +25,17 @@ namespace Ldraw.Ui.Commands
 				selection = value;
 				foreach(var node in value)
 				{
-					oldColours[node] = node.ColourId;
+					oldColours[node] = node.Colour;
 				}
 			}
 		}
-		public int NewColourId {get; construct;}
+		public Colour NewColour {get; construct;}
 
 		public override void Execute()
 		{
 			foreach(var node in Selection)
 			{
-				node.ColourId = NewColourId;
+				node.Colour = NewColour;
 			}
 		}
 
@@ -43,7 +43,7 @@ namespace Ldraw.Ui.Commands
 		{
 			foreach(var node in oldColours.keys)
 			{
-				node.ColourId = oldColours[node];
+				node.Colour = oldColours[node];
 			}
 		}
 	}

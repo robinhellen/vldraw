@@ -1,6 +1,7 @@
 using Gtk;
 using Gdk;
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.OpenGl;
 using Ldraw.Maths;
@@ -72,7 +73,7 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		public int DefaultColour {get; set; default = 0;}
+		public Colour DefaultColour {get; set; default = LdrawColour.GetColour(0);}
 
 		public virtual void Redraw()
 			throws GlError

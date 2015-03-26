@@ -167,7 +167,7 @@ namespace Ldraw.Ui
 				});
 		}
 		
-		private Pixbuf GetPixbufImageForColour(LdrawColour colour)
+		private Pixbuf GetPixbufImageForColour(Colour colour)
 		{
 			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 16, 16);
 			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 14, 14);

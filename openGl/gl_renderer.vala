@@ -20,7 +20,7 @@ namespace Ldraw.OpenGl
 		}
 		
 		public void Render(
-				GLDrawable drawable, int defaultColour, 
+				GLDrawable drawable, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
 				LdrawObject model, PartNode? extraBounds,
 				Gee.Set<LdrawNode> selection)
@@ -90,7 +90,7 @@ namespace Ldraw.OpenGl
 	
 	public class StandardModelRenderer : Object, IRenderModel
 	{
-		public void RenderModel(LdrawObject model, int colour, Vector finalEyeline, Gee.Set<LdrawNode> selection)
+		public void RenderModel(LdrawObject model, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection)
 		{
 			GlBuilder builder = new GlBuilder(colour, finalEyeline, Gee.Map.empty<string, float?>(), selection);
 			model.BuildFromFile<void>(builder);	
@@ -101,7 +101,7 @@ namespace Ldraw.OpenGl
 	
 	public interface IRenderModel : Object
 	{
-		public abstract void RenderModel(LdrawObject object, int colour, Vector finalEyeline, Gee.Set<LdrawNode> selection);			
+		public abstract void RenderModel(LdrawObject object, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection);			
 		public virtual void RenderBoundsFor(PartNode part)	{}
 	}
 }

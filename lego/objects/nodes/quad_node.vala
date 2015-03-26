@@ -14,9 +14,9 @@ namespace Ldraw.Lego.Nodes
 			Type = "Quad";
 		}
 
-		public QuadNode(int colour, Vector a, Vector b, Vector c, Vector d)
+		public QuadNode(Colour colour, Vector a, Vector b, Vector c, Vector d)
 		{
-			ColourId = colour;
+			Colour = colour;
 			m_A = a;
 			m_B = b;
 			m_C = c;
@@ -33,7 +33,7 @@ namespace Ldraw.Lego.Nodes
 
 		public Vector D { get {return m_D;}}
 
-		public override string FileLine{owned get{return @"3 $ColourId $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z) $(m_C.X) $(m_C.Y) $(m_C.Z) $(m_D.X) $(m_D.Y) $(m_D.Z)";}}
+		public override string FileLine{owned get{return @"3 $(Colour.Code) $(m_A.X) $(m_A.Y) $(m_A.Z) $(m_B.X) $(m_B.Y) $(m_B.Z) $(m_C.X) $(m_C.Y) $(m_C.Z) $(m_D.X) $(m_D.Y) $(m_D.Z)";}}
 
 		public override LdrawNode TransformNode(Matrix transform, Vector center)
 		{
@@ -42,7 +42,7 @@ namespace Ldraw.Lego.Nodes
 			var c = transform.TransformVector(m_C).Add(center);
 			var d = transform.TransformVector(m_D).Add(center);
 
-			return new QuadNode(ColourId, a, b, c, d);
+			return new QuadNode(Colour, a, b, c, d);
 		}
 
 		public override void Accept(LdrawVisitor visitor)

@@ -1,3 +1,4 @@
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 using Ldraw.Utils.Di;
@@ -85,7 +86,7 @@ namespace Ldraw.Lego
 			string text = tokens[14].strip().down();
 
 			var locator = OverrideLocator ?? Locators[strategy];
-			return new PartNode(center, transform, locator.GetObjectFromReference(text), colourId);
+			return new PartNode(center, transform, locator.GetObjectFromReference(text), LdrawColour.GetColour(colourId));
 		}
 
 		protected LdrawNode ParseLineNode(string line)
@@ -98,7 +99,7 @@ namespace Ldraw.Lego
 			var b = ParseTokensToVector(tokens[5:7]);
 			var colourId = int.parse(tokens[1]);
 
-			return new LineNode(colourId, a, b);
+			return new LineNode(LdrawColour.GetColour(colourId), a, b);
 		}
 
 		protected LdrawNode ParseTriangleNode(string line)
@@ -112,7 +113,7 @@ namespace Ldraw.Lego
 			var c = ParseTokensToVector(tokens[8:10]);
 			var colourId = int.parse(tokens[1]);
 
-			return new TriangleNode(colourId, a, b, c);
+			return new TriangleNode(LdrawColour.GetColour(colourId), a, b, c);
 		}
 
 		protected LdrawNode ParseQuadNode(string line)
@@ -127,7 +128,7 @@ namespace Ldraw.Lego
 			var d = ParseTokensToVector(tokens[11:13]);
 			var colourId = int.parse(tokens[1]);
 
-			return new QuadNode(colourId, a, b, c, d);
+			return new QuadNode(LdrawColour.GetColour(colourId), a, b, c, d);
 		}
 
 		protected LdrawNode ParseCondLineNode(string line)
@@ -142,7 +143,7 @@ namespace Ldraw.Lego
 			var d = ParseTokensToVector(tokens[11:13]);
 			var colourId = int.parse(tokens[1]);
 
-			return new CondLineNode(colourId, a, b, c, d);
+			return new CondLineNode(LdrawColour.GetColour(colourId), a, b, c, d);
 		}
 
 		protected static string[] Tokenize(string line)

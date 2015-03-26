@@ -19,10 +19,10 @@ namespace Ldraw.OpenGl
 
 		private int m_RecursionDepth = 0;
 
-		public GlBuilder(int defaultColour, Vector eyeline, 
+		public GlBuilder(Colour defaultColour, Vector eyeline, 
 				Map<string, float?> parameters,
 				Set<LdrawNode> selection)
-			requires(defaultColour != 24 && defaultColour != 16) // default colour must be an actual colour
+			requires(defaultColour.Code != 24 && defaultColour.Code != 16) // default colour must be an actual colour
 		{
 			state.CurrentColour = defaultColour;
 			state.Parameters = parameters;
@@ -37,7 +37,7 @@ namespace Ldraw.OpenGl
 
 		public override void VisitLine(LineNode line)
 		{
-			SetRenderColour(line.ColourId);
+			SetRenderColour(line.Colour);
 
 			Vector a = state.Transform.TransformVector(line.A).Add(state.Center);
 			Vector b = state.Transform.TransformVector(line.B).Add(state.Center);
@@ -52,7 +52,7 @@ namespace Ldraw.OpenGl
 
 		public override void VisitTriangle(TriangleNode triangle)
 		{
-			SetRenderColour(triangle.ColourId);
+			SetRenderColour(triangle.Colour);
 
 			Vector a = state.Transform.TransformVector(triangle.A).Add(state.Center);
 			Vector b = state.Transform.TransformVector(triangle.B).Add(state.Center);
@@ -69,7 +69,7 @@ namespace Ldraw.OpenGl
 
 		public override void VisitQuad(QuadNode quad)
 		{
-			SetRenderColour(quad.ColourId);
+			SetRenderColour(quad.Colour);
 
 			Vector a = state.Transform.TransformVector(quad.A).Add(state.Center);
 			Vector b = state.Transform.TransformVector(quad.B).Add(state.Center);
@@ -102,9 +102,9 @@ namespace Ldraw.OpenGl
 			// reset the animation
 			nextObjectAnimationState = new AnimationState();
 
-			if(part.ColourId != 16 && part.ColourId != 24)
+			if(part.Colour.Code != 16 && part.Colour.Code != 24)
 			{
-				state.CurrentColour = part.ColourId;
+				state.CurrentColour = part.Colour;
 			}
 			if(part in selection)
 			{
@@ -168,7 +168,7 @@ namespace Ldraw.OpenGl
 				return; // different signs means different sides
 			}
 
-			SetRenderColour(line.ColourId);
+			SetRenderColour(line.Colour);
 			glBegin(GL_LINES);
 
 			glVertex3fv(a.value_vector());
@@ -177,22 +177,22 @@ namespace Ldraw.OpenGl
 			glEnd();
 		}
 
-		private void SetRenderColour(int ldrawColour)
+		private void SetRenderColour(Colour ldrawColour)
 		{
-			bool invert = ldrawColour == 24;
-			int actualColour = (ldrawColour == 24 || ldrawColour == 16) ? state.CurrentColour : ldrawColour;
+			bool invert = ldrawColour.Code == 24;
+			Colour actualColour = (ldrawColour.Code == 24 || ldrawColour.Code == 16) ? state.CurrentColour : ldrawColour;
 
 			bool actualInvert = (invert && !state.ColourInverted) || (!invert && state.ColourInverted);
 			float red, green, blue, alpha;
 			if(actualInvert)
 			{
-				LdrawColour.EdgeColour(actualColour, out red, out green, out blue, out alpha);
+				LdrawColour.EdgeColour(actualColour.Code, out red, out green, out blue, out alpha);
 				// get line colour
 			}
 			else
 			{
 				// get flat colour
-				LdrawColour.SurfaceColour(actualColour, out red, out green, out blue, out alpha);
+				LdrawColour.SurfaceColour(actualColour.Code, out red, out green, out blue, out alpha);
 			}
 
 			glColor4f(red, green, blue, alpha);
@@ -231,14 +231,14 @@ namespace Ldraw.OpenGl
 			{
 				Transform = Matrix.Identity;
 				Center = Vector.NullVector;
-				CurrentColour = 0;
+				CurrentColour = null;
 				ColourInverted = false;
 				Variables = new HashMap<string, float?>();
 			}
 
 			public Matrix Transform;
 			public Vector Center;
-			public int CurrentColour;
+			public Colour CurrentColour;
 			public bool ColourInverted;
 			public Map<string, float?> Variables;
 			public Map<string, float?> Parameters;

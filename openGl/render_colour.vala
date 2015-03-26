@@ -1,5 +1,6 @@
 using Gee;
 
+using Ldraw.Lego;
 using Ldraw.Lego.Library;
 
 namespace Ldraw.OpenGl
@@ -20,7 +21,7 @@ namespace Ldraw.OpenGl
 			}
 		}		
 		
-		public static RenderColour FromLdrawColour(LdrawColour? c)
+		public static RenderColour FromLdrawColour(Colour? c)
 			requires(c.Code != 24)
 		{
 			CreateCaches();
@@ -40,7 +41,7 @@ namespace Ldraw.OpenGl
 			return newColour;
 		}
 		
-		public static RenderColour FromLdrawEdgeColour(LdrawColour c)
+		public static RenderColour FromLdrawEdgeColour(Colour c)
 			requires(c.Code != 24)
 		{
 			CreateCaches();
@@ -60,14 +61,14 @@ namespace Ldraw.OpenGl
 			return newColour;
 		}
 		
-		private RenderColour.ConsFromLdrawColour(LdrawColour c)
+		private RenderColour.ConsFromLdrawColour(Colour c)
 		{
 			float red, green, blue, alpha;
 			LdrawColour.SurfaceColour(c.Code, out red, out green, out blue, out alpha);
 			Object(Red:red, Green:green, Blue:blue, Alpha:alpha);
 		}
 		
-		private RenderColour.ConsFromLdrawEdgeColour(LdrawColour c)
+		private RenderColour.ConsFromLdrawEdgeColour(Colour c)
 		{
 			float red, green, blue, alpha;
 			LdrawColour.EdgeColour(c.Code, out red, out green, out blue, out alpha);
@@ -79,7 +80,7 @@ namespace Ldraw.OpenGl
 		public float Blue {get; construct;}
 		public float Alpha {get; construct;}
 		
-		public virtual void UseColour(UseColourFunc u, LdrawColour defaultColour)
+		public virtual void UseColour(UseColourFunc u, Colour defaultColour)
 			requires(defaultColour.Code != 16)
 			requires(defaultColour.Code != 24)
 		{
@@ -88,7 +89,7 @@ namespace Ldraw.OpenGl
 		
 		private class DefaultEdge : RenderColour
 		{			
-			public override void UseColour(UseColourFunc u, LdrawColour defaultColour)
+			public override void UseColour(UseColourFunc u, Colour defaultColour)
 				requires(defaultColour.Code != 16)
 				requires(defaultColour.Code != 24)
 			{
@@ -98,7 +99,7 @@ namespace Ldraw.OpenGl
 		
 		private class DefaultSurface : RenderColour
 		{		
-			public override void UseColour(UseColourFunc u, LdrawColour defaultColour)
+			public override void UseColour(UseColourFunc u, Colour defaultColour)
 				requires(defaultColour.Code != 16)
 				requires(defaultColour.Code != 24)
 			{
