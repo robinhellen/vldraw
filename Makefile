@@ -47,7 +47,7 @@ part_group_internal_packages=lego lego_objects maths expressions utils di
 
 undo_sources=$(wildcard gtk/undo/*.vala)
 undo_packages=$(gee) $(gtk)
-undo_internal_packages=lego lego_objects maths expressions utils di
+undo_internal_packages=lego_objects maths
 
 drag_and_drop_sources=$(wildcard gtk/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) $(gtk)
