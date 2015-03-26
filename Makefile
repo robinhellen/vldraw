@@ -9,24 +9,17 @@ json=json-glib-1.0
 xml=libxml-2.0
 soup=libsoup-2.4
 
-TEST_EXPR_SOURCES=		$(wildcard tests/expressions/*.vala)
-TEST_MATHS_SOURCES=		$(wildcard tests/vector/*.vala)
-TEST_FRAMEWORK_SOURCES= $(wildcard tests/*.vala)
-
-TEST_SOURCES= $(TEST_FRAMEWORK_SOURCES) $(TEST_MATHS_SOURCES) $(TEST_EXPR_SOURCES)
+TEST_SOURCES= $(foreach folder, . expressions vector, $(wildcard tests/$(folder)/*.vala))
 
 EXPORT_SOURCES=		$(wildcard export/*.vala)
 OPENGL_SOURCES=		$(wildcard openGl/*.vala)
-MATHS_SOURCES=		$(wildcard maths/*.c)
-REFACTORING_SOURCES=$(wildcard refactoring/*.vala)
 
 UI_SOURCE_FOLDERS= drag_and_drop widgets undo .
 
 GTK_SOURCES= $(foreach folder, $(UI_SOURCE_FOLDERS), $(wildcard gtk/$(folder)/*.vala))
 
-ENGINE_C_SOURCES=$(MATHS_SOURCES)
+SOURCES=$(wildcard *.vala) $(OPENGL_SOURCES) $(GTK_SOURCES) $(EXPORT_SOURCES)
 
-SOURCES=$(wildcard *.vala) $(OPENGL_SOURCES) $(GTK_SOURCES) $(EXPORT_SOURCES) $(REFACTORING_SOURCES)
 di_sources= $(wildcard utils/di/*.vala)
 di_packages=$(gee)
 utils_sources= $(wildcard utils/*.vala)

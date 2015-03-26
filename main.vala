@@ -5,7 +5,6 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Options;
 using Ldraw.Peeron;
-using Ldraw.Refactoring;
 using Ldraw.Ui;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
