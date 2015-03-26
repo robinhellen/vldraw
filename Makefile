@@ -35,8 +35,10 @@ utils_packages=$(gee) $(gtk)
 expressions_sources=$(wildcard expressions/*.vala)
 expressions_packages=$(gee)
 maths_sources=$(wildcard maths/*.vala)
+options_sources=$(wildcard options/*.vala)
+options_internal_packages= maths 
 
-INTERNAL_LIBS=di utils expressions
+INTERNAL_LIBS=di utils expressions maths options
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
 
@@ -62,7 +64,7 @@ $(EXECUTABLE_NAME): $(SOURCES) $(ENGINE_C_SOURCES) $(foreach lib, $(INTERNAL_LIB
 $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 	
-lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), lib/$$(lib).so h/$$(lib).h vapi/$$(lib).vapi)
+lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h lib/$$(lib).so vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
 		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
