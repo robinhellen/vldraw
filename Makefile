@@ -29,38 +29,39 @@ lego_objects_sources=$(foreach n, comment cond_line_node line_node part_node qua
 lego_objects_packages=$(gee) gio-2.0
 lego_objects_internal_packages=maths
 
-lego_sources=$(foreach folder, objects objects/nodes files files/parsing library, $(wildcard lego/$(folder)/*.vala))
+lego_sources:=$(filter-out lego/files/ldraw_file.vala lego/files/parsing/parse_error.vala, $(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala))) \
+	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages=$(gee) $(gtk) $(json)
-lego_internal_packages=maths expressions utils di
+lego_internal_packages=maths expressions utils di lego_objects
 					
 
 peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) $(gtk) $(soup) $(xml)
-peeron_internal_packages=lego maths expressions utils di
+peeron_internal_packages=lego lego_objects maths expressions utils di
 povray_sources=$(wildcard povray/*.vala)
 povray_packages=$(gee) $(gtk)
-povray_internal_packages=lego maths expressions utils di
+povray_internal_packages=lego lego_objects maths expressions utils di
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=$(gee) $(gtk)
-part_group_internal_packages=lego maths expressions utils di
+part_group_internal_packages=lego lego_objects maths expressions utils di
 
 undo_sources=$(wildcard gtk/undo/*.vala)
 undo_packages=$(gee) $(gtk)
-undo_internal_packages=lego maths expressions utils di
+undo_internal_packages=lego lego_objects maths expressions utils di
 
 drag_and_drop_sources=$(wildcard gtk/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) $(gtk)
-drag_and_drop_internal_packages=lego maths expressions utils di
+drag_and_drop_internal_packages=lego lego_objects maths expressions utils di
 
 gl_render_sources=$(wildcard openGl/*.vala)
 gl_render_packages=gl gdkglext-1.0 $(gee) $(gtk)
-gl_render_internal_packages=lego maths expressions utils di
+gl_render_internal_packages=lego lego_objects maths expressions utils di
 
 ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0
-ui_widgets_internal_packages= gl_render lego maths expressions utils di options undo part_group peeron drag_and_drop povray
+ui_widgets_internal_packages= gl_render lego lego_objects maths expressions utils di options undo part_group peeron drag_and_drop povray
 
-INTERNAL_LIBS=di utils expressions maths options lego peeron povray part_group
+INTERNAL_LIBS=di utils expressions maths options lego lego_objects peeron povray part_group lego_objects
 UI_LIBS=drag_and_drop undo gl_render ui_widgets
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
