@@ -2,7 +2,7 @@ DEFAULT: all
 
 .SECONDEXPANSION:
 
-VALACC=valac-0.24
+VALACC=valac-0.26
 gee=gee-0.8
 gtk=gtk+-2.0
 
@@ -34,6 +34,7 @@ utils_sources= $(wildcard utils/*.vala)
 utils_packages=$(gee) $(gtk)
 expressions_sources=$(wildcard expressions/*.vala)
 expressions_packages=$(gee)
+maths_sources=$(wildcard maths/*.vala)
 
 INTERNAL_LIBS=di utils expressions
 
@@ -62,7 +63,11 @@ $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LI
 	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 	
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources)
-	$(VALACC) $($*_sources) $(foreach pkg, $($*_packages), --pkg $(pkg)) --library=$* -H h/$*.h -X -fpic -X -shared -g -o lib/$*.so -X -w --vapi vapi/$*.vapi
+	$(VALACC) $($*_sources) \
+		$(foreach pkg, $($*_packages), --pkg $(pkg)) \
+		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
+		-X -fpic -X -shared -g -X -w
+
 
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
