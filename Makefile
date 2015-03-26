@@ -20,15 +20,13 @@ OPENGL_SOURCES=		$(wildcard openGl/*.vala)
 MATHS_SOURCES=		$(wildcard maths/*.c)
 REFACTORING_SOURCES=$(wildcard refactoring/*.vala)
 
-ENGINE_SOURCE_FOLDERS= lego
 UI_SOURCE_FOLDERS= drag_and_drop widgets undo .
 
-ENGINE_SOURCES= $(foreach folder, $(ENGINE_SOURCE_FOLDERS), $(wildcard $(folder)/*.vala))
 GTK_SOURCES= $(foreach folder, $(UI_SOURCE_FOLDERS), $(wildcard gtk/$(folder)/*.vala))
 
 ENGINE_C_SOURCES=$(MATHS_SOURCES)
 
-SOURCES=$(wildcard *.vala) $(ENGINE_SOURCES) $(OPENGL_SOURCES) $(GTK_SOURCES) $(EXPORT_SOURCES) $(REFACTORING_SOURCES)
+SOURCES=$(wildcard *.vala) $(OPENGL_SOURCES) $(GTK_SOURCES) $(EXPORT_SOURCES) $(REFACTORING_SOURCES)
 di_sources= $(wildcard utils/di/*.vala)
 di_packages=$(gee)
 utils_sources= $(wildcard utils/*.vala)
@@ -47,10 +45,13 @@ peeron_internal_packages=lego maths expressions utils di
 povray_sources=$(wildcard povray/*.vala)
 povray_packages=$(gee) $(gtk) $(json)
 povray_internal_packages=lego maths expressions utils di
+part_group_sources=$(wildcard lego/*.vala)
+part_group_packages=$(gee) $(gtk) $(json)
+part_group_internal_packages=lego maths expressions utils di
 
-INTERNAL_LIBS=di utils expressions maths options lego peeron povray
+INTERNAL_LIBS=di utils expressions maths options lego peeron povray part_group
 
-TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES) $(ENGINE_SOURCES)
+TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl gtkglext-1.0 gdkglext-1.0 gio-2.0
 
@@ -64,10 +65,7 @@ TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 
 all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
 	./$(TEST_EXECUTABLE_NAME)
-
-debug: $(SOURCES)
-	$(VALACC) $(VALA_DEBUG_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME)_debug
-
+	
 $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 
