@@ -12,24 +12,6 @@ namespace Ldraw.Lego.Library
 
 		public static int s_Creations = 0;
 
-		public LdrawSubPart(string filename, LdrawLibrary library)
-			throws ParseError
-		{
-			File partsDir = library.SubPartsDirectory;
-			File partFile = partsDir.get_child(filename);
-			if(!partFile.query_exists())
-			{
-				throw new ParseError.MissingFile(@"Unable to find part file $filename.");
-			}
-			base.FromFile(partFile, new LdrawParser());
-
-			m_FileName = filename;
-
-			m_Name = filename.substring(0, filename.last_index_of_char('.'));
-
-			s_Creations++;
-		}
-
 		public string Category
 		{
 			get

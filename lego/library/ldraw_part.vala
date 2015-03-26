@@ -12,30 +12,6 @@ namespace Ldraw.Lego.Library
 		private string m_BaseName;
 		private Gee.List<string> m_Keywords = new ArrayList<string>();
 
-		public LdrawPart(string filename, LdrawLibrary library)
-			throws ParseError
-		{
-			File partsDir = library.PartsDirectory;
-			File partFile = partsDir.get_child(filename);
-			if(!partFile.query_exists())
-			{
-				throw new ParseError.MissingFile(@"Unable to find part file $filename.");
-			}
-			base.FromFile(partFile, new LdrawParser());
-
-			FileName = filename;
-
-			m_Name = filename.substring(0, filename.last_index_of_char('.'));
-			m_BaseName = "";
-			foreach(char c in m_Name.to_utf8())
-			{
-				if(c.isdigit())
-					m_BaseName += c.to_string();
-				else
-					break;
-			}
-		}
-
 		public string Description
 		{
 			get
