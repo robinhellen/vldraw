@@ -14,7 +14,7 @@ TEST_SOURCES= $(foreach folder, . expressions vector, $(wildcard tests/$(folder)
 EXPORT_SOURCES=		$(wildcard export/*.vala)
 OPENGL_SOURCES=		$(wildcard openGl/*.vala)
 
-UI_SOURCE_FOLDERS= drag_and_drop widgets undo .
+UI_SOURCE_FOLDERS= .
 
 GTK_SOURCES= $(foreach folder, $(UI_SOURCE_FOLDERS), $(wildcard gtk/$(folder)/*.vala))
 
@@ -33,16 +33,25 @@ lego_sources=$(foreach folder, objects objects/nodes files files/parsing library
 lego_packages=$(gee) $(gtk) $(json)
 lego_internal_packages=maths expressions utils di
 peeron_sources=$(wildcard peeron/*.vala)
-peeron_packages=$(gee) $(gtk) $(json) $(soup) $(xml)
+peeron_packages=$(gee) $(gtk) $(soup) $(xml)
 peeron_internal_packages=lego maths expressions utils di
 povray_sources=$(wildcard povray/*.vala)
-povray_packages=$(gee) $(gtk) $(json)
+povray_packages=$(gee) $(gtk)
 povray_internal_packages=lego maths expressions utils di
 part_group_sources=$(wildcard lego/*.vala)
-part_group_packages=$(gee) $(gtk) $(json)
+part_group_packages=$(gee) $(gtk)
 part_group_internal_packages=lego maths expressions utils di
 
+undo_sources=$(wildcard gtk/undo/*.vala)
+undo_packages=$(gee) $(gtk)
+undo_internal_packages=lego maths expressions utils di
+
+drag_and_drop_sources=$(wildcard gtk/drag_and_drop/*.vala)
+drag_and_drop_packages=$(gee) $(gtk)
+drag_and_drop_internal_packages=lego maths expressions utils di
+
 INTERNAL_LIBS=di utils expressions maths options lego peeron povray part_group
+UI_LIBS=drag_and_drop undo
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
@@ -59,8 +68,8 @@ TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
 	./$(TEST_EXECUTABLE_NAME)
 	
-$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
-	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
+$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
+	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 
 $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
@@ -75,7 +84,7 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
-	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS), vapi/$(lib).vapi)
+	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), vapi/$(lib).vapi)
 
 tempclean:
 	rm -f $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))
