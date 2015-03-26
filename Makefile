@@ -62,15 +62,17 @@ $(EXECUTABLE_NAME): $(SOURCES) $(ENGINE_C_SOURCES) $(foreach lib, $(INTERNAL_LIB
 $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) $(ENGINE_C_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 	
-lib/%.so h/%.h vapi/%.vapi: $$($$*_sources)
+lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), lib/$$(lib).so h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
-		$(foreach pkg, $($*_packages), --pkg $(pkg)) \
+		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
+		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
 		-X -fpic -X -shared -g -X -w
 
 
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
+	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS), vapi/$(lib).vapi)
 
 tempclean:
 	rm -f $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))
