@@ -4,6 +4,7 @@ DEFAULT: all
 
 VALACC=valac-0.26
 gee=gee-0.8
+gio=gio-2.0
 gtk=gtk+-2.0
 json=json-glib-1.0
 xml=libxml-2.0
@@ -26,7 +27,7 @@ options_internal_packages= maths
 lego_objects_sources=$(foreach n, comment cond_line_node line_node part_node quad_node triangle_node, lego/objects/nodes/$n.vala) \
 					$(wildcard  lego/objects/*.vala) \
 					lego/files/ldraw_file.vala lego/files/parsing/parse_error.vala
-lego_objects_packages=$(gee) gio-2.0
+lego_objects_packages=$(gee) $(gio)
 lego_objects_internal_packages=maths
 
 lego_sources:=$(filter-out lego/files/ldraw_file.vala lego/files/parsing/parse_error.vala, $(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala))) \
@@ -39,8 +40,8 @@ peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) $(gtk) $(soup) $(xml)
 peeron_internal_packages=lego lego_objects maths expressions utils di
 povray_sources=$(wildcard povray/*.vala)
-povray_packages=$(gee) $(gtk)
-povray_internal_packages=lego lego_objects maths expressions utils di
+povray_packages=$(gee) $(gio)
+povray_internal_packages=lego_objects maths
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=$(gee) $(gtk)
 part_group_internal_packages=lego lego_objects maths expressions utils di
@@ -66,7 +67,7 @@ UI_LIBS=drag_and_drop undo gl_render ui_widgets
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
-VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl gtkglext-1.0 gdkglext-1.0 gio-2.0
+VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl gtkglext-1.0 gdkglext-1.0 $(gio)
 
 VALA_PKG_ARGS = $(foreach pkg, $(VALA_PACKAGES), --pkg $(pkg))
 

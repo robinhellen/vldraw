@@ -2,7 +2,6 @@ using Gee;
 using GLib.Math;
 
 using Ldraw.Lego;
-using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 
@@ -232,7 +231,7 @@ light_source {
 			if(!(colour in exportedColours))
 			{
 				float red, green, blue, alpha;
-				LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
+				colour.SurfaceColour(out red, out green, out blue, out alpha);
 
 				var filter = alpha == 1 ? "" : @"filter $alpha ";
 

@@ -79,6 +79,14 @@ namespace Ldraw.Lego
 
 		public string Name {get {return m_Name;}}
 		public int Code {get {return m_Code;}}
+		
+		public void SurfaceColour(out float red, out float green, out float blue, out float alpha)
+		{
+			red = m_Red;
+			green = m_Green;
+			blue = m_Blue;
+			alpha = m_Alpha;
+		}
 	}
 }
 
