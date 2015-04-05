@@ -28,7 +28,7 @@ lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)
 lego_objects_packages=$(gee) $(gio)
 lego_objects_internal_packages=maths
 
-lego_sources:=$(filter-out lego/files/ldraw_file.vala lego/files/parsing/parse_error.vala, $(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala))) \
+lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages=$(gee) $(gtk) $(json)
 lego_internal_packages=maths expressions utils di lego_objects
