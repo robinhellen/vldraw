@@ -11,14 +11,6 @@ namespace Ldraw.Lego
 			MainObject = new LdrawObject("", this);
 		}
 
-		// return true to indicate that all processing on this line is done,
-		// false to create a node for this comment.
-		public virtual bool HandleCommentLine(string line)
-			throws ParseError
-		{
-			return false;
-		}
-
 		public LdrawObject MainObject {get; construct set;}
 
 		public string FileName {get; construct set;}

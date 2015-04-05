@@ -58,42 +58,6 @@ namespace Ldraw.Lego.Library
 			}
 		}
 
-		public override bool HandleCommentLine(string line)
-			throws ParseError
-		{
-			if(m_Description == null)
-			{
-				m_Description = line.substring(2);
-				MainObject.Description = m_Description;
-				return true;
-			}
-
-			if(line.has_prefix("0 !CATEGORY "))
-			{
-				string category = line.substring(12);
-				if(m_Category != null)
-				{
-					string s = "Part '" + FileName + @"' has two category lines. \nFirst: $m_Category\n Second: $category";
-					throw new ParseError.InvalidComment(s);
-				}
-				m_Category = category;
-				return true;
-			}
-
-			if(line.has_prefix("0 !KEYWORDS"))
-			{
-				string keywords = line.substring(12);
-				string[] words = keywords.split(",");
-				foreach(string word in words)
-				{
-					m_Keywords.add(word);
-				}
-				return true;
-			}
-
-			return base.HandleCommentLine(line);
-		}
-
 		public string Name
 		{
 			get
