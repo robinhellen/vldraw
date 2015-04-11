@@ -26,7 +26,6 @@ namespace Ldraw.Ui
 
         // trees
         SubModelsTree subModels;
-        DocumentObjectLocator documentLocator;
 
         public IOptions Settings {construct; private get;}
         public LdrawFileLoader Loader {construct; private get;}
@@ -38,6 +37,7 @@ namespace Ldraw.Ui
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
 		public PartsTree Parts {construct; get;}
+        public DocumentObjectLocator DocumentLocator {construct; get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
                                     IContainer context)
@@ -53,6 +53,7 @@ namespace Ldraw.Ui
             var editObject = context.Resolve<AnimatedModel>();
             var setList = context.Resolve<SetList>();
             var parts = context.Resolve<PartsTree>();
+			var documentLocator = context.Resolve<DocumentObjectLocator>();
             GLib.Object(
 				Loader: loader, 
 				Settings: settings, 
@@ -63,21 +64,21 @@ namespace Ldraw.Ui
 				SubModelsPreview : preview2,
 				EditingObject: editObject,
 				SetList: setList,
-				Parts: parts
+				Parts: parts,
+				DocumentLocator: documentLocator
 			);
 
             EditingObject.Load(model.MainObject);
-			documentLocator = context.Resolve<DocumentObjectLocator>();
 			
             maximize();
 
-            SetUpControls();
             File = model;
-            SetUpErrorReporting();
         }
         
         construct
         {
+            SetUpControls();
+            SetUpErrorReporting();
 			PartsPreview.Angle = ViewAngle.Ortho;
 			PartsPreview.set_size_request(200, 200);
             PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
@@ -109,7 +110,7 @@ namespace Ldraw.Ui
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
             
-            documentLocator.Objects = Gee.List.empty<LdrawObject>();			
+            DocumentLocator.Objects = Gee.List.empty<LdrawObject>();			
 
             var notebook = new Notebook();
             // add a list of available parts on the left
@@ -509,14 +510,14 @@ namespace Ldraw.Ui
                     m_SubModels.visible = true;
                     EditingObject.Load(mpd.MainObject);
                     subModels.Models = mpd.SubModels;
-                    documentLocator.Objects = mpd.SubModels;
+                    DocumentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
                     m_SubModels.visible = false;
                     EditingObject.Load(value.MainObject);
                     subModels.Models = new ObservableList<LdrawObject>();
-                    documentLocator.Objects = Gee.List.empty<LdrawObject>();
+                    DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
 
                 var titleFileName = value.FileName ?? "untitled";
