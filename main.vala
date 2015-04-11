@@ -54,9 +54,6 @@ namespace Ldraw
 
             // load up the colours
             LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
-            // initialize Gtk and OpenGL
-            init(ref args);
-            Gdk.gl_init(ref args);
             LdrawModelFile model = null;
             var loader = container.Resolve<LdrawFileLoader>();
             try
@@ -69,24 +66,42 @@ namespace Ldraw
                 return 1;
             }
 
-            try
-            {
-                Window win = new MainWindow.WithModel(
-                                model,
-                                container
-                            );
-                win.destroy.connect(() => main_quit());
-                win.show_all();
-            }
-            catch(OpenGl.GlError e)
-            {
-                stderr.printf(@"Unable to initialize OpenGl displays: $(e.message).\n");
-                return -1;
-            }
-
-            Gtk.main();
-
+			var ui = GLib.Object.new(typeof(LdrawEditorUi), Window: new Lazy<MainWindow>(() =>
+				new MainWindow.WithModel(
+								model,
+								container
+							)
+			));
+			var argH = GLib.Object.new(typeof(GtkInitialisingArgHandler));
+			var application = (Ldraw.Application.Application) GLib.Object.new(typeof(Ldraw.Application.Application), Ui: ui, ArgHandler: argH);
+			
+			application.Run(args);
+			
             return 0;
         }
     }
+    
+    public class LdrawEditorUi : GLib.Object, Ldraw.Application.UserInterface
+    {
+		public Lazy<MainWindow> Window {construct; private get;}
+		
+		public void Start()
+		{			
+			Window.value.destroy.connect(() => main_quit());
+			Window.value.show_all();
+			
+			Gtk.main();
+		}
+	}
+	
+	public class GtkInitialisingArgHandler : GLib.Object, Ldraw.Application.ArgumentHandler
+	{
+		public bool HandleArgs(string[] args)
+		{
+            // initialize Gtk and OpenGL
+            init(ref args);
+            Gdk.gl_init(ref args);
+            return true;		
+		}
+	}
 }
