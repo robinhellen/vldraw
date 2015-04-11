@@ -25,7 +25,6 @@ namespace Ldraw.Ui
         ParameterValues parameters;
 
         // trees
-        PartsTree parts;
         SubModelsTree subModels;
         DocumentObjectLocator documentLocator;
 
@@ -37,6 +36,8 @@ namespace Ldraw.Ui
 		public LdrawViewPane PartsPreview {construct; private get;}
 		public LdrawViewPane SubModelsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
+		public SetList SetList {construct; get;}
+		public PartsTree Parts {construct; get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
                                     IContainer context)
@@ -50,6 +51,8 @@ namespace Ldraw.Ui
             var preview1 = context.Resolve<LdrawViewPane>();
             var preview2 = context.Resolve<LdrawViewPane>();
             var editObject = context.Resolve<AnimatedModel>();
+            var setList = context.Resolve<SetList>();
+            var parts = context.Resolve<PartsTree>();
             GLib.Object(
 				Loader: loader, 
 				Settings: settings, 
@@ -58,7 +61,9 @@ namespace Ldraw.Ui
 				View: view,
 				PartsPreview: preview1,
 				SubModelsPreview : preview2,
-				EditingObject: editObject
+				EditingObject: editObject,
+				SetList: setList,
+				Parts: parts
 			);
 
             EditingObject.Load(model.MainObject);
@@ -66,7 +71,7 @@ namespace Ldraw.Ui
 			
             maximize();
 
-            SetUpControls(context);
+            SetUpControls();
             File = model;
             SetUpErrorReporting();
         }
@@ -82,9 +87,13 @@ namespace Ldraw.Ui
 			SubModelsPreview.set_size_request(200, 200);
             SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
             Settings.notify["PreviewColourId"].connect(() => SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
+                        
+            bind_property("File", SetList, "ModelFile");
+            
+            Parts.DetailView = PartsPreview;
 		}
 
-        private void SetUpControls(IContainer context)
+        private void SetUpControls()
             throws OpenGl.GlError
         {
             var toolbarProvider = new ToolBarProvider(EditingObject, Settings, UndoStack);
@@ -104,12 +113,9 @@ namespace Ldraw.Ui
 
             var notebook = new Notebook();
             // add a list of available parts on the left
-            parts = context.Resolve<PartsTree>();
             var treeDetailBox = new VBox(false, 0);
 
-            parts.DetailView = PartsPreview;
-
-            treeDetailBox.pack_start(parts.Widget);
+            treeDetailBox.pack_start(Parts.Widget);
             treeDetailBox.pack_start(PartsPreview, false);
             notebook.append_page(treeDetailBox, new Label("Parts"));
 
@@ -127,9 +133,7 @@ namespace Ldraw.Ui
             bind_property("EditingObject", parameters, "Model");
             notebook.append_page(parameters, new Label("Parameters"));
 
-            var setList = context.Resolve<SetList>();
-            bind_property("File", setList, "ModelFile");
-            notebook.append_page(setList, new Label("Sets"));
+            notebook.append_page(SetList, new Label("Sets"));
 
             Paned treePaned = new HPaned();
             treePaned.add1(WithFrame(notebook));
