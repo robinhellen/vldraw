@@ -11,7 +11,7 @@ using Ldraw.Peeron;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Utils;
-using Ldraw.Utils.Di;
+using Diva;
 
 namespace Ldraw.Ui
 {
@@ -39,7 +39,7 @@ namespace Ldraw.Ui
 		public AnimatedModel EditingObject {construct; get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
-                                    DependencyResolutionContext context)
+                                    IContainer context)
             throws OpenGl.GlError
         {
             var folders = context.Resolve<ILdrawFolders>();
@@ -84,7 +84,7 @@ namespace Ldraw.Ui
             Settings.notify["PreviewColourId"].connect(() => SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
 		}
 
-        private void SetUpControls(DependencyResolutionContext context)
+        private void SetUpControls(IContainer context)
             throws OpenGl.GlError
         {
             var toolbarProvider = new ToolBarProvider(EditingObject, Settings, UndoStack);

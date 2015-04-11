@@ -6,7 +6,12 @@ namespace Ldraw.Ui.DragAndDrop
 {
 	public class DocumentObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
-		public Collection<LdrawObject> Objects {get; construct set; default = Gee.List.empty<LdrawObject>();}
+		public Collection<LdrawObject> Objects {get; set;}
+		
+		construct
+		{
+			Objects = Gee.List.empty<LdrawObject>();
+		}
 
 		public LdrawObject? GetObjectForName(string name)
 		{

@@ -2,7 +2,7 @@ using Gee;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Utils;
-using Ldraw.Utils.Di;
+using Diva;
 
 namespace Ldraw.Lego
 {
@@ -10,7 +10,7 @@ namespace Ldraw.Lego
 	{
 		public IDatFileCache Library {construct; private get;}
 		public LdrawParser Parser {construct; private get;}
-		public IIndex<ReferenceLoadStrategy, ISubFileLocator> Locators {construct; private get;}
+		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
 
 		static construct
 		{

@@ -1,16 +1,16 @@
-using Ldraw.Utils.Di;
+using Diva;
 
 namespace Ldraw.Ui.DragAndDrop
 {
-	public class DragAndDropModule : Module
+	public class DragAndDropModule
 	{
-		public override void Load(CreatorBuilder builder)
+		public void Load(ContainerBuilder builder)
 		{
-            builder.Register<LibraryObjectLocator>().Keyed<ObjectDropType, IDroppedObjectLocator>(ObjectDropType.Library);
-            builder.Register<DocumentObjectLocator>().Keyed<ObjectDropType, IDroppedObjectLocator>(ObjectDropType.Document);
+            builder.Register<LibraryObjectLocator>().Keyed<IDroppedObjectLocator, ObjectDropType>(ObjectDropType.Library);
+            builder.Register<DocumentObjectLocator>().Keyed<IDroppedObjectLocator, ObjectDropType>(ObjectDropType.Document);
             
             //builder.Register<CombinedObjectLocator>().AsInterface<IDroppedObjectLocator>();
-            builder.RegisterAsInterface<CombinedObjectLocator, IDroppedObjectLocator>();			
+            builder.Register<CombinedObjectLocator>().As<IDroppedObjectLocator>();			
 		}
 	}
 }

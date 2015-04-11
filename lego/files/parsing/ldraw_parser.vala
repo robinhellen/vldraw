@@ -1,13 +1,13 @@
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
-using Ldraw.Utils.Di;
+using Diva;
 
 namespace Ldraw.Lego
 {
 	public class LdrawParser : Object
 	{
-		public IIndex<ReferenceLoadStrategy, ISubFileLocator> Locators {get; construct set;}
+		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {get; construct set;}
 		public ISubFileLocator OverrideLocator {get; set;}
 
 		static construct

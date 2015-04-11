@@ -10,7 +10,7 @@ using Ldraw.Maths;
 using Ldraw.Options;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
-using Ldraw.Utils.Di;
+//using Diva;
 
 namespace Ldraw.Ui.Widgets
 {

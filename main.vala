@@ -9,7 +9,7 @@ using Ldraw.Ui;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Widgets;
-using Ldraw.Utils.Di;
+using Diva;
 
 namespace Ldraw
 {
@@ -17,14 +17,14 @@ namespace Ldraw
     {
         public static int main(string[] args)
         {
-            var builder = new CreatorBuilder();
+            var builder = new ContainerBuilder();
 
             // Parts library
-            builder.RegisterAsInterface<LdrawLibrary, ILdrawFolders>().AsInterface<ILdrawFolders>();
+            builder.Register<LdrawLibrary>().As<ILdrawFolders>();
 
             // Model file handling
             builder.Register<LdrawFileLoader>();
-            builder.Register<LdrawParser>().InstancePerDependency();
+            builder.Register<LdrawParser>();
 
             // Peeron communication
             builder.Register<InventoryReader>();
@@ -34,21 +34,23 @@ namespace Ldraw
             builder.Register<PartsTree>();
             builder.Register<SetList>();            
             builder.Register<EditPanes>();
-            builder.Register<LdrawEditPane>().InstancePerDependency();
-            builder.Register<LdrawViewPane>().InstancePerDependency();
+            builder.Register<LdrawEditPane>();
+            builder.Register<LdrawViewPane>();
 
-            builder.Register<LibrarySubFileLocator>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.PartsOnly);
-            builder.Register<OnDemandSubFileLoader>().Keyed<ReferenceLoadStrategy, ISubFileLocator>(ReferenceLoadStrategy.SubPartsAndPrimitives);
+            builder.Register<LibrarySubFileLocator>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
+            builder.Register<OnDemandSubFileLoader>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 
-            builder.RegisterAsInterface<OnDemandPartLoader, IDatFileCache>();
-            builder.RegisterAsInterface<FileCachedLibrary, ILibrary>().AsInterface<ILibrary>();
-
-			builder.RegisterModule<DragAndDropModule>();
+            builder.Register<OnDemandPartLoader>().As<IDatFileCache>();
+            builder.Register<FileCachedLibrary>().As<ILibrary>();
 			
-            builder.RegisterAsInterface<RunningOptions, IOptions>().AsInterface<IOptions>();
+			new DragAndDropModule().Load(builder);
+			//builder.RegisterModule<DragAndDropModule>();
+			
+            builder.Register<RunningOptions>().As<IOptions>();
 
             builder.Register<UndoStack>();
-            builder.RegisterInstance<AnimatedModel>(new AnimatedModel(null));
+            var animatedModel = new AnimatedModel(null);
+            builder.Register<AnimatedModel>(_ => animatedModel);
 
             var container = builder.Build();
 

@@ -1,11 +1,11 @@
 using Ldraw.Lego;
-using Ldraw.Utils.Di;
+using Diva;
 
 namespace Ldraw.Ui.DragAndDrop
 {
 	public class CombinedObjectLocator : IDroppedObjectLocator, GLib.Object
 	{
-		public IIndex<ObjectDropType, IDroppedObjectLocator> Locators {construct; private get;}
+		public Index<IDroppedObjectLocator, ObjectDropType> Locators {construct; private get;}
 		
 		static construct
 		{
