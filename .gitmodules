@@ -1,0 +1,3 @@
+[submodule "diva"]
+	path = diva
+	url = git@github.com:robinhellen/diva.git
