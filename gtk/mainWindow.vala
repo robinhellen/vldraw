@@ -69,9 +69,6 @@ namespace Ldraw.Ui
 			);
 
             EditingObject.Load(model.MainObject);
-			
-            maximize();
-
             File = model;
         }
         
@@ -92,6 +89,8 @@ namespace Ldraw.Ui
             bind_property("File", SetList, "ModelFile");
             
             Parts.DetailView = PartsPreview;
+            
+            maximize();
 		}
 
         private void SetUpControls()

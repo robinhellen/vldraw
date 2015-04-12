@@ -47,6 +47,10 @@ namespace Ldraw
 			//builder.RegisterModule<DragAndDropModule>();
 			
             builder.Register<RunningOptions>().As<IOptions>();
+            builder.Register<MainWindow>()
+					.IgnoreProperty("type")
+					.IgnoreProperty("transient-for")
+					.IgnoreProperty("attached-to");
 
             builder.Register<UndoStack>();
             var animatedModel = new AnimatedModel(null);
@@ -68,12 +72,8 @@ namespace Ldraw
                 return 1;
             }
 
-			var ui = GLib.Object.new(typeof(LdrawEditorUi), Window: new Lazy<MainWindow>(() =>
-				new MainWindow.WithModel(
-								model,
-								container
-							)
-			));
+			var lazyWindow = container.ResolveLazy<MainWindow>();
+			var ui = GLib.Object.new(typeof(LdrawEditorUi), Window: lazyWindow);
 			var argH = GLib.Object.new(typeof(GtkInitialisingArgHandler));
 			var application = (Ldraw.Application.Application) GLib.Object.new(typeof(Ldraw.Application.Application), Ui: ui, ArgHandler: argH);
 			
