@@ -93,6 +93,8 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 		--vapidir=diva -X -Idiva \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
 		-X -fpic -X -shared -g -X -w
+	touch vapi/$*.vapi
+	touch h/$*.h
 
 
 clean:
