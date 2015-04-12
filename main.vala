@@ -1,6 +1,7 @@
 using Gee;
 using Gtk;
 
+using Ldraw.Application;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Options;
@@ -55,27 +56,15 @@ namespace Ldraw
             builder.Register<UndoStack>();
             var animatedModel = new AnimatedModel(null);
             builder.Register<AnimatedModel>(_ => animatedModel);
+            builder.Register<LdrawEditorUi>().As<Ldraw.Application.UserInterface>();
+            builder.Register<GtkInitialisingArgHandler>().As<ArgumentHandler>();
+            builder.Register<Ldraw.Application.Application>();
 
             var container = builder.Build();
 
             // load up the colours
             LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
-            LdrawModelFile model = null;
-            var loader = container.Resolve<LdrawFileLoader>();
-            try
-            {
-                model = loader.LoadModelFile("/home/robin/ldraw/models/car.dat", ReferenceLoadStrategy.PartsOnly);
-            }
-            catch(Error e)
-            {
-                stdout.printf(e.message);
-                return 1;
-            }
-
-			var lazyWindow = container.ResolveLazy<MainWindow>();
-			var ui = GLib.Object.new(typeof(LdrawEditorUi), Window: lazyWindow);
-			var argH = GLib.Object.new(typeof(GtkInitialisingArgHandler));
-			var application = (Ldraw.Application.Application) GLib.Object.new(typeof(Ldraw.Application.Application), Ui: ui, ArgHandler: argH);
+			var application = container.Resolve<Ldraw.Application.Application>();
 			
 			application.Run(args);
 			
@@ -86,6 +75,12 @@ namespace Ldraw
     public class LdrawEditorUi : GLib.Object, Ldraw.Application.UserInterface
     {
 		public Lazy<MainWindow> Window {construct; private get;}
+		
+		static construct
+		{
+			var cls = (ObjectClass)typeof(LdrawEditorUi).class_ref();
+			SetLazyInjection<MainWindow>(cls, "Window");
+		}
 		
 		public void Start()
 		{			
@@ -103,7 +98,7 @@ namespace Ldraw
             // initialize Gtk and OpenGL
             init(ref args);
             Gdk.gl_init(ref args);
-            return true;		
+            return Inner.HandleArgs(args);		
 		}
 	}
 }
