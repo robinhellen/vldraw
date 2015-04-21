@@ -57,7 +57,8 @@ namespace Ldraw
             var animatedModel = new AnimatedModel(null);
             builder.Register<AnimatedModel>(_ => animatedModel);
             builder.Register<LdrawEditorUi>().As<Ldraw.Application.UserInterface>();
-            builder.Register<GtkInitialisingArgHandler>().As<ArgumentHandler>();
+            builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();
+            builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
             builder.Register<Ldraw.Application.Application>();
 
             var container = builder.Build();
@@ -93,12 +94,38 @@ namespace Ldraw
 	
 	public class GtkInitialisingArgHandler : GLib.Object, Ldraw.Application.ArgumentHandler
 	{
+		public ArgumentHandler Inner {construct; private get;}
+		
 		public bool HandleArgs(string[] args)
 		{
             // initialize Gtk and OpenGL
             init(ref args);
             Gdk.gl_init(ref args);
             return Inner.HandleArgs(args);		
+		}
+	}
+	
+	public class FileLoadingArgHandler : GLib.Object, Ldraw.Application.ArgumentHandler
+	{
+		public AnimatedModel Model {construct; private get;}
+		public LdrawFileLoader Loader {construct; private get;}
+		
+		public bool HandleArgs(string[] args)
+		{
+			if(args.length == 0)
+				return true;
+				
+			var filename = args[0];
+            try
+            {
+                Model.Model = Loader.LoadModelFile(filename, ReferenceLoadStrategy.PartsOnly).MainObject;
+                return true;
+            }
+            catch(Error e)
+            {
+                stdout.printf(e.message);
+                return false;
+            }			
 		}
 	}
 }
