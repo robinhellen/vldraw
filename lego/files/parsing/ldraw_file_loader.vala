@@ -22,7 +22,7 @@ namespace Ldraw.Lego
 			throws ParseError
 		{
 			File file = File.new_for_path(filepath);
-			if(!file.query_exists())
+			if(!file.query_exists() || file.query_file_type(FileQueryInfoFlags.NONE) != FileType.REGULAR)
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
 			}
