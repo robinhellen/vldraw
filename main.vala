@@ -112,10 +112,10 @@ namespace Ldraw
 		
 		public bool HandleArgs(string[] args)
 		{
-			if(args.length == 0)
+			if(args.length == 1)
 				return true;
 				
-			var filename = args[0];
+			var filename = args[1];
             try
             {
                 Model.Model = Loader.LoadModelFile(filename, ReferenceLoadStrategy.PartsOnly).MainObject;
