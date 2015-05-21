@@ -42,6 +42,8 @@ namespace Ldraw.Ui.Widgets
 			set_size_request(100, 100);
 			
 			renderer = new GlRenderer();
+			if(m_Model == null)
+				m_Model =  new LdrawObject("", null);				
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
