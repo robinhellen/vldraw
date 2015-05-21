@@ -34,8 +34,6 @@ namespace Ldraw.Ui.Widgets
 
 		construct
 		{
-			m_Model = null;
-
 			// initialize this control for OpenGl rendering
 			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA | GLConfigMode.DOUBLE);
 			widget_set_gl_capability(this, config, null, true, GLRenderType.RGBA_TYPE);

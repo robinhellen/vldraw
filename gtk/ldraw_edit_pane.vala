@@ -39,6 +39,7 @@ namespace Ldraw.Ui.Widgets
 			drag_dest_set_track_motion(this, true);
 			model.bind_property("Model", this, "Model");
 			model.view_changed.connect(() => queue_draw());
+			Model = model.Model;
 		}
 		
 		public override void Redraw()

@@ -17,8 +17,8 @@ namespace Ldraw.Ui
 				Selection: selection
 			);
         }
-
-        public LdrawObject Model {get; construct set;}
+        
+		public LdrawObject Model {get; construct set;}
         public Map<string, float?> CurrentParameters {get; construct; }
         public Set<LdrawNode> Selection {get; construct;}
 
