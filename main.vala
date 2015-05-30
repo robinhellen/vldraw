@@ -60,6 +60,9 @@ namespace Ldraw
             builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();
             builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
             builder.Register<Ldraw.Application.Application>();
+            
+            builder.Register<RecentChooserMenu>().As<RecentChooser>();
+            builder.Register<RecentManager>(() => RecentManager.get_default());
 
             var container = builder.Build();
 

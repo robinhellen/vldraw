@@ -38,6 +38,7 @@ namespace Ldraw.Ui
 		public SetList SetList {construct; get;}
 		public PartsTree Parts {construct; get;}
         public DocumentObjectLocator DocumentLocator {construct; get;}
+        public RecentChooserMenu RecentMenu {construct; private get;}
 
         public MainWindow.WithModel(LdrawModelFile? model = null,
                                     IContainer context)
@@ -236,6 +237,21 @@ namespace Ldraw.Ui
             Gtk.MenuItem fileLoad = new Gtk.MenuItem.with_mnemonic("_Open");
             fileMenu.append(fileLoad);
             fileLoad.activate.connect(FileOpen_OnActivate);
+            
+            var fileRecent = new Gtk.MenuItem.with_mnemonic("_Recent");
+            fileMenu.append(fileRecent);
+            fileRecent.set_submenu(RecentMenu);
+            RecentMenu.filter = new RecentFilter();
+            RecentMenu.filter.add_pattern("*.dat");
+            RecentMenu.filter.add_pattern("*.ldr");
+            RecentMenu.filter.add_pattern("*.mpd");
+            RecentMenu.item_activated.connect(() => 
+            {
+				var item = RecentMenu.get_current_item();
+				var file = GLib.File.new_for_uri(item.get_uri());
+				LoadFile(file.get_path());
+				}
+				);
 
             Gtk.MenuItem fileSave = new Gtk.MenuItem.with_mnemonic("_Save");
             fileSave.activate.connect(FileSave_OnActivate);
@@ -359,25 +375,27 @@ namespace Ldraw.Ui
             filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
 
             dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
-
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 string fileToOpen = dialog.get_filename();
-                try
-                {
-                    LdrawModelFile opened = Loader.LoadModelFile(fileToOpen, ReferenceLoadStrategy.PartsOnly);
-                    File = opened;
-                }
-                catch(ParseError e)
-                {
-                    // TODO: print an error message
-                    stdout.printf(e.message);
-                    dialog.close();
-                    return;
-                }
+                LoadFile(fileToOpen);
             }
             dialog.close();
-        }
+        }        
+        
+        private void LoadFile(string fileName)
+        {
+			try
+			{
+				LdrawModelFile opened = Loader.LoadModelFile(fileName, ReferenceLoadStrategy.PartsOnly);
+				File = opened;
+			}
+			catch(ParseError e)
+			{
+				// TODO: print an error message
+				stdout.printf(e.message);
+			}
+		}
 
         private void FileSave_OnActivate()
         {
