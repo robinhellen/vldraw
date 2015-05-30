@@ -39,39 +39,6 @@ namespace Ldraw.Ui
 		public PartsTree Parts {construct; get;}
         public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
-
-        public MainWindow.WithModel(LdrawModelFile? model = null,
-                                    IContainer context)
-            throws OpenGl.GlError
-        {
-            var folders = context.Resolve<ILdrawFolders>();
-            var settings = context.Resolve<IOptions>();
-            var loader = context.Resolve<LdrawFileLoader>();
-            var undoStack = context.Resolve<UndoStack>();
-            var view = context.Resolve<EditPanes>();
-            var preview1 = context.Resolve<LdrawViewPane>();
-            var preview2 = context.Resolve<LdrawViewPane>();
-            var editObject = context.Resolve<AnimatedModel>();
-            var setList = context.Resolve<SetList>();
-            var parts = context.Resolve<PartsTree>();
-			var documentLocator = context.Resolve<DocumentObjectLocator>();
-            GLib.Object(
-				Loader: loader, 
-				Settings: settings, 
-				LdrawFolders: folders, 
-				UndoStack: undoStack,
-				View: view,
-				PartsPreview: preview1,
-				SubModelsPreview : preview2,
-				EditingObject: editObject,
-				SetList: setList,
-				Parts: parts,
-				DocumentLocator: documentLocator
-			);
-
-            EditingObject.Load(model.MainObject);
-            File = model;
-        }
         
         construct
         {
@@ -219,22 +186,22 @@ namespace Ldraw.Ui
 
         private MenuBar CreateMenus(AccelGroup accelerators)
         {
-            Gtk.MenuBar menus = new MenuBar();
+            var menus = new MenuBar();
 
-            Gtk.MenuItem fileMenuItem = new Gtk.MenuItem.with_mnemonic("_File");
+            var fileMenuItem = new Gtk.MenuItem.with_mnemonic("_File");
             menus.append(fileMenuItem);
 
-            Gtk.Menu fileMenu = new Gtk.Menu();
+            var fileMenu = new Gtk.Menu();
             fileMenuItem.submenu = fileMenu;
             fileMenu.set_accel_group(accelerators);
             fileMenu.set_accel_path("<Ldraw>/File");
 
-            Gtk.MenuItem fileNew = new Gtk.MenuItem.with_mnemonic("_New");
+            var fileNew = new Gtk.MenuItem.with_mnemonic("_New");
             fileMenu.append(fileNew);
             fileNew.activate.connect(() => File = new LdrawModel.Empty());
             AccelMap.add_entry(fileNew.get_accel_path(), Gdk.keyval_from_name("N"), Gdk.ModifierType.CONTROL_MASK);
 
-            Gtk.MenuItem fileLoad = new Gtk.MenuItem.with_mnemonic("_Open");
+            var fileLoad = new Gtk.MenuItem.with_mnemonic("_Open");
             fileMenu.append(fileLoad);
             fileLoad.activate.connect(FileOpen_OnActivate);
             
@@ -253,16 +220,16 @@ namespace Ldraw.Ui
 				}
 				);
 
-            Gtk.MenuItem fileSave = new Gtk.MenuItem.with_mnemonic("_Save");
+            var fileSave = new Gtk.MenuItem.with_mnemonic("_Save");
             fileSave.activate.connect(FileSave_OnActivate);
             fileMenu.append(fileSave);
             AccelMap.add_entry(fileSave.get_accel_path(), Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK);
 
-            Gtk.MenuItem fileSaveAs = new Gtk.MenuItem.with_mnemonic("Save _As");
+            var fileSaveAs = new Gtk.MenuItem.with_mnemonic("Save _As");
             fileSaveAs.activate.connect(FileSaveAs_OnActivate);
             fileMenu.append(fileSaveAs);
 
-            Gtk.MenuItem fileQuit = new Gtk.MenuItem.with_mnemonic("_Quit");
+            var fileQuit = new Gtk.MenuItem.with_mnemonic("_Quit");
             fileMenu.append(fileQuit);
             fileQuit.activate.connect(() => main_quit());
             AccelMap.add_entry(fileQuit.get_accel_path(), Gdk.keyval_from_name("Q"), Gdk.ModifierType.CONTROL_MASK);
