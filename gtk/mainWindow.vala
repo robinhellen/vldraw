@@ -324,14 +324,6 @@ namespace Ldraw.Ui
             return menus;
         }
 
-        private Widget WithFrame(Widget widget)
-        {
-            Frame frame = new Frame(null);
-            frame.add(widget);
-            frame.shadow_type = ShadowType.IN;
-            return frame;
-        }
-
         private void FileOpen_OnActivate()
         {
             FileChooserDialog dialog = new FileChooserDialog("Open File", this, FileChooserAction.OPEN
@@ -556,12 +548,5 @@ namespace Ldraw.Ui
             get{return EditingObject.Model;}
             protected set{}
         }
-    }
-
-    private Widget WithScrolls(Widget widget)
-    {
-        ScrolledWindow win = new ScrolledWindow(null, null);
-        win.add(widget);
-        return win;
     }
 }
