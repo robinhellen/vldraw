@@ -7,8 +7,9 @@ using Ldraw.Lego.Library;
 using Ldraw.Options;
 using Ldraw.Peeron;
 using Ldraw.Ui;
-using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
+using Ldraw.Ui.Dialogs;
+using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Widgets;
 using Diva;
 
@@ -63,6 +64,8 @@ namespace Ldraw
             
             builder.Register<RecentChooserMenu>().As<RecentChooser>();
             builder.Register<RecentManager>(() => RecentManager.get_default());
+            
+            builder.Register<DialogManager>().As<IDialogManager>();
 
             var container = builder.Build();
 

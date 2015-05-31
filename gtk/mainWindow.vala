@@ -39,6 +39,7 @@ namespace Ldraw.Ui
 		public PartsTree Parts {construct; get;}
         public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
+        public IDialogManager Dialogs {construct; private get;}
         
         construct
         {
@@ -370,23 +371,14 @@ namespace Ldraw.Ui
 
         private void FileSaveAs_OnActivate()
         {
-            FileChooserDialog dialog = new FileChooserDialog("Save File As", this, FileChooserAction.SAVE
-                                                , Stock.CANCEL, ResponseType.CANCEL
-                                                , Stock.SAVE, ResponseType.ACCEPT);
-
-            FileFilter filter = new FileFilter();
-            filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
-
-            dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
-
-            if(dialog.run() == ResponseType.ACCEPT)
-            {
-                string saveTo = dialog.get_filename();
+			string chosenFileName;
+			if(Dialogs.GetSaveLocation(out chosenFileName, this))
+			{
                 try
                 {
-                    File.FilePath = saveTo;
+                    File.FilePath = chosenFileName;
                     File.Save();
-                    var file = GLib.File.new_for_path(saveTo);
+                    var file = GLib.File.new_for_path(chosenFileName);
                     File.FileName = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
                     title = @"vldraw - $(File.FileName)";
                 }
@@ -394,11 +386,9 @@ namespace Ldraw.Ui
                 {
                     // TODO: print an error message
                     stdout.printf(e.message);
-                    dialog.close();
                     return;
                 }
             }
-            dialog.close();
         }
 
         private void ModelAddSubModel_OnActivate()
@@ -549,4 +539,9 @@ namespace Ldraw.Ui
             protected set{}
         }
     }
+    
+    public interface IDialogManager : GLib.Object
+    {		
+		public abstract bool GetSaveLocation(out string location, Window parent);
+	}
 }
