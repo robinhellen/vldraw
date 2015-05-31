@@ -35,5 +35,26 @@ namespace Ldraw.Ui.Dialogs
             dialog.close();
             return false;
 		}
+	
+		public bool GetLoadLocation(out string location, Window parent)
+		{			
+            FileChooserDialog dialog = new FileChooserDialog("Open File", parent, FileChooserAction.OPEN
+                                                , Stock.CANCEL, ResponseType.CANCEL
+                                                , Stock.OPEN, ResponseType.ACCEPT);
+
+            FileFilter filter = new FileFilter();
+            filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
+
+            dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
+            if(dialog.run() == ResponseType.ACCEPT)
+            {
+                location = dialog.get_filename();
+                dialog.close();
+                return true;
+            }
+            location = "";
+            dialog.close();
+            return false;
+		}		
 	}
 }
