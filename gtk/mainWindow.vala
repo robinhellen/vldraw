@@ -41,6 +41,8 @@ namespace Ldraw.Ui
         public RecentChooserMenu RecentMenu {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
         
+        public Gee.List<IPartDragSource> PartSources {set; private get;}
+        
         construct
         {
             SetUpControls();
@@ -80,29 +82,18 @@ namespace Ldraw.Ui
             
             DocumentLocator.Objects = Gee.List.empty<LdrawObject>();			
 
-            var notebook = new Notebook();
-            // add a list of available parts on the left
-            var treeDetailBox = new VBox(false, 0);
+			var list = new LinkedList<IPartDragSource>();
+			list.add(new DummyTab("Parts", Parts.Widget));
+			list.add(new DummyTab("Multipart", new SubModelsTree().Widget));
+			list.add(new DummyTab("Sets", SetList));
+			PartSources = list;
+			
 
-            treeDetailBox.pack_start(Parts.Widget);
-            treeDetailBox.pack_start(PartsPreview, false);
-            notebook.append_page(treeDetailBox, new Label("Parts"));
-
-
-            var subModelsBox = new VBox(false, 0);
-
-            subModels = new SubModelsTree();
-            subModels.DetailView = SubModelsPreview;
-
-            subModelsBox.pack_start(subModels.Widget);
-            subModelsBox.pack_start(SubModelsPreview, false);
-            notebook.append_page(subModelsBox, new Label("Multipart"));
-
-            parameters = new ParameterValues(EditingObject);
+            /*parameters = new ParameterValues(EditingObject);
             bind_property("EditingObject", parameters, "Model");
-            notebook.append_page(parameters, new Label("Parameters"));
-
-            notebook.append_page(SetList, new Label("Sets"));
+            notebook.append_page(parameters, new Label("Parameters"));*/
+            
+            var notebook = ShowPartDropSources();
 
             Paned treePaned = new HPaned();
             treePaned.add1(WithFrame(notebook));
@@ -123,6 +114,34 @@ namespace Ldraw.Ui
             bigVBox.pack_start(treePaned, true, true);
             add(bigVBox);
         }
+        
+        public Widget ShowPartDropSources()
+        {
+			var box = new VBox(false, 0);
+			var notebook = new Notebook();
+			box.pack_start(notebook);
+			box.pack_start(PartsPreview, false);
+			
+			ulong currentSignalHandler = 0;
+			uint currentPage = 0;
+			
+			foreach(var source in PartSources)
+			{
+				notebook.append_page(source.GetWidget(), new Label(source.GetTabName()));
+			}
+			/*currentPage = notebook.get_current_page();
+			var source = PartSources[(int)currentPage];
+			currentSignalHandler = source.CurrentChanged.connect(newObject => PartsPreview.Model = newObject);
+			*/
+			notebook.switch_page.connect((_, i) => 
+			{
+				if(currentSignalHandler != 0)
+					PartSources[(int)currentPage].disconnect(currentSignalHandler);
+				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => PartsPreview.Model = newObject);
+				currentPage = i;
+			});
+			return box;
+		}
 
         private ComboBox CreateSubModelsDropDown()
         {
@@ -530,5 +549,36 @@ namespace Ldraw.Ui
     {		
 		public abstract bool GetSaveLocation(out string location, Window parent);
 		public abstract bool GetLoadLocation(out string location, Window parent);
+	}
+	
+	public interface IPartDragSource : GLib.Object
+	{
+		public abstract string GetTabName();
+		public abstract Widget GetWidget();
+		public abstract LdrawObject CurrentObject { get; }
+		public signal void CurrentChanged(LdrawObject newCurrent);
+	}
+	
+	public class DummyTab : GLib.Object, IPartDragSource
+	{
+		string name;
+		Widget widget;
+		LdrawObject object;
+		
+		public DummyTab(string name, Widget widget)
+		{
+			this.name = name;
+			this.widget = widget;
+			object = new LdrawObject("", null);
+		}
+		public string GetTabName() {return name;}
+		public Widget GetWidget() {return widget;}
+		public LdrawObject CurrentObject
+		{
+			get
+			{
+				return object;
+			}
+		}
 	}
 }
