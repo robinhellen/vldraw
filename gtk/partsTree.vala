@@ -7,21 +7,13 @@ using Ldraw.Lego.Library;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class PartsTree : GLib.Object
+	public class PartsTree : GLib.Object, IPartDragSource
 	{
 		private ScrolledWindow m_Scrolled;
 		private TreeView m_Tree;
-		private LdrawViewPane m_Detail;
 
-		public ILibrary Library
-		{
-			construct; get;
-		}
-
-		public IDatFileCache DatFileCache
-		{
-			construct; get;
-		}
+		public ILibrary Library {construct; get;}
+		public IDatFileCache DatFileCache{construct; get;}
 
 		construct
 		{
@@ -77,36 +69,15 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		public ScrolledWindow Widget
-		{
-			get
-			{
-				return m_Scrolled;
-			}
-		}
-
-		public LdrawViewPane DetailView
-		{
-			set
-			{
-				m_Detail = value;
-			}
-		}
-
 		private void Tree_OnCursorChanged(TreeView tree)
 		{
-			if(m_Detail == null)
-			{
-				return;
-			}
-
 			var current = CurrentPart;
 			if(current == null)
 				return;
 
 			LdrawPart part;
 			if(DatFileCache.TryGetPart(current.Name, out part))
-				m_Detail.Model = part.MainObject;
+				CurrentChanged(part.MainObject);
 		}
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
@@ -142,5 +113,31 @@ namespace Ldraw.Ui.Widgets
 				return null;
 			}
 		}
-	}
+				
+		public string GetTabName()
+		{
+			return "Parts";
+		}
+		
+		public Widget GetWidget()
+		{
+			return m_Scrolled;
+		}
+		
+		public LdrawObject? CurrentObject
+		{
+			get
+			{
+				var current = CurrentPart;
+				if(current == null)
+					return null;
+
+				LdrawPart part;
+				if(DatFileCache.TryGetPart(current.Name, out part))
+					return part.MainObject;
+					
+				return null;
+			}			
+		}
+	}	
 }

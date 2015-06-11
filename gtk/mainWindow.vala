@@ -11,7 +11,6 @@ using Ldraw.Peeron;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Utils;
-using Diva;
 
 namespace Ldraw.Ui
 {
@@ -59,8 +58,6 @@ namespace Ldraw.Ui
                         
             bind_property("File", SetList, "ModelFile");
             
-            Parts.DetailView = PartsPreview;
-            
             maximize();
 		}
 
@@ -83,7 +80,7 @@ namespace Ldraw.Ui
             DocumentLocator.Objects = Gee.List.empty<LdrawObject>();			
 
 			var list = new LinkedList<IPartDragSource>();
-			list.add(new DummyTab("Parts", Parts.Widget));
+			list.add(Parts);
 			list.add(new DummyTab("Multipart", new SubModelsTree().Widget));
 			list.add(new DummyTab("Sets", SetList));
 			PartSources = list;
@@ -555,7 +552,7 @@ namespace Ldraw.Ui
 	{
 		public abstract string GetTabName();
 		public abstract Widget GetWidget();
-		public abstract LdrawObject CurrentObject { get; }
+		public abstract LdrawObject? CurrentObject { get; }
 		public signal void CurrentChanged(LdrawObject newCurrent);
 	}
 	
@@ -573,7 +570,7 @@ namespace Ldraw.Ui
 		}
 		public string GetTabName() {return name;}
 		public Widget GetWidget() {return widget;}
-		public LdrawObject CurrentObject
+		public LdrawObject? CurrentObject
 		{
 			get
 			{
