@@ -21,11 +21,6 @@ namespace Ldraw.Ui
 		public InventoryReader InventoryReader {private get; construct;}
 		public ColourChart ColourChart {private get; construct;}
 
-		public SetList(IDatFileCache library, InventoryReader inventoryReader, ColourChart colourChart)
-		{
-			GLib.Object(Library: library, InventoryReader: inventoryReader, ColourChart: colourChart);
-		}
-
 		construct
 		{
 			sets = new ObservableList<Inventory>();
