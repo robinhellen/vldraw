@@ -81,7 +81,7 @@ namespace Ldraw.Ui
 			var list = new LinkedList<IPartDragSource>();
 			list.add(Parts);
 			list.add(SubModels);
-			list.add(new DummyTab("Sets", SetList));
+			list.add(SetList);
 			PartSources = list;
 			
 
@@ -555,28 +555,5 @@ namespace Ldraw.Ui
 		public abstract Widget GetWidget();
 		public abstract LdrawObject? CurrentObject { get; }
 		public signal void CurrentChanged(LdrawObject newCurrent);
-	}
-	
-	public class DummyTab : GLib.Object, IPartDragSource
-	{
-		string name;
-		Widget widget;
-		LdrawObject object;
-		
-		public DummyTab(string name, Widget widget)
-		{
-			this.name = name;
-			this.widget = widget;
-			object = new LdrawObject("", null);
-		}
-		public string GetTabName() {return name;}
-		public Widget GetWidget() {return widget;}
-		public LdrawObject? CurrentObject
-		{
-			get
-			{
-				return object;
-			}
-		}
 	}
 }

@@ -9,13 +9,14 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	public class SetList : VPaned
+	public class SetList : GLib.Object, IPartDragSource
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
 		private LdrawModelFile modelFile;
 		private TreeView partsView;
 		private PartUsageViewModel usageViewModel;
+		private VPaned widget;
 
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
@@ -24,7 +25,7 @@ namespace Ldraw.Ui
 		construct
 		{
 			sets = new ObservableList<Inventory>();
-
+			widget = new VPaned();
 			InitializeControls();
 		}
 
@@ -99,7 +100,7 @@ namespace Ldraw.Ui
 			setsView.insert_text_column_with_data_func(-1, "", s => s.SetNumber);
 			setControls.pack_start(WithScrolls(setsView));
 			setControls.pack_start(setButtons, false);
-			add1(setControls);
+			widget.add1(setControls);
 			partsView = new TreeView();
 			
 			append_column_for_children_only<CellRendererPixbuf>(partsView, new CellRendererPixbuf(),
@@ -136,7 +137,8 @@ namespace Ldraw.Ui
 				icon.fill(0);
 				drag_set_icon_pixbuf(context, icon, 2, 2);
 			});
-			add2(WithScrolls(partsView));
+			
+			widget.add2(WithScrolls(partsView));
 
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
 			partsView.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
@@ -270,6 +272,32 @@ namespace Ldraw.Ui
 				result.add(ToPartGroup(inventory, lib));
 			}
 			return result;
+		}
+				
+		public string GetTabName()
+		{
+			return "Sets";
+		}
+		
+		public Widget GetWidget()
+		{
+			return widget;
+		}
+		
+		public LdrawObject? CurrentObject
+		{
+			get
+			{
+				/*var current = CurrentPart;
+				if(current == null)
+					return null;
+
+				LdrawPart part;
+				if(DatFileCache.TryGetPart(current.Name, out part))
+					return part.MainObject;*/
+					
+				return null;
+			}			
 		}
 	}
 }
