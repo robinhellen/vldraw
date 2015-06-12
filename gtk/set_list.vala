@@ -86,7 +86,14 @@ namespace Ldraw.Ui
 						UpdateUsage(true);
 					});
 				});
-				setButtons.pack_start(addButton);
+			setButtons.pack_start(addButton);
+			var clearButton = new Button.with_label("Clear");
+			setButtons.pack_start(clearButton);
+			clearButton.clicked.connect(() =>
+			{
+				sets.clear();
+				UpdateUsage(true);
+			});
 
 			var setsView = new SimpleList<Inventory>.with_model(sets);
 			setsView.insert_text_column_with_data_func(-1, "", s => s.SetNumber);
