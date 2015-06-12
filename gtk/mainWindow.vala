@@ -135,6 +135,8 @@ namespace Ldraw.Ui
 					PartSources[(int)currentPage].disconnect(currentSignalHandler);
 				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => PartsPreview.Model = newObject);
 				currentPage = i;
+				var current = PartSources[(int)currentPage].CurrentObject;
+				PartsPreview.Model = current ?? new LdrawObject("", null);
 			});
 			return box;
 		}
