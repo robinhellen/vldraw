@@ -24,8 +24,6 @@ namespace Ldraw.Ui
         ParameterValues parameters;
 
         // trees
-        SubModelsTree subModels;
-
         public IOptions Settings {construct; private get;}
         public LdrawFileLoader Loader {construct; private get;}
         public ILdrawFolders LdrawFolders {construct; private get;}
@@ -39,6 +37,7 @@ namespace Ldraw.Ui
         public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
+        public SubModelsTree SubModels {construct; private get;}
         
         public Gee.List<IPartDragSource> PartSources {set; private get;}
         
@@ -81,7 +80,7 @@ namespace Ldraw.Ui
 
 			var list = new LinkedList<IPartDragSource>();
 			list.add(Parts);
-			list.add(new DummyTab("Multipart", new SubModelsTree().Widget));
+			list.add(new DummyTab("Multipart", SubModels.Widget));
 			list.add(new DummyTab("Sets", SetList));
 			PartSources = list;
 			
@@ -477,14 +476,14 @@ namespace Ldraw.Ui
                     m_SubModels.active = 0;
                     m_SubModels.visible = true;
                     EditingObject.Load(mpd.MainObject);
-                    subModels.Models = mpd.SubModels;
+                    SubModels.Models = mpd.SubModels;
                     DocumentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
                     m_SubModels.visible = false;
                     EditingObject.Load(value.MainObject);
-                    subModels.Models = new ObservableList<LdrawObject>();
+                    SubModels.Models = new ObservableList<LdrawObject>();
                     DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
 

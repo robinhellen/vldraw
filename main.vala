@@ -38,6 +38,7 @@ namespace Ldraw
             builder.Register<EditPanes>();
             builder.Register<LdrawEditPane>();
             builder.Register<LdrawViewPane>();
+            builder.Register<SubModelsTree>();
 
             builder.Register<LibrarySubFileLocator>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
             builder.Register<OnDemandSubFileLoader>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);

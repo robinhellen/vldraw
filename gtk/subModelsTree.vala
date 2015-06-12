@@ -5,14 +5,14 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class SubModelsTree
+	public class SubModelsTree : GLib.Object
 	{
 		private TreeView m_Tree;
 		private ScrolledWindow m_Scrolled;
 
 		private LdrawViewPane m_Detail;
 
-		public SubModelsTree()
+		construct
 		{
 			var models = new ObservableList<LdrawObject>();
 			m_Tree = new TreeView.with_model(models);
