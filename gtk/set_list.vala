@@ -91,7 +91,7 @@ namespace Ldraw.Ui
 			var setsView = new SimpleList<Inventory>.with_model(sets);
 			setsView.insert_text_column_with_data_func(-1, "", s => s.SetNumber);
 			setControls.pack_start(WithScrolls(setsView));
-			setControls.pack_start(setButtons);
+			setControls.pack_start(setButtons, false);
 			add1(setControls);
 			partsView = new TreeView();
 			
