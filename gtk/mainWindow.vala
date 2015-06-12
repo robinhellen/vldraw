@@ -80,7 +80,7 @@ namespace Ldraw.Ui
 
 			var list = new LinkedList<IPartDragSource>();
 			list.add(Parts);
-			list.add(new DummyTab("Multipart", SubModels.Widget));
+			list.add(SubModels);
 			list.add(new DummyTab("Sets", SetList));
 			PartSources = list;
 			

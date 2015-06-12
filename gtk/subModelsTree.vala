@@ -5,12 +5,10 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class SubModelsTree : GLib.Object
+	public class SubModelsTree : GLib.Object, IPartDragSource
 	{
 		private TreeView m_Tree;
 		private ScrolledWindow m_Scrolled;
-
-		private LdrawViewPane m_Detail;
 
 		construct
 		{
@@ -45,14 +43,6 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		public LdrawViewPane DetailView
-		{
-			set
-			{
-				m_Detail = value;
-			}
-		}
-
 		public ObservableList<LdrawObject> Models
 		{
 			set
@@ -63,27 +53,22 @@ namespace Ldraw.Ui.Widgets
 
 		private void Tree_OnCursorChanged(TreeView tree)
 		{
-			if(m_Detail == null)
-			{
-				return;
-			}
-
-			var current = Current;
+			var current = CurrentObject;
 			if(current == null)
 				return;
-
-			m_Detail.Model = current;
+			
+			CurrentChanged(current);
 		}
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
-			string currentName = "Document::" + Current.FileName;
+			string currentName = "Document::" + CurrentObject.FileName;
 			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
 		}
 
-		private LdrawObject? Current
+		public LdrawObject? CurrentObject
 		{
-			owned get
+			get
 			{
 				TreeIter active;
 				TreeSelection sel = m_Tree.get_selection();
@@ -93,10 +78,20 @@ namespace Ldraw.Ui.Widgets
 					return null; // no selection
 				}
 
-				LdrawObject node;
+				weak LdrawObject node;
 				model.get(active, 0, out node);
 				return node;
 			}
+		}
+				
+		public string GetTabName()
+		{
+			return "Multipart";
+		}
+		
+		public Widget GetWidget()
+		{
+			return m_Scrolled;
 		}
 	}
 }
