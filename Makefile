@@ -90,15 +90,13 @@ $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$
 $(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 	
-lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h lib/$$(lib).so vapi/$$(lib).vapi)
+lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
 		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
 		--vapidir=diva -X -Idiva \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
 		-X -fpic -X -shared -g -X -w
-	touch vapi/$*.vapi
-	touch h/$*.h
 
 
 clean:
