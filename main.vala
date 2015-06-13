@@ -32,13 +32,8 @@ namespace Ldraw
             builder.Register<InventoryReader>();
             builder.Register<ColourChart>();
 
-            // UI components
-            builder.Register<PartsTree>().As<IPartDragSource>();
-            builder.Register<SetList>().As<IPartDragSource>();            
-            builder.Register<EditPanes>();
-            builder.Register<LdrawEditPane>();
-            builder.Register<LdrawViewPane>();
-            builder.Register<SubModelsTree>().As<IPartDragSource>();
+            // UI components            
+            builder.Register<DialogManager>().As<IDialogManager>();
 
             builder.Register<LibrarySubFileLocator>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
             builder.Register<OnDemandSubFileLoader>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
@@ -47,13 +42,10 @@ namespace Ldraw
             builder.Register<FileCachedLibrary>().As<ILibrary>();
 			
 			new DragAndDropModule().Load(builder);
+			new WidgetsModule().Load(builder);
 			//builder.RegisterModule<DragAndDropModule>();
 			
             builder.Register<RunningOptions>().As<IOptions>();
-            builder.Register<MainWindow>()
-					.IgnoreProperty("type")
-					.IgnoreProperty("transient-for")
-					.IgnoreProperty("attached-to");
 
             builder.Register<UndoStack>();
             var animatedModel = new AnimatedModel(null);
@@ -62,12 +54,6 @@ namespace Ldraw
             builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();
             builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
             builder.Register<Ldraw.Application.Application>();
-            
-            builder.Register<RecentChooserMenu>().As<RecentChooser>();
-            builder.Register<RecentManager>(() => RecentManager.get_default());
-            
-            builder.Register<DialogManager>().As<IDialogManager>();
-
             var container = builder.Build();
 
             // load up the colours
