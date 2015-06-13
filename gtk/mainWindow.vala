@@ -30,7 +30,6 @@ namespace Ldraw.Ui
 		public UndoStack UndoStack {construct; private get;}
 		public EditPanes View {construct; private get;}
 		public LdrawViewPane PartsPreview {construct; private get;}
-		public LdrawViewPane SubModelsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
 		public PartsTree Parts {construct; get;}
@@ -49,11 +48,6 @@ namespace Ldraw.Ui
 			PartsPreview.set_size_request(200, 200);
             PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
             Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
-			
-			SubModelsPreview.Angle = ViewAngle.Ortho;
-			SubModelsPreview.set_size_request(200, 200);
-            SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
-            Settings.notify["PreviewColourId"].connect(() => SubModelsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
                         
             bind_property("File", SetList, "ModelFile");
             
@@ -172,13 +166,6 @@ namespace Ldraw.Ui
                             {
                                 MessageDialog msg = new MessageDialog(this, DialogFlags.DESTROY_WITH_PARENT, MessageType.ERROR, ButtonsType.CLOSE,
                                             "Error rendering main model: %s", x);
-                                msg.run();
-
-                            });
-            SubModelsPreview.RenderingError.connect(x =>
-                            {
-                                MessageDialog msg = new MessageDialog(this, DialogFlags.DESTROY_WITH_PARENT, MessageType.ERROR, ButtonsType.CLOSE,
-                                            "Error rendering part detail: %s", x);
                                 msg.run();
 
                             });
