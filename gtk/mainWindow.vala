@@ -1,3 +1,4 @@
+using Diva;
 using Gee;
 using Gtk;
 
@@ -16,6 +17,12 @@ namespace Ldraw.Ui
 {
     public class MainWindow : Window
     {
+		static construct
+		{
+			var cls = (ObjectClass)typeof(MainWindow).class_ref();
+			SetCollectionInjection<IPartDragSource>(cls, "PartSourcesConstruct");
+		}
+		
         private LdrawModelFile m_Model;
         private ComboBox m_SubModels;
 
@@ -32,12 +39,13 @@ namespace Ldraw.Ui
 		public LdrawViewPane PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
-		public PartsTree Parts {construct; get;}
+		//public PartsTree Parts {construct; get;}
         public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
         public SubModelsTree SubModels {construct; private get;}
         
+        public Collection<IPartDragSource> PartSourcesConstruct {construct {PartSources = new ArrayList<IPartDragSource>(); PartSources.add_all(value);}}
         public Gee.List<IPartDragSource> PartSources {set; private get;}
         
         construct
@@ -72,11 +80,12 @@ namespace Ldraw.Ui
             
             DocumentLocator.Objects = Gee.List.empty<LdrawObject>();			
 
-			var list = new LinkedList<IPartDragSource>();
+			/*var list = new LinkedList<IPartDragSource>();
+			var list = PartSources;
 			list.add(Parts);
 			list.add(SubModels);
-			list.add(SetList);
-			PartSources = list;
+			list.add(SetList);*/
+			//PartSources = list;
 			
 
             /*parameters = new ParameterValues(EditingObject);

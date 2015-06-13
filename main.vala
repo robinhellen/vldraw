@@ -33,12 +33,12 @@ namespace Ldraw
             builder.Register<ColourChart>();
 
             // UI components
-            builder.Register<PartsTree>();
-            builder.Register<SetList>();            
+            builder.Register<PartsTree>().As<IPartDragSource>();
+            builder.Register<SetList>().As<IPartDragSource>();            
             builder.Register<EditPanes>();
             builder.Register<LdrawEditPane>();
             builder.Register<LdrawViewPane>();
-            builder.Register<SubModelsTree>();
+            builder.Register<SubModelsTree>().As<IPartDragSource>();
 
             builder.Register<LibrarySubFileLocator>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
             builder.Register<OnDemandSubFileLoader>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
