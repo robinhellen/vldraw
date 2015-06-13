@@ -1,6 +1,7 @@
 using Diva;
 using Gtk;
 
+using Ldraw.Application;
 using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui
@@ -23,6 +24,9 @@ namespace Ldraw.Ui
 					.IgnoreProperty("type")
 					.IgnoreProperty("transient-for")
 					.IgnoreProperty("attached-to");
+					
+            builder.Register<LdrawEditorUi>().As<UserInterface>();
+            builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
 		}
 	}
 }

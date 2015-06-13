@@ -50,9 +50,7 @@ namespace Ldraw
             builder.Register<UndoStack>();
             var animatedModel = new AnimatedModel(null);
             builder.Register<AnimatedModel>(_ => animatedModel);
-            builder.Register<LdrawEditorUi>().As<Ldraw.Application.UserInterface>();
             builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();
-            builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
             builder.Register<Ldraw.Application.Application>();
             var container = builder.Build();
 
@@ -65,38 +63,6 @@ namespace Ldraw
             return 0;
         }
     }
-    
-    public class LdrawEditorUi : GLib.Object, Ldraw.Application.UserInterface
-    {
-		public Lazy<MainWindow> Window {construct; private get;}
-		
-		static construct
-		{
-			var cls = (ObjectClass)typeof(LdrawEditorUi).class_ref();
-			SetLazyInjection<MainWindow>(cls, "Window");
-		}
-		
-		public void Start()
-		{			
-			Window.value.destroy.connect(() => main_quit());
-			Window.value.show_all();
-			
-			Gtk.main();
-		}
-	}
-	
-	public class GtkInitialisingArgHandler : GLib.Object, Ldraw.Application.ArgumentHandler
-	{
-		public ArgumentHandler Inner {construct; private get;}
-		
-		public bool HandleArgs(string[] args)
-		{
-            // initialize Gtk and OpenGL
-            init(ref args);
-            Gdk.gl_init(ref args);
-            return Inner.HandleArgs(args);		
-		}
-	}
 	
 	public class FileLoadingArgHandler : GLib.Object, Ldraw.Application.ArgumentHandler
 	{

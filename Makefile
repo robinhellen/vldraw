@@ -56,7 +56,7 @@ gl_render_internal_packages=lego lego_objects maths expressions utils
 
 ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
-ui_widgets_internal_packages= gl_render lego lego_objects maths expressions utils options undo part_group peeron drag_and_drop povray
+ui_widgets_internal_packages= application gl_render lego lego_objects maths expressions utils options undo part_group peeron drag_and_drop povray
 
 ui_dialogs_sources=$(wildcard gtk/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
