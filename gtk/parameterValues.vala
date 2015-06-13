@@ -7,7 +7,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class ParameterValues : TreeView
+	private class ParameterValues : TreeView
 	{
 		private AnimatedModel ldrawModel;
 

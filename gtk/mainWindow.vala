@@ -15,7 +15,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-    public class MainWindow : Window
+    private class MainWindow : Window
     {
 		static construct
 		{

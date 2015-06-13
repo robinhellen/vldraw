@@ -9,7 +9,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	public class SetList : GLib.Object, IPartDragSource
+	private class SetList : GLib.Object, IPartDragSource
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;

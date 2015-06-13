@@ -5,7 +5,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class SubModelsTree : GLib.Object, IPartDragSource
+	private class SubModelsTree : GLib.Object, IPartDragSource
 	{
 		private TreeView m_Tree;
 		private ScrolledWindow m_Scrolled;

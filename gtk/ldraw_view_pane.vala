@@ -9,7 +9,7 @@ using GL;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class LdrawViewPane : Layout
+	private class LdrawViewPane : Layout
 	{
 		private LdrawObject m_Model;
 		private ViewAngle m_Angle;

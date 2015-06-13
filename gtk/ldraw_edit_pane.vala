@@ -14,7 +14,7 @@ using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class LdrawEditPane : LdrawViewPane
+	private class LdrawEditPane : LdrawViewPane
 	{
 		public IOptions Settings {construct; private get;}
 		public IDroppedObjectLocator Locator {construct; private get;}

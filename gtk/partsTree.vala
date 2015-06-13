@@ -7,7 +7,7 @@ using Ldraw.Lego.Library;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class PartsTree : GLib.Object, IPartDragSource
+	private class PartsTree : GLib.Object, IPartDragSource
 	{
 		private ScrolledWindow m_Scrolled;
 		private TreeView m_Tree;

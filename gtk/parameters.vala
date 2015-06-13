@@ -8,7 +8,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class ParametersDialog : GLib.Object
+	private class ParametersDialog : GLib.Object
 	{
 		Dialog dialog;
 		ObservableList<AnimParameterCommand> model;

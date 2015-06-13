@@ -10,7 +10,7 @@ using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui
 {
-	public class ToolBarProvider : GLib.Object
+	private class ToolBarProvider : GLib.Object
 	{
 		private unowned AnimatedModel m_ModelContainer;
 		private IOptions m_Options;

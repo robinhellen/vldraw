@@ -7,7 +7,7 @@ using Ldraw.Ui.DragAndDrop;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class FourPaned : HPaned
+	private class FourPaned : HPaned
 	{
 		private Paned left;
 		private Paned right;
@@ -45,7 +45,7 @@ namespace Ldraw.Ui.Widgets
 		}
 	}
 
-	public class EditPanes : FourPaned
+	private class EditPanes : FourPaned
 	{
 		public LdrawEditPane TopLeft {construct; private get;}
 		public LdrawEditPane BottomLeft {construct; private get;}

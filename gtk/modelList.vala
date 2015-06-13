@@ -4,7 +4,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui.Widgets
 {
-	public class ModelList : GLib.Object
+	private class ModelList : GLib.Object
 	{
 		private LdrawObject m_Model;
 		private TreeView m_ListView;
