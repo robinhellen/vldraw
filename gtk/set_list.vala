@@ -169,6 +169,7 @@ namespace Ldraw.Ui
 					var dragData = @"$currentName,$colourId";
 					data.set(Gdk.Atom.intern("LdrawFile", false), 8, dragData.data);
 				});
+			partsView.cursor_changed.connect(() => CurrentChanged(CurrentObject));
 		}
 		
 		private Pixbuf GetPixbufImageForColour(Colour colour)
@@ -288,15 +289,27 @@ namespace Ldraw.Ui
 		{
 			get
 			{
-				/*var current = CurrentPart;
-				if(current == null)
+				TreeIter active;
+				TreeSelection sel = partsView.get_selection();
+				TreeModel model;
+				if(!sel.get_selected(out model, out active))
+				{
+					return null; // no selection
+				}
+
+				Value val;
+				model.get_value(active, 0, out val);
+				int rowType = val.get_int();
+
+				if(rowType != 1)
 					return null;
 
-				LdrawPart part;
-				if(DatFileCache.TryGetPart(current.Name, out part))
-					return part.MainObject;*/
-					
-				return null;
+				Value partVal ;
+				model.get_value(active, 2, out partVal);
+				GLib.Object partObj = partVal.get_object();
+				var current = partObj as PartGroupItem;
+
+				return current.Part.MainObject;
 			}			
 		}
 	}
