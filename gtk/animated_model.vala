@@ -29,6 +29,7 @@ namespace Ldraw.Ui
 			Selection.clear();
 			
 			view_changed();
+			Model.VisibleChange.connect(() => view_changed());
 		}
 
         public void UpdateParameter(string Identifier, float value)

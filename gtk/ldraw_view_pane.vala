@@ -226,7 +226,7 @@ namespace Ldraw.Ui.Widgets
 		}
 	}
 
-	public enum ViewAngle
+	private enum ViewAngle
 	{
 		Front,
 		Back,
@@ -306,10 +306,3 @@ namespace Ldraw.Ui.Widgets
 		}
 	}
 }
-
-// extra methods for gdkglext / x11
-
-/*
-public static extern void* GetXDisplayForConfig(Gdk.GLConfig config);
-public static extern int GetScreenForConfig(Gdk.GLConfig config);
-*/

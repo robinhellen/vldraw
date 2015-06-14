@@ -11,7 +11,7 @@ namespace Ldraw.Ui
 		public void Load(ContainerBuilder builder)
 		{
             builder.Register<PartsTree>().As<IPartDragSource>();
-            builder.Register<SetList>().As<IPartDragSource>();            
+            builder.Register<SetList>().As<IPartDragSource>().SingleInstance();            
             builder.Register<EditPanes>();
             builder.Register<LdrawEditPane>();
             builder.Register<LdrawViewPane>();

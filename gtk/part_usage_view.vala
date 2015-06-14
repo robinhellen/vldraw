@@ -6,7 +6,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	public class PartUsageViewModel : TreeModel, TreeDragSource, GLib.Object
+	private class PartUsageViewModel : TreeModel, TreeDragSource, GLib.Object
 	{
 		private ObservableList<PartGroupItem> used;
 		private ObservableList<PartGroupItem> unused;

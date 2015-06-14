@@ -224,7 +224,7 @@ namespace Ldraw.Ui
 		}
 	}
 
-	public class ColourChooser : VBox
+	private class ColourChooser : VBox
 	{
 		private int page = 0;
 		private Button[] buttons = new Button[32];

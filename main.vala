@@ -38,7 +38,7 @@ namespace Ldraw
             builder.Register<LibrarySubFileLocator>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
             builder.Register<OnDemandSubFileLoader>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 
-            builder.Register<OnDemandPartLoader>().As<IDatFileCache>();
+            builder.Register<OnDemandPartLoader>().As<IDatFileCache>().SingleInstance();
             builder.Register<FileCachedLibrary>().As<ILibrary>();
 			
 			new DragAndDropModule().Load(builder);

@@ -103,7 +103,7 @@ namespace Ldraw.Lego
 				Nodes.insert(Nodes.index_of(after) + 1, newNode);
 			}
 			m_BoundingBox = null;
-			newNode.notify["ColourId"].connect(() => VisibleChange());
+			newNode.notify.connect(() => VisibleChange());
 			VisibleChange();
 		}
 
@@ -131,6 +131,7 @@ namespace Ldraw.Lego
 		public void InsertNode(LdrawNode toInsert, LdrawNode after)
 		{
 			nodes.insert(nodes.index_of(after), toInsert);
+			toInsert.notify.connect(() => VisibleChange());
 			VisibleChange();
 		}
 

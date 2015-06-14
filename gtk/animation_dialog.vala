@@ -20,7 +20,7 @@ namespace Ldraw.Ui
 	 * - All selected nodes have their animation set to what is shown in the dialog
 	 *
 	 */
-	public class AnimationDialog : GLib.Object
+	private class AnimationDialog : GLib.Object
 	{
 		private AnimatedModel model;
 		private Dialog dialog;
