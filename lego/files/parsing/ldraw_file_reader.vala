@@ -38,11 +38,9 @@ namespace Ldraw.Lego
 				{
 					DataInputStream inStream = new DataInputStream(m_File.read());
 					string line;
-					int lineNo = 0;
 					while((line = inStream.read_line(null)) != null)
 					{
 						line = line.strip();
-						lineNo++;
 						if(line == "")
 							continue; // ignore blank lines
 
