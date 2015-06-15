@@ -26,15 +26,15 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
 			}
-			var fileReader = new LdrawFileReader(Parser);
-			var nodes = fileReader.GetNodesFromFile(file, strategy);
+			var fileReader = new LdrawFileReader(file, strategy, Parser);
 			MultipartSubFileLocator locator = null;
 
 			ObservableList<LdrawNode> currentObject = new ObservableList<LdrawNode>();
 			LdrawObject mainObject = null;
 			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
 			string currentFileName = null;
-			foreach(var node in nodes)
+			LdrawNode node;
+			while((node = fileReader.next()) != null)
 			{
 				if(node is MetaCommand)
 				{

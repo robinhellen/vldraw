@@ -69,12 +69,13 @@ namespace Ldraw.Lego.Library
 
 		private T LoadFile<T>(string name, File folder)
 		{
-			var reader = new LdrawFileReader(Parser);
-
 			string filename = name + ".dat";
-			var nodeIter = reader.GetNodesFromFile(folder.get_child(filename), ReferenceLoadStrategy.SubPartsAndPrimitives);
+			var reader = new LdrawFileReader(folder.get_child(filename), ReferenceLoadStrategy.SubPartsAndPrimitives, Parser);
+
 			var nodes = new ArrayList<LdrawNode>();
-			foreach(var node in nodeIter)
+			
+			LdrawNode node;
+			while((node = reader.next()) != null)
 			{
 				nodes.add(node);
 			}

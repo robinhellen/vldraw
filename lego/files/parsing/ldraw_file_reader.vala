@@ -6,56 +6,41 @@ namespace Ldraw.Lego
 	public class LdrawFileReader : Object
 	{
 		private LdrawParser m_Parser;
+		private File file;
+		private ReferenceLoadStrategy strategy;
+		private DataInputStream stream;
 
-		public LdrawFileReader(LdrawParser parser)
+		public LdrawFileReader(File file, ReferenceLoadStrategy strategy, LdrawParser parser)
 		{
 			m_Parser = parser;
+			this.file = file;
+			this.strategy = strategy;
+			stream = new DataInputStream(file.read());
 		}
-
-		public Generator<LdrawNode> GetNodesFromFile(File file, ReferenceLoadStrategy strategy)
-			throws ParseError
+		
+		public LdrawNode? next()
+			throws ParseError, IOError, Error
 		{
-			return new NodeGenerator(file, m_Parser, strategy);
+			string line;
+			line = stream.read_line(null);
+			if(line == null)
+				return null;
+			
+			line = line.strip();
+			if(line == "")
+				return next(); // ignore blank lines
+
+			return m_Parser.ParseLine(line, strategy);
 		}
-
-		private class NodeGenerator : Generator<LdrawNode>
+	}
+	
+	public class FileReaderFactory : Object
+	{
+		public LdrawParser Parser {private get; construct;}
+		
+		public LdrawFileReader GetReader(File file, ReferenceLoadStrategy strategy)
 		{
-			private File m_File;
-			private LdrawParser m_Parser;
-			private ReferenceLoadStrategy strategy;
-
-			public NodeGenerator(File file, LdrawParser parser, ReferenceLoadStrategy strategy)
-			{
-				m_File = file;
-				m_Parser = parser;
-				this.strategy = strategy;
-				helper.begin();
-			}
-
-			protected override async void generate()
-			{
-				try
-				{
-					DataInputStream inStream = new DataInputStream(m_File.read());
-					string line;
-					while((line = inStream.read_line(null)) != null)
-					{
-						line = line.strip();
-						if(line == "")
-							continue; // ignore blank lines
-
-						LdrawNode nodeForLine = m_Parser.ParseLine(line, strategy);
-						if(nodeForLine != null)
-							yield feed(nodeForLine);
-					}
-				}
-				catch(IOError e)
-				{
-				}
-				catch(Error e)
-				{
-				}
-			}
+			return new LdrawFileReader(file, strategy, Parser);
 		}
 	}
 }
