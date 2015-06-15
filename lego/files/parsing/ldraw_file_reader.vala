@@ -6,19 +6,15 @@ namespace Ldraw.Lego
 	public class LdrawFileReader : Object
 	{
 		private LdrawParser m_Parser;
-		private File file;
-		private ReferenceLoadStrategy strategy;
 		private DataInputStream stream;
 
-		public LdrawFileReader(File file, ReferenceLoadStrategy strategy, LdrawParser parser)
+		public LdrawFileReader(File file, LdrawParser parser)
 		{
 			m_Parser = parser;
-			this.file = file;
-			this.strategy = strategy;
 			stream = new DataInputStream(file.read());
 		}
 		
-		public LdrawNode? next()
+		public LdrawNode? next(ISubFileLocator locator)
 			throws ParseError, IOError, Error
 		{
 			string line;
@@ -28,9 +24,9 @@ namespace Ldraw.Lego
 			
 			line = line.strip();
 			if(line == "")
-				return next(); // ignore blank lines
+				return next(locator); // ignore blank lines
 
-			return m_Parser.ParseLine(line, strategy);
+			return m_Parser.ParseLine(line, locator);
 		}
 	}
 	
@@ -38,9 +34,9 @@ namespace Ldraw.Lego
 	{
 		public LdrawParser Parser {private get; construct;}
 		
-		public LdrawFileReader GetReader(File file, ReferenceLoadStrategy strategy)
+		public LdrawFileReader GetReader(File file)
 		{
-			return new LdrawFileReader(file, strategy, Parser);
+			return new LdrawFileReader(file, Parser);
 		}
 	}
 }

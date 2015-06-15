@@ -1,3 +1,4 @@
+using Diva;
 using Gee;
 
 
@@ -9,6 +10,13 @@ namespace Ldraw.Lego.Library
 		public ILdrawFolders Folders {construct; private get;}
 		public LdrawParser Parser {construct; private get;}
 		public FileReaderFactory ReaderFactory {construct; private get;}
+		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
+
+		static construct
+		{
+			var cls = (ObjectClass)typeof(OnDemandPartLoader).class_ref();
+			SetIndexedInjection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
+		}
 
 		private Map<string, LdrawPrimitive> primitivesCache = new HashMap<string, LdrawPrimitive>();
 		private Map<string, LdrawHiresPrimitive> hiresPrimitivesCache = new HashMap<string, LdrawHiresPrimitive>();
@@ -71,12 +79,13 @@ namespace Ldraw.Lego.Library
 		private T LoadFile<T>(string name, File folder)
 		{
 			string filename = name + ".dat";
-			var reader = ReaderFactory.GetReader(folder.get_child(filename), ReferenceLoadStrategy.SubPartsAndPrimitives);
+			var reader = ReaderFactory.GetReader(folder.get_child(filename));
 
 			var nodes = new ArrayList<LdrawNode>();
 			
 			LdrawNode node;
-			while((node = reader.next()) != null)
+			var locator = Locators[ReferenceLoadStrategy.SubPartsAndPrimitives];
+			while((node = reader.next(locator)) != null)
 			{
 				nodes.add(node);
 			}

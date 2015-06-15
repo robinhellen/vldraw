@@ -7,16 +7,7 @@ namespace Ldraw.Lego
 {
 	public class LdrawParser : Object
 	{
-		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {get; construct set;}
-		public ISubFileLocator OverrideLocator {get; set;}
-
-		static construct
-		{
-			var cls = (ObjectClass)typeof(LdrawParser).class_ref();
-			SetIndexedInjection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
-		}
-
-		public LdrawNode ParseLine(string line, ReferenceLoadStrategy strategy)
+		public LdrawNode ParseLine(string line, ISubFileLocator locator)
 			throws ParseError
 			requires(!("\n" in line))
 		{
@@ -26,7 +17,7 @@ namespace Ldraw.Lego
 					// may be a meta command
 					return ParseCommentNode(line);
 				case '1':
-					return ParsePartNode(line, strategy);
+					return ParsePartNode(line, locator);
 				case '2':
 					return ParseLineNode(line);
 				case '3':
@@ -71,7 +62,7 @@ namespace Ldraw.Lego
 			return new Comment(string.joinv(" ", tokens[1: tokens.length]));
 		}
 
-		protected LdrawNode ParsePartNode(string line, ReferenceLoadStrategy strategy)
+		protected LdrawNode ParsePartNode(string line, ISubFileLocator locator)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -85,7 +76,6 @@ namespace Ldraw.Lego
 			int colourId = int.parse(tokens[1]);
 			string text = tokens[14].strip().down();
 
-			var locator = OverrideLocator ?? Locators[strategy];
 			return new PartNode(center, transform, locator.GetObjectFromReference(text), LdrawColour.GetColour(colourId));
 		}
 
