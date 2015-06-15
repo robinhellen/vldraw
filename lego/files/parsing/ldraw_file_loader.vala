@@ -11,6 +11,7 @@ namespace Ldraw.Lego
 		public IDatFileCache Library {construct; private get;}
 		public LdrawParser Parser {construct; private get;}
 		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
+		public FileReaderFactory ReaderFactory {construct; private get;}
 
 		static construct
 		{
@@ -26,7 +27,7 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
 			}
-			var fileReader = new LdrawFileReader(file, strategy, Parser);
+			var fileReader = ReaderFactory.GetReader(file, strategy);
 			MultipartSubFileLocator locator = null;
 
 			ObservableList<LdrawNode> currentObject = new ObservableList<LdrawNode>();

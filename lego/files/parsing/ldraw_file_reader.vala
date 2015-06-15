@@ -22,7 +22,7 @@ namespace Ldraw.Lego
 			throws ParseError, IOError, Error
 		{
 			string line;
-			line = stream.read_line(null);
+			line = stream.read_line();
 			if(line == null)
 				return null;
 			

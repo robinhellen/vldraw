@@ -8,6 +8,7 @@ namespace Ldraw.Lego.Library
 	{
 		public ILdrawFolders Folders {construct; private get;}
 		public LdrawParser Parser {construct; private get;}
+		public FileReaderFactory ReaderFactory {construct; private get;}
 
 		private Map<string, LdrawPrimitive> primitivesCache = new HashMap<string, LdrawPrimitive>();
 		private Map<string, LdrawHiresPrimitive> hiresPrimitivesCache = new HashMap<string, LdrawHiresPrimitive>();
@@ -70,7 +71,7 @@ namespace Ldraw.Lego.Library
 		private T LoadFile<T>(string name, File folder)
 		{
 			string filename = name + ".dat";
-			var reader = new LdrawFileReader(folder.get_child(filename), ReferenceLoadStrategy.SubPartsAndPrimitives, Parser);
+			var reader = ReaderFactory.GetReader(folder.get_child(filename), ReferenceLoadStrategy.SubPartsAndPrimitives);
 
 			var nodes = new ArrayList<LdrawNode>();
 			

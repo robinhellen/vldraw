@@ -27,6 +27,7 @@ namespace Ldraw
             // Model file handling
             builder.Register<LdrawFileLoader>();
             builder.Register<LdrawParser>();
+            builder.Register<FileReaderFactory>();
 
             // Peeron communication
             builder.Register<InventoryReader>();
