@@ -14,19 +14,19 @@ namespace Ldraw.Lego
 			stream = new DataInputStream(file.read());
 		}
 		
-		public LdrawNode? next(ISubFileLocator locator)
+		public async LdrawNode? next(ISubFileLocator locator)
 			throws ParseError, IOError, Error
 		{
 			string line;
-			line = stream.read_line();
+			line = yield stream.read_line_async();
 			if(line == null)
 				return null;
 			
 			line = line.strip();
 			if(line == "")
-				return next(locator); // ignore blank lines
+				return yield next(locator); // ignore blank lines
 
-			return m_Parser.ParseLine(line, locator);
+			return yield m_Parser.ParseLine(line, locator);
 		}
 	}
 	

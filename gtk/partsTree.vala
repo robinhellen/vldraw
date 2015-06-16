@@ -17,7 +17,7 @@ namespace Ldraw.Ui.Widgets
 
 		construct
 		{
-			m_Tree = new TreeView.with_model(CreateAndPopulateModel(Library));
+			m_Tree = new TreeView();
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 1);
 			m_Tree.insert_column_with_attributes(-1, "", new CellRendererText(), text: 2);
 			m_Tree.headers_visible = false;
@@ -36,30 +36,33 @@ namespace Ldraw.Ui.Widgets
 				icon.fill(0);
 				drag_set_icon_pixbuf(context, icon, 2, 2);
 			});
+			
+			CreateAndPopulateModel.begin(Library, (obj, res) =>
+				m_Tree.model = CreateAndPopulateModel.end(res));
 		}
 
-		private TreeModel CreateAndPopulateModel(ILibrary library)
+		private async TreeModel CreateAndPopulateModel(ILibrary library)
 		{
 			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(IPartMetadata));
 
 			var categories = new LinkedList<string>();
-			categories.add_all(library.AllCategories);
+			categories.add_all(yield library.GetAllCategories());
 			categories.sort();
 			foreach(string category in categories)
 			{
-				PopulatePartsForCategory(store, category, library);
+				yield PopulatePartsForCategory(store, category, library);
 			}
-			PopulatePartsForCategory(store, null, library); // add uncategorised items
+			yield PopulatePartsForCategory(store, null, library); // add uncategorised items
 			return store;
 		}
 
-		private void PopulatePartsForCategory(TreeStore store, string? category, ILibrary library)
+		private async void PopulatePartsForCategory(TreeStore store, string? category, ILibrary library)
 		{
 			TreeIter categoryIter;
 			store.append(out categoryIter, null);
 			store.set(categoryIter, 0, 0, 1, (category != null) ? category : "Uncategorised", -1);
 
-			var parts = library.GetPartsByCategory(category);
+			var parts = yield library.GetPartsByCategory(category);
 
 			foreach(IPartMetadata part in parts)
 			{
@@ -75,9 +78,13 @@ namespace Ldraw.Ui.Widgets
 			if(current == null)
 				return;
 
-			LdrawPart part;
-			if(DatFileCache.TryGetPart(current.Name, out part))
-				CurrentChanged(part.MainObject);
+			DatFileCache.TryGetPart.begin(current.Name, (obj, res) => 
+			{
+				LdrawPart part;
+				
+				if(DatFileCache.TryGetPart.end(res, out part))
+					CurrentChanged(part.MainObject);
+			});
 		}
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
@@ -124,20 +131,17 @@ namespace Ldraw.Ui.Widgets
 			return m_Scrolled;
 		}
 		
-		public LdrawObject? CurrentObject
+		public async LdrawObject? GetCurrentObject()
 		{
-			get
-			{
-				var current = CurrentPart;
-				if(current == null)
-					return null;
-
-				LdrawPart part;
-				if(DatFileCache.TryGetPart(current.Name, out part))
-					return part.MainObject;
-					
+			var current = CurrentPart;
+			if(current == null)
 				return null;
-			}			
+
+			LdrawPart part;
+			if(yield DatFileCache.TryGetPart(current.Name, out part))
+				return part.MainObject;
+				
+			return null;
 		}
 	}	
 }

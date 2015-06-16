@@ -13,7 +13,7 @@ namespace Ldraw.Ui.DragAndDrop
 			Objects = Gee.List.empty<LdrawObject>();
 		}
 
-		public LdrawObject? GetObjectForName(string name)
+		public async LdrawObject? GetObjectForName(string name)
 		{
 			foreach(var obj in Objects)
 			{

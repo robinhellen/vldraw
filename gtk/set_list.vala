@@ -35,13 +35,13 @@ namespace Ldraw.Ui
 			{
 				modelFile = value;
 				modelFile.MainObject.VisibleChange.connect(() => UpdateUsage(false));
-				UpdateUsage(true);
+				UpdateUsage.begin(true);
 			}
 		}
 
-		private void UpdateUsage(bool reset)
+		private async void UpdateUsage(bool reset)
 		{
-			var availableParts = Aggregate(ToPartGroups(sets, Library));
+			var availableParts = Aggregate(yield ToPartGroups(sets, Library));
 			usage = new PartGroupUsage(availableParts, new PartGroup.FromModel(modelFile));
 			if(reset)
 			{
@@ -84,7 +84,7 @@ namespace Ldraw.Ui
 						(obj, res) =>
 					{
 						sets.add(InventoryReader.GetInventoryFor.end(res));
-						UpdateUsage(true);
+						UpdateUsage.begin(true);
 					});
 				});
 			setButtons.pack_start(addButton);
@@ -93,7 +93,7 @@ namespace Ldraw.Ui
 			clearButton.clicked.connect(() =>
 			{
 				sets.clear();
-				UpdateUsage(true);
+				UpdateUsage.begin(true);
 			});
 
 			var setsView = new SimpleList<Inventory>.with_model(sets);
@@ -169,7 +169,12 @@ namespace Ldraw.Ui
 					var dragData = @"$currentName,$colourId";
 					data.set(Gdk.Atom.intern("LdrawFile", false), 8, dragData.data);
 				});
-			partsView.cursor_changed.connect(() => CurrentChanged(CurrentObject));
+			partsView.cursor_changed.connect(OnCursorChanged);
+		}
+		
+		private async void OnCursorChanged()
+		{ 
+			CurrentChanged(yield GetCurrentObject());
 		}
 		
 		private Pixbuf GetPixbufImageForColour(Colour colour)
@@ -244,13 +249,13 @@ namespace Ldraw.Ui
 			}
 		}
 
-		private PartGroup ToPartGroup(Inventory i, IDatFileCache lib)
+		private async PartGroup ToPartGroup(Inventory i, IDatFileCache lib)
 		{
 			var items = new ArrayList<PartGroupItem>();
 			foreach(var line in i.Lines)
 			{
 				LdrawPart p;
-				if(lib.TryGetPart(line.PartNumber , out p))
+				if(yield lib.TryGetPart(line.PartNumber , out p))
 				{
 					items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
 							Part: p,
@@ -265,12 +270,12 @@ namespace Ldraw.Ui
 			return (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
 		}
 
-		private Collection<PartGroup> ToPartGroups(Collection<Inventory> sets, IDatFileCache lib)
+		private async Collection<PartGroup> ToPartGroups(Collection<Inventory> sets, IDatFileCache lib)
 		{
 			var result = new ArrayList<PartGroup>();
 			foreach(var inventory in sets)
 			{
-				result.add(ToPartGroup(inventory, lib));
+				result.add(yield ToPartGroup(inventory, lib));
 			}
 			return result;
 		}
@@ -285,32 +290,29 @@ namespace Ldraw.Ui
 			return widget;
 		}
 		
-		public LdrawObject? CurrentObject
+		public async LdrawObject? GetCurrentObject()
 		{
-			get
+			TreeIter active;
+			TreeSelection sel = partsView.get_selection();
+			TreeModel model;
+			if(!sel.get_selected(out model, out active))
 			{
-				TreeIter active;
-				TreeSelection sel = partsView.get_selection();
-				TreeModel model;
-				if(!sel.get_selected(out model, out active))
-				{
-					return null; // no selection
-				}
+				return null; // no selection
+			}
 
-				Value val;
-				model.get_value(active, 0, out val);
-				int rowType = val.get_int();
+			Value val;
+			model.get_value(active, 0, out val);
+			int rowType = val.get_int();
 
-				if(rowType != 1)
-					return null;
+			if(rowType != 1)
+				return null;
 
-				Value partVal ;
-				model.get_value(active, 2, out partVal);
-				GLib.Object partObj = partVal.get_object();
-				var current = partObj as PartGroupItem;
+			Value partVal ;
+			model.get_value(active, 2, out partVal);
+			GLib.Object partObj = partVal.get_object();
+			var current = partObj as PartGroupItem;
 
-				return current.Part.MainObject;
-			}			
+			return current.Part.MainObject;
 		}
 	}
 }

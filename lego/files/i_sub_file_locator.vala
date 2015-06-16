@@ -6,7 +6,7 @@ namespace Ldraw.Lego
 {
 	public interface ISubFileLocator : Object
 	{
-		public abstract LdrawObject? GetObjectFromReference(string reference)
+		public abstract async LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError;
 	}
 
@@ -14,13 +14,13 @@ namespace Ldraw.Lego
 	{
 		public IDatFileCache Library {construct; private get;}
 
-		public LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			var partName = reference.substring(0, reference.last_index_of("."));
 
 			LdrawPart part;
-			if(Library.TryGetPart(partName, out part))
+			if(yield Library.TryGetPart(partName, out part))
 				return part.MainObject;
 
 			return null;
@@ -38,10 +38,10 @@ namespace Ldraw.Lego
 			m_Proxies = new ArrayList<ProxyLdrawObject>();
 		}
 
-		public LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
 		{
-			var baseVal = m_Locator.GetObjectFromReference(reference);
+			var baseVal = yield m_Locator.GetObjectFromReference(reference);
 			if(baseVal == null)
 			{
 				var proxy = new ProxyLdrawObject(reference);

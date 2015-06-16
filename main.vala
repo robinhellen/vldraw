@@ -72,24 +72,26 @@ namespace Ldraw
 		
 		public bool HandleArgs(string[] args)
 		{
+			Model.Model = new LdrawModel.Empty().MainObject;
 			if(args.length == 1)
 			{
-				Model.Model = new LdrawModel.Empty().MainObject;
 				return true;
 			}
 				
 			var filename = args[1];
-            try
-            {
-                Model.Model = Loader.LoadModelFile(filename, ReferenceLoadStrategy.PartsOnly).MainObject;
-                return true;
-            }
-            catch(Error e)
-            {
-                stdout.printf(e.message);
-                Model.Model = new LdrawModel.Empty().MainObject;
-                return false;
-            }			
+			Loader.LoadModelFile.begin(filename, ReferenceLoadStrategy.PartsOnly, (obj, res) =>
+				{
+					try
+					{
+						Model.Model = Loader.LoadModelFile.end(res).MainObject;
+					}
+					catch(Error e)
+					{
+						stdout.printf(e.message);
+						Model.Model = new LdrawModel.Empty().MainObject;
+					}			
+				});
+			return true;            
 		}
 	}
 }

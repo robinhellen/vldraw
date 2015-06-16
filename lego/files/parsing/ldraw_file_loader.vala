@@ -19,7 +19,7 @@ namespace Ldraw.Lego
 			SetIndexedInjection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
 		}
 
-		public LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy)
+		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy)
 			throws ParseError
 		{
 			File file = File.new_for_path(filepath);
@@ -35,7 +35,7 @@ namespace Ldraw.Lego
 			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
 			string currentFileName = null;
 			LdrawNode node;
-			while((node = fileReader.next((ISubFileLocator)locator ?? Locators[strategy])) != null)
+			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy])) != null)
 			{
 				if(node is MetaCommand)
 				{

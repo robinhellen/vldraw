@@ -138,8 +138,11 @@ namespace Ldraw.Ui
 					PartSources[(int)currentPage].disconnect(currentSignalHandler);
 				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => PartsPreview.Model = newObject);
 				currentPage = i;
-				var current = PartSources[(int)currentPage].CurrentObject;
-				PartsPreview.Model = current ?? new LdrawObject("", null);
+				var source = PartSources[(int)currentPage];
+				source.GetCurrentObject.begin((obj, res) => 
+					{
+						PartsPreview.Model = source.GetCurrentObject.end(res) ?? new LdrawObject("", null);
+					});
 			});
 			return box;
 		}
@@ -349,16 +352,19 @@ namespace Ldraw.Ui
         
         private void LoadFile(string fileName)
         {
-			try
+			Loader.LoadModelFile.begin(fileName, ReferenceLoadStrategy.PartsOnly, (obj, res) =>
 			{
-				LdrawModelFile opened = Loader.LoadModelFile(fileName, ReferenceLoadStrategy.PartsOnly);
-				File = opened;
-			}
-			catch(ParseError e)
-			{
-				// TODO: print an error message
-				stdout.printf(e.message);
-			}
+				try
+				{
+					File = Loader.LoadModelFile.end(res);
+				}
+				catch(ParseError e)
+				{
+					// TODO: print an error message
+					stdout.printf(e.message);
+				}
+				
+			});
 		}
 
         private void FileSave_OnActivate()
@@ -549,7 +555,7 @@ namespace Ldraw.Ui
 	{
 		public abstract string GetTabName();
 		public abstract Widget GetWidget();
-		public abstract LdrawObject? CurrentObject { get; }
+		public async abstract LdrawObject? GetCurrentObject();
 		public signal void CurrentChanged(LdrawObject newCurrent);
 	}
 }

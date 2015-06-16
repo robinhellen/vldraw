@@ -4,9 +4,9 @@ namespace Ldraw.Lego.Library
 {
 	public interface ILibrary : Object
 	{
-		public abstract Set<string> AllCategories {	owned get;}
+		public abstract async Set<string> GetAllCategories();
 
-		public abstract Collection<IPartMetadata> GetPartsByCategory(string? category);
+		public abstract async Collection<IPartMetadata> GetPartsByCategory(string? category);
 
 		//public abstract Collection<LdrawPart> GetVariantsOf(LdrawPart part);
 	}
@@ -21,13 +21,13 @@ namespace Ldraw.Lego.Library
 
 	public interface IDatFileCache : Object
 	{
-		public abstract bool TryGetPrimitive(string name, out LdrawPrimitive primitive);
+		public abstract async bool TryGetPrimitive(string name, out LdrawPrimitive primitive);
 
-		public abstract bool TryGetHiresPrimitive(string name, out LdrawHiresPrimitive primitive);
+		public abstract async bool TryGetHiresPrimitive(string name, out LdrawHiresPrimitive primitive);
 
-		public abstract bool TryGetPart(string name, out LdrawPart part);
+		public abstract async bool TryGetPart(string name, out LdrawPart part);
 
-		public abstract bool TryGetSubPart(string name, out LdrawSubPart part);
+		public abstract async bool TryGetSubPart(string name, out LdrawSubPart part);
 	}
 
 	public interface ILdrawFolders : Object

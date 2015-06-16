@@ -14,32 +14,29 @@ namespace Ldraw.Lego.Library
 		private MultiMap<string, IPartMetadata> categories;
 		private bool loaded;
 
-		public Set<string> AllCategories
+		public async Set<string> GetAllCategories()
 		{
-			owned get
+			yield EnsureLoaded();
+			var keys = categories.get_keys();
+			var filtered = new HashSet<string>();
+			foreach(var key in keys)
 			{
-				EnsureLoaded();
-				var keys = categories.get_keys();
-				var filtered = new HashSet<string>();
-				foreach(var key in keys)
+				switch(key[0])
 				{
-					switch(key[0])
-					{
-						case '=':
-						case '_':
-							break;
-						default:
-							filtered.add(key);
-							break;
-					}
+					case '=':
+					case '_':
+						break;
+					default:
+						filtered.add(key);
+						break;
 				}
-				return filtered;
 			}
+			return filtered;
 		}
 
-		public Collection<IPartMetadata> GetPartsByCategory(string? category)
+		public async Collection<IPartMetadata> GetPartsByCategory(string? category)
 		{
-			EnsureLoaded();
+			yield EnsureLoaded();
 			var parts = categories[category];
 			var categoryParts = new LinkedList<IPartMetadata>();
 			foreach(var part in parts)
@@ -52,7 +49,7 @@ namespace Ldraw.Lego.Library
 			return categoryParts;
 		}
 
-		private void EnsureLoaded()
+		private async void EnsureLoaded()
 		{
 			if(loaded)
 				return;
@@ -63,14 +60,14 @@ namespace Ldraw.Lego.Library
 
 			var categoryFile = ldrawUserConfigDir.get_child("categories.ldraw");
 			if(!categoryFile.query_exists())
-				LoadCategoriesAndSave(categoryFile);
+				yield LoadCategoriesAndSave(categoryFile);
 			else
 				LoadCategoriesFromCache(categoryFile);
 
 			loaded = true;
 		}
 
-		private void LoadCategoriesAndSave(File categoryFile)
+		private async void LoadCategoriesAndSave(File categoryFile)
 		{
 			var folder = LibraryFolders.PartsDirectory;
 			var children = folder.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
@@ -85,7 +82,7 @@ namespace Ldraw.Lego.Library
 				string name = current_file.get_name();
 
 				LdrawPart part;
-				PartFiles.TryGetPart(name.substring(0, name.last_index_of(".")), out part);
+				yield PartFiles.TryGetPart(name.substring(0, name.last_index_of(".")), out part);
 
 				categories[part.Category] = part;
 			}

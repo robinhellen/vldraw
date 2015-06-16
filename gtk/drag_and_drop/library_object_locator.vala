@@ -7,10 +7,10 @@ namespace Ldraw.Ui.DragAndDrop
 	{
 		public IDatFileCache Library {construct; private get;}
 
-		public LdrawObject? GetObjectForName(string name)
+		public async LdrawObject? GetObjectForName(string name)
 		{
 			LdrawPart part;
-			if(!Library.TryGetPart(name, out part))
+			if(!yield Library.TryGetPart(name, out part))
 			{
 				return null;
 			}

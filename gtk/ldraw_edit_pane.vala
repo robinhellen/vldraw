@@ -204,81 +204,83 @@ namespace Ldraw.Ui.Widgets
 				newColour = LdrawColour.GetColour(int.parse(sections[1]));
 			}
 
-			var droppedObject = Locator.GetObjectForName(partName);
+			Locator.GetObjectForName.begin(partName, (obj, res) =>
+			{
+				var droppedObject = Locator.GetObjectForName.end(res);
+				if(droppedObject == null)
+				{
+					return;
+				}
+				
+				Allocation alloc;
+				get_allocation(out alloc);
+				int deltaXPx = x - (alloc.width / 2);
+				int deltaYPx = y - (alloc.height / 2);
 
-			if(droppedObject == null)
-			{
-				return;
-			}
-			
-			Allocation alloc;
-			get_allocation(out alloc);
-			int deltaXPx = x - (alloc.width / 2);
-			int deltaYPx = y - (alloc.height / 2);
+				float deltaX = deltaXPx * m_Scale;
+				float deltaY = deltaYPx * m_Scale;
 
-			float deltaX = deltaXPx * m_Scale;
-			float deltaY = deltaYPx * m_Scale;
-
-			// TODO: adjust addition position for drop location
-			switch(Angle)
-			{
-				case ViewAngle.Ortho:
-					break; // do not adjust in the 3D view as that is PAINFUL
-				case ViewAngle.Front:
-					newPosition = Vector(
-						SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
-						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-						newPosition.Z);
-					break;
-				case ViewAngle.Back:
-					newPosition = Vector(
-						SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
-						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-						newPosition.Z);
-					break;
-				case ViewAngle.Left:
-					newPosition = Vector(
-						newPosition.X,
-						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-						SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.Z));
-					break;
-				case ViewAngle.Right:
-					newPosition = Vector(
-						newPosition.X,
-						SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-						SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.Z));
-					break;
-				case ViewAngle.Top:
-					newPosition = Vector(
-						SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
-						newPosition.Y,
-						SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
-					break;
-				case ViewAngle.Bottom:
-					newPosition = Vector(
-						SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
-						newPosition.Y,
-						SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
-					break;
-				default:
-					newPosition = Vector.NullVector;
-					break;
-			}
-			
-			if(finishDrag)
-			{
-				LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
-				model.ClearSelection();
-				model.Select(newNode);
-				UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
-				drag_finish(context, true, false, time);
-			}
-			else
-			{
-				dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
-				drag_status(context, context.suggested_action, time);
-				queue_draw();
-			}
+				// TODO: adjust addition position for drop location
+				switch(Angle)
+				{
+					case ViewAngle.Ortho:
+						break; // do not adjust in the 3D view as that is PAINFUL
+					case ViewAngle.Front:
+						newPosition = Vector(
+							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
+							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
+							newPosition.Z);
+						break;
+					case ViewAngle.Back:
+						newPosition = Vector(
+							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
+							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
+							newPosition.Z);
+						break;
+					case ViewAngle.Left:
+						newPosition = Vector(
+							newPosition.X,
+							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
+							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.Z));
+						break;
+					case ViewAngle.Right:
+						newPosition = Vector(
+							newPosition.X,
+							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
+							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.Z));
+						break;
+					case ViewAngle.Top:
+						newPosition = Vector(
+							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
+							newPosition.Y,
+							SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
+						break;
+					case ViewAngle.Bottom:
+						newPosition = Vector(
+							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
+							newPosition.Y,
+							SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
+						break;
+					default:
+						newPosition = Vector.NullVector;
+						break;
+				}
+				
+				if(finishDrag)
+				{
+					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
+					model.ClearSelection();
+					model.Select(newNode);
+					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
+					drag_finish(context, true, false, time);
+				}
+				else
+				{
+					dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
+					drag_status(context, context.suggested_action, time);
+					queue_draw();
+				}
+			});
 		}
 
 		private Gtk.Menu CreateContextMenu()

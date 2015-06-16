@@ -13,7 +13,7 @@ namespace Ldraw.Ui.DragAndDrop
 			SetIndexedInjection<ObjectDropType, IDroppedObjectLocator>(cls, "Locators");
 		}
 
-		public LdrawObject? GetObjectForName(string name)
+		public async LdrawObject? GetObjectForName(string name)
 		{
 			var separatorIndex = name.index_of("::");
 			string source;
@@ -29,7 +29,7 @@ namespace Ldraw.Ui.DragAndDrop
 				objectName = name.substring(separatorIndex + 2);
 			}
 			
-			return Locators[ObjectDropType.FromString(source)].GetObjectForName(objectName);
+			return yield Locators[ObjectDropType.FromString(source)].GetObjectForName(objectName);
 		}
 	}
 }

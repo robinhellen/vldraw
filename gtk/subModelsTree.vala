@@ -51,37 +51,34 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		private void Tree_OnCursorChanged(TreeView tree)
+		private async void Tree_OnCursorChanged(TreeView tree)
 		{
-			var current = CurrentObject;
+			var current = yield GetCurrentObject();
 			if(current == null)
 				return;
 			
 			CurrentChanged(current);
 		}
 
-		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
+		private async void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
-			string currentName = "Document::" + CurrentObject.FileName;
+			string currentName = "Document::" + (yield GetCurrentObject()).FileName;
 			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
 		}
 
-		public LdrawObject? CurrentObject
+		public async LdrawObject? GetCurrentObject()
 		{
-			get
+			TreeIter active;
+			TreeSelection sel = m_Tree.get_selection();
+			TreeModel model;
+			if(!sel.get_selected(out model, out active))
 			{
-				TreeIter active;
-				TreeSelection sel = m_Tree.get_selection();
-				TreeModel model;
-				if(!sel.get_selected(out model, out active))
-				{
-					return null; // no selection
-				}
-
-				weak LdrawObject node;
-				model.get(active, 0, out node);
-				return node;
+				return null; // no selection
 			}
+
+			weak LdrawObject node;
+			model.get(active, 0, out node);
+			return node;
 		}
 				
 		public string GetTabName()

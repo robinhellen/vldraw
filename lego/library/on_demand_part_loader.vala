@@ -23,27 +23,27 @@ namespace Ldraw.Lego.Library
 		private Map<string, LdrawPart> partsCache = new HashMap<string, LdrawPart>();
 		private Map<string, LdrawSubPart> subpartsCache = new HashMap<string, LdrawSubPart>();
 
-		public bool TryGetPrimitive(string name, out LdrawPrimitive primitive)
+		public async bool TryGetPrimitive(string name, out LdrawPrimitive primitive)
 		{
-			return TryGetFile(name, primitivesCache, Folders.PrimitivesDirectory, out primitive);
+			return yield TryGetFile(name, primitivesCache, Folders.PrimitivesDirectory, out primitive);
 		}
 
-		public bool TryGetHiresPrimitive(string name, out LdrawHiresPrimitive primitive)
+		public async bool TryGetHiresPrimitive(string name, out LdrawHiresPrimitive primitive)
 		{
-			return TryGetFile(name, hiresPrimitivesCache, Folders.HiresPrimitivesDirectory, out primitive);
+			return yield TryGetFile(name, hiresPrimitivesCache, Folders.HiresPrimitivesDirectory, out primitive);
 		}
 
-		public bool TryGetPart(string name, out LdrawPart part)
+		public async bool TryGetPart(string name, out LdrawPart part)
 		{
-			return TryGetFile(name, partsCache, Folders.PartsDirectory, out part);
+			return yield TryGetFile(name, partsCache, Folders.PartsDirectory, out part);
 		}
 
-		public bool TryGetSubPart(string name, out LdrawSubPart part)
+		public async bool TryGetSubPart(string name, out LdrawSubPart part)
 		{
-			return TryGetFile(name, subpartsCache, Folders.SubPartsDirectory, out part);
+			return yield TryGetFile(name, subpartsCache, Folders.SubPartsDirectory, out part);
 		}
 
-		private bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
+		private async bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
 		{
 			if(InCache(name, cache, out result))
 			{
@@ -53,7 +53,7 @@ namespace Ldraw.Lego.Library
 			if(!FolderHasFile(folder, name))
 				return false;
 
-			result = LoadFile(name, folder);
+			result = yield LoadFile(name, folder);
 			cache[name] = result;
 			return true;
 		}
@@ -76,7 +76,7 @@ namespace Ldraw.Lego.Library
 			return attempt.query_exists();
 		}
 
-		private T LoadFile<T>(string name, File folder)
+		private async T LoadFile<T>(string name, File folder)
 		{
 			string filename = name + ".dat";
 			var reader = ReaderFactory.GetReader(folder.get_child(filename));
@@ -85,7 +85,7 @@ namespace Ldraw.Lego.Library
 			
 			LdrawNode node;
 			var locator = Locators[ReferenceLoadStrategy.SubPartsAndPrimitives];
-			while((node = reader.next(locator)) != null)
+			while((node = yield reader.next(locator)) != null)
 			{
 				nodes.add(node);
 			}
@@ -105,7 +105,7 @@ namespace Ldraw.Lego.Library
 			Object(Cache: cache);
 		}
 
-		public LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawObject? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			var dir_parts = reference.split_set("/\\");
@@ -114,7 +114,7 @@ namespace Ldraw.Lego.Library
 				case "s":
 					var name = GetObjectName(dir_parts[1]);
 					LdrawSubPart sp;
-					if(Cache.TryGetSubPart(name, out sp))
+					if(yield Cache.TryGetSubPart(name, out sp))
 					{
 						return sp.MainObject;
 					}
@@ -122,7 +122,7 @@ namespace Ldraw.Lego.Library
 				case "48":
 					var name = GetObjectName(dir_parts[1]);
 					LdrawHiresPrimitive hiresPrim;
-					if(Cache.TryGetHiresPrimitive(name, out hiresPrim))
+					if(yield Cache.TryGetHiresPrimitive(name, out hiresPrim))
 					{
 						return hiresPrim.MainObject;
 					}
@@ -130,13 +130,13 @@ namespace Ldraw.Lego.Library
 				default:
 					var name = GetObjectName(dir_parts[0]);
 					LdrawPrimitive prim;
-					if(Cache.TryGetPrimitive(name, out prim))
+					if(yield Cache.TryGetPrimitive(name, out prim))
 					{
 						return prim.MainObject;
 					}
 
 					LdrawPart p;
-					if(Cache.TryGetPart(name, out p))
+					if(yield Cache.TryGetPart(name, out p))
 					{
 						return p.MainObject;
 					}
