@@ -203,7 +203,8 @@ namespace Ldraw.Ui.Widgets
 				// set the colour from the drag data. This should override any colour copied from another part.
 				newColour = LdrawColour.GetColour(int.parse(sections[1]));
 			}
-
+			
+			var dragFinished = finishDrag;
 			Locator.GetObjectForName.begin(partName, (obj, res) =>
 			{
 				var droppedObject = Locator.GetObjectForName.end(res);
@@ -266,7 +267,7 @@ namespace Ldraw.Ui.Widgets
 						break;
 				}
 				
-				if(finishDrag)
+				if(dragFinished)
 				{
 					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 					model.ClearSelection();
