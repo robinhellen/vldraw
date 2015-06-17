@@ -457,19 +457,18 @@ namespace Ldraw.Ui
             {
                 m_Model = value;
                 m_ModelList.Model = value.MainObject;
+				EditingObject.Load(value.MainObject);
                 var mpd = value as MultipartModel;
                 if(mpd != null)
                 {
                     m_SubModels.model = mpd.SubModels;
                     m_SubModels.active = 0;
                     m_SubModels.visible = true;
-                    EditingObject.Load(mpd.MainObject);
                     DocumentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
                     m_SubModels.visible = false;
-                    EditingObject.Load(value.MainObject);
                     DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
 
