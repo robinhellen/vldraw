@@ -39,14 +39,13 @@ namespace Ldraw.Ui
 		public LdrawViewPane PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
-		//public PartsTree Parts {construct; get;}
         public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
         public SubModelsTree SubModels {construct; private get;}
         
         public Collection<IPartDragSource> PartSourcesConstruct {construct {PartSources = new ArrayList<IPartDragSource>(); PartSources.add_all(value);}}
-        public Gee.List<IPartDragSource> PartSources {set; private get;}
+        private Gee.List<IPartDragSource> PartSources {set; get;}
         
         construct
         {
@@ -78,15 +77,7 @@ namespace Ldraw.Ui
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
             
-            DocumentLocator.Objects = Gee.List.empty<LdrawObject>();			
-
-			/*var list = new LinkedList<IPartDragSource>();
-			var list = PartSources;
-			list.add(Parts);
-			list.add(SubModels);
-			list.add(SetList);*/
-			//PartSources = list;
-			
+            DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
 
             /*parameters = new ParameterValues(EditingObject);
             bind_property("EditingObject", parameters, "Model");
@@ -128,10 +119,7 @@ namespace Ldraw.Ui
 			{
 				notebook.append_page(source.GetWidget(), new Label(source.GetTabName()));
 			}
-			/*currentPage = notebook.get_current_page();
-			var source = PartSources[(int)currentPage];
-			currentSignalHandler = source.CurrentChanged.connect(newObject => PartsPreview.Model = newObject);
-			*/
+			
 			notebook.switch_page.connect((_, i) => 
 			{
 				if(currentSignalHandler != 0)
@@ -190,13 +178,10 @@ namespace Ldraw.Ui
                             });
         }
 
-        // cursor keys - move model in x,z plane
-        // Home/End - move model on y axis
         private AccelGroup SetUpAccelerators()
         {
             AccelGroup group = new AccelGroup();
-            //group.connect(Gdk.keyval_from_name("Up"), 0, 0, (group, object, keyval, modifier) => {stdout.printf("Up\n"); return false; });
-
+            
             add_accel_group(group);
             return group;
         }
