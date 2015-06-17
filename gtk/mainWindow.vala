@@ -42,7 +42,6 @@ namespace Ldraw.Ui
         public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
-        public SubModelsTree SubModels {construct; private get;}
         
         public Collection<IPartDragSource> PartSourcesConstruct {construct {PartSources = new ArrayList<IPartDragSource>(); PartSources.add_all(value);}}
         private Gee.List<IPartDragSource> PartSources {set; get;}
@@ -465,14 +464,12 @@ namespace Ldraw.Ui
                     m_SubModels.active = 0;
                     m_SubModels.visible = true;
                     EditingObject.Load(mpd.MainObject);
-                    SubModels.Models = mpd.SubModels;
                     DocumentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
                     m_SubModels.visible = false;
                     EditingObject.Load(value.MainObject);
-                    SubModels.Models = new ObservableList<LdrawObject>();
                     DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
 

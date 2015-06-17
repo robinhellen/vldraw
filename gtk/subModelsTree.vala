@@ -9,9 +9,12 @@ namespace Ldraw.Ui.Widgets
 	{
 		private TreeView m_Tree;
 		private ScrolledWindow m_Scrolled;
+		
+		public AnimatedModel Model {construct; private get;}
 
 		construct
 		{
+			Model.notify["Model"].connect(ModelChanged);
 			var models = new ObservableList<LdrawObject>();
 			m_Tree = new TreeView.with_model(models);
 			m_Tree.insert_column_with_data_func(-1, "", new CellRendererText(), (col, cell, model, iter) =>
@@ -43,14 +46,6 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 
-		public ObservableList<LdrawObject> Models
-		{
-			set
-			{
-				m_Tree.model = value;
-			}
-		}
-
 		private async void Tree_OnCursorChanged(TreeView tree)
 		{
 			var current = yield GetCurrentObject();
@@ -64,6 +59,15 @@ namespace Ldraw.Ui.Widgets
 		{
 			string currentName = "Document::" + (yield GetCurrentObject()).FileName;
 			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
+		}
+		
+		private void ModelChanged()		
+		{
+			var mpdFile = Model.Model.File as MultipartModel;
+			if(mpdFile == null)
+				m_Tree.model = new ObservableList<LdrawObject>();
+			else
+				m_Tree.model = mpdFile.SubModels;
 		}
 
 		public async LdrawObject? GetCurrentObject()
