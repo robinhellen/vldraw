@@ -43,7 +43,7 @@ namespace Ldraw.Ui
         public ILdrawFolders LdrawFolders {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
         public MainMenu MainMenu {construct; private get;}
-                
+        public ToolBarProvider ToolBars {construct; private get;}        
         construct
         {
             SetUpControls();
@@ -61,16 +61,14 @@ namespace Ldraw.Ui
         private void SetUpControls()
             throws OpenGl.GlError
         {
-            var toolbarProvider = new ToolBarProvider(EditingObject, Settings, UndoStack);
-
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();
             MenuBar menus = MainMenu.CreateMenus(accelerators, this);
             VBox bigVBox = new VBox(false, 0);
             bigVBox.pack_start(menus, false, false);
 
-            Toolbar tools = toolbarProvider.GetMovementToolbar();
-            Toolbar colourTools = toolbarProvider.GetColoursToolbar(this);
+            Toolbar tools = ToolBars.GetMovementToolbar();
+            Toolbar colourTools = ToolBars.GetColoursToolbar(this);
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
 

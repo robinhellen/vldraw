@@ -48,7 +48,7 @@ namespace Ldraw
 			
             builder.Register<RunningOptions>().As<IOptions>();
 
-            builder.Register<UndoStack>();
+            builder.Register<UndoStack>().SingleInstance();
             var animatedModel = new AnimatedModel(null);
             builder.Register<AnimatedModel>(_ => animatedModel);
             builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();

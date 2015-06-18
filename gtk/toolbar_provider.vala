@@ -12,16 +12,9 @@ namespace Ldraw.Ui
 {
 	private class ToolBarProvider : GLib.Object
 	{
-		private unowned AnimatedModel m_ModelContainer;
-		private IOptions m_Options;
-		private UndoStack undoStack;
-
-		public ToolBarProvider(AnimatedModel modelContainer, IOptions options, UndoStack undoStack)
-		{
-			m_ModelContainer = modelContainer;
-			m_Options = options;
-			this.undoStack = undoStack;
-		}
+		public AnimatedModel m_ModelContainer {construct; private get;}
+		public IOptions m_Options {construct; private get;}
+		public UndoStack undoStack {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
 
