@@ -156,6 +156,22 @@ namespace Ldraw.Ui
                     m_ModelList.Model = object;
                     UndoStack.Clear();
                 });
+                
+			EditingObject.notify["Model"].connect(() => 
+				{
+					var mpd = EditingObject.Model.File as MultipartModel;
+					ObservableList<LdrawObject> subModels;
+					if(mpd == null)
+					{
+						subModels = new ObservableList<LdrawObject>();
+					}
+					else
+					{
+						subModels = mpd.SubModels;
+					}
+					cb.model = subModels;
+					cb.visible = (subModels.size > 0);
+				});
             return cb;
         }
 
@@ -461,14 +477,10 @@ namespace Ldraw.Ui
                 var mpd = value as MultipartModel;
                 if(mpd != null)
                 {
-                    m_SubModels.model = mpd.SubModels;
-                    m_SubModels.active = 0;
-                    m_SubModels.visible = true;
                     DocumentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
-                    m_SubModels.visible = false;
                     DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
                 }
 
