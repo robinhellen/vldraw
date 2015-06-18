@@ -34,20 +34,16 @@ namespace Ldraw.Ui
 		public LdrawViewPane PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
-        public RecentChooserMenu RecentMenu {construct; private get;}
         
         public Collection<IPartDragSource> PartSourcesConstruct {construct {PartSources = new ArrayList<IPartDragSource>(); PartSources.add_all(value);}}
         private Gee.List<IPartDragSource> PartSources {set; get;}
         
         // utility objects
         public IOptions Settings {construct; private get;}
-        public LdrawFileLoader Loader {construct; private get;}
         public ILdrawFolders LdrawFolders {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
-        public IDialogManager Dialogs {construct; private get;}
         public MainMenu MainMenu {construct; private get;}
-        
-        
+                
         construct
         {
             SetUpControls();
