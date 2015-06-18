@@ -48,7 +48,7 @@ undo_internal_packages=lego_objects maths
 
 drag_and_drop_sources=$(wildcard gtk/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) $(gtk) diva
-drag_and_drop_internal_packages=lego lego_objects maths expressions utils
+drag_and_drop_internal_packages=lego lego_objects maths expressions utils ui_widgets
 
 gl_render_sources=$(wildcard openGl/*.vala)
 gl_render_packages=gl gdkglext-1.0 $(gee) $(gtk) diva
@@ -56,11 +56,11 @@ gl_render_internal_packages=lego lego_objects maths expressions utils
 
 ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
-ui_widgets_internal_packages= application gl_render lego lego_objects maths expressions utils options undo part_group peeron drag_and_drop povray
+ui_widgets_internal_packages= application gl_render lego lego_objects maths expressions utils options undo part_group peeron povray
 
 ui_dialogs_sources=$(wildcard gtk/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
-ui_dialogs_internal_packages= ui_widgets gl_render lego lego_objects maths expressions utils options undo part_group peeron drag_and_drop povray
+ui_dialogs_internal_packages= ui_widgets gl_render lego lego_objects maths expressions utils options undo part_group peeron povray
 
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala

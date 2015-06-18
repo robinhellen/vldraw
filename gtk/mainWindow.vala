@@ -39,7 +39,7 @@ namespace Ldraw.Ui
 		public LdrawViewPane PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
-        public DocumentObjectLocator DocumentLocator {construct; get;}
+        //public DocumentObjectLocator DocumentLocator {construct; get;}
         public RecentChooserMenu RecentMenu {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
         
@@ -76,7 +76,7 @@ namespace Ldraw.Ui
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
             
-            DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
+            //DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
 
             /*parameters = new ParameterValues(EditingObject);
             bind_property("EditingObject", parameters, "Model");
@@ -475,14 +475,14 @@ namespace Ldraw.Ui
                 m_ModelList.Model = value.MainObject;
 				EditingObject.Load(value.MainObject);
                 var mpd = value as MultipartModel;
-                if(mpd != null)
+                /*if(mpd != null)
                 {
                     DocumentLocator.Objects = mpd.SubModels;
                 }
                 else
                 {
                     DocumentLocator.Objects = Gee.List.empty<LdrawObject>();
-                }
+                }*/
 
                 var titleFileName = value.FileName ?? "untitled";
 
