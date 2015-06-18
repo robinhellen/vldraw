@@ -27,9 +27,7 @@ namespace Ldraw.Ui
             
 			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));
             
-            var fileRecent = new Gtk.MenuItem.with_mnemonic("_Recent");
-            fileMenu.append(fileRecent);
-            fileRecent.set_submenu(RecentMenu);
+            AddSubMenu(fileMenu, "_Recent", RecentMenu);
             RecentMenu.filter = new RecentFilter();
             RecentMenu.filter.add_pattern("*.dat");
             RecentMenu.filter.add_pattern("*.ldr");
@@ -70,11 +68,7 @@ namespace Ldraw.Ui
 					dlg.Run();
 				});
 			
-            var modelExport = new Gtk.MenuItem.with_mnemonic("_Export");
-            modelMenu.append(modelExport);
-
-            var modelExportMenu = new Gtk.Menu();
-            modelExport.submenu = modelExportMenu;
+			var modelExportMenu = AddSubMenu(modelMenu, "_Export");
 			
 			AddMenuItem(modelExportMenu, "Image file (_Jpeg)", () => ExportJpg());
 			AddMenuItem(modelExportMenu, "Povray", () => ExportPov());
@@ -106,6 +100,16 @@ namespace Ldraw.Ui
 				menu.set_accel_path(accelPath);
 				
 			return menu;
+		}
+		
+		private Gtk.Menu AddSubMenu(Gtk.Menu parent, string title, Gtk.Menu? child = null)
+		{
+			var menuItem = new Gtk.MenuItem.with_mnemonic(title);
+            parent.append(menuItem);
+
+            child = child ?? new Gtk.Menu();
+            menuItem.submenu = child;
+            return child;			
 		}
 		
 		private delegate void Action();
@@ -286,4 +290,3 @@ namespace Ldraw.Ui
         }
 	}
 }
-
