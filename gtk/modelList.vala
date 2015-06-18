@@ -6,25 +6,24 @@ namespace Ldraw.Ui.Widgets
 {
 	private class ModelList : GLib.Object
 	{
-		private LdrawObject m_Model;
 		private TreeView m_ListView;
 		private ScrolledWindow m_Widget;
+		
+		public AnimatedModel Model {construct; private get;}
 
-		public ModelList(LdrawObject model)
+		construct
 		{
-			m_Model = model;
 			// initialise list
 			CreateList();
 
 			m_Widget = new ScrolledWindow(null, null);
 			m_Widget.add(m_ListView);
+			Model.notify["Model"].connect(() => m_ListView.model = Model.Model.Nodes as ObservableList);
 		}
 
 		private void CreateList()
 		{
-			TreeModel model = m_Model.Nodes as ObservableList;
-
-			m_ListView = new TreeView.with_model(model);
+			m_ListView = new TreeView();
 			// TODO: set up columns
 			CellRendererText renderer = new CellRendererText();
 			/*renderer.size_points = 6.0;
@@ -69,15 +68,6 @@ namespace Ldraw.Ui.Widgets
 
 			TreeSelection selection = m_ListView.get_selection();
 			selection.set_mode(SelectionMode.MULTIPLE);
-		}
-
-		public LdrawObject Model
-		{
-			set
-			{
-				m_Model = value;
-				m_ListView.model = m_Model.Nodes as ObservableList;
-			}
 		}
 
 		public Widget Widget

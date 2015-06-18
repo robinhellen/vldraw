@@ -27,7 +27,7 @@ namespace Ldraw.Ui
         private ComboBox m_SubModels;
 
         // controls
-        ModelList m_ModelList;
+        public ModelList ModelList {construct; private get;}
         ParameterValues parameters;
 
         // trees
@@ -90,8 +90,7 @@ namespace Ldraw.Ui
             m_SubModels = CreateSubModelsDropDown();
             viewDetails.pack_start(m_SubModels, false, false);
 
-            m_ModelList = new ModelList(EditingObject.Model);
-            viewDetails.pack_start(m_ModelList.Widget);
+            viewDetails.pack_start(ModelList.Widget);
 
             modelPanes.add1(WithFrame(viewDetails));
             modelPanes.add2(WithFrame(View));
@@ -151,7 +150,6 @@ namespace Ldraw.Ui
                     LdrawObject object;
                     tModel.get(tIter, 0, out object, -1);
                     EditingObject.Load(object);
-                    m_ModelList.Model = object;
                     UndoStack.Clear();
                 });
                 
@@ -470,7 +468,6 @@ namespace Ldraw.Ui
             set
             {
                 m_Model = value;
-                m_ModelList.Model = value.MainObject;
 				EditingObject.Load(value.MainObject);
 
                 var titleFileName = value.FileName ?? "untitled";
