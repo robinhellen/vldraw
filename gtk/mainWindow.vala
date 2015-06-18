@@ -23,7 +23,6 @@ namespace Ldraw.Ui
 			SetCollectionInjection<IPartDragSource>(cls, "PartSourcesConstruct");
 		}
 		
-        private LdrawModelFile m_Model;
         private ComboBox m_SubModels;
         ParameterValues parameters;
         
@@ -53,8 +52,6 @@ namespace Ldraw.Ui
             PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
             Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
                         
-            bind_property("File", SetList, "ModelFile");
-            
             maximize();
 		}
 
@@ -191,30 +188,6 @@ namespace Ldraw.Ui
             
             add_accel_group(group);
             return group;
-        }
-
-        protected LdrawModelFile File
-        {
-            public get
-            {
-                return m_Model;
-            }
-            set
-            {
-                m_Model = value;
-				EditingObject.Load(value.MainObject);
-
-                var titleFileName = value.FileName ?? "untitled";
-
-                title = @"vldraw - $titleFileName";
-                UndoStack.Clear();
-            }
-        }
-
-        public LdrawObject Model
-        {
-            get{return EditingObject.Model;}
-            protected set{}
         }
     }
     
