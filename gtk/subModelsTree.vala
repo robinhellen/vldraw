@@ -55,9 +55,9 @@ namespace Ldraw.Ui.Widgets
 			CurrentChanged(current);
 		}
 
-		private async void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
+		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
-			string currentName = "Document::" + (yield GetCurrentObject()).FileName;
+			string currentName = "Document::" + (GetCurrentObjectSync()).FileName;
 			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
 		}
 		
@@ -71,6 +71,11 @@ namespace Ldraw.Ui.Widgets
 		}
 
 		public async LdrawObject? GetCurrentObject()
+		{
+			return GetCurrentObjectSync();
+		}
+		
+		public LdrawObject? GetCurrentObjectSync()
 		{
 			TreeIter active;
 			TreeSelection sel = m_Tree.get_selection();
