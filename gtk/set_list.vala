@@ -13,7 +13,6 @@ namespace Ldraw.Ui
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
-		private LdrawModelFile modelFile;
 		private TreeView partsView;
 		private PartUsageViewModel usageViewModel;
 		private VPaned widget;
@@ -21,28 +20,31 @@ namespace Ldraw.Ui
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
 		public ColourChart ColourChart {private get; construct;}
+		public AnimatedModel Model {construct; private get;}
 
 		construct
 		{
 			sets = new ObservableList<Inventory>();
 			widget = new VPaned();
 			InitializeControls();
-		}
-
-		public LdrawModelFile ModelFile
-		{
-			set
-			{
-				modelFile = value;
-				modelFile.MainObject.VisibleChange.connect(() => UpdateUsage(false));
-				UpdateUsage.begin(true);
-			}
+			Model.view_changed.connect(() => UpdateUsage.begin(false));
 		}
 
 		private async void UpdateUsage(bool reset)
 		{
 			var availableParts = Aggregate(yield ToPartGroups(sets, Library));
-			usage = new PartGroupUsage(availableParts, new PartGroup.FromModel(modelFile));
+			var modelFile = Model.Model.File as LdrawModelFile;
+			PartGroup modelGroup;
+			if(modelFile == null)
+			{
+				var c = Collection.empty<PartGroupItem>();
+				modelGroup = (PartGroup) GLib.Object.new(typeof(PartGroup), Items: c);
+			}
+			else
+			{
+				modelGroup = new PartGroup.FromModel(modelFile);
+			}
+			usage = new PartGroupUsage(availableParts, modelGroup);
 			if(reset)
 			{
 				usageViewModel = new PartUsageViewModel(usage);
