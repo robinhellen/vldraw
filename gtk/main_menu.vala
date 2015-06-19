@@ -16,19 +16,9 @@ namespace Ldraw.Ui
         public IDialogManager Dialogs {construct; private get;}
         
         public RecentChooserMenu RecentMenu {construct; private get;}
-		
-        public MenuBar CreateMenus(AccelGroup accelerators, Window parent)
+        
+        construct
         {
-            var menus = new MenuBar();
-			
-			var fileMenu = CreateMenu(menus, "_File", accelerators, "<Ldraw>/File");
-			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty().MainObject));
-			AddCtrlShortcut(fileNew, "N");
-			AddSeparator(fileMenu);
-            
-			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));
-            
-            AddSubMenu(fileMenu, "_Recent", RecentMenu);
             RecentMenu.filter = new RecentFilter();
             RecentMenu.filter.add_pattern("*.dat");
             RecentMenu.filter.add_pattern("*.ldr");
@@ -39,29 +29,35 @@ namespace Ldraw.Ui
 				var file = GLib.File.new_for_uri(item.get_uri());
 				LoadFile(file.get_path());
 			});
-			AddSeparator(fileMenu);
+		}
+		
+        public MenuBar CreateMenus(AccelGroup accelerators, Window parent)
+        {
+            var menus = new MenuBar();
 			
+			var fileMenu = CreateMenu(menus, "_File", accelerators, "<Ldraw>/File");
+			
+			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty().MainObject));
+			AddSeparator(fileMenu);            
+			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));            
+            AddSubMenu(fileMenu, "_Recent", RecentMenu);
+			AddSeparator(fileMenu);			
 			var fileSave = AddMenuItem(fileMenu, "_Save", () => FileSave_OnActivate(parent));
-			AddCtrlShortcut(fileSave, "S");
-
             AddMenuItem(fileMenu, "Save _As", () => FileSaveAs_OnActivate(parent));
 			AddSeparator(fileMenu);
             var fileQuit = AddMenuItem(fileMenu, "_Quit", () => main_quit());
-            AddCtrlShortcut(fileQuit, "Q");
 			
 			var editMenu = CreateMenu(menus, "_Edit", accelerators, "<Ldraw>/Edit");
 
             var editUndo = AddMenuItem(editMenu, "_Undo", () => UndoStack.UndoSingle());
             UndoStack.notify["HasUndoItems"].connect(() => editUndo.sensitive = UndoStack.HasUndoItems);
             editUndo.sensitive = UndoStack.HasUndoItems;
-            AddCtrlShortcut(editUndo, "Z");
-
             var editRedo = AddMenuItem(editMenu, "_Redo", () => UndoStack.RedoSingle());
             UndoStack.notify["HasRedoItems"].connect(() => editRedo.sensitive = UndoStack.HasRedoItems);
             editRedo.sensitive = UndoStack.HasRedoItems;
-            AddCtrlShortcut(editRedo, "Y");
             
 			var modelMenu = CreateMenu(menus, "_Model", accelerators);
+			
 			AddMenuItem(modelMenu, "_Properties", () => {});
 			AddMenuItem(modelMenu, "Parts _List", () => ShowPartsList(parent));
 			AddMenuItem(modelMenu, "_Add sub-model", () => ModelAddSubModel_OnActivate(parent));
@@ -87,6 +83,12 @@ namespace Ldraw.Ui
                     var dlg = new AnimationDialog(Model, parent);
                     dlg.Run();
                 });
+                
+			AddCtrlShortcut(fileNew, "N");
+			AddCtrlShortcut(fileSave, "S");
+            AddCtrlShortcut(fileQuit, "Q");
+            AddCtrlShortcut(editRedo, "Y");
+            AddCtrlShortcut(editUndo, "Z");
 
             return menus;
         }
