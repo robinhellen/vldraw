@@ -24,6 +24,7 @@ namespace Ldraw.Ui
 			var fileMenu = CreateMenu(menus, "_File", accelerators, "<Ldraw>/File");
 			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty().MainObject));
 			AddCtrlShortcut(fileNew, "N");
+			AddSeparator(fileMenu);
             
 			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));
             
@@ -38,11 +39,13 @@ namespace Ldraw.Ui
 				var file = GLib.File.new_for_uri(item.get_uri());
 				LoadFile(file.get_path());
 			});
+			AddSeparator(fileMenu);
 			
 			var fileSave = AddMenuItem(fileMenu, "_Save", () => FileSave_OnActivate(parent));
 			AddCtrlShortcut(fileSave, "S");
 
             AddMenuItem(fileMenu, "Save _As", () => FileSaveAs_OnActivate(parent));
+			AddSeparator(fileMenu);
             var fileQuit = AddMenuItem(fileMenu, "_Quit", () => main_quit());
             AddCtrlShortcut(fileQuit, "Q");
 			
@@ -120,6 +123,11 @@ namespace Ldraw.Ui
 			menu.append(item);
 			item.activate.connect(() => onActivate());
 			return item;
+		}
+		
+		private void AddSeparator(Gtk.Menu menu)
+		{
+			menu.append(new SeparatorMenuItem());
 		}
 		
 		private void AddCtrlShortcut(Gtk.MenuItem menu, string key)
