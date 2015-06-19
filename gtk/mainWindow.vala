@@ -190,18 +190,4 @@ namespace Ldraw.Ui
             return group;
         }
     }
-    
-    public interface IDialogManager : GLib.Object
-    {		
-		public abstract bool GetSaveLocation(out string location, Window parent);
-		public abstract bool GetLoadLocation(out string location, Window parent);
-	}
-	
-	public interface IPartDragSource : GLib.Object
-	{
-		public abstract string GetTabName();
-		public abstract Widget GetWidget();
-		public async abstract LdrawObject? GetCurrentObject();
-		public signal void CurrentChanged(LdrawObject newCurrent);
-	}
 }

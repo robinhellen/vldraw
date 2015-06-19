@@ -54,7 +54,7 @@ gl_render_sources=$(wildcard openGl/*.vala)
 gl_render_packages=gl gdkglext-1.0 $(gee) $(gtk) diva
 gl_render_internal_packages=lego lego_objects maths expressions utils
 
-ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala)
+ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala) $(wildcard gtk/interfaces/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
 ui_widgets_internal_packages= application gl_render lego lego_objects maths expressions utils options undo part_group peeron povray
 
