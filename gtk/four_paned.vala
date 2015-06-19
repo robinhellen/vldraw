@@ -2,7 +2,6 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Options;
-using Ldraw.Ui.Commands;
 using Ldraw.Ui.DragAndDrop;
 
 namespace Ldraw.Ui.Widgets

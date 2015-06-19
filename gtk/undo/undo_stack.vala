@@ -54,12 +54,5 @@ namespace Ldraw.Ui.Commands
 			HasRedoItems = false;
 		}
 	}
-
-	public abstract class Command : Object
-	{
-		public abstract void Undo();
-
-		public abstract void Execute();
-	}
 }
 
