@@ -70,6 +70,14 @@ namespace Ldraw.Ui
 				view.Model = model.Model;
 			}
 			
+			private void DrawAxes(DrawingContext ctx)
+			{
+				var axisLength= 1F;
+				ctx.DrawLine(Vector(0F,0F,0F), Vector(axisLength, 0F, 0F));
+				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, axisLength, 0F));	
+				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, 0F, axisLength));
+			}
+			
 			public bool Run(out Vector? shift)
 			{
 				dialog.show_all();
@@ -85,5 +93,10 @@ namespace Ldraw.Ui
 				}
 			}
 		}
+	}
+	
+	public interface DrawingContext : GLib.Object
+	{
+		public abstract void DrawLine(Vector a, Vector b);
 	}
 }

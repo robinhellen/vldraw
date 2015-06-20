@@ -9,12 +9,6 @@ using GL;
 
 namespace Ldraw.Ui.Widgets
 {
-	public interface ModelView : Widget
-	{
-		public abstract LdrawObject Model { set; protected get;}
-		public abstract ViewAngle Angle {set; get;}
-	}
-	
 	private class LdrawViewPane : Layout, ModelView
 	{
 		private LdrawObject m_Model;
