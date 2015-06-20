@@ -23,6 +23,7 @@ namespace Ldraw.Ui.Widgets
 		private Adjustment m_Vadj = null;
 		
 		protected PartNode dropItem = null;
+		protected Overlay overlay = null;
 		
 		public GlRenderer renderer;
 
@@ -72,6 +73,8 @@ namespace Ldraw.Ui.Widgets
 				queue_draw();
 			}
 		}
+		
+		public Overlay Overlay {set{overlay = value;}}
 
 		public Colour DefaultColour {get; set; default = LdrawColour.GetColour(0);}
 

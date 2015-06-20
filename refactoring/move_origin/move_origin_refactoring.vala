@@ -68,14 +68,7 @@ namespace Ldraw.Ui
 				
 				content.pack_start(box, true, true, 5);
 				view.Model = model.Model;
-			}
-			
-			private void DrawAxes(DrawingContext ctx)
-			{
-				var axisLength= 1F;
-				ctx.DrawLine(Vector(0F,0F,0F), Vector(axisLength, 0F, 0F));
-				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, axisLength, 0F));	
-				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, 0F, axisLength));
+				view.Overlay = new MoveOriginOverlay();
 			}
 			
 			public bool Run(out Vector? shift)
@@ -93,10 +86,16 @@ namespace Ldraw.Ui
 				}
 			}
 		}
-	}
-	
-	public interface DrawingContext : GLib.Object
-	{
-		public abstract void DrawLine(Vector a, Vector b);
+		
+		private class MoveOriginOverlay : GLib.Object, Overlay
+		{			
+			private void Draw(DrawingContext ctx)
+			{
+				var axisLength= 1000F;
+				ctx.DrawLine(Vector(0F,0F,0F), Vector(axisLength, 0F, 0F));
+				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, axisLength, 0F));	
+				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, 0F, axisLength));
+			}
+		}
 	}
 }
