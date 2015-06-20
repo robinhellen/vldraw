@@ -5,10 +5,11 @@ using GL;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
+using Ldraw.Ui;
 
 namespace Ldraw.OpenGl
 {
-	public class GlRenderer : Object
+	public class GlRenderer : Object, Renderer
 	{
 		public IRenderModel ModelRenderer {construct; private get;}
 		private static GLContext sharingContext;		

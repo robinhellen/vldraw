@@ -43,23 +43,23 @@ part_group_packages=$(gee) $(gtk) diva
 part_group_internal_packages=lego lego_objects maths expressions utils
 
 drag_and_drop_sources=$(wildcard gtk/drag_and_drop/*.vala)
-drag_and_drop_packages=$(gee) $(gtk) diva
+drag_and_drop_packages=$(gee) $(gtk) diva gdkglext-1.0 gl
 drag_and_drop_internal_packages=lego lego_objects maths expressions utils ui_widgets
 
 gl_render_sources=$(wildcard openGl/*.vala)
 gl_render_packages=gl gdkglext-1.0 $(gee) $(gtk) diva
-gl_render_internal_packages=lego lego_objects maths expressions utils
+gl_render_internal_packages=lego lego_objects maths expressions utils ui_widgets
 
 ui_widgets_sources=$(wildcard gtk/*.vala) $(wildcard export/*.vala) $(wildcard gtk/interfaces/*.vala) $(wildcard gtk/undo/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
-ui_widgets_internal_packages= application gl_render lego lego_objects maths expressions utils options part_group peeron povray
+ui_widgets_internal_packages= application lego lego_objects maths expressions utils options part_group peeron povray
 
 ui_dialogs_sources=$(wildcard gtk/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
 ui_dialogs_internal_packages= ui_widgets gl_render lego lego_objects maths expressions utils options part_group peeron povray
 
 move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
-move_origin_packages=$(gtk) $(gee) diva
+move_origin_packages=$(gtk) $(gee) diva gdkglext-1.0 gl
 move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
 
 # Libraries that heve been rewritten with dependencies inverted

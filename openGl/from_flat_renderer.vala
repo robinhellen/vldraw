@@ -10,8 +10,8 @@ namespace Ldraw.OpenGl
 {
 	public class FromFlatRenderer : Object, IRenderModel
 	{
-		public IRenderModel InnerRenderer {private get; construct;}
-		public IRenderModel SelectedRenderer {private get; construct;}
+		private IRenderModel InnerRenderer {get; set;}
+		private IRenderModel SelectedRenderer {get; set;}
 		
 		construct
 		{

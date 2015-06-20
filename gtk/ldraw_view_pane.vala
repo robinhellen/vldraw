@@ -3,7 +3,6 @@ using Gdk;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
-using Ldraw.OpenGl;
 using Ldraw.Maths;
 using GL;
 
@@ -25,7 +24,7 @@ namespace Ldraw.Ui.Widgets
 		protected PartNode dropItem = null;
 		protected Overlay overlay = null;
 		
-		public GlRenderer renderer;
+		public Renderer renderer {construct; protected get;}
 
 		public LdrawViewPane(ViewAngle angle)
 			throws GlError
@@ -42,7 +41,6 @@ namespace Ldraw.Ui.Widgets
 			// minimum size 100 px square
 			set_size_request(100, 100);
 			
-			renderer = new GlRenderer();
 			if(m_Model == null)
 				m_Model =  new LdrawObject("", null);				
 		}

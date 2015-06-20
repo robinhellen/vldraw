@@ -56,7 +56,7 @@ namespace Ldraw.Ui
 		}
 
         private void SetUpControls()
-            throws OpenGl.GlError
+            throws GlError
         {
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();
