@@ -58,12 +58,16 @@ ui_dialogs_sources=$(wildcard gtk/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl gdkglext-1.0 gtkglext-1.0 diva
 ui_dialogs_internal_packages= ui_widgets gl_render lego lego_objects maths expressions utils options part_group peeron povray
 
+move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
+move_origin_packages=$(gtk) $(gee) diva
+move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
+
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
 	application
-UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs
+UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 

@@ -6,6 +6,7 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Options;
 using Ldraw.Peeron;
+using Ldraw.Refactor;
 using Ldraw.Ui;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Dialogs;
@@ -44,6 +45,7 @@ namespace Ldraw
 			
 			new DragAndDropModule().Load(builder);
 			new WidgetsModule().Load(builder);
+			new MoveOriginModule().Load(builder);
 			//builder.RegisterModule<DragAndDropModule>();
 			
             builder.Register<RunningOptions>().As<IOptions>();
