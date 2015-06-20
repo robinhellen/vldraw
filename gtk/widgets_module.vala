@@ -30,6 +30,8 @@ namespace Ldraw.Ui
 					
             builder.Register<LdrawEditorUi>().As<UserInterface>();
             builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
+            
+            builder.Register<MoveOriginRefactoring>().As<Refactoring>();
 		}
 	}
 }
