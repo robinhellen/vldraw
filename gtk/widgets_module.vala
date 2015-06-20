@@ -14,7 +14,7 @@ namespace Ldraw.Ui
             builder.Register<SetList>().As<IPartDragSource>().SingleInstance();            
             builder.Register<EditPanes>();
             builder.Register<LdrawEditPane>();
-            builder.Register<LdrawViewPane>();
+            builder.Register<LdrawViewPane>().As<ModelView>();
             builder.Register<SubModelsTree>().As<IPartDragSource>();
             builder.Register<ModelList>();
             builder.Register<MainMenu>();

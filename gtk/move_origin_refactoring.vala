@@ -7,7 +7,7 @@ namespace Ldraw.Ui
 {
 	private class MoveOriginRefactoring : GLib.Object, Refactoring
 	{
-		public LdrawViewPane View {construct; private get;}
+		public ModelView View {construct; private get;}
 		
 		public string GetLabel() {return "Move Origin";}
 		
@@ -37,7 +37,7 @@ namespace Ldraw.Ui
 			double y;
 			double z;
 			
-			public MoveOriginDialog(Window parent, AnimatedModel model, LdrawViewPane view)
+			public MoveOriginDialog(Window parent, AnimatedModel model, ModelView view)
 			{
 				dialog = new Dialog.with_buttons("Model details", parent,
 					DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,

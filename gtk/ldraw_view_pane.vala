@@ -9,7 +9,13 @@ using GL;
 
 namespace Ldraw.Ui.Widgets
 {
-	private class LdrawViewPane : Layout
+	public interface ModelView : Widget
+	{
+		public abstract LdrawObject Model { set; protected get;}
+		public abstract ViewAngle Angle {set; get;}
+	}
+	
+	private class LdrawViewPane : Layout, ModelView
 	{
 		private LdrawObject m_Model;
 		private ViewAngle m_Angle;
@@ -226,7 +232,7 @@ namespace Ldraw.Ui.Widgets
 		}
 	}
 
-	private enum ViewAngle
+	public enum ViewAngle
 	{
 		Front,
 		Back,
