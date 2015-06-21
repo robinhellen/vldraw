@@ -259,7 +259,7 @@ namespace Ldraw.Ui.Widgets
 				case Ortho:
 					return Vector(0.390731128f, -0.650895224f, -0.650895224f);
 				default:
-					return Vector.NullVector;
+					assert_not_reached();
 			}
 		}
 
@@ -294,7 +294,7 @@ namespace Ldraw.Ui.Widgets
 					var invertY = Matrix(1F, 0F, 0F, 0F, -1F, 0F, 0F, 0F, 1F);
 					return invertY.TransformVector(yRot.TransformVector(zRot.TransformVector(modelCenter)));
 				default:
-					return Vector(0, 0, 0);
+					assert_not_reached();
 			}
 		}
 
