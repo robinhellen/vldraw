@@ -289,6 +289,10 @@ namespace Ldraw.Ui.Widgets
 				case Right:
 					return Vector(modelCenter.Z, -modelCenter.Y, 0);
 				case Ortho:
+					var yRot = Matrix.ForRotation(Vector(0F, 1F, 0F), -40F);
+					var zRot = Matrix.ForRotation(Vector(0F, 0F, 1F), 40F);
+					var invertY = Matrix(1F, 0F, 0F, 0F, -1F, 0F, 0F, 0F, 1F);
+					return invertY.TransformVector(yRot.TransformVector(zRot.TransformVector(modelCenter)));
 				default:
 					return Vector(0, 0, 0);
 			}
