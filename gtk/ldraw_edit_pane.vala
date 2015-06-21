@@ -64,7 +64,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, dropItem, model.Selection);
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, dropItem, model.Selection, overlay);
 		}
 
 		public override bool button_press_event(Gdk.EventButton event)

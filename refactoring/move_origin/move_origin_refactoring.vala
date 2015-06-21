@@ -33,9 +33,9 @@ namespace Ldraw.Ui
 			Dialog dialog;
 			Container view_container;
 			Widget view;
-			double x;
-			double y;
-			double z;
+			public float x {get; set;}
+			public float y {get; set;}
+			public float z {get; set;}
 			
 			public MoveOriginDialog(Window parent, AnimatedModel model, ModelView view)
 			{
@@ -56,9 +56,9 @@ namespace Ldraw.Ui
 				AttachToTable(table, ySpin, 1, 1);
 				AttachToTable(table, zSpin, 1, 2);
 				
-				xSpin.notify["value"].connect(() => x = xSpin.value);
-				ySpin.notify["value"].connect(() => y = ySpin.value);
-				zSpin.notify["value"].connect(() => z = zSpin.value);
+				xSpin.notify["value"].connect(() => x = (float)xSpin.value);
+				ySpin.notify["value"].connect(() => y = (float)ySpin.value);
+				zSpin.notify["value"].connect(() => z = (float)zSpin.value);
 				xSpin.value = ySpin.value = zSpin.value = 0.0;
 				
 				box.pack_start(table);
@@ -68,7 +68,8 @@ namespace Ldraw.Ui
 				
 				content.pack_start(box, true, true, 5);
 				view.Model = model.Model;
-				view.Overlay = new MoveOriginOverlay();
+				view.Angle = ViewAngle.Ortho;
+				view.Overlay = new MoveOriginOverlay(this);
 			}
 			
 			public bool Run(out Vector? shift)
@@ -79,22 +80,34 @@ namespace Ldraw.Ui
 				view_container.remove(view);
 				dialog.destroy();
 				if(response != ResponseType.ACCEPT)
-				;
 				{
 					shift = null;
 					return false;
 				}
+				shift = Vector(x, y, z);
+				return true;
 			}
 		}
 		
 		private class MoveOriginOverlay : GLib.Object, Overlay
-		{			
+		{
+			private MoveOriginDialog dialog;
+			
+			public MoveOriginOverlay(MoveOriginDialog dialog)
+			{
+				this.dialog = dialog;
+				dialog.notify["x"].connect(() => Changed());
+				dialog.notify["y"].connect(() => Changed());
+				dialog.notify["z"].connect(() => Changed());
+			}
+			
 			private void Draw(DrawingContext ctx)
 			{
 				var axisLength= 1000F;
-				ctx.DrawLine(Vector(0F,0F,0F), Vector(axisLength, 0F, 0F));
-				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, axisLength, 0F));	
-				ctx.DrawLine(Vector(0F,0F,0F), Vector(0F, 0F, axisLength));
+				Vector newOrigin = Vector(dialog.x, dialog.y, dialog.z);
+				ctx.DrawLine(newOrigin, newOrigin.Add(Vector(axisLength, 0F, 0F)));
+				ctx.DrawLine(newOrigin, newOrigin.Add(Vector(0F, -axisLength, 0F)));	
+				ctx.DrawLine(newOrigin, newOrigin.Add(Vector(0F, 0F, axisLength)));
 			}
 		}
 	}

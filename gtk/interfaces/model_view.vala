@@ -20,5 +20,6 @@ namespace Ldraw.Ui.Widgets
 	public interface Overlay : GLib.Object
 	{
 		public abstract void Draw(DrawingContext context);	
+		public signal void Changed();
 	}
 }

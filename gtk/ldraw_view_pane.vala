@@ -72,7 +72,7 @@ namespace Ldraw.Ui.Widgets
 			}
 		}
 		
-		public Overlay Overlay {set{overlay = value;}}
+		public Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
 
 		public Colour DefaultColour {get; set; default = LdrawColour.GetColour(0);}
 
@@ -99,7 +99,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, dropItem, Gee.Set.empty<LdrawNode>());
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, dropItem, Gee.Set.empty<LdrawNode>(), overlay);
 		}
 
 		public override bool configure_event(Gdk.EventConfigure event)

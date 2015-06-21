@@ -6,6 +6,7 @@ using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 using Ldraw.Ui;
+using Ldraw.Ui.Widgets;
 
 namespace Ldraw.OpenGl
 {
@@ -24,7 +25,8 @@ namespace Ldraw.OpenGl
 				GLDrawable drawable, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
 				LdrawObject model, PartNode? extraBounds,
-				Gee.Set<LdrawNode> selection)
+				Gee.Set<LdrawNode> selection,
+				Overlay? overlay = null)
 			throws GlError
 		{
 			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
@@ -65,7 +67,10 @@ namespace Ldraw.OpenGl
 
 			ModelRenderer.RenderModel(model, defaultColour, finalEyeline, selection);
 			if(extraBounds != null)
-				ModelRenderer.RenderBoundsFor(extraBounds);			
+				ModelRenderer.RenderBoundsFor(extraBounds);
+			
+			if(overlay != null)
+				overlay.Draw(new GlDrawingContext());
 
 			drawable.gl_end();
 			drawable.swap_buffers();
@@ -86,6 +91,20 @@ namespace Ldraw.OpenGl
 			glMultMatrixf(viewTransform);
 
 			return center.Subtract(eye);
+		}
+	}
+	
+	private class GlDrawingContext : Object, DrawingContext
+	{
+		public void DrawLine(Vector a, Vector b)
+		{
+			glColor4f(1F, 0F, 0F, 1F);
+			glBegin(GL_LINES);
+
+			glVertex3fv(a.value_vector());
+			glVertex3fv(b.value_vector());
+
+			glEnd();
 		}
 	}
 	
