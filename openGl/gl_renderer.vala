@@ -27,7 +27,6 @@ namespace Ldraw.OpenGl
 				LdrawObject model,
 				Gee.Set<LdrawNode> selection,
 				Overlay? overlay = null)
-			throws GlError
 		{
 			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
 			if(sharingContext == null)

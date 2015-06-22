@@ -15,7 +15,6 @@ namespace Ldraw.Ui
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
 				LdrawObject model,
 				Gee.Set<LdrawNode> selection,
-				Overlay? overlay = null)
-			throws GlError;
+				Overlay? overlay = null);
 	}
 }

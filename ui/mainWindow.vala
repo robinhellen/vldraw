@@ -29,7 +29,7 @@ namespace Ldraw.Ui
         // Controls
         public ModelList ModelList {construct; private get;}
 		public EditPanes View {construct; private get;}
-		public LdrawViewPane PartsPreview {construct; private get;}
+		public ModelView PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
 		public SetList SetList {construct; get;}
         
@@ -55,7 +55,6 @@ namespace Ldraw.Ui
 		}
 
         private void SetUpControls()
-            throws GlError
         {
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();

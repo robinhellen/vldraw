@@ -10,11 +10,11 @@ using Ldraw.OpenGl;
 using Ldraw.Options;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
-//using Diva;
+using Ldraw.Ui.Widgets;
 
-namespace Ldraw.Ui.Widgets
+namespace Ldraw.Ui.GtkGl
 {
-	private class LdrawEditPane : LdrawViewPane
+	private class LdrawEditPane : LdrawViewPane, ModelEditor
 	{
 		public IOptions Settings {construct; private get;}
 		public IDroppedObjectLocator Locator {construct; private get;}
@@ -23,7 +23,6 @@ namespace Ldraw.Ui.Widgets
 		public DropBoundsOverlay DropOverlay {construct; private get;}
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
-			throws GlError
 		{
 			GLib.Object(Angle: angle, Settings: settings, Locator: locator, UndoStack: undoStack);
 		}
@@ -45,7 +44,6 @@ namespace Ldraw.Ui.Widgets
 		}
 		
 		public override void Redraw()
-			throws GlError
 		{
 			if(model == null)
 			{
@@ -55,7 +53,7 @@ namespace Ldraw.Ui.Widgets
 			GLWindow drawableWin = widget_get_gl_window(this);
 			if(!(drawableWin is GLDrawable))
 			{
-				throw new GlError.InvalidWidget("GtkGlExt library is playing silly beggars");
+				assert_not_reached();
 			}
 			
 			var drawable = (GLDrawable)drawableWin;

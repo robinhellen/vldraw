@@ -46,10 +46,10 @@ namespace Ldraw.Ui.Widgets
 
 	private class EditPanes : FourPaned
 	{
-		public LdrawEditPane TopLeft {construct; private get;}
-		public LdrawEditPane BottomLeft {construct; private get;}
-		public LdrawEditPane TopRight {construct; private get;}
-		public LdrawEditPane BottomRight {construct; private get;}
+		public ModelEditor TopLeft {construct; private get;}
+		public ModelEditor BottomLeft {construct; private get;}
+		public ModelEditor TopRight {construct; private get;}
+		public ModelEditor BottomRight {construct; private get;}
 		
 		construct
 		{

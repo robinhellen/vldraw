@@ -46,6 +46,7 @@ namespace Ldraw
 			
 			new DragAndDropModule().Load(builder);
 			new WidgetsModule().Load(builder);
+			new GtkGlModule().Load(builder);
 			new MoveOriginModule().Load(builder);
 			//builder.RegisterModule<DragAndDropModule>();
 			
