@@ -43,8 +43,10 @@ namespace Ldraw.Ui
 					DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
 					Stock.OK, ResponseType.ACCEPT,
 					Stock.CANCEL, ResponseType.REJECT);
+				dialog.set_default_response(ResponseType.ACCEPT);
 				var content = (Box) dialog.get_content_area();
 				var box = new HBox(false, 5);
+				var vbox = new VBox(false, 0);
 				var table = new Table(3, 2, false);
 				AttachToTable(table, new Label("X"), 0, 0);
 				AttachToTable(table, new Label("Y"), 0, 1);
@@ -61,15 +63,17 @@ namespace Ldraw.Ui
 				zSpin.notify["value"].connect(() => z = (float)zSpin.value);
 				xSpin.value = ySpin.value = zSpin.value = 0.0;
 				
-				box.pack_start(table);
+				vbox.pack_start(table, false, false, 75);
+				box.pack_start(vbox, false);
 				view_container = (Container)WithFrame(view);
 				this.view = view;
-				box.pack_start(view_container);
+				box.pack_start(view_container, true, true, 10);
 				
 				content.pack_start(box, true, true, 5);
 				view.Model = model.Model;
 				view.Angle = ViewAngle.Ortho;
 				view.Overlay = new MoveOriginOverlay(this);
+				view.set_size_request(300, 300);
 			}
 			
 			public bool Run(out Vector? shift)
