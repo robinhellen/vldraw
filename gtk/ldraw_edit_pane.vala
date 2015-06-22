@@ -20,6 +20,7 @@ namespace Ldraw.Ui.Widgets
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		public AnimatedModel model {construct; private get;}
+		public DropBoundsOverlay DropOverlay {construct; private get;}
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 			throws GlError
@@ -40,6 +41,7 @@ namespace Ldraw.Ui.Widgets
 			model.bind_property("Model", this, "Model");
 			model.view_changed.connect(() => queue_draw());
 			Model = model.Model;
+			overlay = DropOverlay;
 		}
 		
 		public override void Redraw()
@@ -151,6 +153,7 @@ namespace Ldraw.Ui.Widgets
 		{
 			finishDrag = true;
 			dropItem = null;
+			DropOverlay.dropObject = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			finishDrag = false;
 			grab_focus();
@@ -160,6 +163,7 @@ namespace Ldraw.Ui.Widgets
 		public override bool drag_motion(DragContext context, int x, int y, uint time_)
 		{
 			dropItem = null;
+			DropOverlay.dropObject = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			return true;
 		}
@@ -167,6 +171,7 @@ namespace Ldraw.Ui.Widgets
 		public override void drag_leave(DragContext context, uint time)
 		{
 			dropItem = null;
+			DropOverlay.dropObject = null;
 			queue_draw();
 		}
 
@@ -277,6 +282,9 @@ namespace Ldraw.Ui.Widgets
 				}
 				else
 				{
+					DropOverlay.dropObject = droppedObject;
+					DropOverlay.dropLocation = newPosition;
+					DropOverlay.dropTransform = newTransform;
 					dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
 					drag_status(context, context.suggested_action, time);
 					queue_draw();
@@ -359,5 +367,41 @@ namespace Ldraw.Ui.Widgets
 		private uint m_HomeKeyVal = Gdk.keyval_from_name("Home");
 		private uint m_EndKeyVal = Gdk.keyval_from_name("End");
 		private uint delKeyVal = Gdk.keyval_from_name("Delete");
+	}
+	
+	private class DropBoundsOverlay : GLib.Object, Overlay
+	{
+		public LdrawObject? dropObject;
+		public Vector dropLocation;
+		public Matrix dropTransform;
+		
+		public void Draw(DrawingContext context)
+		{			
+			if(dropObject == null)
+				return;
+				
+			var bounds = dropObject.BoundingBox;
+			var a = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MinY, bounds.MinZ))); // (a)
+			var b = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MinY, bounds.MaxZ))); // (b)
+			var c = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MaxY, bounds.MaxZ))); // (c)
+			var d = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MaxY, bounds.MinZ))); // (d)
+			var e = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MaxY, bounds.MinZ))); // (e)
+			var f = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MaxY, bounds.MaxZ))); // (f)
+			var g = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MaxZ))); // (g)
+			var h = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MinZ))); // (h)
+			
+			context.DrawLine(a,b);
+			context.DrawLine(b,c);
+			context.DrawLine(c,d);
+			context.DrawLine(d,a);
+			context.DrawLine(a,h);
+			context.DrawLine(h,e);
+			context.DrawLine(e,f);
+			context.DrawLine(f,g);
+			context.DrawLine(g,h);
+			context.DrawLine(g,b);
+			context.DrawLine(c,f);
+			context.DrawLine(d,e);
+		}
 	}
 }
