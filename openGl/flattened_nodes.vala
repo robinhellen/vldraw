@@ -38,7 +38,7 @@ namespace Ldraw.OpenGl
 				state = new SavedState();
 			}
 			
-			public override FlattenedNodes GetResult()
+			public override FlattenedNodes GetResult(LdrawObject object)
 			{
 				return (FlattenedNodes)Object.new(typeof(FlattenedNodes),
 					Triangles: Triangles,

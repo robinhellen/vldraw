@@ -335,11 +335,11 @@ namespace Ldraw.Ui.GtkGl
 			drawable.gl_begin(context);
 
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
-			model.Model.BuildFromFile<void>(builder);
+			var selected = builder.Visit(model.Model);
 			
-			var selected = builder.ApplySelection(model.Model);
 			if(selected != null)
 				model.Select(selected);
+				
 			drawable.gl_end();
 			drawable.wait_gl();
 		}

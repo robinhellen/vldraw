@@ -63,7 +63,7 @@ ui_dialogs_packages=$(gtk) $(gee) gl gdkglext-1.0 diva
 ui_dialogs_internal_packages= ui_widgets gl_render lego lego_objects maths expressions utils options part_group peeron povray ui_gtk_gl
 
 move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
-move_origin_packages=$(gtk) $(gee) diva gdkglext-1.0 gl
+move_origin_packages=$(gtk) $(gee) diva
 move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
 
 # Libraries that heve been rewritten with dependencies inverted

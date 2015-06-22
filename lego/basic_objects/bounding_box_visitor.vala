@@ -78,7 +78,7 @@ namespace Ldraw.Lego
 			Center = Vector.NullVector;
 		}
 		
-		protected override Bounds GetResult()
+		protected override Bounds GetResult(LdrawObject object)
 		{
 			return BoundingBox;
 		}
