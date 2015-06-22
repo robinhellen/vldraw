@@ -1,6 +1,7 @@
 using Gtk;
 
 using Ldraw.Maths;
+using Ldraw.Refactor;
 using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui
@@ -22,10 +23,8 @@ namespace Ldraw.Ui
 				command = null;
 				return false;
 			}
-				command = null;
-				return false;
-			/*command = new MoveOriginCommand(model, shift);
-			return true;*/
+			command = new MoveOriginCommand(shift, model);
+			return true;
 		}
 		
 		private class MoveOriginDialog : GLib.Object
