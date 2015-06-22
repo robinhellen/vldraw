@@ -24,7 +24,7 @@ namespace Ldraw.OpenGl
 		public void Render(
 				GLDrawable drawable, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
-				LdrawObject model, PartNode? extraBounds,
+				LdrawObject model,
 				Gee.Set<LdrawNode> selection,
 				Overlay? overlay = null)
 			throws GlError
@@ -66,8 +66,6 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_MODELVIEW);
 
 			ModelRenderer.RenderModel(model, defaultColour, finalEyeline, selection);
-			if(extraBounds != null)
-				ModelRenderer.RenderBoundsFor(extraBounds);
 			
 			if(overlay != null)
 				overlay.Draw(new GlDrawingContext());

@@ -66,7 +66,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, dropItem, model.Selection, overlay);
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, model.Selection, overlay);
 		}
 
 		public override bool button_press_event(Gdk.EventButton event)
@@ -152,7 +152,6 @@ namespace Ldraw.Ui.Widgets
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
 		{
 			finishDrag = true;
-			dropItem = null;
 			DropOverlay.dropObject = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			finishDrag = false;
@@ -162,7 +161,6 @@ namespace Ldraw.Ui.Widgets
 
 		public override bool drag_motion(DragContext context, int x, int y, uint time_)
 		{
-			dropItem = null;
 			DropOverlay.dropObject = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			return true;
@@ -170,7 +168,6 @@ namespace Ldraw.Ui.Widgets
 
 		public override void drag_leave(DragContext context, uint time)
 		{
-			dropItem = null;
 			DropOverlay.dropObject = null;
 			queue_draw();
 		}
@@ -285,7 +282,6 @@ namespace Ldraw.Ui.Widgets
 					DropOverlay.dropObject = droppedObject;
 					DropOverlay.dropLocation = newPosition;
 					DropOverlay.dropTransform = newTransform;
-					dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
 					drag_status(context, context.suggested_action, time);
 					queue_draw();
 				}

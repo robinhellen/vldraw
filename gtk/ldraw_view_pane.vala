@@ -21,7 +21,6 @@ namespace Ldraw.Ui.Widgets
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
 		
-		protected PartNode dropItem = null;
 		protected Overlay overlay = null;
 		
 		public Renderer renderer {construct; protected get;}
@@ -99,7 +98,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, dropItem, Gee.Set.empty<LdrawNode>(), overlay);
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
 		}
 
 		public override bool configure_event(Gdk.EventConfigure event)

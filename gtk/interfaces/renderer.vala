@@ -13,7 +13,7 @@ namespace Ldraw.Ui
 		public abstract void Render(
 				GLDrawable drawable, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
-				LdrawObject model, PartNode? extraBounds,
+				LdrawObject model,
 				Gee.Set<LdrawNode> selection,
 				Overlay? overlay = null)
 			throws GlError;
