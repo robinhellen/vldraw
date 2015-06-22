@@ -31,8 +31,8 @@ namespace Ldraw.Ui.Widgets
 		construct
 		{
 			can_focus = true;
-			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
-			events |= Gdk.EventMask.KEY_PRESS_MASK;
+			events |= EventMask.BUTTON_PRESS_MASK;
+			events |= EventMask.KEY_PRESS_MASK;
 
 			// set up this control for drag-and-drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
@@ -94,11 +94,11 @@ namespace Ldraw.Ui.Widgets
 		{
 			switch(event.direction)
 			{
-				case Gdk.ScrollDirection.UP:
+				case ScrollDirection.UP:
 					m_Scale *= Math.powf(2, -0.2f);
 					queue_draw();
 					break;
-				case Gdk.ScrollDirection.DOWN:
+				case ScrollDirection.DOWN:
 					m_Scale *= Math.powf(2, 0.2f);
 					queue_draw();
 					break;
@@ -356,13 +356,13 @@ namespace Ldraw.Ui.Widgets
 			return step * Math.roundf(raw / step);
 		}
 
-		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");
-		private uint m_DownKeyVal = Gdk.keyval_from_name("Down");
-		private uint m_LeftKeyVal = Gdk.keyval_from_name("Left");
-		private uint m_RightKeyVal = Gdk.keyval_from_name("Right");
-		private uint m_HomeKeyVal = Gdk.keyval_from_name("Home");
-		private uint m_EndKeyVal = Gdk.keyval_from_name("End");
-		private uint delKeyVal = Gdk.keyval_from_name("Delete");
+		private uint m_UpKeyVal = keyval_from_name("Up");
+		private uint m_DownKeyVal = keyval_from_name("Down");
+		private uint m_LeftKeyVal = keyval_from_name("Left");
+		private uint m_RightKeyVal = keyval_from_name("Right");
+		private uint m_HomeKeyVal = keyval_from_name("Home");
+		private uint m_EndKeyVal = keyval_from_name("End");
+		private uint delKeyVal = keyval_from_name("Delete");
 	}
 	
 	private class DropBoundsOverlay : GLib.Object, Overlay

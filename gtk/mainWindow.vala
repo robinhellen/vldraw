@@ -24,7 +24,6 @@ namespace Ldraw.Ui
 		}
 		
         private ComboBox m_SubModels;
-        ParameterValues parameters;
         
         // DI injected components
         // Controls
@@ -68,10 +67,6 @@ namespace Ldraw.Ui
             Toolbar colourTools = ToolBars.GetColoursToolbar(this);
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
-
-            /*parameters = new ParameterValues(EditingObject);
-            bind_property("EditingObject", parameters, "Model");
-            notebook.append_page(parameters, new Label("Parameters"));*/
             
             var notebook = ShowPartDropSources();
 

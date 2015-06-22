@@ -120,6 +120,5 @@ namespace Ldraw.OpenGl
 	public interface IRenderModel : Object
 	{
 		public abstract void RenderModel(LdrawObject object, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection);			
-		public virtual void RenderBoundsFor(PartNode part)	{}
 	}
 }
