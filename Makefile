@@ -60,7 +60,7 @@ ui_widgets_internal_packages= application lego lego_objects maths expressions ut
 
 ui_dialogs_sources=$(wildcard ui/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl gdkglext-1.0 diva
-ui_dialogs_internal_packages= ui_widgets gl_render lego lego_objects maths expressions utils options part_group peeron povray ui_gtk_gl
+ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions utils options
 
 move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
 move_origin_packages=$(gtk) $(gee) diva
