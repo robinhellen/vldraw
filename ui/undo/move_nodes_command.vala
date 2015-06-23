@@ -14,7 +14,7 @@ namespace Ldraw.Ui.Commands
 		}
 
 		public Collection<LdrawNode> Selection {get; construct;}
-		public Vector Move {get; construct;}
+		public Vector Move {get; construct set;}
 
 		public override void Execute()
 		{
@@ -39,6 +39,16 @@ namespace Ldraw.Ui.Commands
 
 				partNode.Move(undoMove);
 			}
+		}
+		
+		public override bool TryCombine(Command other)
+		{			
+			var otherMove = other as MoveNodesCommand;
+			if(otherMove == null)
+				return false;
+				
+			Move = otherMove.Move.Add(Move);
+			return true;
 		}
 	}
 }

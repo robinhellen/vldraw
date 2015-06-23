@@ -7,5 +7,10 @@ namespace Ldraw.Ui
 		public abstract void Undo();
 
 		public abstract void Execute();
+		
+		public virtual bool TryCombine(Command other)
+		{
+			return false;
+		}
 	}
 }
