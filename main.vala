@@ -30,6 +30,7 @@ namespace Ldraw
             builder.Register<LdrawFileLoader>();
             builder.Register<LdrawParser>();
             builder.Register<FileReaderFactory>();
+            new CommandFactoryModule().Load(builder);
 
             // Peeron communication
             builder.Register<InventoryReader>();
