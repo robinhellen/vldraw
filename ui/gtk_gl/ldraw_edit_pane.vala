@@ -5,24 +5,24 @@ using Gee;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
-using Ldraw.OpenGl;
 using Ldraw.Maths;
+using Ldraw.OpenGl;
 using Ldraw.Options;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
-//using Diva;
+using Ldraw.Ui.Widgets;
 
-namespace Ldraw.Ui.Widgets
+namespace Ldraw.Ui.GtkGl
 {
-	private class LdrawEditPane : LdrawViewPane
+	private class LdrawEditPane : LdrawViewPane, ModelEditor
 	{
 		public IOptions Settings {construct; private get;}
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		public AnimatedModel model {construct; private get;}
+		public DropBoundsOverlay DropOverlay {construct; private get;}
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
-			throws GlError
 		{
 			GLib.Object(Angle: angle, Settings: settings, Locator: locator, UndoStack: undoStack);
 		}
@@ -30,8 +30,8 @@ namespace Ldraw.Ui.Widgets
 		construct
 		{
 			can_focus = true;
-			events |= Gdk.EventMask.BUTTON_PRESS_MASK;
-			events |= Gdk.EventMask.KEY_PRESS_MASK;
+			events |= EventMask.BUTTON_PRESS_MASK;
+			events |= EventMask.KEY_PRESS_MASK;
 
 			// set up this control for drag-and-drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
@@ -40,10 +40,10 @@ namespace Ldraw.Ui.Widgets
 			model.bind_property("Model", this, "Model");
 			model.view_changed.connect(() => queue_draw());
 			Model = model.Model;
+			overlay = DropOverlay;
 		}
 		
 		public override void Redraw()
-			throws GlError
 		{
 			if(model == null)
 			{
@@ -53,7 +53,7 @@ namespace Ldraw.Ui.Widgets
 			GLWindow drawableWin = widget_get_gl_window(this);
 			if(!(drawableWin is GLDrawable))
 			{
-				throw new GlError.InvalidWidget("GtkGlExt library is playing silly beggars");
+				assert_not_reached();
 			}
 			
 			var drawable = (GLDrawable)drawableWin;
@@ -64,7 +64,7 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, dropItem, model.Selection);
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, model.Selection, overlay);
 		}
 
 		public override bool button_press_event(Gdk.EventButton event)
@@ -92,11 +92,11 @@ namespace Ldraw.Ui.Widgets
 		{
 			switch(event.direction)
 			{
-				case Gdk.ScrollDirection.UP:
+				case ScrollDirection.UP:
 					m_Scale *= Math.powf(2, -0.2f);
 					queue_draw();
 					break;
-				case Gdk.ScrollDirection.DOWN:
+				case ScrollDirection.DOWN:
 					m_Scale *= Math.powf(2, 0.2f);
 					queue_draw();
 					break;
@@ -150,7 +150,7 @@ namespace Ldraw.Ui.Widgets
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
 		{
 			finishDrag = true;
-			dropItem = null;
+			DropOverlay.dropObject = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			finishDrag = false;
 			grab_focus();
@@ -159,14 +159,14 @@ namespace Ldraw.Ui.Widgets
 
 		public override bool drag_motion(DragContext context, int x, int y, uint time_)
 		{
-			dropItem = null;
+			DropOverlay.dropObject = null;
 			drag_get_data(this, context, Atom.intern("LdrawFile", false), time_);
 			return true;
 		}
 
 		public override void drag_leave(DragContext context, uint time)
 		{
-			dropItem = null;
+			DropOverlay.dropObject = null;
 			queue_draw();
 		}
 
@@ -277,7 +277,9 @@ namespace Ldraw.Ui.Widgets
 				}
 				else
 				{
-					dropItem = new PartNode(newPosition, newTransform, droppedObject, newColour);
+					DropOverlay.dropObject = droppedObject;
+					DropOverlay.dropLocation = newPosition;
+					DropOverlay.dropTransform = newTransform;
 					drag_status(context, context.suggested_action, time);
 					queue_draw();
 				}
@@ -333,11 +335,11 @@ namespace Ldraw.Ui.Widgets
 			drawable.gl_begin(context);
 
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
-			model.Model.BuildFromFile<void>(builder);
+			var selected = builder.Visit(model.Model);
 			
-			var selected = builder.ApplySelection(model.Model);
 			if(selected != null)
 				model.Select(selected);
+				
 			drawable.gl_end();
 			drawable.wait_gl();
 		}
@@ -352,12 +354,48 @@ namespace Ldraw.Ui.Widgets
 			return step * Math.roundf(raw / step);
 		}
 
-		private uint m_UpKeyVal = Gdk.keyval_from_name("Up");
-		private uint m_DownKeyVal = Gdk.keyval_from_name("Down");
-		private uint m_LeftKeyVal = Gdk.keyval_from_name("Left");
-		private uint m_RightKeyVal = Gdk.keyval_from_name("Right");
-		private uint m_HomeKeyVal = Gdk.keyval_from_name("Home");
-		private uint m_EndKeyVal = Gdk.keyval_from_name("End");
-		private uint delKeyVal = Gdk.keyval_from_name("Delete");
+		private uint m_UpKeyVal = keyval_from_name("Up");
+		private uint m_DownKeyVal = keyval_from_name("Down");
+		private uint m_LeftKeyVal = keyval_from_name("Left");
+		private uint m_RightKeyVal = keyval_from_name("Right");
+		private uint m_HomeKeyVal = keyval_from_name("Home");
+		private uint m_EndKeyVal = keyval_from_name("End");
+		private uint delKeyVal = keyval_from_name("Delete");
+	}
+	
+	private class DropBoundsOverlay : GLib.Object, Overlay
+	{
+		public LdrawObject? dropObject;
+		public Vector dropLocation;
+		public Matrix dropTransform;
+		
+		public void Draw(DrawingContext context)
+		{			
+			if(dropObject == null)
+				return;
+				
+			var bounds = dropObject.BoundingBox;
+			var a = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MinY, bounds.MinZ))); // (a)
+			var b = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MinY, bounds.MaxZ))); // (b)
+			var c = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MaxY, bounds.MaxZ))); // (c)
+			var d = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MinX, bounds.MaxY, bounds.MinZ))); // (d)
+			var e = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MaxY, bounds.MinZ))); // (e)
+			var f = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MaxY, bounds.MaxZ))); // (f)
+			var g = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MaxZ))); // (g)
+			var h = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MinZ))); // (h)
+			
+			context.DrawLine(a,b);
+			context.DrawLine(b,c);
+			context.DrawLine(c,d);
+			context.DrawLine(d,a);
+			context.DrawLine(a,h);
+			context.DrawLine(h,e);
+			context.DrawLine(e,f);
+			context.DrawLine(f,g);
+			context.DrawLine(g,h);
+			context.DrawLine(g,b);
+			context.DrawLine(c,f);
+			context.DrawLine(d,e);
+		}
 	}
 }

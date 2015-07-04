@@ -4,8 +4,10 @@ using Gtk;
 using Ldraw.Application;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
+using Ldraw.OpenGl;
 using Ldraw.Options;
 using Ldraw.Peeron;
+using Ldraw.Refactor;
 using Ldraw.Ui;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Dialogs;
@@ -44,6 +46,8 @@ namespace Ldraw
 			
 			new DragAndDropModule().Load(builder);
 			new WidgetsModule().Load(builder);
+			new GtkGlModule().Load(builder);
+			new MoveOriginModule().Load(builder);
 			//builder.RegisterModule<DragAndDropModule>();
 			
             builder.Register<RunningOptions>().As<IOptions>();
@@ -53,6 +57,11 @@ namespace Ldraw
             builder.Register<AnimatedModel>(_ => animatedModel);
             builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();
             builder.Register<Ldraw.Application.Application>();
+            
+            // OpenGl stuff
+            builder.Register<GlRenderer>().As<Renderer>();
+            builder.Register<FromFlatRenderer>().As<IRenderModel>();
+            
             var container = builder.Build();
 
             // load up the colours

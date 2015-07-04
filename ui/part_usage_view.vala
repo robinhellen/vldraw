@@ -176,6 +176,7 @@ namespace Ldraw.Ui
 
 		private bool get_iter_for_item(out TreeIter iter, int sectionIndex, int itemIndex)
 		{
+			iter = TreeIter();
 			ObservableList<PartGroupItem> sectionList;
 			switch(sectionIndex)
 			{
@@ -186,7 +187,6 @@ namespace Ldraw.Ui
 				case 2:
 					sectionList = extra; break;
 				default:
-					iter = TreeIter();
 					return false;
 			}
 
@@ -195,7 +195,6 @@ namespace Ldraw.Ui
 			if(!sectionList.get_iter(out childIter, pathForChild))
 				return false;
 
-			iter = TreeIter();
 			iter.stamp = c_IteratorStamp;
 			iter.user_data = 1.to_pointer();
 			iter.user_data2 = sectionIndex.to_pointer();

@@ -3,13 +3,13 @@ using Gdk;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
-using Ldraw.OpenGl;
 using Ldraw.Maths;
+using Ldraw.Ui.Widgets;
 using GL;
 
-namespace Ldraw.Ui.Widgets
+namespace Ldraw.Ui.GtkGl
 {
-	private class LdrawViewPane : Layout
+	private class LdrawViewPane : Layout, ModelView
 	{
 		private LdrawObject m_Model;
 		private ViewAngle m_Angle;
@@ -22,12 +22,11 @@ namespace Ldraw.Ui.Widgets
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
 		
-		protected PartNode dropItem = null;
+		protected Overlay overlay = null;
 		
-		public GlRenderer renderer;
+		public Renderer renderer {construct; protected get;}
 
 		public LdrawViewPane(ViewAngle angle)
-			throws GlError
 		{
 			GLib.Object(Angle: angle);
 		}
@@ -41,20 +40,16 @@ namespace Ldraw.Ui.Widgets
 			// minimum size 100 px square
 			set_size_request(100, 100);
 			
-			renderer = new GlRenderer();
 			if(m_Model == null)
 				m_Model =  new LdrawObject("", null);				
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
-			throws GlError
 		{
 			this(angle);
 			m_Model = model;
 			m_Model.VisibleChange.connect(() => queue_draw());
 		}
-
-		public signal void RenderingError(string description);
 
 		public LdrawObject Model
 		{
@@ -72,11 +67,12 @@ namespace Ldraw.Ui.Widgets
 				queue_draw();
 			}
 		}
+		
+		public Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
 
 		public Colour DefaultColour {get; set; default = LdrawColour.GetColour(0);}
 
 		public virtual void Redraw()
-			throws GlError
 		{
 			if(m_Model == null)
 			{
@@ -87,7 +83,7 @@ namespace Ldraw.Ui.Widgets
 			GLWindow drawableWin = widget_get_gl_window(this);
 			if(!(drawableWin is GLDrawable))
 			{
-				throw new GlError.InvalidWidget("GtkGlExt library is playing silly beggars");
+				assert_not_reached();
 			}
 			
 			var drawable = (GLDrawable)drawableWin;
@@ -98,32 +94,18 @@ namespace Ldraw.Ui.Widgets
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, dropItem, Gee.Set.empty<LdrawNode>());
+			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
 		}
 
 		public override bool configure_event(Gdk.EventConfigure event)
 		{
-			try
-			{
-				Redraw();
-			}
-			catch (GlError e)
-			{
-				RenderingError(@"OpenGL error during window resize: \n $(e.message).");
-			}
+			Redraw();
 			return false;
 		}
 
 		public override bool expose_event(Gdk.EventExpose event)
 		{
-			try
-			{
-				Redraw();
-			}
-			catch (GlError e)
-			{
-				RenderingError(@"OpenGL error during window redraw: \n $(e.message).");
-			}
+			Redraw();
 			return false;
 		}
 
@@ -223,86 +205,6 @@ namespace Ldraw.Ui.Widgets
 			get_allocation(out alloc);
 
 			return m_Angle.GetViewBounds(alloc.width, alloc.height, m_Scale, m_Center);
-		}
-	}
-
-	private enum ViewAngle
-	{
-		Front,
-		Back,
-
-		Right,
-		Left,
-
-		Top,
-		Bottom,
-
-		Ortho;
-
-		public Vector GetCameraDirection()
-		{
-			switch(this)
-			{
-				case Front:
-					return Vector(0, 0, -1.5f);
-				case Back:
-					return Vector(0, 0, 1.5f);
-				case Right:
-					return Vector(1.5f, 0, 0);
-				case Left:
-					return Vector(-1.5f, 0, 0);
-				case Top:
-					return Vector(0, -1.5f, 0);
-				case Bottom:
-					return Vector(0, 1.5f, 0);
-				case Ortho:
-					return Vector(0.390731128f, -0.650895224f, -0.650895224f);
-				default:
-					return Vector.NullVector;
-			}
-		}
-
-		public Vector GetCameraUp()
-		{
-			switch(this)
-			{
-				case Top:
-				case Bottom:
-					return Vector(0, 0, 1);
-				default:
-					return Vector(0, -1, 0);
-			}
-		}
-
-		public Vector GetViewCenter(Vector modelCenter)
-		{
-			switch(this)
-			{
-				case Front:
-				case Back:
-					return Vector(modelCenter.X, -modelCenter.Y, 0);
-				case Top:
-				case Bottom:
-					return Vector(modelCenter.X, modelCenter.Z, 0);
-				case Left:
-				case Right:
-					return Vector(modelCenter.Z, -modelCenter.Y, 0);
-				case Ortho:
-				default:
-					return Vector(0, 0, 0);
-			}
-		}
-
-		public Bounds GetViewBounds(int viewWidth, int viewHeight, float scale, Vector viewCenter)
-		{
-			var viewWidthLdu = viewWidth * scale;
-			var viewHeightLdu = viewHeight * scale;
-
-			Bounds b = new Bounds();
-			b.Union(viewCenter.Add(Vector(viewWidthLdu / 2, viewHeightLdu / 2, 1000000)));
-			b.Union(viewCenter.Subtract(Vector(viewWidthLdu / 2, viewHeightLdu / 2, 1000000)));
-
-			return b;
 		}
 	}
 }

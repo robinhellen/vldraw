@@ -5,10 +5,12 @@ using GL;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
+using Ldraw.Ui;
+using Ldraw.Ui.Widgets;
 
 namespace Ldraw.OpenGl
 {
-	public class GlRenderer : Object
+	public class GlRenderer : Object, Renderer
 	{
 		public IRenderModel ModelRenderer {construct; private get;}
 		private static GLContext sharingContext;		
@@ -22,9 +24,9 @@ namespace Ldraw.OpenGl
 		public void Render(
 				GLDrawable drawable, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
-				LdrawObject model, PartNode? extraBounds,
-				Gee.Set<LdrawNode> selection)
-			throws GlError
+				LdrawObject model,
+				Gee.Set<LdrawNode> selection,
+				Overlay? overlay = null)
 		{
 			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
 			if(sharingContext == null)
@@ -63,8 +65,9 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_MODELVIEW);
 
 			ModelRenderer.RenderModel(model, defaultColour, finalEyeline, selection);
-			if(extraBounds != null)
-				ModelRenderer.RenderBoundsFor(extraBounds);			
+			
+			if(overlay != null)
+				overlay.Draw(new GlDrawingContext());
 
 			drawable.gl_end();
 			drawable.swap_buffers();
@@ -88,6 +91,20 @@ namespace Ldraw.OpenGl
 		}
 	}
 	
+	private class GlDrawingContext : Object, DrawingContext
+	{
+		public void DrawLine(Vector a, Vector b)
+		{
+			glColor4f(1F, 0F, 0F, 1F);
+			glBegin(GL_LINES);
+
+			glVertex3fv(a.value_vector());
+			glVertex3fv(b.value_vector());
+
+			glEnd();
+		}
+	}
+	
 	public class StandardModelRenderer : Object, IRenderModel
 	{
 		public void RenderModel(LdrawObject model, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection)
@@ -102,6 +119,5 @@ namespace Ldraw.OpenGl
 	public interface IRenderModel : Object
 	{
 		public abstract void RenderModel(LdrawObject object, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection);			
-		public virtual void RenderBoundsFor(PartNode part)	{}
 	}
 }

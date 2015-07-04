@@ -38,7 +38,19 @@ namespace Ldraw.Lego.Nodes
 			}
 		}
 
-		public override string FileLine{owned get{return @"1 $(Colour.Code) $(Center.X) $(Center.Y) $(Center.Z) $(Transform[0,0]) $(Transform[0,1]) $(Transform[0,2]) $(Transform[1,0]) $(Transform[1,1]) $(Transform[1,2]) $(Transform[2,0]) $(Transform[2,1]) $(Transform[2,2]) $m_Text";}}
+		public override string FileLine
+		{
+			owned get
+			{
+				return "1 %d %.f %.f %.f %.f %.f %.f %.f %.f %.f %.f %.f %.f %s".printf(
+					Colour.Code,
+					Center.X, Center.Y, Center.Z,
+					Transform[0,0], Transform[0,1], Transform[0,2],
+					Transform[1,0], Transform[1,1], Transform[1,2],
+					Transform[2,0], Transform[2,1], Transform[2,2],
+					m_Text);
+			}
+		}
 
 		public Matrix Transform
 		{

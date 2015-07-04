@@ -1,3 +1,5 @@
+using Diva;
+using Gee;
 using Gtk;
 
 using Ldraw.Export;
@@ -10,10 +12,17 @@ namespace Ldraw.Ui
 {
 	private class MainMenu : GLib.Object
 	{
+		static construct
+		{
+			var cls = (ObjectClass)typeof(MainMenu).class_ref();
+			SetCollectionInjection<Refactoring>(cls, "Refactorings");
+		}
+		
 		public AnimatedModel Model {construct; private get;}
         public LdrawFileLoader Loader {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
+        public Collection<Refactoring> Refactorings {construct; private get;}
         
         public RecentChooserMenu RecentMenu {construct; private get;}
         
@@ -84,6 +93,8 @@ namespace Ldraw.Ui
                     dlg.Run();
                 });
                 
+			AddRefactorMenu(menus, accelerators, parent);
+                
 			AddCtrlShortcut(fileNew, "N");
 			AddCtrlShortcut(fileSave, "S");
             AddCtrlShortcut(fileQuit, "Q");
@@ -92,6 +103,30 @@ namespace Ldraw.Ui
 
             return menus;
         }
+        
+        private void AddRefactorMenu(MenuBar parent, AccelGroup accelerators, Window parentWindow)
+        {
+			if(Refactorings.is_empty)
+				return;
+				
+			var refactorMenu = CreateMenu(parent, "Refactor", accelerators);
+			foreach(var r in Refactorings)
+			{
+				AddMenuItem(refactorMenu, r.GetLabel(), GetExecuteAction(r, parentWindow));
+			}
+		}
+		
+		private Action GetExecuteAction(Refactoring r, Window parent)
+		{
+			return () => 
+			{
+				Command c;
+				if(!r.PrepareToExecute(Model, parent, out c))
+					return;
+				
+				UndoStack.ExecuteCommand(c);
+			};			
+		}
         
         private Gtk.Menu CreateMenu(MenuBar parent, string title, AccelGroup accelerators, string? accelPath = null)
         {

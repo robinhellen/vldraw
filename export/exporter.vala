@@ -3,16 +3,18 @@ using Gdk;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Maths;
-using Ldraw.OpenGl;
 using Ldraw.Povray;
+using Ldraw.Ui;
 
 namespace Ldraw.Export
 {
 	public class Exporter : Object
 	{
+		//public Renderer Renderer {construct; private get;}
+		
 		public void ExportJpg(LdrawObject model, string filename)
 		{
-			var angle = Ui.Widgets.ViewAngle.Ortho;
+			var angle = ViewAngle.Ortho;
 
 			var pixmap = new Pixmap(null, 800, 600, 24);
 			var glPixmap = new GLPixmap(new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA), pixmap, 0);
@@ -26,8 +28,7 @@ namespace Ldraw.Export
 
 			GLDrawable drawable = (GLDrawable)glPixmap;
 			
-			var renderer = new GlRenderer();
-			renderer.Render(drawable, LdrawColour.GetColour(0), viewBounds, eyeline, center, up, model, null, Gee.Set.empty<LdrawNode>());
+			//Renderer.Render(drawable, LdrawColour.GetColour(0), viewBounds, eyeline, center, up, model, Gee.Set.empty<LdrawNode>(), null);
 
 			var pixbuf = pixbuf_get_from_drawable(null, pixmap, null, 0, 0, 0, 0, 800, 600);
 			pixbuf.save(filename, "jpeg");

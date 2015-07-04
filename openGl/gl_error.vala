@@ -1,4 +1,4 @@
-namespace Ldraw.OpenGl
+namespace Ldraw.Ui
 {
 	public errordomain GlError
 	{

@@ -6,7 +6,7 @@ using GL;
 
 namespace Ldraw.OpenGl
 {
-	public class GlSelectorBuilder : LdrawVisitor<void>
+	public class GlSelectorBuilder : LdrawVisitor<LdrawNode>
 	{
 		private Vector m_Eyeline;
 		private Matrix m_Transform;
@@ -59,7 +59,7 @@ namespace Ldraw.OpenGl
 			glMatrixMode(GL_MODELVIEW);
 		}
 
-		public LdrawNode ApplySelection(LdrawObject model)
+		public override LdrawNode GetResult(LdrawObject object)
 		{
 			glFlush();
 
@@ -86,7 +86,7 @@ namespace Ldraw.OpenGl
 				}
 			}
 
-			var rawNode = model.Nodes[(int)currentFrontName];
+			var rawNode = object.Nodes[(int)currentFrontName];
 			return rawNode;
 		}
 

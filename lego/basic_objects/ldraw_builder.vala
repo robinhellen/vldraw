@@ -11,7 +11,7 @@ namespace Ldraw.Lego
 			{
 				VisitNode(node);
 			}
-			return GetResult();
+			return GetResult(object);
 		}
 		
 		protected void VisitInner(LdrawObject object)
@@ -35,6 +35,6 @@ namespace Ldraw.Lego
 		public virtual void VisitComment(Comment line) {}
 		
 		protected virtual void Initialize() {}
-		protected virtual T? GetResult() {return null;}
+		protected virtual T? GetResult(LdrawObject object) {return null;}
 	}
 }
