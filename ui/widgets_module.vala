@@ -16,7 +16,8 @@ namespace Ldraw.Ui
             builder.Register<SubModelsTree>().As<IPartDragSource>();
             builder.Register<ModelList>();
             builder.Register<MainMenu>();
-            builder.Register<ToolBarProvider>();
+            builder.Register<ColourToolbar>().As<ToolbarProvider>();
+            builder.Register<MovementToolbar>().As<ToolbarProvider>();
             
             builder.Register<RecentChooserMenu>().As<RecentChooser>();
             builder.Register<RecentManager>(() => RecentManager.get_default());            

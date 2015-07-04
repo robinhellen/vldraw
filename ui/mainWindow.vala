@@ -42,7 +42,6 @@ namespace Ldraw.Ui
         public ILdrawFolders LdrawFolders {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
         public MainMenu MainMenu {construct; private get;}
-        public ToolBarProvider ToolBars {construct; private get;}
         public Collection<ToolbarProvider> ToolbarProviders {construct; private get;}
                 
         construct
@@ -64,16 +63,11 @@ namespace Ldraw.Ui
             MenuBar menus = MainMenu.CreateMenus(accelerators, this);
             VBox bigVBox = new VBox(false, 0);
             bigVBox.pack_start(menus, false, false);
-
-            Toolbar tools = ToolBars.GetMovementToolbar();
-            Toolbar colourTools = ToolBars.GetColoursToolbar(this);
+            
             foreach(var provider in ToolbarProviders)            
             {
-				bigVBox.pack_start(provider.CreateToolbar(), false, false);
+				bigVBox.pack_start(provider.CreateToolbar(this), false, false);
 			}
-			
-            bigVBox.pack_start(colourTools, false, false);
-            bigVBox.pack_start(tools, false, false);
             
             var notebook = ShowPartDropSources();
 

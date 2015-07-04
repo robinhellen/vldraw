@@ -10,7 +10,7 @@ using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui
 {
-	private class ToolBarProvider : GLib.Object
+	private class MovementToolbar : GLib.Object, ToolbarProvider
 	{
 		public AnimatedModel m_ModelContainer {construct; private get;}
 		public IOptions m_Options {construct; private get;}
@@ -18,7 +18,7 @@ namespace Ldraw.Ui
 
 		public int ButtonSize {get; set; default = 16;}
 
-		public Toolbar GetMovementToolbar()
+		public Toolbar CreateToolbar(Gtk.Window dialogParent)
 		{
 			Toolbar bar = new Toolbar();
 
@@ -47,50 +47,6 @@ namespace Ldraw.Ui
 			return bar;
 		}
 
-		public Toolbar GetColoursToolbar(Gtk.Window window)
-		{
-			Toolbar bar = new Toolbar();
-			bar.insert(new SeparatorToolItem(), -1);
-			var falseVal = Value(typeof(bool));
-			falseVal.set_boolean(false);
-			for(int i = 0; i < 16; i++)
-			{
-				var button = CreateColourButton(i);
-				bar.insert(button, -1);
-				bar.child_set_property(button, "homogeneous", falseVal);
-			}
-
-			var moreButton = new ToolButton(null, "More");
-			moreButton.clicked.connect(() =>
-				{
-					var dialog = new Dialog.with_buttons("Select colour", window,
-						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						Stock.OK,		ResponseType.ACCEPT,
-						Stock.CANCEL,	ResponseType.REJECT
-					);
-
-					var chooser = new ColourChooser();
-
-					((Container)dialog.get_content_area()).add(chooser);
-
-					dialog.show_all();
-					var result = dialog.run();
-					if(result != ResponseType.ACCEPT)
-					{
-						dialog.destroy();
-						return;
-					}
-
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
-					dialog.destroy();
-				});
-			moreButton.set_tooltip_text("More colours");
-			bar.insert(moreButton, -1);
-			bar.child_set_property(moreButton, "homogeneous", falseVal);
-
-			return bar;
-		}
-
 		private ToolButton CreateGridButton(GridSize size, string iconName, ref unowned SList<RadioToolButton>? group)
 		{
 			string icon = "/home/robin/git/vldraw/icons/" + iconName + ".xpm";
@@ -102,33 +58,6 @@ namespace Ldraw.Ui
 					if(button.active)
 						m_Options.Grid = size;
 				});
-			return button;
-		}
-
-		private ToolButton CreateColourButton(int colourId)
-		{
-			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
-			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);
-			
-			var colour = LdrawColour.GetColour(colourId);
-			
-			float red, green, blue, alpha;
-			LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
-
-			uint32 fillColour = ((int)(red * 255) << 24)
-							  | ((int)(green * 255) << 16)
-							  | ((int)(blue * 255) << 8)
-							  | ((int)(alpha * 255));
-			swatch.fill(fillColour);
-			image.fill((uint32) 255);
-			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
-			
-			var button = new ToolButton(new Image.from_pixbuf(image), null);
-			button.clicked.connect(() =>
-				{
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, colour));
-				});
-			button.set_tooltip_text(LdrawColour.GetName(colourId));
 			return button;
 		}
 
@@ -214,6 +143,86 @@ namespace Ldraw.Ui
 						return "Unknown axis.";
 				}
 			}
+		}
+	}
+	
+	private class ColourToolbar : GLib.Object, ToolbarProvider
+	{
+		public AnimatedModel m_ModelContainer {construct; private get;}
+		public IOptions m_Options {construct; private get;}
+		public UndoStack undoStack {construct; private get;}
+
+		public int ButtonSize {get; set; default = 16;}
+
+		public Toolbar CreateToolbar(Gtk.Window window)
+		{
+			Toolbar bar = new Toolbar();
+			bar.insert(new SeparatorToolItem(), -1);
+			var falseVal = Value(typeof(bool));
+			falseVal.set_boolean(false);
+			for(int i = 0; i < 16; i++)
+			{
+				var button = CreateColourButton(i);
+				bar.insert(button, -1);
+				bar.child_set_property(button, "homogeneous", falseVal);
+			}
+
+			var moreButton = new ToolButton(null, "More");
+			moreButton.clicked.connect(() =>
+				{
+					var dialog = new Dialog.with_buttons("Select colour", window,
+						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
+						Stock.OK,		ResponseType.ACCEPT,
+						Stock.CANCEL,	ResponseType.REJECT
+					);
+
+					var chooser = new ColourChooser();
+
+					((Container)dialog.get_content_area()).add(chooser);
+
+					dialog.show_all();
+					var result = dialog.run();
+					if(result != ResponseType.ACCEPT)
+					{
+						dialog.destroy();
+						return;
+					}
+
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
+					dialog.destroy();
+				});
+			moreButton.set_tooltip_text("More colours");
+			bar.insert(moreButton, -1);
+			bar.child_set_property(moreButton, "homogeneous", falseVal);
+
+			return bar;
+		}
+
+		private ToolButton CreateColourButton(int colourId)
+		{
+			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
+			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);
+			
+			var colour = LdrawColour.GetColour(colourId);
+			
+			float red, green, blue, alpha;
+			LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
+
+			uint32 fillColour = ((int)(red * 255) << 24)
+							  | ((int)(green * 255) << 16)
+							  | ((int)(blue * 255) << 8)
+							  | ((int)(alpha * 255));
+			swatch.fill(fillColour);
+			image.fill((uint32) 255);
+			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
+			
+			var button = new ToolButton(new Image.from_pixbuf(image), null);
+			button.clicked.connect(() =>
+				{
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, colour));
+				});
+			button.set_tooltip_text(LdrawColour.GetName(colourId));
+			return button;
 		}
 	}
 
