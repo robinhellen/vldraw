@@ -1,6 +1,7 @@
 using Diva;
 
-//using Ldraw.Steps;
+using Ldraw.Lego;
+using Ldraw.Steps;
 
 namespace Ldraw
 {
@@ -8,6 +9,8 @@ namespace Ldraw
 	{
 		public void Load(ContainerBuilder builder)
 		{
+			builder.Register<StepCommandFactory>()
+					.Keyed<CommandFactory, string>("STEP");
 		}
 	}
 }
