@@ -63,6 +63,8 @@ namespace Ldraw
             builder.Register<GlRenderer>().As<Renderer>();
             builder.Register<FromFlatRenderer>().As<IRenderModel>();
             
+            new StepsModule().Load(builder);
+            
             var container = builder.Build();
 
             // load up the colours

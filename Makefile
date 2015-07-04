@@ -66,12 +66,16 @@ move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
 move_origin_packages=$(gtk) $(gee) diva
 move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
 
+steps_sources=$(wildcard steps/*.vala)
+steps_packages=$(gtk) $(gee) diva
+steps_internal_packages=ui_widgets lego lego_objects maths expressions utils
+
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
 	application
-UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl
+UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
