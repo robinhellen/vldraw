@@ -21,6 +21,7 @@ namespace Ldraw.Ui
 		{
 			var cls = (ObjectClass)typeof(MainWindow).class_ref();
 			SetCollectionInjection<IPartDragSource>(cls, "PartSourcesConstruct");
+			SetCollectionInjection<ToolbarProvider>(cls, "ToolbarProviders");
 		}
 		
         private ComboBox m_SubModels;
@@ -41,7 +42,9 @@ namespace Ldraw.Ui
         public ILdrawFolders LdrawFolders {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
         public MainMenu MainMenu {construct; private get;}
-        public ToolBarProvider ToolBars {construct; private get;}        
+        public ToolBarProvider ToolBars {construct; private get;}
+        public Collection<ToolbarProvider> ToolbarProviders {construct; private get;}
+                
         construct
         {
             SetUpControls();
@@ -64,6 +67,11 @@ namespace Ldraw.Ui
 
             Toolbar tools = ToolBars.GetMovementToolbar();
             Toolbar colourTools = ToolBars.GetColoursToolbar(this);
+            foreach(var provider in ToolbarProviders)            
+            {
+				bigVBox.pack_start(provider.CreateToolbar(), false, false);
+			}
+			
             bigVBox.pack_start(colourTools, false, false);
             bigVBox.pack_start(tools, false, false);
             
