@@ -1,7 +1,9 @@
 using Diva;
 
 using Ldraw.Lego;
+using Ldraw.OpenGl;
 using Ldraw.Steps;
+using Ldraw.Ui;
 
 namespace Ldraw
 {
@@ -11,6 +13,9 @@ namespace Ldraw
 		{
 			builder.Register<StepCommandFactory>()
 					.Keyed<CommandFactory, string>("STEP");
+			builder.Register<StepModel>().SingleInstance();
+			builder.Register<StepToolbar>().As<ToolbarProvider>();
+			builder.Register<HideLaterStepsStrategy>().As<RenderNodeStrategy>();
 		}
 	}
 }

@@ -40,6 +40,9 @@ namespace Ldraw.OpenGl
 		
 		public void RenderBuiltModel(LdrawObject model, Colour defaultColour, Vector finalEyeline, Set<LdrawNode> selection)
 		{
+			foreach(var strategy in Strategies)
+				strategy.StartModel(model);
+				
 			foreach(var node in model.Nodes)
 			{
 				if(!Strategies.fold<bool>((strategy, show) => show &= strategy.ShouldRenderNode(node), true))

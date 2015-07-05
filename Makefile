@@ -67,8 +67,8 @@ move_origin_packages=$(gtk) $(gee) diva
 move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
 
 steps_sources=$(wildcard steps/*.vala)
-steps_packages=$(gtk) $(gee) diva
-steps_internal_packages=ui_widgets lego lego_objects maths expressions utils
+steps_packages=$(gtk) $(gee) diva gl gdkglext-1.0
+steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala
