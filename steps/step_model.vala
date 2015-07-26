@@ -29,6 +29,7 @@ namespace Ldraw.Steps
 		{			
 			var command = new AddNodeCommand(Model.Model, new StepCommand(), Model.LastSelected);
 			UndoStack.ExecuteCommand(command);
+			CurrentStep++;
 		}
 		
 		public bool HasNextSteps {get; set;}
