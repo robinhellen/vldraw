@@ -55,6 +55,15 @@ namespace Ldraw.Ui
 			Selection.add_all(node);
 			view_changed();
 		}
+		
+		public LdrawNode? LastSelected
+		{
+			get
+			{
+				weak LdrawNode? node = Model.Nodes.filter(x => x in Selection).fold<unowned LdrawNode?>((x, a) => x, null);
+				return node;
+			}
+		}
 
         public signal void view_changed();
     }	
