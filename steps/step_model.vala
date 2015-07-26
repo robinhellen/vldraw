@@ -1,12 +1,14 @@
 
 using Ldraw.Lego;
 using Ldraw.Ui;
+using Ldraw.Ui.Commands;
 
 namespace Ldraw.Steps
 {
 	private class StepModel : Object
 	{
 		public AnimatedModel Model { construct; private get; }
+		public UndoStack UndoStack { construct; private get; }
 		
 		construct
 		{
@@ -22,6 +24,12 @@ namespace Ldraw.Steps
 		public void Previous() {CurrentStep--; UpdateHasProps();}
 		public void Next() {CurrentStep++; UpdateHasProps();}
 		public void Last() {CurrentStep = TotalSteps; UpdateHasProps();}
+		
+		public void AddStep() 
+		{			
+			var command = new AddNodeCommand(Model.Model, new StepCommand(), Model.LastSelected);
+			UndoStack.ExecuteCommand(command);
+		}
 		
 		public bool HasNextSteps {get; set;}
 		public bool HasPrevSteps {get; set;}

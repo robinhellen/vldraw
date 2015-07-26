@@ -17,6 +17,9 @@ namespace Ldraw.Steps
 			AddButtonFromStock(bar, Stock.GO_FORWARD, () => Model.Next(), "HasNextSteps");
 			AddButtonFromStock(bar, Stock.GOTO_LAST, () => Model.Last(), "HasNextSteps");
 			
+			bar.insert(new SeparatorToolItem(), -1);
+			
+			AddButtonFromStock(bar, Stock.ADD, () => Model.AddStep(), "");
 			return bar;
 		}
 		
