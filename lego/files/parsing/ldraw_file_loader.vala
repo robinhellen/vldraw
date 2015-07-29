@@ -30,13 +30,14 @@ namespace Ldraw.Lego
 			}
 			var fileReader = ReaderFactory.GetReader(file);
 			MultipartSubFileLocator locator = null;
+			var colours = new CurrentFileColourContext(ColourContext);
 
 			ObservableList<LdrawNode> currentObject = new ObservableList<LdrawNode>();
 			LdrawObject mainObject = null;
 			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
 			string currentFileName = null;
 			LdrawNode node;
-			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy], ColourContext)) != null)
+			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy], colours)) != null)
 			{
 				if(node is MetaCommand)
 				{
@@ -120,6 +121,21 @@ namespace Ldraw.Lego
 				locator.ResolveAll(subObjs);
 				return modelFile;
 			}
+		}
+	}
+	
+	private class CurrentFileColourContext : Object, ColourContext
+	{
+		ColourContext base_context;
+		
+		public CurrentFileColourContext(ColourContext base_context)
+		{
+			this.base_context = base_context;
+		}
+		
+		public Colour GetColourById(int colourId)
+		{
+			return base_context.GetColourById(colourId);
 		}
 	}
 }
