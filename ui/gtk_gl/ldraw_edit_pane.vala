@@ -184,7 +184,7 @@ namespace Ldraw.Ui.GtkGl
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
 			Matrix newTransform = Matrix.Identity;
 			Vector newPosition = Vector.NullVector;
-			var newColour = LdrawColour.GetColour(0);
+			var newColour = ColourContext.GetColourById(0);
 			PartNode copyPart = model.Model.LastSubFile;
 
 			if(copyPart != null)
@@ -201,7 +201,7 @@ namespace Ldraw.Ui.GtkGl
 				var sections = partName.split(",");
 				partName = sections[0];
 				// set the colour from the drag data. This should override any colour copied from another part.
-				newColour = LdrawColour.GetColour(int.parse(sections[1]));
+				newColour = ColourContext.GetColourById(int.parse(sections[1]));
 			}
 			
 			var dragFinished = finishDrag;

@@ -183,13 +183,11 @@ namespace Ldraw.Ui
 		{
 			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 16, 16);
 			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 14, 14);
-			float red, green, blue, alpha;
-			LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
 
-			uint32 fillColour = ((int)(red * 255) << 24)
-							  | ((int)(green * 255) << 16)
-							  | ((int)(blue * 255) << 8)
-							  | ((int)(alpha * 255));
+			uint32 fillColour = (colour.Red << 24)
+							  | (colour.Green << 16)
+							  | (colour.Blue << 8)
+							  | (colour.Alpha);
 			swatch.fill(fillColour);
 			image.fill((uint32)255);
 			swatch.copy_area(0, 0, 14, 14, image, 1, 1);

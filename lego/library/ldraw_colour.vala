@@ -70,44 +70,6 @@ namespace Ldraw.Lego.Library
 		{
 			return s_Colours[code].Name;
 		}
-
-		public static void SurfaceColour(int code, out float red, out float green, out float blue, out float alpha)
-			requires (code != 16)
-			requires (code != 24)
-		{
-			Colour colour = GetColour(code);
-			if(colour == null)
-			{
-				red = green = blue = alpha = 0f;
-			}
-			else
-			{
-				red = colour.m_Red / 256.0f;
-				green = colour.m_Green / 256.0f;
-				blue = colour.m_Blue / 256.0f;
-
-				alpha = 1.0f - colour.m_Alpha / 255.0f;
-			}
-		}
-
-		public static void EdgeColour(int code, out float red, out float green, out float blue, out float alpha)
-			requires (code != 16)
-			requires (code != 24)
-		{
-			Colour colour = GetColour(code);
-			if(colour == null)
-			{
-				red = green = blue = alpha = 0f;
-			}
-			else
-			{
-				red = colour.m_EdgeRed / 256.0f;
-				green = colour.m_EdgeGreen / 256.0f;
-				blue = colour.m_EdgeBlue / 256.0f;
-
-				alpha = 1.0f - colour.m_Alpha / 255.0f;
-			}
-		}
 		
 		private class SpecialColour : Colour
 		{

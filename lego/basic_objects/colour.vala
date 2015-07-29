@@ -4,13 +4,13 @@ namespace Ldraw.Lego
 	{
 		private string m_Name;
 		public int m_Code;
-		public uint8 m_Red;
-		public uint8 m_Green;
-		public uint8 m_Blue;
-		public uint8 m_EdgeRed;
-		public uint8 m_EdgeGreen;
-		public uint8 m_EdgeBlue;
-		public uint8 m_Alpha;
+		public uint8 Red;
+		public uint8 Green;
+		public uint8 Blue;
+		public uint8 EdgeRed;
+		public uint8 EdgeGreen;
+		public uint8 EdgeBlue;
+		public uint8 Alpha;
 
 		public Colour(string line)
 		{
@@ -49,21 +49,21 @@ namespace Ldraw.Lego
 			m_Name = tokens[2];
 			m_Code = int.parse(tokens[4]);
 
-			m_Red = ParseHex(tokens[6][1], tokens[6][2]);
-			m_Green = ParseHex(tokens[6][3], tokens[6][4]);
-			m_Blue = ParseHex(tokens[6][5], tokens[6][6]);
+			Red = ParseHex(tokens[6][1], tokens[6][2]);
+			Green = ParseHex(tokens[6][3], tokens[6][4]);
+			Blue = ParseHex(tokens[6][5], tokens[6][6]);
 
-			m_EdgeRed = ParseHex(tokens[8][1], tokens[8][2]);
-			m_EdgeGreen = ParseHex(tokens[8][3], tokens[8][4]);
-			m_EdgeBlue = ParseHex(tokens[8][5], tokens[8][6]);
+			EdgeRed = ParseHex(tokens[8][1], tokens[8][2]);
+			EdgeGreen = ParseHex(tokens[8][3], tokens[8][4]);
+			EdgeBlue = ParseHex(tokens[8][5], tokens[8][6]);
 
 			if(tokens[9] == "ALPHA")
 			{
-				m_Alpha = (uint8) (int.parse(tokens[10]));
+				Alpha = (uint8) (int.parse(tokens[10]));
 			}
 			else
 			{
-				m_Alpha = 0;
+				Alpha = 0;
 			}
 		}
 
@@ -79,14 +79,6 @@ namespace Ldraw.Lego
 
 		public string Name {get {return m_Name;}}
 		public int Code {get {return m_Code;}}
-		
-		public void SurfaceColour(out float red, out float green, out float blue, out float alpha)
-		{
-			red = m_Red;
-			green = m_Green;
-			blue = m_Blue;
-			alpha = m_Alpha;
-		}
 	}
 }
 

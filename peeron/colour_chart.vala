@@ -12,6 +12,8 @@ namespace Ldraw.Peeron
 	{
 		private bool Loaded {get; set; default = false;}
 		private Map<string, int> ColourMap = new HashMap<string, int>();
+		
+		public ColourContext ColourContext {construct; private get;}
 
 		private void Load()
 			throws GLib.Error
@@ -55,7 +57,7 @@ namespace Ldraw.Peeron
 
 		public Colour GetColourFromName(string name)
 		{
-			return LdrawColour.GetColour(GetColourIdFromName(name));
+			return ColourContext.GetColourById(GetColourIdFromName(name));
 		}
 
 		private int GetColourIdFromName(string name)

@@ -12,6 +12,7 @@ namespace Ldraw.Lego
 		public LdrawParser Parser {construct; private get;}
 		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
 		public FileReaderFactory ReaderFactory {construct; private get;}
+		public ColourContext ColourContext {construct; private get;}
 
 		static construct
 		{
@@ -35,7 +36,7 @@ namespace Ldraw.Lego
 			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
 			string currentFileName = null;
 			LdrawNode node;
-			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy])) != null)
+			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy], ColourContext)) != null)
 			{
 				if(node is MetaCommand)
 				{

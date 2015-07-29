@@ -15,7 +15,7 @@ namespace Ldraw.Lego
 		
 		public Index<CommandFactory, string> CommandFactories {construct; private get;}
 		
-		public async LdrawNode ParseLine(string line, ISubFileLocator locator)
+		public async LdrawNode ParseLine(string line, ISubFileLocator locator, ColourContext colourContext)
 			throws ParseError
 			requires(!("\n" in line))
 		{
@@ -25,15 +25,15 @@ namespace Ldraw.Lego
 					// may be a meta command
 					return ParseCommentNode(line);
 				case '1':
-					return yield ParsePartNode(line, locator);
+					return yield ParsePartNode(line, locator, colourContext);
 				case '2':
-					return ParseLineNode(line);
+					return ParseLineNode(line, colourContext);
 				case '3':
-					return ParseTriangleNode(line);
+					return ParseTriangleNode(line, colourContext);
 				case '4':
-					return ParseQuadNode(line);
+					return ParseQuadNode(line, colourContext);
 				case '5':
-					return ParseCondLineNode(line);
+					return ParseCondLineNode(line, colourContext);
 				default:
 					throw new ParseError.UnknownLineType(@"Unable to parse line '$line'.");
 			}
@@ -57,7 +57,7 @@ namespace Ldraw.Lego
 			return factory.CreateCommand(tokens[1], tokens[2:tokens.length]);
 		}
 
-		protected async LdrawNode ParsePartNode(string line, ISubFileLocator locator)
+		protected async LdrawNode ParsePartNode(string line, ISubFileLocator locator, ColourContext colourContext)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -71,10 +71,10 @@ namespace Ldraw.Lego
 			int colourId = int.parse(tokens[1]);
 			string text = tokens[14].strip().down();
 
-			return new PartNode(center, transform, yield locator.GetObjectFromReference(text), LdrawColour.GetColour(colourId));
+			return new PartNode(center, transform, yield locator.GetObjectFromReference(text), colourContext.GetColourById(colourId));
 		}
 
-		protected LdrawNode ParseLineNode(string line)
+		protected LdrawNode ParseLineNode(string line, ColourContext colourContext)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -84,10 +84,10 @@ namespace Ldraw.Lego
 			var b = ParseTokensToVector(tokens[5:7]);
 			var colourId = int.parse(tokens[1]);
 
-			return new LineNode(LdrawColour.GetColour(colourId), a, b);
+			return new LineNode(colourContext.GetColourById(colourId), a, b);
 		}
 
-		protected LdrawNode ParseTriangleNode(string line)
+		protected LdrawNode ParseTriangleNode(string line, ColourContext colourContext)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -98,10 +98,10 @@ namespace Ldraw.Lego
 			var c = ParseTokensToVector(tokens[8:10]);
 			var colourId = int.parse(tokens[1]);
 
-			return new TriangleNode(LdrawColour.GetColour(colourId), a, b, c);
+			return new TriangleNode(colourContext.GetColourById(colourId), a, b, c);
 		}
 
-		protected LdrawNode ParseQuadNode(string line)
+		protected LdrawNode ParseQuadNode(string line, ColourContext colourContext)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -113,10 +113,10 @@ namespace Ldraw.Lego
 			var d = ParseTokensToVector(tokens[11:13]);
 			var colourId = int.parse(tokens[1]);
 
-			return new QuadNode(LdrawColour.GetColour(colourId), a, b, c, d);
+			return new QuadNode(colourContext.GetColourById(colourId), a, b, c, d);
 		}
 
-		protected LdrawNode ParseCondLineNode(string line)
+		protected LdrawNode ParseCondLineNode(string line, ColourContext colourContext)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -128,7 +128,7 @@ namespace Ldraw.Lego
 			var d = ParseTokensToVector(tokens[11:13]);
 			var colourId = int.parse(tokens[1]);
 
-			return new CondLineNode(LdrawColour.GetColour(colourId), a, b, c, d);
+			return new CondLineNode(colourContext.GetColourById(colourId), a, b, c, d);
 		}
 
 		protected static string[] Tokenize(string line)
@@ -167,5 +167,10 @@ namespace Ldraw.Lego
 	public interface CommandFactory : Object 
 	{
 		public abstract MetaCommand CreateCommand(string command, string[] args);
+	}
+	
+	public interface ColourContext : Object
+	{
+		public abstract Colour GetColourById(int colourId);
 	}
 }

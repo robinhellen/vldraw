@@ -63,16 +63,12 @@ namespace Ldraw.OpenGl
 		
 		private RenderColour.ConsFromLdrawColour(Colour c)
 		{
-			float red, green, blue, alpha;
-			LdrawColour.SurfaceColour(c.Code, out red, out green, out blue, out alpha);
-			Object(Red:red, Green:green, Blue:blue, Alpha:alpha);
+			Object(Red:c.Red / 255f, Green:c.Green / 255f, Blue:c.Blue / 255f, Alpha:1f - c.Alpha / 255f);
 		}
 		
 		private RenderColour.ConsFromLdrawEdgeColour(Colour c)
 		{
-			float red, green, blue, alpha;
-			LdrawColour.EdgeColour(c.Code, out red, out green, out blue, out alpha);
-			Object(Red:red, Green:green, Blue:blue, Alpha:alpha);			
+			Object(Red:c.EdgeRed / 255f, Green:c.EdgeGreen / 255f, Blue:c.EdgeBlue / 255f, Alpha:1f - c.Alpha / 255f);
 		}
 		
 		public float Red {get; construct;}
