@@ -50,26 +50,6 @@ namespace Ldraw.Lego.Library
 		{
 			return s_Colours[code];
 		}
-
-		public static Colour? GetColourByName(string name)
-		{
-			for(int i = 0; i <= 512; i++)
-			{
-				if(s_Colours[i] != null &&
-					s_Colours[i].Name == name)
-				{
-					return s_Colours[i];
-				}
-			}
-			stderr.printf(@"Unable to find colour; '$name'\n");
-			return null;
-		}
-
-		public static string GetName(int code)
-			requires (code <= 512 && code >= 0)
-		{
-			return s_Colours[code].Name;
-		}
 		
 		private class SpecialColour : Colour
 		{
