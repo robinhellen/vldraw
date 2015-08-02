@@ -29,7 +29,7 @@ lego_objects_internal_packages=maths
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages=$(gee) $(gtk) $(json) diva
-lego_internal_packages=maths expressions utils lego_objects
+lego_internal_packages=application maths expressions utils lego_objects
 					
 
 peeron_sources=$(wildcard peeron/*.vala)
@@ -72,6 +72,7 @@ steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_
 
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala
+application_packages=$(gee) diva
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
 	application

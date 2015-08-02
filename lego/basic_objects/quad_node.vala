@@ -9,11 +9,6 @@ namespace Ldraw.Lego.Nodes
 		private Vector m_C;
 		private Vector m_D;
 
-		class construct
-		{
-			Type = "Quad";
-		}
-
 		public QuadNode(Colour colour, Vector a, Vector b, Vector c, Vector d)
 		{
 			Colour = colour;

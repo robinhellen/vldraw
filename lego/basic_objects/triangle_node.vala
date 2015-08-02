@@ -8,11 +8,6 @@ namespace Ldraw.Lego.Nodes
 		private Vector m_B;
 		private Vector m_C;
 
-		class construct
-		{
-			Type = "Triangle";
-		}
-
 		public TriangleNode(Colour colour, Vector a, Vector b, Vector c)
 		{
 			Colour = colour;

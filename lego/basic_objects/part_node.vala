@@ -7,11 +7,6 @@ namespace Ldraw.Lego.Nodes
 		private LdrawObject m_Contents;
 		private string m_Text;
 
-		class construct
-		{
-			Type = "Part";
-		}
-
 		public PartNode(Vector center, Matrix transform, LdrawObject contents, Colour colour)
 		{
 			Center = center;

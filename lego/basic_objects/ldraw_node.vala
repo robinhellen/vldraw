@@ -18,8 +18,6 @@ namespace Ldraw.Lego
 
 		public abstract void Accept(LdrawVisitor visitor);
 
-		public class string Type;
-
 		protected static string[] Tokenize(string line)
 		{
 			var allTokens = line.split_set(" \t");

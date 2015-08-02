@@ -9,11 +9,6 @@ namespace Ldraw.Lego.Nodes
 		private Vector m_Control1;
 		private Vector m_Control2;
 
-		class construct
-		{
-			Type = "Conditional Line";
-		}
-
 		public CondLineNode(Colour colour, Vector a, Vector b, Vector control1, Vector control2)
 		{
 			Colour = colour;

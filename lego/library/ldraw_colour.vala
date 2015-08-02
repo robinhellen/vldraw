@@ -7,40 +7,6 @@ namespace Ldraw.Lego.Library
 		public static void ReadAllColours(ILdrawFolders library)
 			throws InitializationError
 		{
-			File ldrawDir = library.LibraryDirectory;
-			File configFile = ldrawDir.get_child("LDConfig.ldr");
-
-			DataInputStream inStream;
-			try
-			{
-				inStream = new DataInputStream(configFile.read());
-			}
-			catch
-			{
-				throw new InitializationError.LoadingColours("Unable to open the LDraw config file for reading.");
-			}
-
-			string line;
-			int lineNo = 0;
-			try
-			{
-				while((line = inStream.read_line(null)) != null)
-				{
-					line = line.strip();
-					lineNo++;
-					if(line == "")
-						continue; // ignore blank lines
-					if(line.contains("!COLOUR"))
-					{
-						var parsed = new Colour(line);
-						s_Colours[parsed.Code] = parsed;
-					}
-				}
-			}
-			catch
-			{
-				throw new InitializationError.LoadingColours("IO error while reading LDraw configuration file.");
-			}
 			s_Colours[16] = new SpecialColour(16);
 			s_Colours[24] = new SpecialColour(24);
 		}
@@ -55,7 +21,7 @@ namespace Ldraw.Lego.Library
 		{
 			public SpecialColour(int code)
 			{
-				base(@"0 !COLOUR SPECIAL CODE $code VALUE #000000 EDGE #000000");
+				base({"SPECIAL", "CODE", @"$code", "VALUE", "#000000", "EDGE", "#000000"});
 			}
 		}
 	}

@@ -12,7 +12,7 @@ namespace Ldraw.Lego
 		public uint8 EdgeBlue;
 		public uint8 Alpha;
 
-		public Colour(string line)
+		public Colour(string[] tokens)
 		{
 			// form of a colourLine:
 			// 0 !COLOUR name CODE x VALUE v EDGE e [ALPHA a] [LUMINANCE l] [ CHROME | PEARLESCENT | RUBBER | MATTE_METALLIC | METAL | MATERIAL <params> ]</params>
@@ -22,44 +22,31 @@ namespace Ldraw.Lego
 			// e is rgb #rrggbb
 			// alpha is an int
 
-			var allTokens = line.split_set(" \t");
-			string[] tokens = {};
-
-			foreach(string token in allTokens)
-			{
-				if(token != "")
-				{
-					tokens += token;
-				}
-			}
-
 			// necessary tokens:
-			if(!(tokens[0] == "0" 		&&
-				 tokens[1] == "!COLOUR"	&&
-				 tokens[3] == "CODE"	&&
-				 tokens[5] == "VALUE"	&&
-				 tokens[7] == "EDGE"	&&
+			if(!(tokens[1] == "CODE"	&&
+				 tokens[3] == "VALUE"	&&
+				 tokens[5] == "EDGE"	&&
 				 // values start with #
-				 tokens[6][0] == '#'	&&
-				 tokens[8][0] == '#'
+				 tokens[4][0] == '#'	&&
+				 tokens[6][0] == '#'
 				 ))
 			{
 				// ERROR
 			}
-			m_Name = tokens[2];
-			m_Code = int.parse(tokens[4]);
+			m_Name = tokens[0];
+			m_Code = int.parse(tokens[2]);
 
-			Red = ParseHex(tokens[6][1], tokens[6][2]);
-			Green = ParseHex(tokens[6][3], tokens[6][4]);
-			Blue = ParseHex(tokens[6][5], tokens[6][6]);
+			Red = ParseHex(tokens[4][1], tokens[4][2]);
+			Green = ParseHex(tokens[4][3], tokens[4][4]);
+			Blue = ParseHex(tokens[4][5], tokens[4][6]);
 
-			EdgeRed = ParseHex(tokens[8][1], tokens[8][2]);
-			EdgeGreen = ParseHex(tokens[8][3], tokens[8][4]);
-			EdgeBlue = ParseHex(tokens[8][5], tokens[8][6]);
+			EdgeRed = ParseHex(tokens[6][1], tokens[6][2]);
+			EdgeGreen = ParseHex(tokens[6][3], tokens[6][4]);
+			EdgeBlue = ParseHex(tokens[6][5], tokens[6][6]);
 
-			if(tokens[9] == "ALPHA")
+			if(tokens[7] == "ALPHA")
 			{
-				Alpha = (uint8) (int.parse(tokens[10]));
+				Alpha = (uint8) (int.parse(tokens[8]));
 			}
 			else
 			{
