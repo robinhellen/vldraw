@@ -21,7 +21,6 @@ namespace Ldraw.Steps
 			if(node is StepCommand)
 				currentStepNumber++;
 			
-			stderr.printf(@"Trying render with current step: $(Model.CurrentStep). Count is $(currentStepNumber).\n");
 			return currentStepNumber <= Model.CurrentStep;
 		}
 	}

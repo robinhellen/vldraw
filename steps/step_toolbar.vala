@@ -19,15 +19,16 @@ namespace Ldraw.Steps
 			
 			bar.insert(new SeparatorToolItem(), -1);
 			
-			AddButtonFromStock(bar, Stock.ADD, () => Model.AddStep(), "");
+			AddButtonFromStock(bar, Stock.ADD, () => Model.AddStep());
 			return bar;
 		}
 		
-		private void AddButtonFromStock(Toolbar bar, string stockId, Action onClicked, string enabledOnModelProperty)
+		private void AddButtonFromStock(Toolbar bar, string stockId, Action onClicked, string? enabledOnModelProperty = null)
 		{
 			var button = new ToolButton.from_stock(stockId);
 			button.clicked.connect(() => onClicked() );
-			Model.bind_property(enabledOnModelProperty, button, "sensitive", BindingFlags.DEFAULT | BindingFlags.SYNC_CREATE);
+			if(enabledOnModelProperty != null)
+				Model.bind_property(enabledOnModelProperty, button, "sensitive", BindingFlags.DEFAULT | BindingFlags.SYNC_CREATE);
 			bar.insert(button, -1);
 		}
 		
