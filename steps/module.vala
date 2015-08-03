@@ -7,9 +7,9 @@ using Ldraw.Ui;
 
 namespace Ldraw
 {
-	public class StepsModule : Object
+	public class StepsModule : Module
 	{
-		public void Load(ContainerBuilder builder)
+		public override void Load(ContainerBuilder builder)
 		{
 			builder.Register<StepCommandFactory>()
 					.Keyed<CommandFactory, string>("STEP");

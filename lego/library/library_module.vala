@@ -4,9 +4,9 @@ using Ldraw.Application;
 
 namespace Ldraw.Lego.Library
 {
-	public class LibraryModule : Object
+	public class LibraryModule : Module
 	{
-		public void Load(ContainerBuilder builder)
+		public override void Load(ContainerBuilder builder)
 		{
             builder.Register<StandardColourContext>()
 				.SingleInstance()

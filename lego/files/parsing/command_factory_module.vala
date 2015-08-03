@@ -2,9 +2,9 @@ using Diva;
 
 namespace Ldraw.Lego
 {
-	public class CommandFactoryModule : Object
+	public class CommandFactoryModule : Module
 	{
-		public void Load(ContainerBuilder builder)
+		public override void Load(ContainerBuilder builder)
 		{
 			builder.Register<StandardsCommandFactory>()
 						.Keyed<CommandFactory, string>("FILE")
