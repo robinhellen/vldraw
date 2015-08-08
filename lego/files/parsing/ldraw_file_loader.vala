@@ -80,6 +80,7 @@ namespace Ldraw.Lego
 							currentFileName = command.Arguments[0];
 							continue;
 					}
+					UpdateColours(command as ColourMetaCommand, colours);
 				}
 				currentObject.add(node);
 			}
@@ -122,11 +123,20 @@ namespace Ldraw.Lego
 				return modelFile;
 			}
 		}
+		
+		private void UpdateColours(ColourMetaCommand? command, CurrentFileColourContext context)
+		{
+			if(command == null)
+				return;
+			context.RegisterColour(command.CommandColour);
+		}
 	}
 	
 	private class CurrentFileColourContext : Object, ColourContext
 	{
 		ColourContext base_context;
+		
+		private Map<int, Colour> overrideColours = new HashMap<int, Colour>();
 		
 		public CurrentFileColourContext(ColourContext base_context)
 		{
@@ -135,7 +145,12 @@ namespace Ldraw.Lego
 		
 		public Colour GetColourById(int colourId)
 		{
-			return base_context.GetColourById(colourId);
+			return overrideColours[colourId] ?? base_context.GetColourById(colourId);
+		}
+		
+		public void RegisterColour(Colour colour)
+		{
+			overrideColours[colour.Code] = colour;
 		}
 	}
 }
