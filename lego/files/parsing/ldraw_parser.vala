@@ -171,6 +171,6 @@ namespace Ldraw.Lego
 	
 	public interface ColourContext : Object
 	{
-		public abstract Colour GetColourById(int colourId);
+		public abstract Colour GetColourById(int colourId);		
 	}
 }

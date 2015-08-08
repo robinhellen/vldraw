@@ -66,6 +66,17 @@ namespace Ldraw.Lego
 
 		public string Name {get {return m_Name;}}
 		public int Code {get {return m_Code;}}
+	
+		public static Colour MainColour = new SpecialColour(16);
+		public static Colour ComplementColour = new SpecialColour(24);
+			
+		private class SpecialColour : Colour
+		{
+			public SpecialColour(int code)
+			{
+				base({"SPECIAL", "CODE", @"$code", "VALUE", "#000000", "EDGE", "#000000"});
+			}
+		}		
 	}
 }
 

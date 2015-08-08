@@ -68,7 +68,6 @@ namespace Ldraw
             var container = builder.Build();
 
             // load up the colours
-            LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
 			var application = container.Resolve<Ldraw.Application.Application>();
 			
 			application.Run(args);

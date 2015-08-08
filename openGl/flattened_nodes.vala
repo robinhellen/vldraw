@@ -114,7 +114,7 @@ namespace Ldraw.OpenGl
 				{
 					Transform = Matrix.Identity;
 					Center = Vector.NullVector;
-					CurrentColour = LdrawColour.GetColour(16);
+					CurrentColour = Colour.MainColour;
 					ColourInverted = false;
 				}
 

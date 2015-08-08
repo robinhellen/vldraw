@@ -18,6 +18,8 @@ namespace Ldraw.Lego.Library
 		{
 			var loop = new MainLoop();
 			LoadAllColours.begin(() => loop.quit());
+			allColours[16] = Colour.MainColour;
+			allColours[24] = Colour.ComplementColour;
 			loop.run();
 		}
 		
