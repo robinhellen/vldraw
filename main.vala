@@ -48,7 +48,7 @@ namespace Ldraw
 			builder.RegisterModule<DragAndDropModule>();
 			builder.RegisterModule<WidgetsModule>();
 			builder.RegisterModule<GtkGlModule>();
-			builder.Register<MoveOriginModule>();
+			builder.RegisterModule<MoveOriginModule>();
 			
             builder.Register<RunningOptions>().As<IOptions>();
 
