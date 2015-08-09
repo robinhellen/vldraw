@@ -1,3 +1,4 @@
+using Diva;
 using Gee;
 using GL;
 
@@ -12,6 +13,14 @@ namespace Ldraw.OpenGl
 	{
 		private IRenderModel InnerRenderer {get; set;}
 		private IRenderModel SelectedRenderer {get; set;}
+		
+		public Collection<RenderNodeStrategy> Strategies { construct; private get; }
+		
+		static construct
+		{			
+			var cls = (ObjectClass)typeof(FromFlatRenderer).class_ref();
+			SetCollectionInjection<RenderNodeStrategy>(cls, "Strategies");
+		}
 		
 		construct
 		{
@@ -33,6 +42,9 @@ namespace Ldraw.OpenGl
 		{
 			foreach(var node in model.Nodes)
 			{
+				if(!Strategies.fold<bool>((strategy, show) => show &= strategy.ShouldRenderNode(node), true))
+					continue;
+				
 				var part = node as PartNode;
 				if(part == null)
 					continue;
@@ -165,5 +177,11 @@ namespace Ldraw.OpenGl
 			glEnd();			
 		}
 		protected delegate void RenderAction<T>(T t);		
+	}
+	
+	public interface RenderNodeStrategy : Object
+	{
+		public abstract void StartModel(LdrawObject object);		
+		public abstract bool ShouldRenderNode(LdrawNode node);
 	}
 }

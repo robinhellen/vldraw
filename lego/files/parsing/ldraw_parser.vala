@@ -7,6 +7,14 @@ namespace Ldraw.Lego
 {
 	public class LdrawParser : Object
 	{
+		static construct
+		{
+			var cls = (ObjectClass)typeof(LdrawParser).class_ref();
+			SetIndexedInjection<string, CommandFactory>(cls, "CommandFactories");
+		}
+		
+		public Index<CommandFactory, string> CommandFactories {construct; private get;}
+		
 		public async LdrawNode ParseLine(string line, ISubFileLocator locator)
 			throws ParseError
 			requires(!("\n" in line))
@@ -37,29 +45,16 @@ namespace Ldraw.Lego
 			var tokens = Tokenize(line);
 
 			var command = tokens[1];
+			if(command == null)
+				return new Comment("");
 			if(command != null && command.has_prefix("!"))
 				command = command.substring(1);
-
-			switch(command)
-			{
-				case "FILE":
-				case "NOFILE":
-					return new MetaCommand(tokens[1], tokens[2: tokens.length]);
-				case "LDRAW_ORG":
-					return new LdrawOrgHeader(tokens[1], tokens[2: tokens.length]);
-				case "ANIM":
-					switch(tokens[2])
-					{
-						case "ROTATE":
-							return new AnimRotateCommand(tokens[1], tokens[2: tokens.length]);
-						case "PARAMETER":
-							return new AnimParameterCommand(tokens[1], tokens[2: tokens.length]);
-					}
-					break;
-
-			}
-
-			return new Comment(string.joinv(" ", tokens[1: tokens.length]));
+				
+			var factory = CommandFactories[command];
+			if(factory == null)
+				return new Comment(string.joinv(" ", tokens[1: tokens.length]));
+			
+			return factory.CreateCommand(tokens[1], tokens[2:tokens.length]);
 		}
 
 		protected async LdrawNode ParsePartNode(string line, ISubFileLocator locator)
@@ -167,5 +162,10 @@ namespace Ldraw.Lego
 				throw new ParseError.IncompleteLine(@"Unable to parse: Expected $expected tokens (space separated), found $(tokens.length).");
 			}
 		}
+	}
+	
+	public interface CommandFactory : Object 
+	{
+		public abstract MetaCommand CreateCommand(string command, string[] args);
 	}
 }
