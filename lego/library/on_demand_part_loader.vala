@@ -11,6 +11,7 @@ namespace Ldraw.Lego.Library
 		public LdrawParser Parser {construct; private get;}
 		public FileReaderFactory ReaderFactory {construct; private get;}
 		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
+		public ColourContext ColourContext {construct; private get;}
 
 		static construct
 		{
@@ -85,7 +86,7 @@ namespace Ldraw.Lego.Library
 			
 			LdrawNode node;
 			var locator = Locators[ReferenceLoadStrategy.SubPartsAndPrimitives];
-			while((node = yield reader.next(locator)) != null)
+			while((node = yield reader.next(locator, ColourContext)) != null)
 			{
 				nodes.add(node);
 			}

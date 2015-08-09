@@ -166,13 +166,22 @@ namespace Ldraw.OpenGl
 			switch(ldrawColour.Code)
 			{
 				case 16:
-					LdrawColour.SurfaceColour(colour.Code, out red, out green, out blue, out alpha);
+					red = colour.Red / 255f;
+					green = colour.Green / 255f;
+					blue = colour.Blue / 255f;
+					alpha = 1f - colour.Alpha / 255f;
 					break;
 				case 24:
-					LdrawColour.EdgeColour(colour.Code, out red, out green, out blue, out alpha);
+					red = colour.EdgeRed / 255f;
+					green = colour.EdgeGreen / 255f;
+					blue = colour.EdgeBlue / 255f;
+					alpha = 1f - colour.Alpha / 255f;
 					break;
 				default:
-					LdrawColour.SurfaceColour(ldrawColour.Code, out red, out green, out blue, out alpha);
+					red = ldrawColour.Red / 255f;
+					green = ldrawColour.Green / 255f;
+					blue = ldrawColour.Blue / 255f;
+					alpha = 1f - ldrawColour.Alpha / 255f;
 					break;
 			}
 

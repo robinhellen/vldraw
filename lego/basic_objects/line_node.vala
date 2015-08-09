@@ -7,11 +7,6 @@ namespace Ldraw.Lego.Nodes
 		private Vector m_A;
 		private Vector m_B;
 
-		class construct
-		{
-			Type = "Comment";
-		}
-
 		public LineNode(Colour colour, Vector a, Vector b)
 		{
 			Colour = colour;

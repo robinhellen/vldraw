@@ -25,6 +25,7 @@ namespace Ldraw.Ui.GtkGl
 		protected Overlay overlay = null;
 		
 		public Renderer renderer {construct; protected get;}
+		public ColourContext ColourContext {construct; protected get;}
 
 		public LdrawViewPane(ViewAngle angle)
 		{
@@ -41,7 +42,9 @@ namespace Ldraw.Ui.GtkGl
 			set_size_request(100, 100);
 			
 			if(m_Model == null)
-				m_Model =  new LdrawObject("", null);				
+				m_Model =  new LdrawObject("", null);
+				
+			DefaultColour = ColourContext.GetColourById(0);
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
@@ -70,7 +73,7 @@ namespace Ldraw.Ui.GtkGl
 		
 		public Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
 
-		public Colour DefaultColour {get; set; default = LdrawColour.GetColour(0);}
+		public Colour DefaultColour {get; set;}
 
 		public virtual void Redraw()
 		{

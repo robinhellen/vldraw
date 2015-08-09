@@ -30,7 +30,7 @@ namespace Ldraw
             builder.Register<LdrawFileLoader>();
             builder.Register<LdrawParser>();
             builder.Register<FileReaderFactory>();
-            new CommandFactoryModule().Load(builder);
+            builder.RegisterModule<CommandFactoryModule>();
 
             // Peeron communication
             builder.Register<InventoryReader>();
@@ -45,11 +45,10 @@ namespace Ldraw
             builder.Register<OnDemandPartLoader>().As<IDatFileCache>().SingleInstance();
             builder.Register<FileCachedLibrary>().As<ILibrary>();
 			
-			new DragAndDropModule().Load(builder);
-			new WidgetsModule().Load(builder);
-			new GtkGlModule().Load(builder);
-			new MoveOriginModule().Load(builder);
-			//builder.RegisterModule<DragAndDropModule>();
+			builder.RegisterModule<DragAndDropModule>();
+			builder.RegisterModule<WidgetsModule>();
+			builder.RegisterModule<GtkGlModule>();
+			builder.RegisterModule<MoveOriginModule>();
 			
             builder.Register<RunningOptions>().As<IOptions>();
 
@@ -63,10 +62,12 @@ namespace Ldraw
             builder.Register<GlRenderer>().As<Renderer>();
             builder.Register<FromFlatRenderer>().As<IRenderModel>();
             
+            builder.RegisterModule<StepsModule>();
+            builder.RegisterModule<LibraryModule>();
+            
             var container = builder.Build();
 
             // load up the colours
-            LdrawColour.ReadAllColours(container.Resolve<ILdrawFolders>());
 			var application = container.Resolve<Ldraw.Application.Application>();
 			
 			application.Run(args);

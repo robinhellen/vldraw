@@ -12,6 +12,7 @@ namespace Ldraw.Lego
 		public LdrawParser Parser {construct; private get;}
 		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
 		public FileReaderFactory ReaderFactory {construct; private get;}
+		public ColourContext ColourContext {construct; private get;}
 
 		static construct
 		{
@@ -29,13 +30,14 @@ namespace Ldraw.Lego
 			}
 			var fileReader = ReaderFactory.GetReader(file);
 			MultipartSubFileLocator locator = null;
+			var colours = new CurrentFileColourContext(ColourContext);
 
 			ObservableList<LdrawNode> currentObject = new ObservableList<LdrawNode>();
 			LdrawObject mainObject = null;
 			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
 			string currentFileName = null;
 			LdrawNode node;
-			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy])) != null)
+			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy], colours)) != null)
 			{
 				if(node is MetaCommand)
 				{
@@ -78,6 +80,7 @@ namespace Ldraw.Lego
 							currentFileName = command.Arguments[0];
 							continue;
 					}
+					UpdateColours(command as ColourMetaCommand, colours);
 				}
 				currentObject.add(node);
 			}
@@ -119,6 +122,35 @@ namespace Ldraw.Lego
 				locator.ResolveAll(subObjs);
 				return modelFile;
 			}
+		}
+		
+		private void UpdateColours(ColourMetaCommand? command, CurrentFileColourContext context)
+		{
+			if(command == null)
+				return;
+			context.RegisterColour(command.CommandColour);
+		}
+	}
+	
+	private class CurrentFileColourContext : Object, ColourContext
+	{
+		ColourContext base_context;
+		
+		private Map<int, Colour> overrideColours = new HashMap<int, Colour>();
+		
+		public CurrentFileColourContext(ColourContext base_context)
+		{
+			this.base_context = base_context;
+		}
+		
+		public Colour GetColourById(int colourId)
+		{
+			return overrideColours[colourId] ?? base_context.GetColourById(colourId);
+		}
+		
+		public void RegisterColour(Colour colour)
+		{
+			overrideColours[colour.Code] = colour;
 		}
 	}
 }

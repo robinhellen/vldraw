@@ -6,9 +6,9 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui
 {
-	public class WidgetsModule
+	public class WidgetsModule : Module
 	{
-		public void Load(ContainerBuilder builder)
+		public override void Load(ContainerBuilder builder)
 		{
             builder.Register<PartsTree>().As<IPartDragSource>();
             builder.Register<SetList>().As<IPartDragSource>().SingleInstance();            

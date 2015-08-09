@@ -5,9 +5,9 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui
 {
-	public class GtkGlModule
+	public class GtkGlModule : Module
 	{
-		public void Load(ContainerBuilder builder)
+		public override void Load(ContainerBuilder builder)
 		{
             builder.Register<LdrawEditPane>().As<ModelEditor>();
             builder.Register<LdrawViewPane>().As<ModelView>();

@@ -3,9 +3,9 @@ using Ldraw.Ui;
 
 namespace Ldraw.Refactor
 {
-	public class MoveOriginModule : Object
+	public class MoveOriginModule : Module
 	{
-		public void Load(ContainerBuilder builder)
+		public override void Load(ContainerBuilder builder)
 		{
             builder.Register<MoveOriginRefactoring>().As<Refactoring>();
 		}

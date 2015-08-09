@@ -43,6 +43,7 @@ namespace Ldraw.Ui
 		public UndoStack UndoStack {construct; private get;}
         public MainMenu MainMenu {construct; private get;}
         public Collection<ToolbarProvider> ToolbarProviders {construct; private get;}
+        public ColourContext ColourContext {construct; private get;}
                 
         construct
         {
@@ -50,8 +51,8 @@ namespace Ldraw.Ui
             SetUpErrorReporting();
 			PartsPreview.Angle = ViewAngle.Ortho;
 			PartsPreview.set_size_request(200, 200);
-            PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId);
-            Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = LdrawColour.GetColour(Settings.PreviewColourId));
+            PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
+            Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId));
                         
             maximize();
 		}

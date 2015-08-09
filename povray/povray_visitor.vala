@@ -230,8 +230,10 @@ light_source {
 
 			if(!(colour in exportedColours))
 			{
-				float red, green, blue, alpha;
-				colour.SurfaceColour(out red, out green, out blue, out alpha);
+				float red = colour.Red;
+				float green = colour.Green;
+				float blue = colour.Blue; 
+				float alpha = colour.Alpha;
 
 				var filter = alpha == 1 ? "" : @"filter $alpha ";
 

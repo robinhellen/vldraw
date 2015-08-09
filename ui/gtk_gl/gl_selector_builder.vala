@@ -258,19 +258,24 @@ namespace Ldraw.OpenGl
 			Colour actualColour = (ldrawColour.Code == 24 || ldrawColour.Code == 16) ? m_CurrentColour : ldrawColour;
 
 			bool actualInvert = (invert && !m_InvertColour) || (!invert && m_InvertColour);
-			float red, green, blue, alpha;
 			if(actualInvert)
 			{
-				LdrawColour.EdgeColour(actualColour.Code, out red, out green, out blue, out alpha);
-				// get line colour
+				glColor4f(
+						actualColour.EdgeRed / 255f, 
+						actualColour.EdgeGreen / 255f, 
+						actualColour.EdgeBlue / 255f, 
+						1f - actualColour.Alpha / 255f
+						);
 			}
 			else
 			{
-				// get flat colour
-				LdrawColour.SurfaceColour(actualColour.Code, out red, out green, out blue, out alpha);
+				glColor4f(
+						actualColour.Red / 255f, 
+						actualColour.Green / 255f, 
+						actualColour.Blue / 255f, 
+						1f - actualColour.Alpha / 255f
+						);
 			}
-
-			glColor4f(red, green, blue, alpha);
 		}
 	}
 }
