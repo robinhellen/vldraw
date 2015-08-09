@@ -15,7 +15,8 @@ namespace Ldraw.Lego.Library
 
 		construct
 		{
-			m_LibraryDir = File.new_for_path("/home/robin/ldraw");
+			var homeFolder = File.new_for_path(Environment.get_home_dir());
+			m_LibraryDir = homeFolder.get_child("ldraw");
 			m_PartsDirectory = m_LibraryDir.get_child("parts");
 			m_SubPartsDirectory = m_PartsDirectory.get_child("s");
 			m_PrimitivesDirectory = m_LibraryDir.get_child("p");
