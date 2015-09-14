@@ -10,7 +10,7 @@ namespace Ldraw.Ui.DragAndDrop
 		static construct
 		{
 			var cls = (ObjectClass)typeof(CombinedObjectLocator).class_ref();
-			SetIndexedInjection<ObjectDropType, IDroppedObjectLocator>(cls, "Locators");
+			set_indexed_injection<ObjectDropType, IDroppedObjectLocator>(cls, "Locators");
 		}
 
 		public async LdrawObject? GetObjectForName(string name)

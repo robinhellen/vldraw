@@ -6,14 +6,14 @@ namespace Ldraw.Lego.Library
 {
 	public class LibraryModule : Module
 	{
-		public override void Load(ContainerBuilder builder)
+		public override void load(ContainerBuilder builder)
 		{
-            builder.Register<StandardColourContext>()
-				.SingleInstance()
-				.As<ColourContext>()
-				.As<InitializeOnStartup>();
-			builder.Register<ColourMetaCommandFactory>()
-				.Keyed<CommandFactory, string>("COLOUR");
+            builder.register<StandardColourContext>()
+				.single_instance()
+				.as<ColourContext>()
+				.as<InitializeOnStartup>();
+			builder.register<ColourMetaCommandFactory>()
+				.keyed<CommandFactory, string>("COLOUR");
 		}
 	}
 }

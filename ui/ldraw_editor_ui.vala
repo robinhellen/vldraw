@@ -13,7 +13,7 @@ namespace Ldraw.Ui
 		static construct
 		{
 			var cls = (ObjectClass)typeof(LdrawEditorUi).class_ref();
-			SetLazyInjection<MainWindow>(cls, "Window");
+			set_lazy_injection<MainWindow>(cls, "Window");
 		}
 		
 		public void Start()

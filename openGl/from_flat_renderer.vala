@@ -19,7 +19,7 @@ namespace Ldraw.OpenGl
 		static construct
 		{			
 			var cls = (ObjectClass)typeof(FromFlatRenderer).class_ref();
-			SetCollectionInjection<RenderNodeStrategy>(cls, "Strategies");
+			set_collection_injection<RenderNodeStrategy>(cls, "Strategies");
 		}
 		
 		construct

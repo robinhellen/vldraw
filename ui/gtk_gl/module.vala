@@ -7,11 +7,11 @@ namespace Ldraw.Ui
 {
 	public class GtkGlModule : Module
 	{
-		public override void Load(ContainerBuilder builder)
+		public override void load(ContainerBuilder builder)
 		{
-            builder.Register<LdrawEditPane>().As<ModelEditor>();
-            builder.Register<LdrawViewPane>().As<ModelView>();
-            builder.Register<DropBoundsOverlay>(); 
+            builder.register<LdrawEditPane>().as<ModelEditor>();
+            builder.register<LdrawViewPane>().as<ModelView>();
+            builder.register<DropBoundsOverlay>(); 
 		}
 	}
 }
