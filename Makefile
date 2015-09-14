@@ -5,7 +5,7 @@ DEFAULT: all
 VALACC=valac-0.28
 gee=gee-0.8
 gio=gio-2.0
-gtk=gtk+-2.0
+gtk=gtk+-3.0
 json=json-glib-1.0
 xml=libxml-2.0
 soup=libsoup-2.4
