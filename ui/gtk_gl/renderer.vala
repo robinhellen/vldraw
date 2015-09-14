@@ -11,7 +11,7 @@ namespace Ldraw.Ui
 	public interface Renderer : Object
 	{
 		public abstract void Render(
-				GLDrawable drawable, Colour defaultColour, 
+				GLContext context, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
 				LdrawObject model,
 				Gee.Set<LdrawNode> selection,

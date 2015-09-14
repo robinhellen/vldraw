@@ -22,20 +22,16 @@ namespace Ldraw.OpenGl
 		}
 		
 		public void Render(
-				GLDrawable drawable, Colour defaultColour, 
+				GLContext context, Colour defaultColour, 
 				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
 				LdrawObject model,
 				Gee.Set<LdrawNode> selection,
 				Overlay? overlay = null)
 		{
-			GLContext context = new GLContext(drawable, sharingContext, true, GLRenderType.RGBA_TYPE);
-			if(sharingContext == null)
-				sharingContext = context;
-				
-			drawable.gl_begin(context);
-
-			int width = 0; int height = 0;
-			drawable.get_size(out width, out height);
+			/*if(sharingContext == null)
+				sharingContext = context;*/
+			int width = context.get_window().get_width();
+			int height = context.get_window().get_height();
 			
 			// Set up the openGL viewing area
 			// Clear the colour and alpha
@@ -68,10 +64,6 @@ namespace Ldraw.OpenGl
 			
 			if(overlay != null)
 				overlay.Draw(new GlDrawingContext());
-
-			drawable.gl_end();
-			drawable.swap_buffers();
-			//drawable.wait_gl();
 		}
 
 		private Vector lookAt(Vector eye, Vector center, Vector up)

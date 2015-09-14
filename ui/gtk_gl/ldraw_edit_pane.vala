@@ -14,13 +14,16 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui.GtkGl
 {
-	private class LdrawEditPane : LdrawViewPane, ModelEditor
+	private class LdrawEditPane : LdrawViewPane, ModelEditor, Scrollable
 	{
 		public IOptions Settings {construct; private get;}
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		public AnimatedModel model {construct; private get;}
 		public DropBoundsOverlay DropOverlay {construct; private get;}
+
+		private Adjustment m_Hadj = null;
+		private Adjustment m_Vadj = null;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 		{
@@ -43,20 +46,12 @@ namespace Ldraw.Ui.GtkGl
 			overlay = DropOverlay;
 		}
 		
-		public override void Redraw()
+		public override bool render(GLContext context)
 		{
 			if(model == null)
 			{
-				return;
+				return false;
 			}
-
-			GLWindow drawableWin = widget_get_gl_window(this);
-			if(!(drawableWin is GLDrawable))
-			{
-				assert_not_reached();
-			}
-			
-			var drawable = (GLDrawable)drawableWin;
 
 			if(m_Eyeline == null)
 			{
@@ -64,7 +59,8 @@ namespace Ldraw.Ui.GtkGl
 				InitializeView();
 			}
 
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, model.Selection, overlay);
+			renderer.Render(context, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, model.Selection, overlay);
+			return false;
 		}
 
 		public override bool button_press_event(Gdk.EventButton event)
@@ -195,7 +191,7 @@ namespace Ldraw.Ui.GtkGl
 			}
 
 			// get the part from the drag data
-			string partName = (string)selection_data.data;
+			string partName = (string)selection_data.get_data();
 			if(partName.contains(","))
 			{
 				var sections = partName.split(",");
@@ -280,7 +276,7 @@ namespace Ldraw.Ui.GtkGl
 					DropOverlay.dropObject = droppedObject;
 					DropOverlay.dropLocation = newPosition;
 					DropOverlay.dropTransform = newTransform;
-					drag_status(context, context.suggested_action, time);
+					drag_status(context, context.get_suggested_action(), time);
 					queue_draw();
 				}
 			});
@@ -308,6 +304,57 @@ namespace Ldraw.Ui.GtkGl
 			parent.append(item);
 			item.show();
 		}
+		
+		public Adjustment hadjustment
+		{
+			construct set
+			{
+				m_Hadj = value;
+				m_Hadj.lower = -3000;
+				m_Hadj.upper = 3000;
+				m_Hadj.page_increment = 150;
+				m_Hadj.step_increment = 30;
+				m_Hadj.value_changed.connect(adj =>
+				{
+					float dx = -(float)adj.value - m_Center.X;
+					m_Center = m_Center.Add(Vector(dx, 0, 0));
+					m_Eyeline = m_Eyeline.Add(Vector(dx, 0, 0));
+					queue_draw();
+				});			
+				if(m_Center != null)
+					m_Hadj.value = -m_Center.X;		
+			}
+			get
+			{
+				return m_Hadj;
+			}
+		}
+		
+		public Adjustment vadjustment
+		{
+			construct set
+			{
+				m_Vadj = value;
+				m_Vadj.lower = -3000;
+				m_Vadj.upper = 3000;
+				m_Vadj.page_increment = 150;
+				m_Vadj.step_increment = 30;
+				m_Vadj.value_changed.connect(adj =>
+					{
+						float dy = -(float)adj.value - m_Center.Y;
+
+						m_Center = m_Center.Add(Vector(0, dy, 0));
+						m_Eyeline = m_Eyeline.Add(Vector(0, dy, 0));
+						queue_draw();
+					});
+				if(m_Center != null)
+					m_Vadj.value = -m_Center.Y;					
+			}
+			get
+			{
+				return m_Vadj;
+			}
+		}
 
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
@@ -328,20 +375,14 @@ namespace Ldraw.Ui.GtkGl
 									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y - 0.5f) / alloc.height),
 									 modelCenterZ - radius * 100));
 
-			GLWindow drawableWin = widget_get_gl_window(this);
-			GLDrawable drawable = (GLDrawable)drawableWin;
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
-
-			drawable.gl_begin(context);
-
+			GLContext context = get_context();
+			context.make_current();
+			
 			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
 			var selected = builder.Visit(model.Model);
 			
 			if(selected != null)
 				model.Select(selected);
-				
-			drawable.gl_end();
-			drawable.wait_gl();
 		}
 
 		private float ScaleBetween(float start, float end, float ratio)
