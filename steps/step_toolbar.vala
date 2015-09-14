@@ -4,7 +4,7 @@ using Ldraw.Ui;
 
 namespace Ldraw.Steps
 {
-	private class StepToolbar : Gtk.Object, ToolbarProvider
+	private class StepToolbar : Object, ToolbarProvider
 	{
 		public StepModel Model {construct; private get;}
 		
