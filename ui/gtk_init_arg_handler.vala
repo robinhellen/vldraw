@@ -10,9 +10,8 @@ namespace Ldraw.Ui
 		
 		public bool HandleArgs(string[] args)
 		{
-            // initialize Gtk and OpenGL
+            // initialize Gtk
             init(ref args);
-            Gdk.gl_init(ref args);
             return Inner.HandleArgs(args);		
 		}
 	}
