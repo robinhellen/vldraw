@@ -310,6 +310,8 @@ namespace Ldraw.Ui.GtkGl
 			construct set
 			{
 				m_Hadj = value;
+				if(value == null)
+					return;
 				m_Hadj.lower = -3000;
 				m_Hadj.upper = 3000;
 				m_Hadj.page_increment = 150;
@@ -335,6 +337,8 @@ namespace Ldraw.Ui.GtkGl
 			construct set
 			{
 				m_Vadj = value;
+				if(value == null)
+					return;
 				m_Vadj.lower = -3000;
 				m_Vadj.upper = 3000;
 				m_Vadj.page_increment = 150;
@@ -355,6 +359,9 @@ namespace Ldraw.Ui.GtkGl
 				return m_Vadj;
 			}
 		}
+		
+		public ScrollablePolicy hscroll_policy {get;set;}
+		public ScrollablePolicy vscroll_policy {get;set;}
 
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
