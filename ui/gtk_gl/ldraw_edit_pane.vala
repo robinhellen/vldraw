@@ -363,7 +363,7 @@ namespace Ldraw.Ui.GtkGl
 		private uint delKeyVal = keyval_from_name("Delete");
 	}
 	
-	private class DropBoundsOverlay : GLib.Object, Overlay
+	private class DropBoundsOverlay : GLib.Object, Ldraw.Ui.Widgets.Overlay
 	{
 		public LdrawObject? dropObject;
 		public Vector dropLocation;

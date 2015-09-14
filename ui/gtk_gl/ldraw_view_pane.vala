@@ -22,7 +22,7 @@ namespace Ldraw.Ui.GtkGl
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
 		
-		protected Overlay overlay = null;
+		protected Ldraw.Ui.Widgets.Overlay overlay = null;
 		
 		public Renderer renderer {construct; protected get;}
 		public ColourContext ColourContext {construct; protected get;}
@@ -71,7 +71,7 @@ namespace Ldraw.Ui.GtkGl
 			}
 		}
 		
-		public Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
+		public Ldraw.Ui.Widgets.Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
 
 		public Colour DefaultColour {get; set;}
 

@@ -92,7 +92,7 @@ namespace Ldraw.Ui
 			}
 		}
 		
-		private class MoveOriginOverlay : GLib.Object, Overlay
+		private class MoveOriginOverlay : GLib.Object, Ldraw.Ui.Widgets.Overlay
 		{
 			private MoveOriginDialog dialog;
 			
