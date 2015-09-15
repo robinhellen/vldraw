@@ -6,15 +6,16 @@ using Ldraw.Ui.DragAndDrop;
 
 namespace Ldraw.Ui.Widgets
 {
-	private class FourPaned : HPaned
+	private class FourPaned : Paned
 	{
 		private Paned left;
 		private Paned right;
 
 		construct
 		{
-			left = new VPaned();
-			right = new VPaned();
+			orientation = Orientation.HORIZONTAL;
+			left = new Paned(Orientation.VERTICAL);
+			right = new Paned(Orientation.VERTICAL);
 
 			add1(left);
 			add2(right);

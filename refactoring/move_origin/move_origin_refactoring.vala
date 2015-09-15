@@ -44,8 +44,8 @@ namespace Ldraw.Ui
 					Stock.CANCEL, ResponseType.REJECT);
 				dialog.set_default_response(ResponseType.ACCEPT);
 				var content = (Box) dialog.get_content_area();
-				var box = new HBox(false, 5);
-				var vbox = new VBox(false, 0);
+				var box = new Box(Orientation.HORIZONTAL, 5);
+				var vbox = new Box(Orientation.VERTICAL, 0);
 				var table = new Table(3, 2, false);
 				AttachToTable(table, new Label("X"), 0, 0);
 				AttachToTable(table, new Label("Y"), 0, 1);

@@ -9,13 +9,13 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	private class SetList : GLib.Object, IPartDragSource
+	private class SetList : Object, IPartDragSource
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
 		private TreeView partsView;
 		private PartUsageViewModel usageViewModel;
-		private VPaned widget;
+		private Paned widget;
 
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
@@ -25,7 +25,7 @@ namespace Ldraw.Ui
 		construct
 		{
 			sets = new ObservableList<Inventory>();
-			widget = new VPaned();
+			widget = new Paned(Orientation.VERTICAL);
 			InitializeControls();
 			Model.view_changed.connect(() => UpdateUsage.begin(false));
 		}
@@ -58,8 +58,8 @@ namespace Ldraw.Ui
 
 		private void InitializeControls()
 		{
-			var setControls = new VBox(false, 0);
-			var setButtons = new HBox(true, 2);
+			var setControls = new Box(Orientation.VERTICAL, 0);
+			var setButtons = new Box(Orientation.HORIZONTAL, 2);
 			var addButton = new Button.with_label("Add");
 			addButton.clicked.connect(() =>
 				{

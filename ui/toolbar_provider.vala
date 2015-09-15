@@ -276,7 +276,7 @@ namespace Ldraw.Ui
 				});
 
 			pack_start(grid, false, true, 10);
-			var button_box = new VBox(true, 10);
+			var button_box = new Box(Orientation.VERTICAL, 10);
 			button_box.pack_start(prevPageButton, true, false);
 			button_box.pack_start(nextPageButton, true, false);
 			pack_end(button_box, false);

@@ -47,7 +47,7 @@ namespace Ldraw.Ui
 			GetOriginalValues(model);
 
 			var contentArea = (VBox)dialog.get_content_area();
-			var animationControlsBox = new VBox(false, 0);
+			var animationControlsBox = new Box(Orientation.VERTICAL, 0);
 
 			var rotationAngleEntry = new Entry();
 			rotationAngleEntry.text = rotationAngle == null ? "" : rotationAngle.to_string();
@@ -97,7 +97,7 @@ namespace Ldraw.Ui
 			animationControlsBox.pack_start(enableRotation, false, false);
 			animationControlsBox.pack_start(rotationAngleEntry, false, false);
 
-			var rotationAxisHBox = new HBox(false, 0);
+			var rotationAxisHBox = new Box(Orientation.HORIZONTAL, 0);
 			rotationAxisHBox.pack_start(new Label("Axis: ("), false, false);
 			rotationAxisHBox.pack_start(rotationAxisX, false, false);
 			rotationAxisHBox.pack_start(new Label(", "), false, false);
