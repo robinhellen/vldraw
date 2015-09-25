@@ -4,10 +4,9 @@ namespace Ldraw.Ui
 {
     public Widget WithScrolls(Widget widget)
     {
-        //ScrolledWindow win = new ScrolledWindow(null, null);
-        //win.add(widget);
-        //return win;
-        return widget;
+        ScrolledWindow win = new ScrolledWindow(null, null);
+        win.add(widget);
+        return win;
     }
 
 	public Widget WithFrame(Widget widget)
