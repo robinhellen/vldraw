@@ -17,7 +17,6 @@ namespace Ldraw.Ui.GtkGl
 		protected Vector? m_Eyeline = null;
 		protected Vector? m_Center = null;
 		protected Vector? m_Up = null;
-		private DateTime m_LastRedraw = null;
 		
 		protected Ldraw.Ui.Widgets.Overlay overlay = null;
 		
@@ -31,6 +30,9 @@ namespace Ldraw.Ui.GtkGl
 
 		construct
 		{
+			auto_render = true;
+			has_alpha = true;
+			has_depth_buffer = true;
 			// minimum size 100 px square
 			set_size_request(100, 100);
 			
@@ -38,13 +40,14 @@ namespace Ldraw.Ui.GtkGl
 				m_Model =  new LdrawObject("", null);
 				
 			DefaultColour = ColourContext.GetColourById(0);
+			base.realize.connect(realize); // if we override the virtual, the base won't get called properly.
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
 		{
 			this(angle);
 			m_Model = model;
-			m_Model.VisibleChange.connect(() => queue_draw());
+			m_Model.VisibleChange.connect(() => queue_render());
 		}
 
 		public LdrawObject Model
@@ -56,14 +59,15 @@ namespace Ldraw.Ui.GtkGl
 			set
 			{
 				m_Model = value;
-				m_Model.VisibleChange.connect(() => queue_draw());
+				m_Model.VisibleChange.connect(() => queue_render());
 				m_Eyeline = m_Center = m_Up = null;
+				realize();
 
-				queue_draw();
+				queue_render();
 			}
 		}
 		
-		public Ldraw.Ui.Widgets.Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
+		public Ldraw.Ui.Widgets.Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_render());}}
 
 		public Colour DefaultColour {get; set;}
 		
@@ -71,7 +75,7 @@ namespace Ldraw.Ui.GtkGl
 		{
 			if(m_Model == null)
 			{
-				return false;
+				return true;
 			}
 
 			if(m_Eyeline == null)
@@ -79,9 +83,33 @@ namespace Ldraw.Ui.GtkGl
 				// setup viewing area.
 				InitializeView();
 			}
+			
+			renderer.Render2(context, Gee.Set.empty<LdrawNode>(), overlay,
+							 m_Scale, m_Scale, // scale
+							 45, -30, // long, lat
+							 //0,0,
+							 0, 0); // scroll
 
-			renderer.Render(context, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
-			return false;
+			//renderer.Render(context, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
+			var error = get_error();
+			if(error != null)
+			{
+				stderr.printf(@"rendering error: $(error.message).\n");
+			}
+			return true;
+		}
+		
+		public new void realize()
+		{
+			if(!get_realized())
+			{
+				return;
+			}
+			make_current();
+			if(get_error() != null)
+				return;
+				
+			renderer.PrepareRender(m_Model, DefaultColour);
 		}
 
 		public ViewAngle Angle
@@ -94,7 +122,7 @@ namespace Ldraw.Ui.GtkGl
 			{
 				m_Angle = value;
 				m_Eyeline = m_Center = m_Up = null;
-				queue_draw();
+				queue_render();
 			}
 		}
 
@@ -117,8 +145,7 @@ namespace Ldraw.Ui.GtkGl
 
 			Allocation alloc;
 			get_allocation(out alloc);
-			int size = (alloc.height > alloc.width) ? alloc.width : alloc.height;
-			m_Scale = (2 * modelRadius) / size;
+			m_Scale = (2 * modelRadius);
 			if(m_Scale < 0.0f) {m_Scale = -m_Scale;}
 			m_Scale = Math.fmaxf(m_Scale, 0.25f);
 
