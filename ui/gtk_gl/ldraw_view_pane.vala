@@ -85,8 +85,7 @@ namespace Ldraw.Ui.GtkGl
 							 lduViewWidth, lduViewHeight, // scale
 							 cameraLongitude, cameraLatitude,
 							 lduScrollX, lduScrollY); // scroll
-
-			//renderer.Render(context, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
+							 
 			var error = get_error();
 			if(error != null)
 			{
@@ -106,6 +105,16 @@ namespace Ldraw.Ui.GtkGl
 				return;
 				
 			renderer.PrepareRender(m_Model, DefaultColour);
+		}
+
+		public override void size_allocate(Allocation allocation)
+		{
+			Allocation old_allocation;
+			get_allocation(out old_allocation);
+			lduViewHeight *= ((float)allocation.height / old_allocation.height);
+			lduViewWidth *= ((float)allocation.width / old_allocation.width);	
+			base.size_allocate(allocation);
+					
 		}
 
 		public ViewAngle Angle
@@ -155,8 +164,20 @@ namespace Ldraw.Ui.GtkGl
 			// TODO
 			lduScrollX = lduScrollY = 0;
 			var bounds = m_Model.BoundingBox;
-			lduViewWidth = bounds.Radius;
-			lduViewHeight = bounds.Radius;
+			lduViewWidth = 2 * bounds.Radius;
+			lduViewHeight = 2 * bounds.Radius;
+			
+			Allocation alloc;
+			get_allocation(out alloc);
+			var allocRatio = alloc.width / alloc.height;
+			if(allocRatio > 1)
+			{
+				lduViewWidth *= allocRatio;
+			}
+			else
+			{
+				lduViewHeight /= allocRatio;
+			}
 		}
 		
 		private static Gee.Set<LdrawNode> emptySelection = Gee.Set.empty<LdrawNode>();
