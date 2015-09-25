@@ -46,23 +46,14 @@ namespace Ldraw.Ui.GtkGl
 			overlay = DropOverlay;
 		}
 		
-		public override bool render(GLContext context)
+		protected override Gee.Set<LdrawNode> CurrentSelection
 		{
-			if(model == null)
+			get
 			{
-				return false;
+				return model.Selection;
 			}
-
-			if(m_Eyeline == null)
-			{
-				// setup viewing area.
-				InitializeView();
-			}
-
-			renderer.Render(context, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, model.Selection, overlay);
-			return false;
 		}
-
+		
 		public override bool button_press_event(Gdk.EventButton event)
 		{
 			// if button is right, popup context menu
@@ -89,11 +80,13 @@ namespace Ldraw.Ui.GtkGl
 			switch(event.direction)
 			{
 				case ScrollDirection.UP:
-					m_Scale *= Math.powf(2, -0.2f);
+					lduViewHeight *= Math.powf(2, -0.2f);
+					lduViewWidth *= Math.powf(2, -0.2f);
 					queue_draw();
 					break;
 				case ScrollDirection.DOWN:
-					m_Scale *= Math.powf(2, 0.2f);
+					lduViewHeight *= Math.powf(2, 0.2f);
+					lduViewWidth *= Math.powf(2, 0.2f);
 					queue_draw();
 					break;
 			}
@@ -166,7 +159,7 @@ namespace Ldraw.Ui.GtkGl
 			queue_draw();
 		}
 
-		public override void drag_data_received (DragContext context, int x, int y,
+		/*public override void drag_data_received (DragContext context, int x, int y,
 												 SelectionData selection_data, uint info,
 												 uint time)
 		{
@@ -280,7 +273,7 @@ namespace Ldraw.Ui.GtkGl
 					queue_draw();
 				}
 			});
-		}
+		}*/
 
 		private Gtk.Menu CreateContextMenu()
 		{
@@ -318,13 +311,10 @@ namespace Ldraw.Ui.GtkGl
 				m_Hadj.step_increment = 30;
 				m_Hadj.value_changed.connect(adj =>
 				{
-					float dx = -(float)adj.value - m_Center.X;
-					m_Center = m_Center.Add(Vector(dx, 0, 0));
-					m_Eyeline = m_Eyeline.Add(Vector(dx, 0, 0));
+					lduScrollX = (float)adj.value;
 					queue_draw();
 				});			
-				if(m_Center != null)
-					m_Hadj.value = -m_Center.X;		
+				m_Hadj.value = lduScrollX;		
 			}
 			get
 			{
@@ -345,14 +335,10 @@ namespace Ldraw.Ui.GtkGl
 				m_Vadj.step_increment = 30;
 				m_Vadj.value_changed.connect(adj =>
 					{
-						float dy = -(float)adj.value - m_Center.Y;
-
-						m_Center = m_Center.Add(Vector(0, dy, 0));
-						m_Eyeline = m_Eyeline.Add(Vector(0, dy, 0));
+						lduScrollY = (float)adj.value;
 						queue_draw();
 					});
-				if(m_Center != null)
-					m_Vadj.value = -m_Center.Y;					
+				m_Vadj.value = lduScrollY;					
 			}
 			get
 			{
@@ -368,7 +354,7 @@ namespace Ldraw.Ui.GtkGl
 			Allocation alloc;
 			get_allocation(out alloc);
 
-			var fullBounds = CalculateViewArea();
+			/*var fullBounds = CalculateViewArea();
 
 			var modelBounds = model.Model.BoundingBox;
 			var radius = modelBounds.Radius;
@@ -389,7 +375,7 @@ namespace Ldraw.Ui.GtkGl
 			var selected = builder.Visit(model.Model);
 			
 			if(selected != null)
-				model.Select(selected);
+				model.Select(selected);*/
 		}
 
 		private float ScaleBetween(float start, float end, float ratio)

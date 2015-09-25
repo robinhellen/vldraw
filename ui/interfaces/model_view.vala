@@ -8,7 +8,7 @@ namespace Ldraw.Ui.Widgets
 	public interface ModelView : Widget
 	{
 		public abstract LdrawObject Model { set; protected get;}
-		public abstract ViewAngle Angle {set; get;}
+		public abstract ViewAngle Angle {set;}
 		public abstract Colour DefaultColour {get; set;}
 		public abstract Overlay Overlay {set;}
 		public signal void RenderingError(string description);

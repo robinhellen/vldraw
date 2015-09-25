@@ -12,11 +12,14 @@ namespace Ldraw.Ui.GtkGl
 	private class LdrawViewPane : GLArea, ModelView
 	{
 		private LdrawObject m_Model;
-		private ViewAngle m_Angle;
-		protected float m_Scale;
-		protected Vector? m_Eyeline = null;
-		protected Vector? m_Center = null;
-		protected Vector? m_Up = null;
+		
+		// camera viewpoint definition
+		private float cameraLongitude;
+		private float cameraLatitude;
+		protected float lduViewWidth;
+		protected float lduViewHeight;
+		protected float lduScrollX;
+		protected float lduScrollY;		
 		
 		protected Ldraw.Ui.Widgets.Overlay overlay = null;
 		
@@ -60,7 +63,7 @@ namespace Ldraw.Ui.GtkGl
 			{
 				m_Model = value;
 				m_Model.VisibleChange.connect(() => queue_render());
-				m_Eyeline = m_Center = m_Up = null;
+				CenterScrollAndZoom();
 				realize();
 
 				queue_render();
@@ -77,18 +80,11 @@ namespace Ldraw.Ui.GtkGl
 			{
 				return true;
 			}
-
-			if(m_Eyeline == null)
-			{
-				// setup viewing area.
-				InitializeView();
-			}
 			
-			renderer.Render2(context, Gee.Set.empty<LdrawNode>(), overlay,
-							 m_Scale, m_Scale, // scale
-							 45, -30, // long, lat
-							 //0,0,
-							 0, 0); // scroll
+			renderer.Render2(context, CurrentSelection, overlay,
+							 lduViewWidth, lduViewHeight, // scale
+							 cameraLongitude, cameraLatitude,
+							 lduScrollX, lduScrollY); // scroll
 
 			//renderer.Render(context, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
 			var error = get_error();
@@ -114,50 +110,63 @@ namespace Ldraw.Ui.GtkGl
 
 		public ViewAngle Angle
 		{
-			get
-			{
-				return m_Angle;
-			}
 			public set
 			{
-				m_Angle = value;
-				m_Eyeline = m_Center = m_Up = null;
+				switch(value)
+				{
+					case ViewAngle.Left:
+						cameraLatitude = 0;
+						cameraLongitude = 90;
+						break;
+					case ViewAngle.Right:
+						cameraLatitude = 0;
+						cameraLongitude = -90;
+						break;
+					case ViewAngle.Top:
+						cameraLatitude = -90;
+						cameraLongitude = 0;
+						break;
+					case ViewAngle.Bottom:
+						cameraLatitude = 90;
+						cameraLongitude = 0;
+						break;
+					case ViewAngle.Front:
+						cameraLatitude = 0;
+						cameraLongitude = 0;
+						break;
+					case ViewAngle.Back:
+						cameraLatitude = 0;
+						cameraLongitude = 180;
+						break;
+					case ViewAngle.Ortho:
+						cameraLatitude = -30;
+						cameraLongitude = 45;
+						break;
+					default:
+						assert_not_reached();
+				}
+				CenterScrollAndZoom();
 				queue_render();
 			}
 		}
-
-		protected void InitializeView()
+		
+		private void CenterScrollAndZoom()
 		{
-			var modelBounds = new Bounds.Clone(m_Model.BoundingBox);
-			if(modelBounds.Radius == 0)
-			{
-				var v = Vector(240, 120, 240);
-				modelBounds.Union(Vector.NullVector.Add(v));
-				modelBounds.Union(Vector.NullVector.Subtract(v));
-			}
-
-			float modelRadius = modelBounds.Radius;
-			var modelCenter = modelBounds.Center();
-			Vector cameraShift = m_Angle.GetCameraDirection().Scale(modelRadius);
-			m_Center = m_Angle.GetViewCenter(modelCenter);
-
-			m_Eyeline = m_Center.Add(cameraShift);
-
-			Allocation alloc;
-			get_allocation(out alloc);
-			m_Scale = (2 * modelRadius);
-			if(m_Scale < 0.0f) {m_Scale = -m_Scale;}
-			m_Scale = Math.fmaxf(m_Scale, 0.25f);
-
-			m_Up = m_Angle.GetCameraUp();
+			// TODO
+			lduScrollX = lduScrollY = 0;
+			var bounds = m_Model.BoundingBox;
+			lduViewWidth = bounds.Radius;
+			lduViewHeight = bounds.Radius;
 		}
-
-		protected Bounds CalculateViewArea()
+		
+		private static Gee.Set<LdrawNode> emptySelection = Gee.Set.empty<LdrawNode>();
+		
+		protected virtual Gee.Set<LdrawNode> CurrentSelection
 		{
-			Allocation alloc;
-			get_allocation(out alloc);
-
-			return m_Angle.GetViewBounds(alloc.width, alloc.height, m_Scale, m_Center);
+			get
+			{
+				return emptySelection;
+			}
 		}
 	}
 }
