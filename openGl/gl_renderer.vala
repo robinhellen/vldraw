@@ -113,12 +113,27 @@ namespace Ldraw.OpenGl
 			PrepareVertexData(model, defaultColour);
 		}
 		
+		static Map<LdrawObject, FlattenedNodes> cache = new HashMap<LdrawObject, FlattenedNodes>();
+		
+		private FlattenedNodes FlattenObject(LdrawObject model)
+		{
+			var cached = cache[model];
+			if(cached == null)
+			{
+				var flats = FlattenedNodes.FlatForObject(model);
+				cache[model] = flats;
+				cached = flats;
+				model.VisibleChange.connect(() => cache.unset(model));
+			}
+			return cached;
+		}
+		
 		private void PrepareVertexData(LdrawObject model, Colour defaultColour)
 		{
 			GLuint vao;
 			glGenVertexArrays(1, out vao);
 			glBindVertexArray(vao);
-			var nodes = FlattenedNodes.FlatForObject(model);
+			var nodes = FlattenObject(model);
 			
 			var vertices = new LinkedList<VertexInfo?>();
 			
