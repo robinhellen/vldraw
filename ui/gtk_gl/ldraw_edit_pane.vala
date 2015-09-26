@@ -33,8 +33,9 @@ namespace Ldraw.Ui.GtkGl
 		construct
 		{
 			can_focus = true;
-			events |= EventMask.BUTTON_PRESS_MASK;
-			events |= EventMask.KEY_PRESS_MASK;
+			events |= EventMask.BUTTON_PRESS_MASK 
+				   |  EventMask.KEY_PRESS_MASK
+				   |  EventMask.SCROLL_MASK;
 
 			// set up this control for drag-and-drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
