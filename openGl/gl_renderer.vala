@@ -106,17 +106,6 @@ namespace Ldraw.OpenGl
 			
 			glDisableVertexAttribArray(0);			
 		}
-		
-		public void Render(
-				GLContext context, Colour defaultColour, 
-				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
-				LdrawObject model,
-				Gee.Set<LdrawNode> selection,
-				Overlay? overlay = null)
-		{			
-			glUseProgram(program);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
 		{

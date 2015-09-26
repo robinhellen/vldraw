@@ -9,14 +9,7 @@ using Ldraw.Ui.Widgets;
 namespace Ldraw.Ui
 {
 	public interface Renderer : Object
-	{
-		public abstract void Render(
-				GLContext context, Colour defaultColour, 
-				Bounds viewArea, Vector eyeline, Vector center, Vector up, 
-				LdrawObject model,
-				Gee.Set<LdrawNode> selection,
-				Overlay? overlay = null);
-				
+	{				
 		public abstract void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection, 
 				Overlay? overlay,
