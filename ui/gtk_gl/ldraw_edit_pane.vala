@@ -55,6 +55,7 @@ namespace Ldraw.Ui.GtkGl
 			}
 		}
 		
+		// event overrides.		
 		public override bool button_press_event(Gdk.EventButton event)
 		{
 			base.button_press_event(event);
@@ -143,6 +144,9 @@ namespace Ldraw.Ui.GtkGl
 			return false;
 		}
 
+		// end of event overrides.
+		
+		// drag and drop events
 		private bool finishDrag = false;
 
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
@@ -284,6 +288,8 @@ namespace Ldraw.Ui.GtkGl
 			});
 		}*/
 
+		// end of drag and drop events.
+	
 		private Gtk.Menu CreateContextMenu()
 		{
 			Gtk.Menu menu = new Gtk.Menu();
@@ -308,6 +314,7 @@ namespace Ldraw.Ui.GtkGl
 			item.show();
 		}
 		
+		// implementation of Scrollable
 		public Adjustment hadjustment
 		{
 			construct set
@@ -358,6 +365,8 @@ namespace Ldraw.Ui.GtkGl
 		
 		public ScrollablePolicy hscroll_policy {get;set;}
 		public ScrollablePolicy vscroll_policy {get;set;}
+
+		// end implementation of Scrollable
 
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
