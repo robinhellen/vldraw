@@ -56,6 +56,7 @@ namespace Ldraw.Ui.GtkGl
 		
 		public override bool button_press_event(Gdk.EventButton event)
 		{
+			base.button_press_event(event);
 			// if button is right, popup context menu
 			grab_focus();
 			switch(event.button)
@@ -70,9 +71,16 @@ namespace Ldraw.Ui.GtkGl
 					break;
 				case 3: // right button
 					CreateContextMenu().popup(null, null, null, event.button, event.time);
-					return true;
+					break;
 			}
 			return false;
+		}
+		
+		public override bool popup_menu()
+		{
+			base.popup_menu();
+			CreateContextMenu().popup(null, null, null, 0, get_current_event_time());
+			return false;		
 		}
 
 		public override bool scroll_event(Gdk.EventScroll event)
@@ -278,6 +286,7 @@ namespace Ldraw.Ui.GtkGl
 		private Gtk.Menu CreateContextMenu()
 		{
 			Gtk.Menu menu = new Gtk.Menu();
+			menu.attach_widget = this;
 			
 			AppendMenuFor(ViewAngle.Front, "Front", menu);
 			AppendMenuFor(ViewAngle.Back, "Back", menu);
