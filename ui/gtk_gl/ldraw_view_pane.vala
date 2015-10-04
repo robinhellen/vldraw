@@ -176,7 +176,7 @@ namespace Ldraw.Ui.GtkGl
 			
 			Allocation alloc;
 			get_allocation(out alloc);
-			var allocRatio = alloc.width / alloc.height;
+			var allocRatio = (float)alloc.width / alloc.height;
 			if(allocRatio > 1)
 			{
 				lduViewWidth *= allocRatio;
