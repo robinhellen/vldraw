@@ -161,9 +161,16 @@ namespace Ldraw.Ui.GtkGl
 		
 		private void CenterScrollAndZoom()
 		{
-			// TODO
-			lduScrollX = lduScrollY = 0;
 			var bounds = m_Model.BoundingBox;
+						
+			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);			
+			var m = latTransform.TransformMatrix(longTransform);
+			var transformedCenter = m.TransformVector(bounds.Center());
+			lduScrollX = -transformedCenter.X;
+			lduScrollY = -transformedCenter.Y;
+			
+			
 			lduViewWidth = 2 * bounds.Radius;
 			lduViewHeight = 2 * bounds.Radius;
 			
@@ -177,7 +184,7 @@ namespace Ldraw.Ui.GtkGl
 			else
 			{
 				lduViewHeight /= allocRatio;
-			}
+			}			
 		}
 		
 		private static Gee.Set<LdrawNode> emptySelection = Gee.Set.empty<LdrawNode>();
