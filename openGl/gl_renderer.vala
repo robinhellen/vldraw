@@ -215,18 +215,20 @@ namespace Ldraw.OpenGl
 			GLfloat[] vertexNorms = {};
 			vertexNormalsList.foreach(x => {vertexNorms += x; return true;});
 			
-			glGenBuffers(1, out vertexBuffer);
+			GLuint[] buffers = {0,0,0};
+			glGenBuffers(3, buffers);	
+			vertexBuffer = buffers[0];
+			vertexColourBuffer = buffers[1];
+			vertexNormals = buffers[2];		
+			
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 			glBufferData(GL_ARRAY_BUFFER, vertexPositionsList.size * sizeof(GLfloat), (GLvoid[]) vertexData, GL_STATIC_DRAW);
 			
-			glGenBuffers(1, out vertexColourBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexColourBuffer);
 			glBufferData(GL_ARRAY_BUFFER, vertexColoursList.size * sizeof(GLfloat), (GLvoid[]) vertexColours, GL_STATIC_DRAW);
 			
-			glGenBuffers(1, out vertexNormals);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexNormals);
 			glBufferData(GL_ARRAY_BUFFER, vertexNormalsList.size * sizeof(GLfloat), (GLvoid[]) vertexNorms, GL_STATIC_DRAW);
-			
 			
 			glClearColor(1f,1f,1f,0f);			
 		}

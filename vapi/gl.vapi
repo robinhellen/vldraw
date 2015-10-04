@@ -9429,7 +9429,7 @@ namespace GL {
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenAsyncMarkersSGIX")]
 	public static GL.GLuint glGenAsyncMarkersSGIX (GL.GLsizei range);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenBuffers")]
-	public static void glGenBuffers (GL.GLsizei n, out GL.GLuint buffers);
+	public static void glGenBuffers (GL.GLsizei n, [CCode (array_length = false)] GL.GLuint[] buffers);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenBuffersARB")]
 	public static void glGenBuffersARB (GL.GLsizei n, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] buffers);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenFencesAPPLE")]
