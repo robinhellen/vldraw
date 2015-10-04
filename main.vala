@@ -60,7 +60,6 @@ namespace Ldraw
             
             // OpenGl stuff
             builder.register<GlRenderer>().as<Renderer>();
-            builder.register<FromFlatRenderer>().as<IRenderModel>();
             
             builder.register_module<StepsModule>();
             builder.register_module<LibraryModule>();

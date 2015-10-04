@@ -11,15 +11,7 @@ using Ldraw.Ui.Widgets;
 namespace Ldraw.OpenGl
 {
 	public class GlRenderer : Object, Renderer
-	{
-		public IRenderModel ModelRenderer {construct; private get;}
-		
-		public GlRenderer()
-		{
-			var m = new FromFlatRenderer();
-			Object(ModelRenderer: m);
-		}
-		
+	{		
 		// initialized at preparation time, and then used at render time.
 		//	  vertex information
 		GLuint vertexBuffer;
@@ -392,19 +384,9 @@ void main(){
 		}
 	}
 	
-	public class StandardModelRenderer : Object, IRenderModel
-	{
-		public void RenderModel(LdrawObject model, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection)
-		{
-			GlBuilder builder = new GlBuilder(colour, finalEyeline, Gee.Map.empty<string, float?>(), selection);
-			model.BuildFromFile<void>(builder);	
-			
-			builder.Flush();		
-		}
-	}
-	
-	public interface IRenderModel : Object
-	{
-		public abstract void RenderModel(LdrawObject object, Colour colour, Vector finalEyeline, Gee.Set<LdrawNode> selection);			
-	}
+	public interface RenderNodeStrategy : Object
+    {
+        public abstract void StartModel(LdrawObject object);            
+        public abstract bool ShouldRenderNode(LdrawNode node);
+    }
 }
