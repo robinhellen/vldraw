@@ -49,6 +49,7 @@ namespace Ldraw
 			builder.register_module<WidgetsModule>();
 			builder.register_module<GtkGlModule>();
 			builder.register_module<MoveOriginModule>();
+			builder.register_module<OpenGlModule>();
 			
             builder.register<RunningOptions>().as<IOptions>();
 
