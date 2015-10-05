@@ -111,6 +111,9 @@ namespace Ldraw.OpenGl
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
 		{
 			CreateProgram();
+			GLuint vao;
+			glGenVertexArrays(1, out vao);
+			glBindVertexArray(vao);
 			PrepareVertexData(model, defaultColour);
 		}
 		
@@ -129,106 +132,30 @@ namespace Ldraw.OpenGl
 			return cached;
 		}
 		
+		/*private void PrepareAllVertexData(LdrawObject model, Colour defaultColour)
+		{
+			foreach(var node in 
+		}*/
+		
 		private void PrepareVertexData(LdrawObject model, Colour defaultColour)
 		{
-			GLuint vao;
-			glGenVertexArrays(1, out vao);
-			glBindVertexArray(vao);
 			var nodes = FlattenObject(model);
-			
-			var vertices = new LinkedList<VertexInfo?>();
-			
-			var triangles = nodes.Triangles;
-			foreach(var colour in triangles.get_keys())
-			{
-				foreach(var colouredTri in triangles[colour])
-				{
-					// calculate normal
-					var a = colouredTri.A;
-					var b = colouredTri.B;
-					var c = colouredTri.C;
-					
-					var normal = b.Subtract(a).Cross(c.Subtract(a));
-					
-					var x = VertexInfo(a, normal, colour);
-					var y = VertexInfo(b, normal, colour);
-					var z = VertexInfo(c, normal, colour);
-					vertices.add(x);
-					vertices.add(y);
-					vertices.add(z);					
-				}
-			}
-			var quads = nodes.Quads;
-			foreach(var colour in quads.get_keys())
-			{
-				foreach(var colouredQuad in quads[colour])
-				{
-					// calculate normal
-					var a = colouredQuad.A;
-					var b = colouredQuad.B;
-					var c = colouredQuad.C;
-					var d = colouredQuad.D;
-					
-					var normal = b.Subtract(a).Cross(c.Subtract(a));
-					
-					
-					// decompose to triangles
-					var x = VertexInfo(a, normal, colour);
-					var y = VertexInfo(b, normal, colour);
-					var z = VertexInfo(c, normal, colour);
-					vertices.add(x);
-					vertices.add(y);
-					vertices.add(z);
-					x = VertexInfo(a, normal, colour);
-					y = VertexInfo(c, normal, colour);
-					z = VertexInfo(d, normal, colour);
-					vertices.add(x);
-					vertices.add(y);
-					vertices.add(z);						
-				}
-			}
-			vertexCount = vertices.size;
-			
-			var vertexPositionsList = new LinkedList<float?>();
-			var vertexColoursList = new LinkedList<float?>();
-			var vertexNormalsList = new LinkedList<float?>();
-			
-			foreach(var vertex in vertices)
-			{
-				vertexPositionsList.add(vertex.Position.X);
-				vertexPositionsList.add(vertex.Position.Y);
-				vertexPositionsList.add(vertex.Position.Z);
-				vertex.Colour.UseColour((r,g,b,a) => 
-					{
-						vertexColoursList.add(r);
-						vertexColoursList.add(g);
-						vertexColoursList.add(b);
-					}, defaultColour);
-				vertexNormalsList.add(vertex.Normal.X);
-				vertexNormalsList.add(vertex.Normal.Y);
-				vertexNormalsList.add(vertex.Normal.Z);
-			}
-			GLfloat[] vertexData = {};
-			vertexPositionsList.foreach(x => {vertexData += x; return true;});
-			GLfloat[] vertexColours = {};
-			vertexColoursList.foreach(x => {vertexColours += x; return true;});
-			GLfloat[] vertexNorms = {};
-			vertexNormalsList.foreach(x => {vertexNorms += x; return true;});
 			
 			GLuint[] buffers = {0,0,0};
 			glGenBuffers(3, buffers);	
 			vertexBuffer = buffers[0];
 			vertexColourBuffer = buffers[1];
-			vertexNormals = buffers[2];		
+			vertexNormals = buffers[2];	
+			vertexCount = nodes.ArraySizes;	
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, vertexPositionsList.size * sizeof(GLfloat), (GLvoid[]) vertexData, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Vertices, GL_STATIC_DRAW);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vertexColourBuffer);
-			glBufferData(GL_ARRAY_BUFFER, vertexColoursList.size * sizeof(GLfloat), (GLvoid[]) vertexColours, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Colours, GL_STATIC_DRAW);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, vertexNormals);
-			glBufferData(GL_ARRAY_BUFFER, vertexNormalsList.size * sizeof(GLfloat), (GLvoid[]) vertexNorms, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Normals, GL_STATIC_DRAW);
 			
 			glClearColor(1f,1f,1f,0f);			
 		}
