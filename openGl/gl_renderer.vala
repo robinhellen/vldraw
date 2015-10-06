@@ -34,6 +34,7 @@ namespace Ldraw.OpenGl
 		GLint scrollMatrix;
 		GLint viewAngleMatrix;
 		GLint scaleMatrix;
+		GLint modelMatrix;
 		GLint lightColour;
 		GLint lightPosition;
 		GLint defaultColour;
@@ -63,6 +64,11 @@ namespace Ldraw.OpenGl
 										0, -2 / lduHeight,0, 0,
 										0, 0, 0.0001f, 0,
 										0, 0, 0, 1};
+			float modelTransform[16] = {1, 0, 0, 0,
+									    0, 1, 0, 0,
+									    0, 0, 1, 0,
+									    0, 0, 0, 1};
+			
 									     
 			
 			glUseProgram(program);
@@ -70,6 +76,7 @@ namespace Ldraw.OpenGl
 			glUniformMatrix4fv(viewAngleMatrix, 1, (GLboolean)GL_FALSE, viewingAngle);
 			glUniformMatrix4fv(scrollMatrix, 1, (GLboolean)GL_FALSE, scrollTransform);
 			glUniformMatrix4fv(scaleMatrix, 1, (GLboolean)GL_FALSE, scaleTransform);
+			glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
 			glUniform3fv(lightColour, 1, {1f,1f,1f});
 			glUniform3fv(lightPosition, 1, {-20,-30,-50});
 			glUniform4fv(defaultColour, 1, {DefaultColour.Red / 255f, DefaultColour.Green / 255f, DefaultColour.Blue / 255f, DefaultColour.Alpha / 255f});
@@ -210,6 +217,7 @@ namespace Ldraw.OpenGl
 			lightColour = glGetUniformLocation(program, "LightColor");
 			defaultColour = glGetUniformLocation(program, "DefaultColour");
 			defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");
+			modelMatrix = glGetUniformLocation(program, "modelTransform");
 		}
 		
 		private void CheckShaderStatus(GLuint shader)
