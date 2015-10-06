@@ -8,27 +8,27 @@ namespace Ldraw.Ui
 {
 	public class WidgetsModule : Module
 	{
-		public override void Load(ContainerBuilder builder)
+		public override void load(ContainerBuilder builder)
 		{
-            builder.Register<PartsTree>().As<IPartDragSource>();
-            builder.Register<SetList>().As<IPartDragSource>().SingleInstance();            
-            builder.Register<EditPanes>();
-            builder.Register<SubModelsTree>().As<IPartDragSource>();
-            builder.Register<ModelList>();
-            builder.Register<MainMenu>();
-            builder.Register<ColourToolbar>().As<ToolbarProvider>();
-            builder.Register<MovementToolbar>().As<ToolbarProvider>();
+            builder.register<PartsTree>().as<IPartDragSource>();
+            builder.register<SetList>().as<IPartDragSource>().single_instance();            
+            builder.register<EditPanes>();
+            builder.register<SubModelsTree>().as<IPartDragSource>();
+            builder.register<ModelList>();
+            builder.register<MainMenu>();
+            builder.register<ColourToolbar>().as<ToolbarProvider>();
+            builder.register<MovementToolbar>().as<ToolbarProvider>();
             
-            builder.Register<RecentChooserMenu>().As<RecentChooser>();
-            builder.Register<RecentManager>(() => RecentManager.get_default());            
+            builder.register<RecentChooserMenu>().as<RecentChooser>();
+            builder.register<RecentManager>(() => RecentManager.get_default());            
             
-            builder.Register<MainWindow>()
-					.IgnoreProperty("type")
-					.IgnoreProperty("transient-for")
-					.IgnoreProperty("attached-to");
+            builder.register<MainWindow>()
+					.ignore_property("type")
+					.ignore_property("transient-for")
+					.ignore_property("attached-to");
 					
-            builder.Register<LdrawEditorUi>().As<UserInterface>();
-            builder.Register<GtkInitialisingArgHandler>().AsDecorator<ArgumentHandler>();
+            builder.register<LdrawEditorUi>().as<UserInterface>();
+            builder.register<GtkInitialisingArgHandler>().as_decorator<ArgumentHandler>();
 		}
 	}
 }

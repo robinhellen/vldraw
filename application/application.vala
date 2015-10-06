@@ -8,7 +8,7 @@ namespace Ldraw.Application
 		static construct
 		{
 			var cls = (ObjectClass)typeof(Application).class_ref();
-			SetCollectionInjection<InitializeOnStartup>(cls, "StartupInitializers");
+			set_collection_injection<InitializeOnStartup>(cls, "StartupInitializers");
 		}
 		
 		public ArgumentHandler ArgHandler {construct; private get;}

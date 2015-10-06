@@ -15,7 +15,7 @@ namespace Ldraw.Ui
 		static construct
 		{
 			var cls = (ObjectClass)typeof(MainMenu).class_ref();
-			SetCollectionInjection<Refactoring>(cls, "Refactorings");
+			set_collection_injection<Refactoring>(cls, "Refactorings");
 		}
 		
 		public AnimatedModel Model {construct; private get;}

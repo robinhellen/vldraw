@@ -5,9 +5,9 @@ namespace Ldraw.Refactor
 {
 	public class MoveOriginModule : Module
 	{
-		public override void Load(ContainerBuilder builder)
+		public override void load(ContainerBuilder builder)
 		{
-            builder.Register<MoveOriginRefactoring>().As<Refactoring>();
+            builder.register<MoveOriginRefactoring>().as<Refactoring>();
 		}
 	}
 }

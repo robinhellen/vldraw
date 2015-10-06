@@ -20,8 +20,8 @@ namespace Ldraw.Ui
 		static construct
 		{
 			var cls = (ObjectClass)typeof(MainWindow).class_ref();
-			SetCollectionInjection<IPartDragSource>(cls, "PartSourcesConstruct");
-			SetCollectionInjection<ToolbarProvider>(cls, "ToolbarProviders");
+			set_collection_injection<IPartDragSource>(cls, "PartSourcesConstruct");
+			set_collection_injection<ToolbarProvider>(cls, "ToolbarProviders");
 		}
 		
         private ComboBox m_SubModels;

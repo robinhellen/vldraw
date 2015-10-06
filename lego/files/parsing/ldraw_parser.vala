@@ -10,7 +10,7 @@ namespace Ldraw.Lego
 		static construct
 		{
 			var cls = (ObjectClass)typeof(LdrawParser).class_ref();
-			SetIndexedInjection<string, CommandFactory>(cls, "CommandFactories");
+			set_indexed_injection<string, CommandFactory>(cls, "CommandFactories");
 		}
 		
 		public Index<CommandFactory, string> CommandFactories {construct; private get;}

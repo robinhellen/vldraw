@@ -16,7 +16,7 @@ namespace Ldraw.Lego.Library
 		static construct
 		{
 			var cls = (ObjectClass)typeof(OnDemandPartLoader).class_ref();
-			SetIndexedInjection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
+			set_indexed_injection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
 		}
 
 		private Map<string, LdrawPrimitive> primitivesCache = new HashMap<string, LdrawPrimitive>();

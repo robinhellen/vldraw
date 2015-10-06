@@ -2,7 +2,7 @@ DEFAULT: all
 
 .SECONDEXPANSION:
 
-VALACC=valac-0.26
+VALACC=valac-0.28
 gee=gee-0.8
 gio=gio-2.0
 gtk=gtk+-2.0

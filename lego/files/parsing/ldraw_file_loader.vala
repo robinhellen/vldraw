@@ -17,7 +17,7 @@ namespace Ldraw.Lego
 		static construct
 		{
 			var cls = (ObjectClass)typeof(LdrawFileLoader).class_ref();
-			SetIndexedInjection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
+			set_indexed_injection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
 		}
 
 		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy)

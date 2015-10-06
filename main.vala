@@ -24,51 +24,51 @@ namespace Ldraw
             var builder = new ContainerBuilder();
 
             // Parts library
-            builder.Register<LdrawLibrary>().As<ILdrawFolders>();
+            builder.register<LdrawLibrary>().as<ILdrawFolders>();
 
             // Model file handling
-            builder.Register<LdrawFileLoader>();
-            builder.Register<LdrawParser>();
-            builder.Register<FileReaderFactory>();
-            builder.RegisterModule<CommandFactoryModule>();
+            builder.register<LdrawFileLoader>();
+            builder.register<LdrawParser>();
+            builder.register<FileReaderFactory>();
+            builder.register_module<CommandFactoryModule>();
 
             // Peeron communication
-            builder.Register<InventoryReader>();
-            builder.Register<ColourChart>();
+            builder.register<InventoryReader>();
+            builder.register<ColourChart>();
 
             // UI components            
-            builder.Register<DialogManager>().As<IDialogManager>();
+            builder.register<DialogManager>().as<IDialogManager>();
 
-            builder.Register<LibrarySubFileLocator>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
-            builder.Register<OnDemandSubFileLoader>().Keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
+            builder.register<LibrarySubFileLocator>().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
+            builder.register<OnDemandSubFileLoader>().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 
-            builder.Register<OnDemandPartLoader>().As<IDatFileCache>().SingleInstance();
-            builder.Register<FileCachedLibrary>().As<ILibrary>();
+            builder.register<OnDemandPartLoader>().as<IDatFileCache>().single_instance();
+            builder.register<FileCachedLibrary>().as<ILibrary>();
 			
-			builder.RegisterModule<DragAndDropModule>();
-			builder.RegisterModule<WidgetsModule>();
-			builder.RegisterModule<GtkGlModule>();
-			builder.RegisterModule<MoveOriginModule>();
+			builder.register_module<DragAndDropModule>();
+			builder.register_module<WidgetsModule>();
+			builder.register_module<GtkGlModule>();
+			builder.register_module<MoveOriginModule>();
 			
-            builder.Register<RunningOptions>().As<IOptions>();
+            builder.register<RunningOptions>().as<IOptions>();
 
-            builder.Register<UndoStack>().SingleInstance();
+            builder.register<UndoStack>().single_instance();
             var animatedModel = new AnimatedModel(null);
-            builder.Register<AnimatedModel>(_ => animatedModel);
-            builder.Register<FileLoadingArgHandler>().As<ArgumentHandler>();
-            builder.Register<Ldraw.Application.Application>();
+            builder.register<AnimatedModel>(_ => animatedModel);
+            builder.register<FileLoadingArgHandler>().as<ArgumentHandler>();
+            builder.register<Ldraw.Application.Application>();
             
             // OpenGl stuff
-            builder.Register<GlRenderer>().As<Renderer>();
-            builder.Register<FromFlatRenderer>().As<IRenderModel>();
+            builder.register<GlRenderer>().as<Renderer>();
+            builder.register<FromFlatRenderer>().as<IRenderModel>();
             
-            builder.RegisterModule<StepsModule>();
-            builder.RegisterModule<LibraryModule>();
+            builder.register_module<StepsModule>();
+            builder.register_module<LibraryModule>();
             
-            var container = builder.Build();
+            var container = builder.build();
 
             // load up the colours
-			var application = container.Resolve<Ldraw.Application.Application>();
+			var application = container.resolve<Ldraw.Application.Application>();
 			
 			application.Run(args);
 			
