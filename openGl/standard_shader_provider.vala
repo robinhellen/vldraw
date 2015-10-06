@@ -57,6 +57,8 @@ uniform mat4 scroll;
 uniform mat4 scale;
 uniform mat4 view_angle;
 uniform vec3 LightPosition_worldspace = vec3(20,30,50);
+uniform vec4 DefaultColour;
+uniform vec4 DefaultEdgeColour;
 
 out vec3 fragmentColour;
 out vec3 Position_worldspace;
@@ -80,7 +82,12 @@ void main () {
 	
 	Normal_cameraspace = (scroll * view_angle * vec4(vertexNormal,0)).xyz;	
 	
-	fragmentColour = vertexColour;
+	if(vertexColour.x == -1f)
+		fragmentColour = DefaultColour.xyz;
+	else if(vertexColour.x == -2f)
+		fragmentColour = DefaultEdgeColour.xyz;
+	else
+		fragmentColour = vertexColour;
 }
 ";
 	}

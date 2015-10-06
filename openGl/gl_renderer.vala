@@ -36,6 +36,9 @@ namespace Ldraw.OpenGl
 		GLint scaleMatrix;
 		GLint lightColour;
 		GLint lightPosition;
+		GLint defaultColour;
+		GLint defaultEdgeColour;
+		Colour DefaultColour;
 		
 		public void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection,
@@ -69,6 +72,8 @@ namespace Ldraw.OpenGl
 			glUniformMatrix4fv(scaleMatrix, 1, (GLboolean)GL_FALSE, scaleTransform);
 			glUniform3fv(lightColour, 1, {1f,1f,1f});
 			glUniform3fv(lightPosition, 1, {-20,-30,-50});
+			glUniform4fv(defaultColour, 1, {DefaultColour.Red / 255f, DefaultColour.Green / 255f, DefaultColour.Blue / 255f, DefaultColour.Alpha / 255f});
+			glUniform4fv(defaultEdgeColour, 1, {DefaultColour.EdgeRed / 255f, DefaultColour.EdgeGreen / 255f, DefaultColour.EdgeBlue / 255f, DefaultColour.Alpha / 255f});
 			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
@@ -157,7 +162,9 @@ namespace Ldraw.OpenGl
 			glBindBuffer(GL_ARRAY_BUFFER, vertexNormals);
 			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Normals, GL_STATIC_DRAW);
 			
-			glClearColor(1f,1f,1f,0f);			
+			glClearColor(1f,1f,1f,0f);
+			
+			DefaultColour = defaultColour;
 		}
 		
 		private struct VertexInfo
@@ -200,11 +207,9 @@ namespace Ldraw.OpenGl
 			viewAngleMatrix = glGetUniformLocation(program, "view_angle");
 			scaleMatrix = glGetUniformLocation(program, "scale");
 			lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
-			if(lightPosition == -1)
-				stderr.printf(@"Could not get program location for light position.\n");
 			lightColour = glGetUniformLocation(program, "LightColor");
-			if(lightColour == -1)
-				stderr.printf(@"Could not get program location for light colour.\n");
+			defaultColour = glGetUniformLocation(program, "DefaultColour");
+			defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");
 		}
 		
 		private void CheckShaderStatus(GLuint shader)
