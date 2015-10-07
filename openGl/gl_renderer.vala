@@ -22,13 +22,7 @@ namespace Ldraw.OpenGl
 		}	
 		
 		// initialized at preparation time, and then used at render time.
-		//	  vertex information
-		GLuint vertexBuffer;
-		GLuint vertexColourBuffer;
-		GLuint vertexNormals;
-		//    how many triangles there are to draw
-		int vertexCount;
-		//	  the program itself
+		//	  the program 
 		GLuint program;
 		//	  uniform parameters to the shaders
 		GLint scrollMatrix;
@@ -40,6 +34,7 @@ namespace Ldraw.OpenGl
 		GLint defaultColour;
 		GLint defaultEdgeColour;
 		Colour DefaultColour;
+		LdrawObject currentModel;
 		
 		public void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection,
@@ -64,60 +59,114 @@ namespace Ldraw.OpenGl
 										0, -2 / lduHeight,0, 0,
 										0, 0, 0.0001f, 0,
 										0, 0, 0, 1};
-			float modelTransform[16] = {1, 0, 0, 0,
-									    0, 1, 0, 0,
-									    0, 0, 1, 0,
-									    0, 0, 0, 1};
-			
-									     
-			
+													
 			glUseProgram(program);
 			 
 			glUniformMatrix4fv(viewAngleMatrix, 1, (GLboolean)GL_FALSE, viewingAngle);
 			glUniformMatrix4fv(scrollMatrix, 1, (GLboolean)GL_FALSE, scrollTransform);
 			glUniformMatrix4fv(scaleMatrix, 1, (GLboolean)GL_FALSE, scaleTransform);
-			glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
 			glUniform3fv(lightColour, 1, {1f,1f,1f});
-			glUniform3fv(lightPosition, 1, {-20,-30,-50});
-			glUniform4fv(defaultColour, 1, {DefaultColour.Red / 255f, DefaultColour.Green / 255f, DefaultColour.Blue / 255f, DefaultColour.Alpha / 255f});
-			glUniform4fv(defaultEdgeColour, 1, {DefaultColour.EdgeRed / 255f, DefaultColour.EdgeGreen / 255f, DefaultColour.EdgeBlue / 255f, DefaultColour.Alpha / 255f});
+			glUniform3fv(lightPosition, 1, {-2000,-3000,-5000});
 			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-			glVertexAttribPointer(
-				0,
-				3,
-				GL_FLOAT,
-				(GLboolean) GL_FALSE,
-				0,
-				null
-			);
 			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexColourBuffer);
-			glVertexAttribPointer(
-				1,
-				3,
-				GL_FLOAT,
-				(GLboolean) GL_FALSE,
-				0,
-				null
-			);
-			
 			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexNormals);
-			glVertexAttribPointer(
-				2,
-				3,
-				GL_FLOAT,
-				(GLboolean) GL_FALSE,
-				0,
-				null
-			);
-			glDrawArrays(GL_TRIANGLES, 0, 3 * vertexCount);
 			
-			glDisableVertexAttribArray(0);			
+			if(currentModel.File is LdrawModelFile)
+			{			
+				foreach(var node in currentModel.Nodes)
+				{
+					var partNode = node as PartNode;
+					if(partNode == null)
+						continue;
+					var t = partNode.Transform;
+					var v = partNode.Center;
+					var colour = partNode.Colour;
+					float modelTransform[16] = 
+								{t[0,0], t[1,0], t[2,0], 0,
+								 t[0,1], t[1,1], t[2,1], 0,
+								 t[0,2], t[1,2], t[2,2], 0,
+								 v.X   , v.Y   , v.Z   , 1};
+					glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
+					glUniform4fv(defaultColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
+					glUniform4fv(defaultEdgeColour, 1, {colour.EdgeRed / 255f, colour.EdgeGreen / 255f, colour.EdgeBlue / 255f, colour.Alpha / 255f});
+				
+					var arrays = arrayCache[partNode.Contents];
+					glBindBuffer(GL_ARRAY_BUFFER, arrays.vertexBuffer);
+					glVertexAttribPointer(
+						0,
+						3,
+						GL_FLOAT,
+						(GLboolean) GL_FALSE,
+						0,
+						null
+					);
+					glBindBuffer(GL_ARRAY_BUFFER, arrays.colourBuffer);
+					glVertexAttribPointer(
+						1,
+						3,
+						GL_FLOAT,
+						(GLboolean) GL_FALSE,
+						0,
+						null
+					);
+					
+					glBindBuffer(GL_ARRAY_BUFFER, arrays.normalBuffer);
+					glVertexAttribPointer(
+						2,
+						3,
+						GL_FLOAT,
+						(GLboolean) GL_FALSE,
+						0,
+						null
+					);
+					glDrawArrays(GL_TRIANGLES, 0, 3 * arrays.count);	
+				}
+			}
+			else
+			{				
+				float modelTransform[16] = 
+							{1, 0, 0, 0,
+							 0, 1, 0, 0,
+							 0, 0, 1, 0,
+							 0, 0, 0, 1};
+				glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
+				glUniform4fv(defaultColour, 1, {DefaultColour.Red / 255f, DefaultColour.Green / 255f, DefaultColour.Blue / 255f, DefaultColour.Alpha / 255f});
+				glUniform4fv(defaultEdgeColour, 1, {DefaultColour.EdgeRed / 255f, DefaultColour.EdgeGreen / 255f, DefaultColour.EdgeBlue / 255f, DefaultColour.Alpha / 255f});
+			
+				var arrays = arrayCache[currentModel];
+				glBindBuffer(GL_ARRAY_BUFFER, arrays.vertexBuffer);
+				glVertexAttribPointer(
+					0,
+					3,
+					GL_FLOAT,
+					(GLboolean) GL_FALSE,
+					0,
+					null
+				);
+				glBindBuffer(GL_ARRAY_BUFFER, arrays.colourBuffer);
+				glVertexAttribPointer(
+					1,
+					3,
+					GL_FLOAT,
+					(GLboolean) GL_FALSE,
+					0,
+					null
+				);
+				
+				glBindBuffer(GL_ARRAY_BUFFER, arrays.normalBuffer);
+				glVertexAttribPointer(
+					2,
+					3,
+					GL_FLOAT,
+					(GLboolean) GL_FALSE,
+					0,
+					null
+				);
+				glDrawArrays(GL_TRIANGLES, 0, 3 * arrays.count);
+			}				
 		}
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
@@ -126,10 +175,30 @@ namespace Ldraw.OpenGl
 			GLuint vao;
 			glGenVertexArrays(1, out vao);
 			glBindVertexArray(vao);
-			PrepareVertexData(model, defaultColour);
+			PrepareAllVertexData(model);
+			
+			DefaultColour = defaultColour;
+			currentModel = model;
 		}
 		
 		static Map<LdrawObject, FlattenedNodes> cache = new HashMap<LdrawObject, FlattenedNodes>();
+		Map<LdrawObject, RenderArrays> arrayCache = new HashMap<LdrawObject, RenderArrays>();
+		
+		private class RenderArrays
+		{
+			public RenderArrays(GLuint vertexBuffer, GLuint normalBuffer, GLuint colourBuffer, int count)
+			{
+				this.vertexBuffer = vertexBuffer;
+				this.normalBuffer = normalBuffer;
+				this.colourBuffer = colourBuffer;
+				this.count = count;
+			}
+			
+			public GLuint vertexBuffer;
+			public GLuint normalBuffer;
+			public GLuint colourBuffer;
+			public int count;
+		}
 		
 		private FlattenedNodes FlattenObject(LdrawObject model)
 		{
@@ -144,48 +213,47 @@ namespace Ldraw.OpenGl
 			return cached;
 		}
 		
-		/*private void PrepareAllVertexData(LdrawObject model, Colour defaultColour)
+		private void PrepareAllVertexData(LdrawObject model)
 		{
-			foreach(var node in 
-		}*/
+			if(!(model.File is LdrawModelFile))
+			{
+				arrayCache[model] = PrepareVertexData(model);
+				return;
+			}
+			
+			foreach(var node in model.Nodes)
+			{
+				PartNode partNode = node as PartNode;
+				if(partNode == null)
+					continue;
+				
+				var obj = partNode.Contents;
+				if(arrayCache.has_key(obj))
+					continue;
+				
+				arrayCache[obj] = PrepareVertexData(obj);
+			}
+		}
 		
-		private void PrepareVertexData(LdrawObject model, Colour defaultColour)
+		private RenderArrays PrepareVertexData(LdrawObject model)
 		{
 			var nodes = FlattenObject(model);
 			
 			GLuint[] buffers = {0,0,0};
-			glGenBuffers(3, buffers);	
-			vertexBuffer = buffers[0];
-			vertexColourBuffer = buffers[1];
-			vertexNormals = buffers[2];	
-			vertexCount = nodes.ArraySizes;	
+			glGenBuffers(3, buffers);
 			
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Vertices, GL_STATIC_DRAW);
 			
-			glBindBuffer(GL_ARRAY_BUFFER, vertexColourBuffer);
-			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Colours, GL_STATIC_DRAW);
-			
-			glBindBuffer(GL_ARRAY_BUFFER, vertexNormals);
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
 			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Normals, GL_STATIC_DRAW);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Colours, GL_STATIC_DRAW);
 			
 			glClearColor(1f,1f,1f,0f);
 			
-			DefaultColour = defaultColour;
-		}
-		
-		private struct VertexInfo
-		{
-			public VertexInfo(Vector position, Vector normal, RenderColour colour)
-			{
-				Position = position;
-				Normal = normal;
-				Colour = colour;
-			}
-			
-			public Vector Position;
-			public Vector Normal;
-			public RenderColour Colour; // ready for opengl (R,G,B) => (x,y,x), values in range 0 => 1
+			return new RenderArrays(buffers[0], buffers[1], buffers[2], nodes.ArraySizes);
 		}
 		
 		private void CreateProgram()
