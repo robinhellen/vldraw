@@ -1,5 +1,6 @@
 using Diva;
 
+using Ldraw.Lego;
 using Ldraw.OpenGl;
 
 namespace Ldraw
@@ -9,6 +10,7 @@ namespace Ldraw
 		public override void load(ContainerBuilder builder)
 		{
 			builder.register<StandardShaderProvider>().keyed<ShaderProvider, ShaderType>(ShaderType.Drawing);
+			builder.register<BfcCommandFactory>().keyed<CommandFactory, string>("BFC");
 		}
 	}
 }
