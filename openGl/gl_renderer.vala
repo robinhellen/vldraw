@@ -46,6 +46,12 @@ namespace Ldraw.OpenGl
 			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
 			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);
 			
+			var lightLongitude = cameraLongitude + 5;
+			var lightLatitude = cameraLatitude + 5;
+			var lightPos = Matrix.ForRotation(Vector(1,0,0), lightLatitude)
+						.TransformMatrix(Matrix.ForRotation(Vector(0,1,0), lightLongitude))
+						.TransformVector(Vector(0,0,-currentModel.BoundingBox.Radius));
+			
 			var m = latTransform.TransformMatrix(longTransform);
 			float[16] viewingAngle = {m[0,0], m[1,0], m[2,0], 0,
 									  m[0,1], m[1,1], m[2,1], 0,
@@ -66,7 +72,7 @@ namespace Ldraw.OpenGl
 			glUniformMatrix4fv(scrollMatrix, 1, (GLboolean)GL_FALSE, scrollTransform);
 			glUniformMatrix4fv(scaleMatrix, 1, (GLboolean)GL_FALSE, scaleTransform);
 			glUniform3fv(lightColour, 1, {1f,1f,1f});
-			glUniform3fv(lightPosition, 1, {-2000,-3000,-5000});
+			glUniform3fv(lightPosition, 1, {lightPos.X,lightPos.Y,lightPos.Z});
 			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
