@@ -59,6 +59,13 @@ namespace Ldraw.OpenGl
 				var b = state.Transform.TransformVector(triangle.B).Add(state.Center);
 				var c = state.Transform.TransformVector(triangle.C).Add(state.Center);
 				
+				if(state.BfcInvertCurrent)
+				{
+					var v = a;
+					a = b;
+					b = v;
+				}
+				
 				var normal = (b.Subtract(a)).Cross(c.Subtract(a)).Normalized();
 				
 				PushVector(a, Vertices);	
@@ -75,6 +82,12 @@ namespace Ldraw.OpenGl
 				Vector c = state.Transform.TransformVector(quad.C).Add(state.Center);
 				Vector d = state.Transform.TransformVector(quad.D).Add(state.Center);
 				
+				if(state.BfcInvertCurrent)
+				{
+					var v = a;
+					a = c;
+					c = v;
+				}
 				var normal = (b.Subtract(a)).Cross(c.Subtract(a)).Normalized();
 				
 				// decomposed to two trinagles
@@ -94,6 +107,12 @@ namespace Ldraw.OpenGl
 				state = new SavedState();
 				state.ColourInverted = oldState.ColourInverted;
 				state.CurrentColour = oldState.CurrentColour;
+				
+				// BfcProperties
+				state.BfcInvertCurrent = 
+						oldState.BfcInvertCurrent ^ 
+						oldState.BfcInvertNext ^
+						(part.Transform.Determinant < 0);
 
 				// apply the current transform to the sub-model's transform and center vector
 				state.Center = oldState.Transform.TransformVector(part.Center).Add(oldState.Center);
@@ -107,8 +126,15 @@ namespace Ldraw.OpenGl
 				VisitInner(part.Contents);
 				// finally restore the old state
 				state = oldState;
+				state.BfcInvertNext = false;
 			}
 
+			public override void VisitComment(Comment comment)
+			{
+				if(comment is BfcInvertNext)
+					state.BfcInvertNext = true;
+			}
+			
 			private class SavedState
 			{
 				public SavedState()
@@ -117,12 +143,19 @@ namespace Ldraw.OpenGl
 					Center = Vector.NullVector;
 					CurrentColour = Colour.MainColour;
 					ColourInverted = false;
+					BfcInvertNext = false;
+					BfcInvertCurrent = false;
+					BfcOn = true;
 				}
 
 				public Matrix Transform;
 				public Vector Center;
 				public Colour CurrentColour;
 				public bool ColourInverted;
+				public bool BfcInvertNext;
+				public bool BfcInvertCurrent;
+				public bool BfcOn;
+				public bool BfcClockwise;
 			}
 			
 			private void PushColour(Colour colour, int vertices)
