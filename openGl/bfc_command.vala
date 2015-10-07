@@ -10,9 +10,15 @@ namespace Ldraw.OpenGl
 		{
 			base(command, args);
 			Certified = certified;
+			foreach(var arg in args)
+			{
+				if(arg == "CW")
+					ClockwiseWinding = true;
+			}
 		}
 		
 		public bool Certified {get; set;}
+		public bool ClockwiseWinding {get;set;}
 	}
 	
 	private class BfcInvertNext : MetaCommand
@@ -39,6 +45,11 @@ namespace Ldraw.OpenGl
 		}
 		
 		public BfcOptions Options {get; set;}
+		
+		public bool IsOptionSet(BfcOptions o)
+		{
+			return (Options & o) == o;
+		}
 	}
 	
 	[Flags]

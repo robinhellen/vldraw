@@ -59,7 +59,7 @@ namespace Ldraw.OpenGl
 				var b = state.Transform.TransformVector(triangle.B).Add(state.Center);
 				var c = state.Transform.TransformVector(triangle.C).Add(state.Center);
 				
-				if(state.BfcInvertCurrent)
+				if(state.BfcInvertCurrent ^ state.BfcClockwise)
 				{
 					var v = a;
 					a = b;
@@ -82,7 +82,7 @@ namespace Ldraw.OpenGl
 				Vector c = state.Transform.TransformVector(quad.C).Add(state.Center);
 				Vector d = state.Transform.TransformVector(quad.D).Add(state.Center);
 				
-				if(state.BfcInvertCurrent)
+				if(state.BfcInvertCurrent ^ state.BfcClockwise)
 				{
 					var v = a;
 					a = c;
@@ -132,7 +132,26 @@ namespace Ldraw.OpenGl
 			public override void VisitComment(Comment comment)
 			{
 				if(comment is BfcInvertNext)
+				{
 					state.BfcInvertNext = true;
+					return;
+				}
+				var certify = comment as BfcCertifyCommand;
+				if(certify != null)
+				{
+					if(!certify.Certified)
+						state.BfcOn = false;
+					if(certify.ClockwiseWinding)
+						state.BfcClockwise = true;
+				}
+				var bfc = comment as BfcCommand;
+				if(bfc != null)
+				{
+					if(bfc.IsOptionSet(BfcOptions.WindingAntiClockwise))
+						state.BfcClockwise = false;
+					if(bfc.IsOptionSet(BfcOptions.WindingClockwise))
+						state.BfcClockwise = true;
+				}
 			}
 			
 			private class SavedState
@@ -146,6 +165,7 @@ namespace Ldraw.OpenGl
 					BfcInvertNext = false;
 					BfcInvertCurrent = false;
 					BfcOn = true;
+					BfcClockwise = false;
 				}
 
 				public Matrix Transform;
