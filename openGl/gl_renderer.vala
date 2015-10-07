@@ -179,6 +179,9 @@ namespace Ldraw.OpenGl
 			
 			DefaultColour = defaultColour;
 			currentModel = model;
+			
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 		}
 		
 		static Map<LdrawObject, FlattenedNodes> cache = new HashMap<LdrawObject, FlattenedNodes>();
