@@ -14,11 +14,13 @@ namespace Ldraw.OpenGl
 	public class GlRenderer : Object, Renderer
 	{		
 		public Index<ShaderProvider, ShaderType> ShaderProviders {get; construct;}
+		public Collection<RenderNodeStrategy> RenderStrategies {get; construct;}
 		
 		static construct 
 		{
 			var cls = (ObjectClass)typeof(GlRenderer).class_ref();
 			set_indexed_injection<ShaderType, ShaderProvider>(cls, "ShaderProviders");
+			set_collection_injection<RenderNodeStrategy>(cls, "RenderStrategies");
 		}	
 		
 		// initialized at preparation time, and then used at render time.
@@ -81,9 +83,15 @@ namespace Ldraw.OpenGl
 			glEnableVertexAttribArray(2);
 			
 			if(currentModel.File is LdrawModelFile)
-			{			
+			{
+				foreach(var strategy in RenderStrategies)
+				{
+					strategy.StartModel(currentModel);
+				}
 				foreach(var node in currentModel.Nodes)
 				{
+					if(!RenderStrategies.fold<bool>((s, r) => r &= s.ShouldRenderNode(node), true))
+						continue;
 					var partNode = node as PartNode;
 					if(partNode == null)
 						continue;
@@ -137,7 +145,7 @@ namespace Ldraw.OpenGl
 				0,
 				null
 			);
-			glDrawArrays(GL_TRIANGLES, 0, 3 * arrays.count);
+			glDrawArrays(GL_TRIANGLES, 0, arrays.count);
 		}
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
