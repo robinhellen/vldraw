@@ -146,6 +146,36 @@ namespace Ldraw.OpenGl
 				null
 			);
 			glDrawArrays(GL_TRIANGLES, 0, arrays.count);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, arrays.lineVertexBuffer);
+			glVertexAttribPointer(
+				0,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			glBindBuffer(GL_ARRAY_BUFFER, arrays.lineColourBuffer);
+			glVertexAttribPointer(
+				1,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, arrays.lineNormalBuffer);
+			glVertexAttribPointer(
+				2,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			glDrawArrays(GL_LINES, 0, arrays.lineCount);
 		}
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
@@ -168,18 +198,28 @@ namespace Ldraw.OpenGl
 		
 		private class RenderArrays
 		{
-			public RenderArrays(GLuint vertexBuffer, GLuint normalBuffer, GLuint colourBuffer, int count)
+			public RenderArrays(GLuint vertexBuffer, GLuint normalBuffer, GLuint colourBuffer, int count,
+								GLuint lineVertexBuffer, GLuint lineNormalBuffer, GLuint lineColourBuffer, int lineCount)
 			{
 				this.vertexBuffer = vertexBuffer;
 				this.normalBuffer = normalBuffer;
 				this.colourBuffer = colourBuffer;
 				this.count = count;
+				this.lineVertexBuffer = lineVertexBuffer;
+				this.lineNormalBuffer = lineNormalBuffer;
+				this.lineColourBuffer = lineColourBuffer;
+				this.lineCount = lineCount;
 			}
 			
 			public GLuint vertexBuffer;
 			public GLuint normalBuffer;
 			public GLuint colourBuffer;
 			public int count;
+			
+			public GLuint lineVertexBuffer;
+			public GLuint lineNormalBuffer;
+			public GLuint lineColourBuffer;
+			public int lineCount;
 		}
 		
 		private FlattenedNodes FlattenObject(LdrawObject model)
@@ -221,8 +261,8 @@ namespace Ldraw.OpenGl
 		{
 			var nodes = FlattenObject(model);
 			
-			GLuint[] buffers = {0,0,0};
-			glGenBuffers(3, buffers);
+			GLuint[] buffers = {0,0,0,0,0,0};
+			glGenBuffers(6, buffers);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Vertices, GL_STATIC_DRAW);
@@ -233,9 +273,18 @@ namespace Ldraw.OpenGl
 			glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
 			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Colours, GL_STATIC_DRAW);
 			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
+			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.LineVertices, GL_STATIC_DRAW);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[4]);
+			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.LineNormals, GL_STATIC_DRAW);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[5]);
+			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.LineColours, GL_STATIC_DRAW);
+			
 			glClearColor(1f,1f,1f,0f);
 			
-			return new RenderArrays(buffers[0], buffers[1], buffers[2], nodes.ArraySizes);
+			return new RenderArrays(buffers[0], buffers[1], buffers[2], nodes.ArraySizes, buffers[3], buffers[4], buffers[5], nodes.LineArraySizes);
 		}
 		
 		private void CreateProgram()

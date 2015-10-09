@@ -14,6 +14,11 @@ namespace Ldraw.OpenGl
 		public float[] Colours {get; private set;}
 		public int ArraySizes {get; private set;}
 		
+		public float[] LineVertices {get; private set;}
+		public float[] LineNormals {get; private set;}
+		public float[] LineColours {get; private set;}
+		public int LineArraySizes {get; private set;}
+		
 		public static FlattenedNodes FlatForObject(LdrawObject obj)
 		{
 			return new NodeFlattenerVisitor().Visit(obj);
@@ -25,6 +30,10 @@ namespace Ldraw.OpenGl
 			public Collection<float?> Normals {get; private set;}
 			public Collection<float?> Colours {get; private set;}
 			
+			public Collection<float?> LineVertices {get; private set;}
+			public Collection<float?> LineNormals {get; private set;}
+			public Collection<float?> LineColours {get; private set;}
+			
 			private SavedState state;
 			
 			public override void Initialize()
@@ -32,6 +41,9 @@ namespace Ldraw.OpenGl
 				Vertices = new LinkedList<float?>();
 				Normals = new LinkedList<float?>();
 				Colours = new LinkedList<float?>();
+				LineVertices = new LinkedList<float?>();
+				LineNormals = new LinkedList<float?>();
+				LineColours = new LinkedList<float?>();
 				
 				state = new SavedState();
 			}
@@ -49,12 +61,24 @@ namespace Ldraw.OpenGl
 				foreach(var f in Colours ) temp += f;
 				flat.Colours = temp;
 				flat.ArraySizes = Colours.size;
+				
+				temp = {};
+				foreach(var f in LineVertices) temp += f;
+				flat.LineVertices = temp;
+				temp = {};
+				foreach(var f in LineNormals) temp += f;
+				flat.LineNormals = temp;
+				temp = {};
+				foreach(var f in LineColours ) temp += f;
+				flat.LineColours = temp;
+				
+				flat.LineArraySizes = LineColours.size;
 				return flat;
 			}
 
 			public override void VisitTriangle(TriangleNode triangle)
 			{
-				PushColour(triangle.Colour, 3);
+				PushColour(triangle.Colour, 3, Colours);
 				var a = state.Transform.TransformVector(triangle.A).Add(state.Center);
 				var b = state.Transform.TransformVector(triangle.B).Add(state.Center);
 				var c = state.Transform.TransformVector(triangle.C).Add(state.Center);
@@ -76,7 +100,7 @@ namespace Ldraw.OpenGl
 
 			public override void VisitQuad(QuadNode quad)
 			{
-				PushColour(quad.Colour, 6);
+				PushColour(quad.Colour, 6, Colours);
 				Vector a = state.Transform.TransformVector(quad.A).Add(state.Center);
 				Vector b = state.Transform.TransformVector(quad.B).Add(state.Center);
 				Vector c = state.Transform.TransformVector(quad.C).Add(state.Center);
@@ -99,6 +123,19 @@ namespace Ldraw.OpenGl
 				PushVector(c, Vertices);	
 				PushVector(d, Vertices);	
 				PushVector(normal, Normals, 6);
+			}
+
+			public override void VisitLine(LineNode line)
+			{
+				PushColour(line.Colour, 2, LineColours);
+				var a = state.Transform.TransformVector(line.A).Add(state.Center);
+				var b = state.Transform.TransformVector(line.B).Add(state.Center);
+				
+				var normal = Vector.NullVector;
+				
+				PushVector(a, LineVertices);	
+				PushVector(b, LineVertices);	
+				PushVector(normal, LineNormals, 2);
 			}
 
 			public override void VisitSubModel(PartNode part)
@@ -178,7 +215,7 @@ namespace Ldraw.OpenGl
 				public bool BfcClockwise;
 			}
 			
-			private void PushColour(Colour colour, int vertices)
+			private void PushColour(Colour colour, int vertices, Collection<float?> target)
 			{
 				float red, green, blue;
 				if(colour.Code == 16)
@@ -215,9 +252,9 @@ namespace Ldraw.OpenGl
 				}
 				for(int i = 0; i < vertices; i++)
 				{
-					Colours.add(red);
-					Colours.add(green);
-					Colours.add(blue);
+					target.add(red);
+					target.add(green);
+					target.add(blue);
 				}					
 			}
 			
