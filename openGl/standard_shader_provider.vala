@@ -31,6 +31,14 @@ out vec4 color;
 uniform vec3 LightColor = vec3(1,1,1);
 
 void main(){
+	if(length(Normal_cameraspace) == 0)
+	{
+		// I shall make lines have no normal.
+		color.xyz = fragmentColour;
+		color.a = 1;
+		return;		
+	}
+	
 	vec3 n = normalize(Normal_cameraspace);
 	vec3 l = normalize(LightDirection_cameraspace);
 	float cosTheta = clamp(dot(n,l),0,1);
