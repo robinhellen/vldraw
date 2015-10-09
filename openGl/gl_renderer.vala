@@ -87,92 +87,57 @@ namespace Ldraw.OpenGl
 					var partNode = node as PartNode;
 					if(partNode == null)
 						continue;
-					var t = partNode.Transform;
-					var v = partNode.Center;
-					var colour = partNode.Colour;
-					float modelTransform[16] = 
-								{t[0,0], t[1,0], t[2,0], 0,
-								 t[0,1], t[1,1], t[2,1], 0,
-								 t[0,2], t[1,2], t[2,2], 0,
-								 v.X   , v.Y   , v.Z   , 1};
-					glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
-					glUniform4fv(defaultColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
-					glUniform4fv(defaultEdgeColour, 1, {colour.EdgeRed / 255f, colour.EdgeGreen / 255f, colour.EdgeBlue / 255f, colour.Alpha / 255f});
-				
-					var arrays = arrayCache[partNode.Contents];
-					glBindBuffer(GL_ARRAY_BUFFER, arrays.vertexBuffer);
-					glVertexAttribPointer(
-						0,
-						3,
-						GL_FLOAT,
-						(GLboolean) GL_FALSE,
-						0,
-						null
-					);
-					glBindBuffer(GL_ARRAY_BUFFER, arrays.colourBuffer);
-					glVertexAttribPointer(
-						1,
-						3,
-						GL_FLOAT,
-						(GLboolean) GL_FALSE,
-						0,
-						null
-					);
-					
-					glBindBuffer(GL_ARRAY_BUFFER, arrays.normalBuffer);
-					glVertexAttribPointer(
-						2,
-						3,
-						GL_FLOAT,
-						(GLboolean) GL_FALSE,
-						0,
-						null
-					);
-					glDrawArrays(GL_TRIANGLES, 0, 3 * arrays.count);	
+					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour);
 				}
 			}
 			else
-			{				
-				float modelTransform[16] = 
-							{1, 0, 0, 0,
-							 0, 1, 0, 0,
-							 0, 0, 1, 0,
-							 0, 0, 0, 1};
-				glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
-				glUniform4fv(defaultColour, 1, {DefaultColour.Red / 255f, DefaultColour.Green / 255f, DefaultColour.Blue / 255f, DefaultColour.Alpha / 255f});
-				glUniform4fv(defaultEdgeColour, 1, {DefaultColour.EdgeRed / 255f, DefaultColour.EdgeGreen / 255f, DefaultColour.EdgeBlue / 255f, DefaultColour.Alpha / 255f});
+			{
+				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour);	
+			}
+		}
+		
+		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, Colour colour)
+		{
+			var t = transform; var v = offset;
+			float modelTransform[16] = 
+						{t[0,0], t[1,0], t[2,0], 0,
+						 t[0,1], t[1,1], t[2,1], 0,
+						 t[0,2], t[1,2], t[2,2], 0,
+						 v.X   , v.Y   , v.Z   , 1};
+			glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
+			glUniform4fv(defaultColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
+			glUniform4fv(defaultEdgeColour, 1, {colour.EdgeRed / 255f, colour.EdgeGreen / 255f, colour.EdgeBlue / 255f, colour.Alpha / 255f});
+		
+			var arrays = arrayCache[o];
+			glBindBuffer(GL_ARRAY_BUFFER, arrays.vertexBuffer);
+			glVertexAttribPointer(
+				0,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			glBindBuffer(GL_ARRAY_BUFFER, arrays.colourBuffer);
+			glVertexAttribPointer(
+				1,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
 			
-				var arrays = arrayCache[currentModel];
-				glBindBuffer(GL_ARRAY_BUFFER, arrays.vertexBuffer);
-				glVertexAttribPointer(
-					0,
-					3,
-					GL_FLOAT,
-					(GLboolean) GL_FALSE,
-					0,
-					null
-				);
-				glBindBuffer(GL_ARRAY_BUFFER, arrays.colourBuffer);
-				glVertexAttribPointer(
-					1,
-					3,
-					GL_FLOAT,
-					(GLboolean) GL_FALSE,
-					0,
-					null
-				);
-				
-				glBindBuffer(GL_ARRAY_BUFFER, arrays.normalBuffer);
-				glVertexAttribPointer(
-					2,
-					3,
-					GL_FLOAT,
-					(GLboolean) GL_FALSE,
-					0,
-					null
-				);
-				glDrawArrays(GL_TRIANGLES, 0, 3 * arrays.count);
-			}				
+			glBindBuffer(GL_ARRAY_BUFFER, arrays.normalBuffer);
+			glVertexAttribPointer(
+				2,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			glDrawArrays(GL_TRIANGLES, 0, 3 * arrays.count);
 		}
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
