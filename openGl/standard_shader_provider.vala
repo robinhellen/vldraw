@@ -20,7 +20,7 @@ namespace Ldraw.OpenGl
 		}
 		
 		private const string fragmentShader = @"#version 330 core
-in vec3 fragmentColour;
+in vec4 fragmentColour;
 in vec3 Position_worldspace;
 in vec3 EyeDirection_cameraspace;
 in vec3 Normal_cameraspace;
@@ -34,8 +34,7 @@ void main(){
 	if(length(Normal_cameraspace) == 0)
 	{
 		// I shall make lines have no normal.
-		color.xyz = fragmentColour;
-		color.a = 1;
+		color = fragmentColour;
 		return;		
 	}
 	
@@ -47,19 +46,19 @@ void main(){
 	vec3 R = reflect(l,n);
 	float cosAlpha = clamp(dot(E,R),0,1);
 	
-	vec3 diffuseColour = fragmentColour * LightColor * cosTheta; // TODO: Fall-off with distance from light source
-	vec3 ambientColour = fragmentColour * vec3(0.1,0.1,0.1);
+	vec3 diffuseColour = fragmentColour.xyz * LightColor * cosTheta; // TODO: Fall-off with distance from light source
+	vec3 ambientColour = fragmentColour.xyz * vec3(0.1,0.1,0.1);
 	//vec3 specularColour = fragmentColour * LightColor * pow(cosAlpha,5);
 	//vec3 ambientColour = vec3(0,0,0);
 	vec3 specularColour = vec3(0,0,0);
 	color.xyz = diffuseColour + ambientColour + specularColour;
-	color.a = 1;
+	color.a = fragmentColour.a;
 }
 ";
 		private const string vertexShader = @"#version 330 core
 
 layout(location = 0) in vec3 vertexPosition_modelspace;
-layout(location = 1) in vec3 vertexColour;
+layout(location = 1) in vec4 vertexColour;
 layout(location = 2) in vec3 vertexNormal;
 
 uniform mat4 modelTransform;
@@ -71,7 +70,7 @@ uniform vec3 LightPosition_worldspace = vec3(20,30,50);
 uniform vec4 DefaultColour;
 uniform vec4 DefaultEdgeColour;
 
-out vec3 fragmentColour;
+out vec4 fragmentColour;
 out vec3 Position_worldspace;
 out vec3 EyeDirection_cameraspace;
 out vec3 Normal_cameraspace;
@@ -97,9 +96,9 @@ void main () {
 	
 	// use the defualt colour if necessary.	
 	if(vertexColour.x == -1f)
-		fragmentColour = DefaultColour.xyz;
+		fragmentColour = DefaultColour;
 	else if(vertexColour.x == -2f)
-		fragmentColour = DefaultEdgeColour.xyz;
+		fragmentColour = DefaultEdgeColour;
 	else
 		fragmentColour = vertexColour;
 }

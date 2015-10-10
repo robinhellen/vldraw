@@ -67,7 +67,10 @@ namespace Ldraw.OpenGl
 										0, -2 / lduHeight,0, 0,
 										0, 0, 0.0001f, 0,
 										0, 0, 0, 1};
-													
+									
+			glEnable(GL_BLEND);
+			glClearColor(1f,1f,1f,1f);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUseProgram(program);
 			 
 			glUniformMatrix4fv(viewAngleMatrix, 1, (GLboolean)GL_FALSE, viewingAngle);
@@ -129,7 +132,7 @@ namespace Ldraw.OpenGl
 			glBindBuffer(GL_ARRAY_BUFFER, arrays.colourBuffer);
 			glVertexAttribPointer(
 				1,
-				3,
+				4,
 				GL_FLOAT,
 				(GLboolean) GL_FALSE,
 				0,
@@ -145,7 +148,7 @@ namespace Ldraw.OpenGl
 				0,
 				null
 			);
-			glDrawArrays(GL_TRIANGLES, 0, arrays.count);
+			glDrawArrays(GL_TRIANGLES, 0, arrays.count / 3);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, arrays.lineVertexBuffer);
 			glVertexAttribPointer(
@@ -159,7 +162,7 @@ namespace Ldraw.OpenGl
 			glBindBuffer(GL_ARRAY_BUFFER, arrays.lineColourBuffer);
 			glVertexAttribPointer(
 				1,
-				3,
+				4,
 				GL_FLOAT,
 				(GLboolean) GL_FALSE,
 				0,
@@ -175,7 +178,7 @@ namespace Ldraw.OpenGl
 				0,
 				null
 			);
-			glDrawArrays(GL_LINES, 0, arrays.lineCount);
+			glDrawArrays(GL_LINES, 0, arrays.lineCount / 3);
 		}
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
@@ -271,7 +274,7 @@ namespace Ldraw.OpenGl
 			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Normals, GL_STATIC_DRAW);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
-			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.Colours, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, nodes.ArraySizes * 4 / 3 * sizeof(GLfloat), (GLvoid[]) nodes.Colours, GL_STATIC_DRAW);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
 			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.LineVertices, GL_STATIC_DRAW);
@@ -280,10 +283,8 @@ namespace Ldraw.OpenGl
 			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.LineNormals, GL_STATIC_DRAW);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, buffers[5]);
-			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * sizeof(GLfloat), (GLvoid[]) nodes.LineColours, GL_STATIC_DRAW);
-			
-			glClearColor(1f,1f,1f,0f);
-			
+			glBufferData(GL_ARRAY_BUFFER, nodes.LineArraySizes * 4 / 3 * sizeof(GLfloat), (GLvoid[]) nodes.LineColours, GL_STATIC_DRAW);
+						
 			return new RenderArrays(buffers[0], buffers[1], buffers[2], nodes.ArraySizes, buffers[3], buffers[4], buffers[5], nodes.LineArraySizes);
 		}
 		

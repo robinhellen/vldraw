@@ -60,7 +60,7 @@ namespace Ldraw.OpenGl
 				temp = {};
 				foreach(var f in Colours ) temp += f;
 				flat.Colours = temp;
-				flat.ArraySizes = Colours.size;
+				flat.ArraySizes = Vertices.size;
 				
 				temp = {};
 				foreach(var f in LineVertices) temp += f;
@@ -72,7 +72,7 @@ namespace Ldraw.OpenGl
 				foreach(var f in LineColours ) temp += f;
 				flat.LineColours = temp;
 				
-				flat.LineArraySizes = LineColours.size;
+				flat.LineArraySizes = LineVertices.size;
 				return flat;
 			}
 
@@ -250,11 +250,13 @@ namespace Ldraw.OpenGl
 					green = colour.Green / 255f;
 					blue = colour.Blue / 255f;
 				}
+				var alpha = colour.Alpha / 255f;
 				for(int i = 0; i < vertices; i++)
 				{
 					target.add(red);
 					target.add(green);
 					target.add(blue);
+					target.add(alpha);
 				}					
 			}
 			

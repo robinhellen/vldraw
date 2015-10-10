@@ -50,7 +50,7 @@ namespace Ldraw.Lego
 			}
 			else
 			{
-				Alpha = 0;
+				Alpha = 255;
 			}
 		}
 
