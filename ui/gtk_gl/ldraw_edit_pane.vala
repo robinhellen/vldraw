@@ -21,6 +21,7 @@ namespace Ldraw.Ui.GtkGl
 		public UndoStack UndoStack {construct; private get;}
 		public AnimatedModel model {construct; private get;}
 		public DropBoundsOverlay DropOverlay {construct; private get;}
+		public GlSelector Selector {construct; get;}
 
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
@@ -372,6 +373,14 @@ namespace Ldraw.Ui.GtkGl
 		{
 			Allocation alloc;
 			get_allocation(out alloc);
+			
+			make_current();
+			
+			var chosen = Selector.SelectAt((int)x,(int)y,model.Model,
+							alloc.width, alloc.height,
+							lduViewWidth, lduViewHeight, // scale
+						    cameraLongitude, cameraLatitude,
+						    lduScrollX, lduScrollY);
 
 			/*var fullBounds = CalculateViewArea();
 

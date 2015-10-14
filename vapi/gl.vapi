@@ -9439,7 +9439,7 @@ namespace GL {
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenFragmentShadersATI")]
 	public static GL.GLuint glGenFragmentShadersATI (GL.GLuint range);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenFramebuffers")]
-	public static void glGenFramebuffers (GL.GLsizei n, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] framebuffers);
+	public static void glGenFramebuffers (GL.GLsizei n, [CCode (array_length = false)] GL.GLuint[] framebuffers);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenFramebuffersEXT")]
 	public static void glGenFramebuffersEXT (GL.GLsizei n, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] framebuffers);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenLists")]
@@ -9461,7 +9461,7 @@ namespace GL {
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenQueriesARB")]
 	public static void glGenQueriesARB (GL.GLsizei n, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] ids);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenRenderbuffers")]
-	public static void glGenRenderbuffers (GL.GLsizei n, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] renderbuffers);
+	public static void glGenRenderbuffers (GL.GLsizei n, [CCode (array_length = false)] GL.GLuint[] renderbuffers);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenRenderbuffersEXT")]
 	public static void glGenRenderbuffersEXT (GL.GLsizei n, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLuint[] renderbuffers);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glGenSamplers")]
@@ -11343,7 +11343,7 @@ namespace GL {
 	[CCode (cheader_filename = "GL/gl.h", cname = "glReadInstrumentsSGIX")]
 	public static void glReadInstrumentsSGIX (GL.GLint marker);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glReadPixels")]
-	public static void glReadPixels (GL.GLint x, GL.GLint y, GL.GLsizei width, GL.GLsizei height, GL.GLenum format, GL.GLenum type, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLvoid[] pixels);
+	public static void glReadPixels (GL.GLint x, GL.GLint y, GL.GLsizei width, GL.GLsizei height, GL.GLenum format, GL.GLenum type, [CCode (array_length = false)] GL.GLvoid[] pixels);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glReadnPixelsARB")]
 	public static void glReadnPixelsARB (GL.GLint x, GL.GLint y, GL.GLsizei width, GL.GLsizei height, GL.GLenum format, GL.GLenum type, GL.GLsizei bufSize, [CCode (array_length = false, array_null_terminated = true)] out unowned GL.GLvoid[] data);
 	[CCode (cheader_filename = "GL/gl.h", cname = "glRectd")]

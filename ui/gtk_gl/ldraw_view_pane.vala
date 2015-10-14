@@ -14,8 +14,8 @@ namespace Ldraw.Ui.GtkGl
 		private LdrawObject m_Model;
 		
 		// camera viewpoint definition
-		private float cameraLongitude;
-		private float cameraLatitude;
+		protected float cameraLongitude;
+		protected float cameraLatitude;
 		protected float lduViewWidth;
 		protected float lduViewHeight;
 		protected float lduScrollX;

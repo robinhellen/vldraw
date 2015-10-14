@@ -13,13 +13,13 @@ namespace Ldraw.OpenGl
 {
 	public class GlRenderer : Object, Renderer
 	{		
-		public Index<ShaderProvider, ShaderType> ShaderProviders {get; construct;}
 		public Collection<RenderNodeStrategy> RenderStrategies {get; construct;}
+		public FlatStore FlatStore {get; construct;}
+		public ShaderProgramFactory ProgramFactory {get; construct;}
 		
 		static construct 
 		{
 			var cls = (ObjectClass)typeof(GlRenderer).class_ref();
-			set_indexed_injection<ShaderType, ShaderProvider>(cls, "ShaderProviders");
 			set_collection_injection<RenderNodeStrategy>(cls, "RenderStrategies");
 		}	
 		
@@ -45,6 +45,16 @@ namespace Ldraw.OpenGl
 				float cameraLongitude, float cameraLatitude,
 				float lduScrollX, float lduScrollY)
 		{
+			
+			scrollMatrix = glGetUniformLocation(program, "scroll");
+			viewAngleMatrix = glGetUniformLocation(program, "view_angle");
+			scaleMatrix = glGetUniformLocation(program, "scale");
+			lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
+			lightColour = glGetUniformLocation(program, "LightColor");
+			defaultColour = glGetUniformLocation(program, "DefaultColour");
+			defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");
+			modelMatrix = glGetUniformLocation(program, "modelTransform");
+			
 			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
 			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);
 			
@@ -183,7 +193,8 @@ namespace Ldraw.OpenGl
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
 		{
-			CreateProgram();
+			program = ProgramFactory.CreateProgram(ShaderType.Drawing);
+			
 			GLuint vao;
 			glGenVertexArrays(1, out vao);
 			glBindVertexArray(vao);
@@ -196,7 +207,6 @@ namespace Ldraw.OpenGl
 			glCullFace(GL_BACK);
 		}
 		
-		static Map<LdrawObject, FlattenedNodes> cache = new HashMap<LdrawObject, FlattenedNodes>();
 		Map<LdrawObject, RenderArrays> arrayCache = new HashMap<LdrawObject, RenderArrays>();
 		
 		private class RenderArrays
@@ -225,19 +235,6 @@ namespace Ldraw.OpenGl
 			public int lineCount;
 		}
 		
-		private FlattenedNodes FlattenObject(LdrawObject model)
-		{
-			var cached = cache[model];
-			if(cached == null)
-			{
-				var flats = FlattenedNodes.FlatForObject(model);
-				cache[model] = flats;
-				cached = flats;
-				model.VisibleChange.connect(() => cache.unset(model));
-			}
-			return cached;
-		}
-		
 		private void PrepareAllVertexData(LdrawObject model)
 		{
 			if(!(model.File is LdrawModelFile))
@@ -262,7 +259,7 @@ namespace Ldraw.OpenGl
 		
 		private RenderArrays PrepareVertexData(LdrawObject model)
 		{
-			var nodes = FlattenObject(model);
+			var nodes = FlatStore[model];
 			
 			GLuint[] buffers = {0,0,0,0,0,0};
 			glGenBuffers(6, buffers);
@@ -288,76 +285,6 @@ namespace Ldraw.OpenGl
 			return new RenderArrays(buffers[0], buffers[1], buffers[2], nodes.ArraySizes, buffers[3], buffers[4], buffers[5], nodes.LineArraySizes);
 		}
 		
-		private void CreateProgram()
-		{
-			var shaderProvider = ShaderProviders[ShaderType.Drawing];
-			
-			var vertexShader = glCreateShader(GL_VERTEX_SHADER);
-			var fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-			
-			glShaderSource(vertexShader, 1, {shaderProvider.VertexShader}, null);
-			glCompileShader(vertexShader);
-			CheckShaderStatus(vertexShader);
-			
-			glShaderSource(fragShader, 1, {shaderProvider.FragmentShader}, null);			
-			glCompileShader(fragShader);
-			CheckShaderStatus(fragShader);
-			
-			program = glCreateProgram();
-			glAttachShader(program, vertexShader);
-			glAttachShader(program, fragShader);
-			
-			glLinkProgram(program);
-			CheckProgramStatus(program);
-			
-			scrollMatrix = glGetUniformLocation(program, "scroll");
-			viewAngleMatrix = glGetUniformLocation(program, "view_angle");
-			scaleMatrix = glGetUniformLocation(program, "scale");
-			lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
-			lightColour = glGetUniformLocation(program, "LightColor");
-			defaultColour = glGetUniformLocation(program, "DefaultColour");
-			defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");
-			modelMatrix = glGetUniformLocation(program, "modelTransform");
-		}
-		
-		private void CheckShaderStatus(GLuint shader)
-		{
-			int result;
-			glGetShaderiv(shader, GL_COMPILE_STATUS, out result);
-			if(result == GL_TRUE)
-				return;
-			if(result != GL_FALSE)
-				assert_not_reached();
-			
-			stderr.printf("Shader compile error: \n\t");
-			int log_length;
-			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, out log_length);
-			var buffer = new char[log_length];
-			glGetShaderInfoLog(shader, log_length, null, buffer);
-			for(int i = 0; i < log_length; i++){stderr.printf(@"$(buffer[i])");}
-			
-			stderr.printf("\n");
-		}
-		
-		private void CheckProgramStatus(GLuint program)
-		{
-			int result;
-			glGetProgramiv(program, GL_LINK_STATUS, out result);
-			if(result == GL_TRUE)
-				return;
-			if(result != GL_FALSE)
-				assert_not_reached();
-			
-			stderr.printf("Program link error: \n\t");
-			 
-			int log_length;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, out log_length);
-			var buffer = new char[log_length];
-			glGetProgramInfoLog(program, log_length, null, buffer);
-			for(int i = 0; i < log_length; i++){stderr.printf(@"$(buffer[i])");}
-			
-			stderr.printf("\n");
-		}
 	}
 	
 	private class GlDrawingContext : Object, DrawingContext
@@ -384,6 +311,17 @@ namespace Ldraw.OpenGl
     {
 		public abstract string VertexShader {get;}
 		public abstract string FragmentShader {get;}
+	}
+	
+	public interface FlatStore : Object
+	{
+		public abstract FlattenedNodes @get(LdrawObject part);
+		public abstract void Prepare(LdrawObject part);
+	}
+	
+	public interface ShaderProgramFactory : Object
+	{
+		public abstract GLuint CreateProgram(ShaderType shader);
 	}
 	
 	public enum ShaderType
