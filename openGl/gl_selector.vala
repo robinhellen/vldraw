@@ -27,30 +27,19 @@ namespace Ldraw.OpenGl
 						    float cameraLongitude, float cameraLatitude,
 						    float lduScrollX, float lduScrollY)
 		{
-			CheckGlError("Entering selection method.");
 			GLuint[] framebuffer = {0};
 			glGenFramebuffers(1, framebuffer);
-			CheckGlError("Generating framebuffer.");
 			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer[0]);
-			CheckGlError("Binding framebuffer.");
 			
 			GLuint[] renderbuffer = {0, 0};
 			glGenRenderbuffers(2, renderbuffer);
-			CheckGlError("Generating renderbuffer.");
 			glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer[0]);
-			CheckGlError("Binding colour renderbuffer.");
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_R16UI, width, height);
-			CheckGlError("Assigning storage to colour renderbuffer.");
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderbuffer[0]);
-			CheckGlError("Attaching colour renderbuffer to framebuffer.");
 			
 			glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer[1]);
-			CheckGlError("Binding depth renderbuffer.");
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-			CheckGlError("Assigning storage to depth renderbuffer");
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer[1]);
-			
-			CheckGlError("Attaching depth renderbuffer to framebuffer.");
 			
 			glDrawBuffers(1, {GL_COLOR_ATTACHMENT0});
 			glViewport(0,0,width, height);
@@ -63,7 +52,6 @@ namespace Ldraw.OpenGl
 			var modelMatrix = glGetUniformLocation(program, "modelTransform");
 			var nodeIndex = glGetUniformLocation(program, "vertexId");
 			
-			CheckGlError("Created program.");
 			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
 			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);
 			
@@ -117,7 +105,6 @@ namespace Ldraw.OpenGl
 			{
 				RenderObject(model, Matrix.Identity, Vector.NullVector, modelMatrix);	
 			}
-			CheckGlError("After rendering, before checking framebuffer.");
 			
 			var status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 			if(status != GL_FRAMEBUFFER_COMPLETE)
@@ -128,9 +115,7 @@ namespace Ldraw.OpenGl
 			
 			GLushort[] result = {0};
 			glReadPixels(x, height - y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
-			
-			stderr.printf(@"Selected node at index: $(result[0]).\n");
-			
+						
 			if(result[0] > model.Nodes.size)
 				return null;
 			return model.Nodes[result[0]];			
@@ -164,43 +149,7 @@ namespace Ldraw.OpenGl
 				null
 			);
 			glDrawArrays(GL_TRIANGLES, 0, nodes.ArraySizes / 3);
-		}
-		
-		private void CheckGlError(string location)
-		{
-			var error = glGetError();
-			if(error == GL_NO_ERROR)
-				return;
-			
-			stderr.printf(@"GL error $location: ");
-			switch(error)
-			{
-				case GL_INVALID_ENUM:
-					stderr.printf("Invalid enum value.\n");
-					break;
-				case GL_INVALID_VALUE:
-					stderr.printf("Invalid argument value.\n");
-					break;
-				case GL_INVALID_OPERATION:
-					stderr.printf("Invalid operation.\n");
-					break;
-				case GL_INVALID_FRAMEBUFFER_OPERATION:
-					stderr.printf("Invalid framebuffer operation.\n");
-					break;
-				case GL_OUT_OF_MEMORY:
-					stderr.printf("OOM\n");
-					break;
-				case GL_STACK_OVERFLOW:
-					stderr.printf("Stack overflow.\n");
-					break;
-				case GL_STACK_UNDERFLOW:
-					stderr.printf("Stack underflow.\n");
-					break;
-				default:
-					stderr.printf(@"Other error: $error\n");
-					break;
-			}
-		}
+		}		
 	}
 }
 
