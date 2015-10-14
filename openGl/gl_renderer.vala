@@ -108,16 +108,17 @@ namespace Ldraw.OpenGl
 					var partNode = node as PartNode;
 					if(partNode == null)
 						continue;
-					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour);
+					var selected = node in selection;
+					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour, selected);
 				}
 			}
 			else
 			{
-				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour);	
+				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour, false);	
 			}
 		}
 		
-		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, Colour colour)
+		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, Colour colour, bool selected)
 		{
 			var t = transform; var v = offset;
 			float modelTransform[16] = 
@@ -126,9 +127,16 @@ namespace Ldraw.OpenGl
 						 t[0,2], t[1,2], t[2,2], 0,
 						 v.X   , v.Y   , v.Z   , 1};
 			glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
-			glUniform4fv(defaultColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
-			glUniform4fv(defaultEdgeColour, 1, {colour.EdgeRed / 255f, colour.EdgeGreen / 255f, colour.EdgeBlue / 255f, colour.Alpha / 255f});
-		
+			if(selected)
+			{
+				glUniform4fv(defaultEdgeColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
+				glUniform4fv(defaultColour, 1, {colour.EdgeRed / 255f, colour.EdgeGreen / 255f, colour.EdgeBlue / 255f, colour.Alpha / 255f});
+			}
+			else
+			{
+				glUniform4fv(defaultColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
+				glUniform4fv(defaultEdgeColour, 1, {colour.EdgeRed / 255f, colour.EdgeGreen / 255f, colour.EdgeBlue / 255f, colour.Alpha / 255f});
+			}
 			var arrays = arrayCache[o];
 			glBindBuffer(GL_ARRAY_BUFFER, arrays.vertexBuffer);
 			glVertexAttribPointer(
