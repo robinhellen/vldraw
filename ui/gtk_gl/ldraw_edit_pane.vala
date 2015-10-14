@@ -381,29 +381,9 @@ namespace Ldraw.Ui.GtkGl
 							lduViewWidth, lduViewHeight, // scale
 						    cameraLongitude, cameraLatitude,
 						    lduScrollX, lduScrollY);
-
-			/*var fullBounds = CalculateViewArea();
-
-			var modelBounds = model.Model.BoundingBox;
-			var radius = modelBounds.Radius;
-			var modelCenterZ = modelBounds.Center().Z;
-
-			var pixelVolume = new Bounds();
-			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MinX, fullBounds.MaxX, ((float)x + 0.5f) / alloc.width),
-									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y + 0.5f) / alloc.height),
-									 modelCenterZ + radius * 100));
-			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MinX, fullBounds.MaxX, ((float)x - 0.5f) / alloc.width),
-									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y - 0.5f) / alloc.height),
-									 modelCenterZ - radius * 100));
-
-			GLContext context = get_context();
-			context.make_current();
-			
-			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
-			var selected = builder.Visit(model.Model);
-			
-			if(selected != null)
-				model.Select(selected);*/
+						    
+			if(chosen != null)
+				model.Select(chosen);
 		}
 
 		private float ScaleBetween(float start, float end, float ratio)

@@ -127,7 +127,7 @@ namespace Ldraw.OpenGl
 			}
 			
 			GLushort[] result = {0};
-			glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
+			glReadPixels(x, height - y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
 			
 			stderr.printf(@"Selected node at index: $(result[0]).\n");
 			
