@@ -382,6 +382,8 @@ namespace Ldraw.Ui.GtkGl
 		public Vector dropLocation;
 		public Matrix dropTransform;
 		
+		public ColourContext Colours {construct; private get;}
+		
 		public void Draw(DrawingContext context)
 		{			
 			if(dropObject == null)
@@ -397,18 +399,20 @@ namespace Ldraw.Ui.GtkGl
 			var g = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MaxZ))); // (g)
 			var h = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MinZ))); // (h)
 			
-			context.DrawLine(a,b);
-			context.DrawLine(b,c);
-			context.DrawLine(c,d);
-			context.DrawLine(d,a);
-			context.DrawLine(a,h);
-			context.DrawLine(h,e);
-			context.DrawLine(e,f);
-			context.DrawLine(f,g);
-			context.DrawLine(g,h);
-			context.DrawLine(g,b);
-			context.DrawLine(c,f);
-			context.DrawLine(d,e);
+			var colour = Colours.GetColourById(0);
+			
+			context.DrawLine(a,b, colour);
+			context.DrawLine(b,c, colour);
+			context.DrawLine(c,d, colour);
+			context.DrawLine(d,a, colour);
+			context.DrawLine(a,h, colour);
+			context.DrawLine(h,e, colour);
+			context.DrawLine(e,f, colour);
+			context.DrawLine(f,g, colour);
+			context.DrawLine(g,h, colour);
+			context.DrawLine(g,b, colour);
+			context.DrawLine(c,f, colour);
+			context.DrawLine(d,e, colour);
 		}
 	}
 }

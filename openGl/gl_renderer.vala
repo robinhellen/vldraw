@@ -106,6 +106,20 @@ namespace Ldraw.OpenGl
 			{
 				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour, false);	
 			}
+			if(overlay != null)
+			{
+				float modelTransform[16] = 
+							{	1, 0, 0, 0, 
+								0, 1, 0, 0, 
+								0, 0, 1, 0, 
+								0, 0, 0, 1
+							};
+				var modelMatrix = glGetUniformLocation(program, "modelTransform");
+				glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
+				var ctx = new GlDrawingContext();
+				overlay.Draw(ctx);
+				ctx.Render();
+			}
 		}
 		
 		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, Colour colour, bool selected)
@@ -291,15 +305,93 @@ namespace Ldraw.OpenGl
 	
 	private class GlDrawingContext : Object, DrawingContext
 	{
-		public void DrawLine(Vector a, Vector b)
+		private Collection<float?> vertices = new LinkedList<float?>();
+		private Collection<float?> normals  = new LinkedList<float?>();
+		private Collection<float?> colours  = new LinkedList<float?>();
+		
+		public void DrawLine(Vector a, Vector b, Colour colour)
 		{
-			glColor4f(1F, 0F, 0F, 1F);
-			glBegin(GL_LINES);
-
-			glVertex3fv(a.value_vector());
-			glVertex3fv(b.value_vector());
-
-			glEnd();
+			PushColour(colour, 2, colours);
+			PushVector(Vector.NullVector, normals, 2);
+			PushVector(a, vertices);
+			PushVector(b, vertices);
+		}
+			
+		private void PushColour(Colour colour, int vertices, Collection<float?> target)
+		{
+			float red = colour.Red / 255f;
+			float green = colour.Green / 255f;
+			float blue = colour.Blue / 255f;
+			float alpha = colour.Alpha / 255f;
+			
+			for(int i = 0; i < vertices; i++)
+			{
+				target.add(red);
+				target.add(green);
+				target.add(blue);
+				target.add(alpha);
+			}					
+		}
+		
+		private void PushVector(Vector v, Collection<float?> list, int repeats = 1)
+		{
+			for(int i = 0; i < repeats; i++)
+			{
+				list.add(v.X);
+				list.add(v.Y);
+				list.add(v.Z);
+			}
+		}
+		
+		public void Render()
+		{
+			GLfloat[] glVertices = {}; foreach(var f in vertices) {glVertices += f;}
+			GLfloat[] glNormals  = {}; foreach(var f in normals) {glNormals  += f;}
+			GLfloat[] glColours  = {}; foreach(var f in colours) {glColours  += f;}
+			
+			GLuint[] buffers = {0,0,0};
+			glGenBuffers(3, buffers);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+			glBufferData(GL_ARRAY_BUFFER, vertices.size * sizeof(GLfloat), (GLvoid[]) glVertices, GL_STATIC_DRAW);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+			glBufferData(GL_ARRAY_BUFFER, colours.size * sizeof(GLfloat), (GLvoid[]) glColours, GL_STATIC_DRAW);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+			glBufferData(GL_ARRAY_BUFFER, normals.size * sizeof(GLfloat), (GLvoid[]) glNormals, GL_STATIC_DRAW);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+			glVertexAttribPointer(
+				0,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+			glVertexAttribPointer(
+				1,
+				4,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+			glVertexAttribPointer(
+				2,
+				3,
+				GL_FLOAT,
+				(GLboolean) GL_FALSE,
+				0,
+				null
+			);
+			glDrawArrays(GL_LINES, 0, vertices.size / 3);
+			
+			glDeleteBuffers(3, buffers);
 		}
 	}
 	

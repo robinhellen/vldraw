@@ -16,7 +16,7 @@ namespace Ldraw.Ui.Widgets
 	
 	public interface DrawingContext : GLib.Object
 	{
-		public abstract void DrawLine(Vector a, Vector b);
+		public abstract void DrawLine(Vector a, Vector b, Colour colour);
 	}
 	
 	public interface Overlay : GLib.Object
