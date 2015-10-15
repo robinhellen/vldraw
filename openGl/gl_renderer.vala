@@ -70,6 +70,7 @@ namespace Ldraw.OpenGl
 									
 			glEnable(GL_BLEND);
 			glClearColor(1f,1f,1f,1f);
+			glLineWidth(2);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUseProgram(program);
 			 
