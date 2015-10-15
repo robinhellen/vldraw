@@ -25,16 +25,8 @@ namespace Ldraw.OpenGl
 		
 		// initialized at preparation time, and then used at render time.
 		//	  the program 
-		GLuint program;
+		GLuint program = 0;
 		//	  uniform parameters to the shaders
-		GLint scrollMatrix;
-		GLint viewAngleMatrix;
-		GLint scaleMatrix;
-		GLint modelMatrix;
-		GLint lightColour;
-		GLint lightPosition;
-		GLint defaultColour;
-		GLint defaultEdgeColour;
 		Colour DefaultColour;
 		LdrawObject currentModel;
 		
@@ -46,14 +38,11 @@ namespace Ldraw.OpenGl
 				float lduScrollX, float lduScrollY)
 		{
 			
-			scrollMatrix = glGetUniformLocation(program, "scroll");
-			viewAngleMatrix = glGetUniformLocation(program, "view_angle");
-			scaleMatrix = glGetUniformLocation(program, "scale");
-			lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
-			lightColour = glGetUniformLocation(program, "LightColor");
-			defaultColour = glGetUniformLocation(program, "DefaultColour");
-			defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");
-			modelMatrix = glGetUniformLocation(program, "modelTransform");
+			var scrollMatrix = glGetUniformLocation(program, "scroll");
+			var viewAngleMatrix = glGetUniformLocation(program, "view_angle");
+			var scaleMatrix = glGetUniformLocation(program, "scale");
+			var lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
+			var lightColour = glGetUniformLocation(program, "LightColor");
 			
 			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
 			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);
@@ -126,7 +115,10 @@ namespace Ldraw.OpenGl
 						 t[0,1], t[1,1], t[2,1], 0,
 						 t[0,2], t[1,2], t[2,2], 0,
 						 v.X   , v.Y   , v.Z   , 1};
+			var modelMatrix = glGetUniformLocation(program, "modelTransform");
 			glUniformMatrix4fv(modelMatrix, 1, (GLboolean)GL_FALSE, modelTransform);
+			var defaultColour = glGetUniformLocation(program, "DefaultColour");
+			var defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");
 			if(selected)
 			{
 				glUniform4fv(defaultEdgeColour, 1, {colour.Red / 255f, colour.Green / 255f, colour.Blue / 255f, colour.Alpha / 255f});
@@ -201,18 +193,21 @@ namespace Ldraw.OpenGl
 				
 		public void PrepareRender(LdrawObject model, Colour defaultColour)
 		{
-			program = ProgramFactory.CreateProgram(ShaderType.Drawing);
+			if(program == 0)
+			{
+				program = ProgramFactory.CreateProgram(ShaderType.Drawing);
+				GLuint vao;
+				glGenVertexArrays(1, out vao);
+				glBindVertexArray(vao);
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_BACK);
+			}
 			
-			GLuint vao;
-			glGenVertexArrays(1, out vao);
-			glBindVertexArray(vao);
 			PrepareAllVertexData(model);
 			
 			DefaultColour = defaultColour;
 			currentModel = model;
 			
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
 		}
 		
 		Map<LdrawObject, RenderArrays> arrayCache = new HashMap<LdrawObject, RenderArrays>();
