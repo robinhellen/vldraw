@@ -191,6 +191,7 @@ namespace Ldraw.Ui.GtkGl
 			Vector newPosition = Vector.NullVector;
 			var newColour = ColourContext.GetColourById(0);
 			PartNode copyPart = model.Model.LastSubFile;
+			LdrawNode addAfterNode = model.Model.Nodes.last();
 
 			if(copyPart != null)
 			{
@@ -248,9 +249,8 @@ namespace Ldraw.Ui.GtkGl
 					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 					model.ClearSelection();
 					model.Select(newNode);
-					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
+					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, addAfterNode));
 					drag_finish(context, true, false, time);
-					stderr.printf("Drop completed.\n");
 				}
 				else
 				{
