@@ -51,7 +51,7 @@ namespace Ldraw
 			builder.register_module<MoveOriginModule>();
 			builder.register_module<OpenGlModule>();
 			
-            builder.register<RunningOptions>().as<IOptions>();
+            builder.register<RunningOptions>().as<IOptions>().single_instance();
 
             builder.register<UndoStack>().single_instance();
             var animatedModel = new AnimatedModel(null);
