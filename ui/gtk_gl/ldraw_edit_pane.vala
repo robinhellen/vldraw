@@ -182,6 +182,8 @@ namespace Ldraw.Ui.GtkGl
 				// this is the drag motion, so the provided mouse coordinates are bunkum
 				get_pointer(out x, out y);
 			}
+			Allocation allocation;
+			get_allocation(out allocation);
 			
 			// rotation is same as last or selected part, or no rotation
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
@@ -196,7 +198,29 @@ namespace Ldraw.Ui.GtkGl
 				newPosition = copyPart.Center;
 				newColour = copyPart.Colour;
 			}
-
+			
+			// Go from world coordinates to screen:
+			var v = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude).TransformMatrix(
+					Matrix.ForRotation(Vector(0,1,0), -cameraLongitude)).TransformVector(
+					newPosition).Add(Vector(lduScrollX, lduScrollY, 0));
+					
+			v = Matrix(2 * allocation.width / lduViewWidth, 0, 0, 0, 2 * allocation.height / lduViewHeight, 0, 0, 0, 1).TransformVector(v);
+			v = v.Add(Vector(allocation.width / 2, allocation.height / 2, 0));
+			
+			var dropPosition = Vector(x, y, v.Z);
+			
+			dropPosition = dropPosition.Subtract(Vector(allocation.width / 2, allocation.height / 2, 0));
+			dropPosition = Matrix(lduViewWidth / (allocation.width), 0, 0, 0, lduViewHeight / (allocation.height), 0, 0, 0, 1)
+							.TransformVector(dropPosition);
+			dropPosition = dropPosition
+							.Subtract(Vector(lduScrollX, lduScrollY, 0));
+							
+			dropPosition = 
+					Matrix.ForRotation(Vector(0,1,0), cameraLongitude).TransformMatrix(
+					Matrix.ForRotation(Vector(1,0,0), cameraLatitude)).TransformVector(
+					dropPosition);
+					
+			newPosition = dropPosition;		
 			// get the part from the drag data
 			string partName = (string)selection_data.get_data();
 			if(partName.contains(","))
