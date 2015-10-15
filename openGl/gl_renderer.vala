@@ -36,7 +36,8 @@ namespace Ldraw.OpenGl
 				float lduWidth, float lduHeight,
 				float cameraLongitude, float cameraLatitude,
 				float lduScrollX, float lduScrollY)
-		{
+		{			
+			PrepareAllVertexData(currentModel);
 			
 			var scrollMatrix = glGetUniformLocation(program, "scroll");
 			var viewAngleMatrix = glGetUniformLocation(program, "view_angle");
@@ -202,8 +203,6 @@ namespace Ldraw.OpenGl
 				glEnable(GL_CULL_FACE);
 				glCullFace(GL_BACK);
 			}
-			
-			PrepareAllVertexData(model);
 			
 			DefaultColour = defaultColour;
 			currentModel = model;
