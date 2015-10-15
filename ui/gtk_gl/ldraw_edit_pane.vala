@@ -219,8 +219,11 @@ namespace Ldraw.Ui.GtkGl
 					Matrix.ForRotation(Vector(0,1,0), cameraLongitude).TransformMatrix(
 					Matrix.ForRotation(Vector(1,0,0), cameraLatitude)).TransformVector(
 					dropPosition);
-					
-			newPosition = dropPosition;		
+			var xD = dropPosition.X == newPosition.X ? newPosition.X : SnapTo(dropPosition.X, Settings.CurrentGrid.X);
+			var yD = dropPosition.Y == newPosition.Y ? newPosition.Y : SnapTo(dropPosition.Y, Settings.CurrentGrid.Y);
+			var zD = dropPosition.Z == newPosition.Z ? newPosition.Z : SnapTo(dropPosition.Z, Settings.CurrentGrid.Z);			
+			
+			newPosition = Vector(xD,yD,zD);		
 			// get the part from the drag data
 			string partName = (string)selection_data.get_data();
 			if(partName.contains(","))
