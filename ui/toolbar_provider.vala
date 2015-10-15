@@ -209,7 +209,8 @@ namespace Ldraw.Ui
 			uint32 fillColour = (colour.Red << 24)
 							  | (colour.Green << 16)
 							  | (colour.Blue << 8)
-							  | (255 - colour.Alpha);
+							  | (colour.Alpha);
+
 			swatch.fill(fillColour);
 			image.fill((uint32) 255);
 			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
