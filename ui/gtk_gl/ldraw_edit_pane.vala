@@ -173,7 +173,7 @@ namespace Ldraw.Ui.GtkGl
 			queue_draw();
 		}
 
-		/*public override void drag_data_received (DragContext context, int x, int y,
+		public override void drag_data_received (DragContext context, int x, int y,
 												 SelectionData selection_data, uint info,
 												 uint time)
 		{
@@ -215,61 +215,7 @@ namespace Ldraw.Ui.GtkGl
 				{
 					return;
 				}
-				
-				Allocation alloc;
-				get_allocation(out alloc);
-				int deltaXPx = x - (alloc.width / 2);
-				int deltaYPx = y - (alloc.height / 2);
 
-				float deltaX = deltaXPx * m_Scale;
-				float deltaY = deltaYPx * m_Scale;
-
-				// TODO: adjust addition position for drop location
-				switch(Angle)
-				{
-					case ViewAngle.Ortho:
-						break; // do not adjust in the 3D view as that is PAINFUL
-					case ViewAngle.Front:
-						newPosition = Vector(
-							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							newPosition.Z);
-						break;
-					case ViewAngle.Back:
-						newPosition = Vector(
-							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							newPosition.Z);
-						break;
-					case ViewAngle.Left:
-						newPosition = Vector(
-							newPosition.X,
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.Z));
-						break;
-					case ViewAngle.Right:
-						newPosition = Vector(
-							newPosition.X,
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.Z));
-						break;
-					case ViewAngle.Top:
-						newPosition = Vector(
-							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
-							newPosition.Y,
-							SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
-						break;
-					case ViewAngle.Bottom:
-						newPosition = Vector(
-							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
-							newPosition.Y,
-							SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
-						break;
-					default:
-						newPosition = Vector.NullVector;
-						break;
-				}
-				
 				if(dragFinished)
 				{
 					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
@@ -277,6 +223,7 @@ namespace Ldraw.Ui.GtkGl
 					model.Select(newNode);
 					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
 					drag_finish(context, true, false, time);
+					stderr.printf("Drop completed.\n");
 				}
 				else
 				{
@@ -287,7 +234,7 @@ namespace Ldraw.Ui.GtkGl
 					queue_draw();
 				}
 			});
-		}*/
+		}
 
 		// end of drag and drop events.
 	
