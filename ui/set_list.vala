@@ -65,8 +65,8 @@ namespace Ldraw.Ui
 				{
 					var dialog = new Dialog.with_buttons("Set number", null,
 						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						Stock.OK, ResponseType.ACCEPT,
-						Stock.CANCEL, ResponseType.REJECT);
+						"_OK", ResponseType.ACCEPT,
+						"_Cancel", ResponseType.REJECT);
 
 					var content = (Box) dialog.get_content_area();
 					var setnameEntry = new Entry();

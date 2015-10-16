@@ -173,8 +173,8 @@ namespace Ldraw.Ui
 				{
 					var dialog = new Dialog.with_buttons("Select colour", window,
 						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						Stock.OK,		ResponseType.ACCEPT,
-						Stock.CANCEL,	ResponseType.REJECT
+						"_OK",		ResponseType.ACCEPT,
+						"_Cancel",	ResponseType.REJECT
 					);
 
 					var chooser = new ColourChooser(ColourContext);
@@ -251,8 +251,8 @@ namespace Ldraw.Ui
 
 			}
 
-			var nextPageButton = new Button.from_stock(Stock.GO_FORWARD);
-			var prevPageButton = new Button.from_stock(Stock.GO_BACK);
+			var nextPageButton = new Button.from_icon_name("go-next");
+			var prevPageButton = new Button.from_icon_name("go-previous");
 			prevPageButton.sensitive = false;
 
 			nextPageButton.clicked.connect(() =>
@@ -315,7 +315,7 @@ namespace Ldraw.Ui
 				else
 				{
 					button.sensitive = false;
-					button.add(new Image.from_stock(Stock.STOP, IconSize.BUTTON));
+					button.add(new Image.from_icon_name("process-stop", IconSize.BUTTON));
 					button.set_tooltip_text("Not defined");
 				}
 			}

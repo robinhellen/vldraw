@@ -238,8 +238,8 @@ namespace Ldraw.Ui
         {
             var dialog = new Dialog.with_buttons("Model details", parent,
                 DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-                Stock.OK, ResponseType.ACCEPT,
-                Stock.CANCEL, ResponseType.REJECT);
+                "_OK", ResponseType.ACCEPT,
+                "_Cancel", ResponseType.REJECT);
 
             var content = (Box) dialog.get_content_area();
             var table = new Table(3, 2, false);
@@ -311,7 +311,7 @@ namespace Ldraw.Ui
         {
             var dialog = new Dialog.with_buttons("Model details", parent,
                 DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-                Stock.OK, ResponseType.ACCEPT);
+                "_OK", ResponseType.ACCEPT);
 
             var content = (Box) dialog.get_content_area();
             var parts = new PartGroup.FromModel(Model.Model.File as LdrawModelFile);

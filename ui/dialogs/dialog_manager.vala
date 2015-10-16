@@ -11,8 +11,8 @@ namespace Ldraw.Ui.Dialogs
 		public bool GetSaveLocation(out string location, Window parent)
 		{
 			FileChooserDialog dialog = new FileChooserDialog("Save File As", parent, FileChooserAction.SAVE
-                                                , Stock.CANCEL, ResponseType.CANCEL
-                                                , Stock.SAVE, ResponseType.ACCEPT);
+                                                , "_Cancel", ResponseType.CANCEL
+                                                , "_Save", ResponseType.ACCEPT);
 
             FileFilter filter = new FileFilter();
             filter.add_custom(
@@ -39,8 +39,8 @@ namespace Ldraw.Ui.Dialogs
 		public bool GetLoadLocation(out string location, Window parent)
 		{			
             FileChooserDialog dialog = new FileChooserDialog("Open File", parent, FileChooserAction.OPEN
-                                                , Stock.CANCEL, ResponseType.CANCEL
-                                                , Stock.OPEN, ResponseType.ACCEPT);
+                                                , "_Cancel", ResponseType.CANCEL
+                                                , "_Open", ResponseType.ACCEPT);
 
             FileFilter filter = new FileFilter();
             filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));

@@ -41,8 +41,8 @@ namespace Ldraw.Ui
 
 			dialog = new Dialog.with_buttons("Animation details", parent,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-				Stock.OK, ResponseType.ACCEPT,
-				Stock.CANCEL, ResponseType.REJECT);
+				"_OK", ResponseType.ACCEPT,
+				"_Cancel", ResponseType.REJECT);
 
 			GetOriginalValues(model);
 
