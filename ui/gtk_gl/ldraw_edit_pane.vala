@@ -179,7 +179,7 @@ namespace Ldraw.Ui.GtkGl
 			if(!finishDrag)
 			{
 				// this is the drag motion, so the provided mouse coordinates are bunkum
-				get_pointer(out x, out y);
+				get_window().get_device_position(context.get_device(), out x, out y, null);
 			}
 			Allocation allocation;
 			get_allocation(out allocation);
