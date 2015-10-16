@@ -6,7 +6,6 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
-using Ldraw.OpenGl;
 using Ldraw.Options;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
@@ -358,11 +357,6 @@ namespace Ldraw.Ui.GtkGl
 						    
 			if(chosen != null)
 				model.Select(chosen);
-		}
-
-		private float ScaleBetween(float start, float end, float ratio)
-		{
-			return start + ((end - start) * ratio);
 		}
 
 		private float SnapTo(float raw, float step)
