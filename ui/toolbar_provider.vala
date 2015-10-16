@@ -305,7 +305,7 @@ namespace Ldraw.Ui
 					uint32 fillColour = (colour.Red << 24)
 									  | (colour.Green << 16)
 									  | (colour.Blue << 8)
-									  | (255 - colour.Alpha);
+									  | (colour.Alpha);
 					data.fill(fillColour);
 
 					var image = new Image.from_pixbuf(data);
