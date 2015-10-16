@@ -234,7 +234,9 @@ namespace Ldraw.Ui
 
 		public ColourChooser(ColourContext colourContext)
 		{
-			var grid = new Table(4, 8, true);
+			var grid = new Grid();
+			grid.row_homogeneous = true;
+			grid.column_homogeneous = true;
 			this.colourContext = colourContext;
 			for(int i = 0; i < 32; i++)
 			{
@@ -245,7 +247,7 @@ namespace Ldraw.Ui
 						ChosenColour = colourContext.GetColourById(32 * page + x);
 					});
 
-				grid.attach_defaults(button, i % 8, i % 8 + 1, i / 8, i / 8 + 1);
+				grid.attach(button, i % 8, i / 8);
 
 				buttons[i] = button;
 

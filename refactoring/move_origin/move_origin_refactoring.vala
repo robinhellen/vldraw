@@ -48,23 +48,24 @@ namespace Ldraw.Ui
 				var content = (Box) dialog.get_content_area();
 				var box = new Box(Orientation.HORIZONTAL, 5);
 				var vbox = new Box(Orientation.VERTICAL, 0);
-				var table = new Table(3, 2, false);
-				AttachToTable(table, new Label("X"), 0, 0);
-				AttachToTable(table, new Label("Y"), 0, 1);
-				AttachToTable(table, new Label("Z"), 0, 2);
+				var grid = new Grid();
+				grid.column_homogeneous = false;
+				grid.attach(new Label("X"), 0, 0);
+				grid.attach(new Label("Y"), 0, 1);
+				grid.attach(new Label("Z"), 0, 2);
 				var xSpin = new SpinButton.with_range(-5000.0, 5000.0, 5.0);
 				var ySpin = new SpinButton.with_range(-5000.0, 5000.0, 5.0);
 				var zSpin = new SpinButton.with_range(-5000.0, 5000.0, 5.0);
-				AttachToTable(table, xSpin, 1, 0);
-				AttachToTable(table, ySpin, 1, 1);
-				AttachToTable(table, zSpin, 1, 2);
+				grid.attach(xSpin, 1, 0);
+				grid.attach(ySpin, 1, 1);
+				grid.attach(zSpin, 1, 2);
 				
 				xSpin.notify["value"].connect(() => x = (float)xSpin.value);
 				ySpin.notify["value"].connect(() => y = (float)ySpin.value);
 				zSpin.notify["value"].connect(() => z = (float)zSpin.value);
 				xSpin.value = ySpin.value = zSpin.value = 0.0;
 				
-				vbox.pack_start(table, false, false, 75);
+				vbox.pack_start(grid, false, false, 75);
 				box.pack_start(vbox, false);
 				view_container = (Container)WithFrame(view);
 				this.view = view;

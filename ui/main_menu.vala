@@ -242,17 +242,19 @@ namespace Ldraw.Ui
                 "_Cancel", ResponseType.REJECT);
 
             var content = (Box) dialog.get_content_area();
-            var table = new Table(3, 2, false);
-            AttachToTable(table, new Label("Filename"), 0, 0);
-            AttachToTable(table, new Label("Sub-model name"), 0, 1);
-            AttachToTable(table, new Label("Description"), 0, 2);
+            var grid = new Grid();
+				grid.column_homogeneous = false;
+				grid.row_homogeneous = false;
+            grid.attach(new Label("Filename"), 0, 0);
+            grid.attach(new Label("Sub-model name"), 0, 1);
+            grid.attach(new Label("Description"), 0, 2);
             var filenameEntry = new Entry();
             var nameEntry = new Entry();
             var descriptionEntry = new Entry();
-            AttachToTable(table, filenameEntry, 1, 0);
-            AttachToTable(table, nameEntry, 1, 1);
-            AttachToTable(table, descriptionEntry, 1, 2);
-            content.pack_start(table);
+            grid.attach(filenameEntry, 1, 0);
+            grid.attach(nameEntry, 1, 1);
+            grid.attach(descriptionEntry, 1, 2);
+            content.pack_start(grid);
 
             dialog.show_all();
 
