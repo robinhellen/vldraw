@@ -45,7 +45,7 @@ namespace Ldraw.Ui
 				modelGroup = new PartGroup.FromModel(modelFile);
 			}
 			usage = new PartGroupUsage(availableParts, modelGroup);
-			if(reset)
+			if(reset || usageViewModel == null)
 			{
 				usageViewModel = new PartUsageViewModel(usage);
 				partsView.model = usageViewModel;
