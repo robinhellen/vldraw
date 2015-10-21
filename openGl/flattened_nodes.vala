@@ -96,6 +96,14 @@ namespace Ldraw.OpenGl
 				PushVector(b, Vertices);	
 				PushVector(c, Vertices);		
 				PushVector(normal, Normals, 3);
+				if(!state.BfcOn)
+				{
+					PushColour(triangle.Colour, 3, Colours);
+					PushVector(a, Vertices);	
+					PushVector(c, Vertices);	
+					PushVector(b, Vertices);		
+					PushVector(Vector.NullVector.Subtract(normal), Normals, 3);
+				}
 			}
 
 			public override void VisitQuad(QuadNode quad)
@@ -123,6 +131,18 @@ namespace Ldraw.OpenGl
 				PushVector(c, Vertices);	
 				PushVector(d, Vertices);	
 				PushVector(normal, Normals, 6);
+				if(!state.BfcOn)
+				{
+					PushColour(quad.Colour, 6, Colours);
+					PushVector(a, Vertices);
+					PushVector(c, Vertices);	
+					PushVector(b, Vertices);	
+						
+					PushVector(a, Vertices);	
+					PushVector(d, Vertices);	
+					PushVector(c, Vertices);	
+					PushVector(Vector.NullVector.Subtract(normal), Normals, 6);
+				}
 			}
 
 			public override void VisitLine(LineNode line)
@@ -188,6 +208,10 @@ namespace Ldraw.OpenGl
 						state.BfcClockwise = false;
 					if(bfc.IsOptionSet(BfcOptions.WindingClockwise))
 						state.BfcClockwise = true;
+					if(bfc.IsOptionSet(BfcOptions.ClipOff))
+						state.BfcOn = false;
+					if(bfc.IsOptionSet(BfcOptions.ClipOn))
+						state.BfcOn = true;					
 				}
 			}
 			
@@ -201,7 +225,7 @@ namespace Ldraw.OpenGl
 					ColourInverted = false;
 					BfcInvertNext = false;
 					BfcInvertCurrent = false;
-					BfcOn = true;
+					BfcOn = false;
 					BfcClockwise = false;
 				}
 

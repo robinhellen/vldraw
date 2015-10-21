@@ -190,7 +190,6 @@ namespace Ldraw.Ui.GtkGl
 			Vector newPosition = Vector.NullVector;
 			var newColour = ColourContext.GetColourById(0);
 			PartNode copyPart = model.Model.LastSubFile;
-			
 			LdrawNode addAfterNode = model.Model.Nodes.is_empty ? null : model.Model.Nodes.last();
 
 			if(copyPart != null)
