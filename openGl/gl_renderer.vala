@@ -257,6 +257,7 @@ namespace Ldraw.OpenGl
 			if(!(model.File is LdrawModelFile))
 			{
 				arrayCache[model] = PrepareVertexData(model);
+				model.VisibleChange.connect(() => arrayCache.unset(model));
 				return;
 			}
 			
@@ -271,6 +272,7 @@ namespace Ldraw.OpenGl
 					continue;
 				
 				arrayCache[obj] = PrepareVertexData(obj);
+				obj.VisibleChange.connect(() => arrayCache.unset(obj));
 			}
 		}
 		
