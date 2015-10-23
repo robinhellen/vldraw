@@ -9,13 +9,13 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	private class SetList : GLib.Object, IPartDragSource
+	private class SetList : Object, IPartDragSource
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
 		private TreeView partsView;
 		private PartUsageViewModel usageViewModel;
-		private VPaned widget;
+		private Paned widget;
 
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
@@ -25,7 +25,7 @@ namespace Ldraw.Ui
 		construct
 		{
 			sets = new ObservableList<Inventory>();
-			widget = new VPaned();
+			widget = new Paned(Orientation.VERTICAL);
 			InitializeControls();
 			Model.view_changed.connect(() => UpdateUsage.begin(false));
 		}
@@ -45,7 +45,7 @@ namespace Ldraw.Ui
 				modelGroup = new PartGroup.FromModel(modelFile);
 			}
 			usage = new PartGroupUsage(availableParts, modelGroup);
-			if(reset)
+			if(reset || usageViewModel == null)
 			{
 				usageViewModel = new PartUsageViewModel(usage);
 				partsView.model = usageViewModel;
@@ -58,15 +58,15 @@ namespace Ldraw.Ui
 
 		private void InitializeControls()
 		{
-			var setControls = new VBox(false, 0);
-			var setButtons = new HBox(true, 2);
+			var setControls = new Box(Orientation.VERTICAL, 0);
+			var setButtons = new Box(Orientation.HORIZONTAL, 2);
 			var addButton = new Button.with_label("Add");
 			addButton.clicked.connect(() =>
 				{
 					var dialog = new Dialog.with_buttons("Set number", null,
 						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						Stock.OK, ResponseType.ACCEPT,
-						Stock.CANCEL, ResponseType.REJECT);
+						"_OK", ResponseType.ACCEPT,
+						"_Cancel", ResponseType.REJECT);
 
 					var content = (Box) dialog.get_content_area();
 					var setnameEntry = new Entry();

@@ -173,8 +173,8 @@ namespace Ldraw.Ui
 				{
 					var dialog = new Dialog.with_buttons("Select colour", window,
 						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						Stock.OK,		ResponseType.ACCEPT,
-						Stock.CANCEL,	ResponseType.REJECT
+						"_OK",		ResponseType.ACCEPT,
+						"_Cancel",	ResponseType.REJECT
 					);
 
 					var chooser = new ColourChooser(ColourContext);
@@ -209,7 +209,8 @@ namespace Ldraw.Ui
 			uint32 fillColour = (colour.Red << 24)
 							  | (colour.Green << 16)
 							  | (colour.Blue << 8)
-							  | (255 - colour.Alpha);
+							  | (colour.Alpha);
+
 			swatch.fill(fillColour);
 			image.fill((uint32) 255);
 			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
@@ -233,7 +234,9 @@ namespace Ldraw.Ui
 
 		public ColourChooser(ColourContext colourContext)
 		{
-			var grid = new Table(4, 8, true);
+			var grid = new Grid();
+			grid.row_homogeneous = true;
+			grid.column_homogeneous = true;
 			this.colourContext = colourContext;
 			for(int i = 0; i < 32; i++)
 			{
@@ -244,14 +247,14 @@ namespace Ldraw.Ui
 						ChosenColour = colourContext.GetColourById(32 * page + x);
 					});
 
-				grid.attach_defaults(button, i % 8, i % 8 + 1, i / 8, i / 8 + 1);
+				grid.attach(button, i % 8, i / 8);
 
 				buttons[i] = button;
 
 			}
 
-			var nextPageButton = new Button.from_stock(Stock.GO_FORWARD);
-			var prevPageButton = new Button.from_stock(Stock.GO_BACK);
+			var nextPageButton = new Button.from_icon_name("go-next");
+			var prevPageButton = new Button.from_icon_name("go-previous");
 			prevPageButton.sensitive = false;
 
 			nextPageButton.clicked.connect(() =>
@@ -276,7 +279,7 @@ namespace Ldraw.Ui
 				});
 
 			pack_start(grid, false, true, 10);
-			var button_box = new VBox(true, 10);
+			var button_box = new Box(Orientation.VERTICAL, 10);
 			button_box.pack_start(prevPageButton, true, false);
 			button_box.pack_start(nextPageButton, true, false);
 			pack_end(button_box, false);
@@ -289,7 +292,10 @@ namespace Ldraw.Ui
 			{
 				var colourId = page * 32 + i;
 				var button = buttons[i];
-				button.remove(button.child);
+				foreach(var child in button.get_children())
+				{
+					child.destroy();
+				}
 
 				var colour = colourContext.GetColourById(colourId);
 				if(colour != null)
@@ -299,7 +305,7 @@ namespace Ldraw.Ui
 					uint32 fillColour = (colour.Red << 24)
 									  | (colour.Green << 16)
 									  | (colour.Blue << 8)
-									  | (255 - colour.Alpha);
+									  | (colour.Alpha);
 					data.fill(fillColour);
 
 					var image = new Image.from_pixbuf(data);
@@ -311,7 +317,7 @@ namespace Ldraw.Ui
 				else
 				{
 					button.sensitive = false;
-					button.add(new Image.from_stock(Stock.STOP, IconSize.BUTTON));
+					button.add(new Image.from_icon_name("process-stop", IconSize.BUTTON));
 					button.set_tooltip_text("Not defined");
 				}
 			}

@@ -16,9 +16,4 @@ namespace Ldraw.Ui
 		frame.shadow_type = ShadowType.IN;
 		return frame;
 	}
-	
-	public void AttachToTable(Table t, Widget w, uint x, uint y)
-	{
-		t.attach(w, x, x + 1, y, y + 1, AttachOptions.EXPAND, AttachOptions.EXPAND, 5, 5);
-	}
 }
