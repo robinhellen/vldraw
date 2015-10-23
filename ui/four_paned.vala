@@ -6,15 +6,16 @@ using Ldraw.Ui.DragAndDrop;
 
 namespace Ldraw.Ui.Widgets
 {
-	private class FourPaned : HPaned
+	private class FourPaned : Paned
 	{
 		private Paned left;
 		private Paned right;
 
 		construct
 		{
-			left = new VPaned();
-			right = new VPaned();
+			orientation = Orientation.HORIZONTAL;
+			left = new Paned(Orientation.VERTICAL);
+			right = new Paned(Orientation.VERTICAL);
 
 			add1(left);
 			add2(right);
@@ -25,22 +26,32 @@ namespace Ldraw.Ui.Widgets
 
 		public void add_top_left(Widget w)
 		{
-			left.add1(w);
+			left.pack1(w, true, true);
 		}
 
 		public void add_bottom_left(Widget w)
 		{
-			left.add2(w);
+			left.pack2(w, true, true);
 		}
 
 		public void add_top_right(Widget w)
 		{
-			right.add1(w);
+			right.pack1(w, true, true);
 		}
 
 		public void add_bottom_right(Widget w)
 		{
-			right.add2(w);
+			right.pack2(w, true, true);
+		}
+		
+		public override void realize()
+		{
+			base.realize();
+			Allocation a;
+			get_allocation(out a);
+			position = a.width / 2;
+			left.position = a.height / 2;
+			right.position = a.height / 2;
 		}
 	}
 
@@ -72,12 +83,5 @@ namespace Ldraw.Ui.Widgets
 		}
 
 		public signal void RenderingError(string description);
-
-		private Widget WithScrolls(Widget widget)
-		{
-			ScrolledWindow win = new ScrolledWindow(null, null);
-			win.add(widget);
-			return win;
-		}
 	}
 }

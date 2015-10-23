@@ -9,20 +9,19 @@ using GL;
 
 namespace Ldraw.Ui.GtkGl
 {
-	private class LdrawViewPane : Layout, ModelView
+	private class LdrawViewPane : GLArea, ModelView
 	{
 		private LdrawObject m_Model;
-		private ViewAngle m_Angle;
-		protected float m_Scale;
-		protected Vector? m_Eyeline = null;
-		protected Vector? m_Center = null;
-		protected Vector? m_Up = null;
-		private DateTime m_LastRedraw = null;
-
-		private Adjustment m_Hadj = null;
-		private Adjustment m_Vadj = null;
 		
-		protected Overlay overlay = null;
+		// camera viewpoint definition
+		protected float cameraLongitude;
+		protected float cameraLatitude;
+		protected float lduViewWidth;
+		protected float lduViewHeight;
+		protected float lduScrollX;
+		protected float lduScrollY;		
+		
+		protected Ldraw.Ui.Widgets.Overlay overlay = null;
 		
 		public Renderer renderer {construct; protected get;}
 		public ColourContext ColourContext {construct; protected get;}
@@ -34,10 +33,9 @@ namespace Ldraw.Ui.GtkGl
 
 		construct
 		{
-			// initialize this control for OpenGl rendering
-			GLConfig config = new GLConfig.by_mode(GLConfigMode.DEPTH | GLConfigMode.RGBA | GLConfigMode.DOUBLE);
-			widget_set_gl_capability(this, config, null, true, GLRenderType.RGBA_TYPE);
-
+			auto_render = true;
+			has_alpha = true;
+			has_depth_buffer = true;
 			// minimum size 100 px square
 			set_size_request(100, 100);
 			
@@ -45,13 +43,14 @@ namespace Ldraw.Ui.GtkGl
 				m_Model =  new LdrawObject("", null);
 				
 			DefaultColour = ColourContext.GetColourById(0);
+			base.realize.connect(realize); // if we override the virtual, the base won't get called properly.
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
 		{
 			this(angle);
 			m_Model = model;
-			m_Model.VisibleChange.connect(() => queue_draw());
+			m_Model.VisibleChange.connect(() => queue_render());
 		}
 
 		public LdrawObject Model
@@ -63,151 +62,139 @@ namespace Ldraw.Ui.GtkGl
 			set
 			{
 				m_Model = value;
-				m_Model.VisibleChange.connect(() => queue_draw());
-				m_Eyeline = m_Center = m_Up = null;
-				SetAdjustmentRanges();
+				m_Model.VisibleChange.connect(() => queue_render());
+				CenterScrollAndZoom();
+				realize();
 
-				queue_draw();
+				queue_render();
 			}
 		}
 		
-		public Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_draw());}}
+		public Ldraw.Ui.Widgets.Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_render());}}
 
 		public Colour DefaultColour {get; set;}
-
-		public virtual void Redraw()
+		
+		public override bool render(GLContext context)
 		{
 			if(m_Model == null)
 			{
-				return;
-			}
-
-			m_LastRedraw = new DateTime.now_utc();
-			GLWindow drawableWin = widget_get_gl_window(this);
-			if(!(drawableWin is GLDrawable))
-			{
-				assert_not_reached();
+				return true;
 			}
 			
-			var drawable = (GLDrawable)drawableWin;
-
-			if(m_Eyeline == null)
+			renderer.Render2(context, CurrentSelection, overlay,
+							 lduViewWidth, lduViewHeight, // scale
+							 cameraLongitude, cameraLatitude,
+							 lduScrollX, lduScrollY); // scroll
+							 
+			var error = get_error();
+			if(error != null)
 			{
-				// setup viewing area.
-				InitializeView();
+				stderr.printf(@"rendering error: $(error.message).\n");
 			}
-
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, m_Model, Gee.Set.empty<LdrawNode>(), overlay);
+			return true;
 		}
-
-		public override bool configure_event(Gdk.EventConfigure event)
+		
+		public new void realize()
 		{
-			Redraw();
-			return false;
-		}
-
-		public override bool expose_event(Gdk.EventExpose event)
-		{
-			Redraw();
-			return false;
-		}
-
-		public override void set_scroll_adjustments(Adjustment hadj, Adjustment vadj)
-		{
-			m_Hadj = hadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
-			m_Hadj.lower = -3000;
-			m_Hadj.upper = 3000;
-			m_Hadj.page_increment = 150;
-			m_Hadj.step_increment = 30;
-			m_Hadj.value_changed.connect(adj =>
-					{
-						float dx = -(float)adj.value - m_Center.X;
-						m_Center = m_Center.Add(Vector(dx, 0, 0));
-						m_Eyeline = m_Eyeline.Add(Vector(dx, 0, 0));
-						queue_draw();
-					});
-			m_Vadj = vadj ?? new Adjustment(0, 0, 0, 0, 0, 0);
-			m_Vadj.lower = -3000;
-			m_Vadj.upper = 3000;
-			m_Vadj.page_increment = 150;
-			m_Vadj.step_increment = 30;
-			m_Vadj.value_changed.connect(adj =>
-					{
-						float dy = -(float)adj.value - m_Center.Y;
-
-						m_Center = m_Center.Add(Vector(0, dy, 0));
-						m_Eyeline = m_Eyeline.Add(Vector(0, dy, 0));
-						queue_draw();
-					});
-
-			SetAdjustmentRanges();
-		}
-
-		private void SetAdjustmentRanges()
-		{
-			if(m_Center == null
-				|| m_Hadj == null
-				|| m_Vadj == null)
+			if(!get_realized())
+			{
 				return;
+			}
+			make_current();
+			if(get_error() != null)
+				return;
+				
+			renderer.PrepareRender(m_Model, DefaultColour);
+		}
 
-			m_Hadj.value = -m_Center.X;
-
-			m_Vadj.value = -m_Center.Y;
+		public override void size_allocate(Allocation allocation)
+		{
+			Allocation old_allocation;
+			get_allocation(out old_allocation);
+			lduViewHeight *= ((float)allocation.height / old_allocation.height);
+			lduViewWidth *= ((float)allocation.width / old_allocation.width);	
+			base.size_allocate(allocation);
+					
 		}
 
 		public ViewAngle Angle
 		{
-			get
-			{
-				return m_Angle;
-			}
 			public set
 			{
-				m_Angle = value;
-				m_Eyeline = m_Center = m_Up = null;
-				if(m_Hadj != null)
+				switch(value)
 				{
-					SetAdjustmentRanges();
+					case ViewAngle.Left:
+						cameraLatitude = 0;
+						cameraLongitude = 90;
+						break;
+					case ViewAngle.Right:
+						cameraLatitude = 0;
+						cameraLongitude = -90;
+						break;
+					case ViewAngle.Top:
+						cameraLatitude = -90;
+						cameraLongitude = 0;
+						break;
+					case ViewAngle.Bottom:
+						cameraLatitude = 90;
+						cameraLongitude = 0;
+						break;
+					case ViewAngle.Front:
+						cameraLatitude = 0;
+						cameraLongitude = 0;
+						break;
+					case ViewAngle.Back:
+						cameraLatitude = 0;
+						cameraLongitude = 180;
+						break;
+					case ViewAngle.Ortho:
+						cameraLatitude = -30;
+						cameraLongitude = 45;
+						break;
+					default:
+						assert_not_reached();
 				}
-				queue_draw();
+				CenterScrollAndZoom();
+				queue_render();
 			}
 		}
-
-		protected void InitializeView()
+		
+		private void CenterScrollAndZoom()
 		{
-			var modelBounds = new Bounds.Clone(m_Model.BoundingBox);
-			if(modelBounds.Radius == 0)
+			var bounds = m_Model.BoundingBox;
+						
+			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);			
+			var m = latTransform.TransformMatrix(longTransform);
+			var transformedCenter = m.TransformVector(bounds.Center());
+			lduScrollX = -transformedCenter.X;
+			lduScrollY = -transformedCenter.Y;
+			
+			
+			lduViewWidth = 2 * bounds.Radius;
+			lduViewHeight = 2 * bounds.Radius;
+			
+			Allocation alloc;
+			get_allocation(out alloc);
+			var allocRatio = (float)alloc.width / alloc.height;
+			if(allocRatio > 1)
 			{
-				var v = Vector(240, 120, 240);
-				modelBounds.Union(Vector.NullVector.Add(v));
-				modelBounds.Union(Vector.NullVector.Subtract(v));
+				lduViewWidth *= allocRatio;
 			}
-
-			float modelRadius = modelBounds.Radius;
-			var modelCenter = modelBounds.Center();
-			Vector cameraShift = m_Angle.GetCameraDirection().Scale(modelRadius);
-			m_Center = m_Angle.GetViewCenter(modelCenter);
-
-			m_Eyeline = m_Center.Add(cameraShift);
-
-			Allocation alloc;
-			get_allocation(out alloc);
-			int size = (alloc.height > alloc.width) ? alloc.width : alloc.height;
-			m_Scale = (2 * modelRadius) / size;
-			if(m_Scale < 0.0f) {m_Scale = -m_Scale;}
-			m_Scale = Math.fmaxf(m_Scale, 0.25f);
-
-			m_Up = m_Angle.GetCameraUp();
-
-			SetAdjustmentRanges();
+			else
+			{
+				lduViewHeight /= allocRatio;
+			}			
 		}
-
-		protected Bounds CalculateViewArea()
+		
+		private static Gee.Set<LdrawNode> emptySelection = Gee.Set.empty<LdrawNode>();
+		
+		protected virtual Gee.Set<LdrawNode> CurrentSelection
 		{
-			Allocation alloc;
-			get_allocation(out alloc);
-
-			return m_Angle.GetViewBounds(alloc.width, alloc.height, m_Scale, m_Center);
+			get
+			{
+				return emptySelection;
+			}
 		}
 	}
 }

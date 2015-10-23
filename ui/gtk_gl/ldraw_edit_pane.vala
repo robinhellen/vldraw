@@ -6,7 +6,6 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
-using Ldraw.OpenGl;
 using Ldraw.Options;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Ui.Commands;
@@ -14,13 +13,17 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui.GtkGl
 {
-	private class LdrawEditPane : LdrawViewPane, ModelEditor
+	private class LdrawEditPane : LdrawViewPane, ModelEditor, Scrollable
 	{
 		public IOptions Settings {construct; private get;}
 		public IDroppedObjectLocator Locator {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
 		public AnimatedModel model {construct; private get;}
 		public DropBoundsOverlay DropOverlay {construct; private get;}
+		public GlSelector Selector {construct; get;}
+
+		private Adjustment m_Hadj = null;
+		private Adjustment m_Vadj = null;
 
 		public LdrawEditPane(ViewAngle angle, IOptions settings, IDroppedObjectLocator locator, UndoStack undoStack)
 		{
@@ -30,8 +33,9 @@ namespace Ldraw.Ui.GtkGl
 		construct
 		{
 			can_focus = true;
-			events |= EventMask.BUTTON_PRESS_MASK;
-			events |= EventMask.KEY_PRESS_MASK;
+			events |= EventMask.BUTTON_PRESS_MASK 
+				   |  EventMask.KEY_PRESS_MASK
+				   |  EventMask.SCROLL_MASK;
 
 			// set up this control for drag-and-drop
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
@@ -43,32 +47,18 @@ namespace Ldraw.Ui.GtkGl
 			overlay = DropOverlay;
 		}
 		
-		public override void Redraw()
+		protected override Gee.Set<LdrawNode> CurrentSelection
 		{
-			if(model == null)
+			get
 			{
-				return;
+				return model.Selection;
 			}
-
-			GLWindow drawableWin = widget_get_gl_window(this);
-			if(!(drawableWin is GLDrawable))
-			{
-				assert_not_reached();
-			}
-			
-			var drawable = (GLDrawable)drawableWin;
-
-			if(m_Eyeline == null)
-			{
-				// setup viewing area.
-				InitializeView();
-			}
-
-			renderer.Render(drawable, DefaultColour, CalculateViewArea(), m_Eyeline, m_Center, m_Up, Model, model.Selection, overlay);
 		}
-
+		
+		// event overrides.		
 		public override bool button_press_event(Gdk.EventButton event)
 		{
+			base.button_press_event(event);
 			// if button is right, popup context menu
 			grab_focus();
 			switch(event.button)
@@ -83,9 +73,16 @@ namespace Ldraw.Ui.GtkGl
 					break;
 				case 3: // right button
 					CreateContextMenu().popup(null, null, null, event.button, event.time);
-					return true;
+					break;
 			}
 			return false;
+		}
+		
+		public override bool popup_menu()
+		{
+			base.popup_menu();
+			CreateContextMenu().popup(null, null, null, 0, get_current_event_time());
+			return false;		
 		}
 
 		public override bool scroll_event(Gdk.EventScroll event)
@@ -93,11 +90,13 @@ namespace Ldraw.Ui.GtkGl
 			switch(event.direction)
 			{
 				case ScrollDirection.UP:
-					m_Scale *= Math.powf(2, -0.2f);
+					lduViewHeight *= Math.powf(2, -0.2f);
+					lduViewWidth *= Math.powf(2, -0.2f);
 					queue_draw();
 					break;
 				case ScrollDirection.DOWN:
-					m_Scale *= Math.powf(2, 0.2f);
+					lduViewHeight *= Math.powf(2, 0.2f);
+					lduViewWidth *= Math.powf(2, 0.2f);
 					queue_draw();
 					break;
 			}
@@ -145,6 +144,9 @@ namespace Ldraw.Ui.GtkGl
 			return false;
 		}
 
+		// end of event overrides.
+		
+		// drag and drop events
 		private bool finishDrag = false;
 
 		public override bool drag_drop(DragContext context, int x, int y, uint time_)
@@ -177,8 +179,10 @@ namespace Ldraw.Ui.GtkGl
 			if(!finishDrag)
 			{
 				// this is the drag motion, so the provided mouse coordinates are bunkum
-				get_pointer(out x, out y);
+				get_window().get_device_position(context.get_device(), out x, out y, null);
 			}
+			Allocation allocation;
+			get_allocation(out allocation);
 			
 			// rotation is same as last or selected part, or no rotation
 			// offest is same as last or selected part, then moved for drop location, else 0,0,0
@@ -186,6 +190,7 @@ namespace Ldraw.Ui.GtkGl
 			Vector newPosition = Vector.NullVector;
 			var newColour = ColourContext.GetColourById(0);
 			PartNode copyPart = model.Model.LastSubFile;
+			LdrawNode addAfterNode = model.Model.Nodes.is_empty ? null : model.Model.Nodes.last();
 
 			if(copyPart != null)
 			{
@@ -193,9 +198,34 @@ namespace Ldraw.Ui.GtkGl
 				newPosition = copyPart.Center;
 				newColour = copyPart.Colour;
 			}
-
+			
+			// Go from world coordinates to screen:
+			var v = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude).TransformMatrix(
+					Matrix.ForRotation(Vector(0,1,0), -cameraLongitude)).TransformVector(
+					newPosition).Add(Vector(lduScrollX, lduScrollY, 0));
+					
+			v = Matrix(2 * allocation.width / lduViewWidth, 0, 0, 0, 2 * allocation.height / lduViewHeight, 0, 0, 0, 1).TransformVector(v);
+			v = v.Add(Vector(allocation.width / 2, allocation.height / 2, 0));
+			
+			var dropPosition = Vector(x, y, v.Z);
+			
+			dropPosition = dropPosition.Subtract(Vector(allocation.width / 2, allocation.height / 2, 0));
+			dropPosition = Matrix(lduViewWidth / (allocation.width), 0, 0, 0, lduViewHeight / (allocation.height), 0, 0, 0, 1)
+							.TransformVector(dropPosition);
+			dropPosition = dropPosition
+							.Subtract(Vector(lduScrollX, lduScrollY, 0));
+							
+			dropPosition = 
+					Matrix.ForRotation(Vector(0,1,0), cameraLongitude).TransformMatrix(
+					Matrix.ForRotation(Vector(1,0,0), cameraLatitude)).TransformVector(
+					dropPosition);
+			var xD = dropPosition.X == newPosition.X ? newPosition.X : SnapTo(dropPosition.X, Settings.CurrentGrid.X);
+			var yD = dropPosition.Y == newPosition.Y ? newPosition.Y : SnapTo(dropPosition.Y, Settings.CurrentGrid.Y);
+			var zD = dropPosition.Z == newPosition.Z ? newPosition.Z : SnapTo(dropPosition.Z, Settings.CurrentGrid.Z);			
+			
+			newPosition = Vector(xD,yD,zD);		
 			// get the part from the drag data
-			string partName = (string)selection_data.data;
+			string partName = (string)selection_data.get_data();
 			if(partName.contains(","))
 			{
 				var sections = partName.split(",");
@@ -212,67 +242,13 @@ namespace Ldraw.Ui.GtkGl
 				{
 					return;
 				}
-				
-				Allocation alloc;
-				get_allocation(out alloc);
-				int deltaXPx = x - (alloc.width / 2);
-				int deltaYPx = y - (alloc.height / 2);
 
-				float deltaX = deltaXPx * m_Scale;
-				float deltaY = deltaYPx * m_Scale;
-
-				// TODO: adjust addition position for drop location
-				switch(Angle)
-				{
-					case ViewAngle.Ortho:
-						break; // do not adjust in the 3D view as that is PAINFUL
-					case ViewAngle.Front:
-						newPosition = Vector(
-							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							newPosition.Z);
-						break;
-					case ViewAngle.Back:
-						newPosition = Vector(
-							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							newPosition.Z);
-						break;
-					case ViewAngle.Left:
-						newPosition = Vector(
-							newPosition.X,
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.Z));
-						break;
-					case ViewAngle.Right:
-						newPosition = Vector(
-							newPosition.X,
-							SnapTo(-m_Center.Y + deltaY, Settings.CurrentGrid.Y),
-							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.Z));
-						break;
-					case ViewAngle.Top:
-						newPosition = Vector(
-							SnapTo(m_Center.X + deltaX, Settings.CurrentGrid.X),
-							newPosition.Y,
-							SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
-						break;
-					case ViewAngle.Bottom:
-						newPosition = Vector(
-							SnapTo(-m_Center.X - deltaX, Settings.CurrentGrid.X),
-							newPosition.Y,
-							SnapTo(m_Center.Y - deltaY, Settings.CurrentGrid.Z));
-						break;
-					default:
-						newPosition = Vector.NullVector;
-						break;
-				}
-				
 				if(dragFinished)
 				{
 					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 					model.ClearSelection();
 					model.Select(newNode);
-					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, copyPart));
+					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, addAfterNode));
 					drag_finish(context, true, false, time);
 				}
 				else
@@ -280,15 +256,18 @@ namespace Ldraw.Ui.GtkGl
 					DropOverlay.dropObject = droppedObject;
 					DropOverlay.dropLocation = newPosition;
 					DropOverlay.dropTransform = newTransform;
-					drag_status(context, context.suggested_action, time);
+					drag_status(context, context.get_suggested_action(), time);
 					queue_draw();
 				}
 			});
 		}
 
+		// end of drag and drop events.
+	
 		private Gtk.Menu CreateContextMenu()
 		{
 			Gtk.Menu menu = new Gtk.Menu();
+			menu.attach_widget = this;
 			
 			AppendMenuFor(ViewAngle.Front, "Front", menu);
 			AppendMenuFor(ViewAngle.Back, "Back", menu);
@@ -308,45 +287,76 @@ namespace Ldraw.Ui.GtkGl
 			parent.append(item);
 			item.show();
 		}
+		
+		// implementation of Scrollable
+		public Adjustment hadjustment
+		{
+			construct set
+			{
+				m_Hadj = value;
+				if(value == null)
+					return;
+				m_Hadj.lower = -3000;
+				m_Hadj.upper = 3000;
+				m_Hadj.page_increment = 150;
+				m_Hadj.step_increment = 30;
+				m_Hadj.value_changed.connect(adj =>
+				{
+					lduScrollX = (float)adj.value;
+					queue_draw();
+				});			
+				m_Hadj.value = lduScrollX;		
+			}
+			get
+			{
+				return m_Hadj;
+			}
+		}
+		
+		public Adjustment vadjustment
+		{
+			construct set
+			{
+				m_Vadj = value;
+				if(value == null)
+					return;
+				m_Vadj.lower = -3000;
+				m_Vadj.upper = 3000;
+				m_Vadj.page_increment = 150;
+				m_Vadj.step_increment = 30;
+				m_Vadj.value_changed.connect(adj =>
+					{
+						lduScrollY = (float)adj.value;
+						queue_draw();
+					});
+				m_Vadj.value = lduScrollY;					
+			}
+			get
+			{
+				return m_Vadj;
+			}
+		}
+		
+		public ScrollablePolicy hscroll_policy {get;set;}
+		public ScrollablePolicy vscroll_policy {get;set;}
+
+		// end implementation of Scrollable
 
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
 			Allocation alloc;
 			get_allocation(out alloc);
-
-			var fullBounds = CalculateViewArea();
-
-			var modelBounds = model.Model.BoundingBox;
-			var radius = modelBounds.Radius;
-			var modelCenterZ = modelBounds.Center().Z;
-
-			var pixelVolume = new Bounds();
-			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MinX, fullBounds.MaxX, ((float)x + 0.5f) / alloc.width),
-									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y + 0.5f) / alloc.height),
-									 modelCenterZ + radius * 100));
-			pixelVolume.Union(Vector(ScaleBetween(fullBounds.MinX, fullBounds.MaxX, ((float)x - 0.5f) / alloc.width),
-									 ScaleBetween(fullBounds.MaxY, fullBounds.MinY, ((float)y - 0.5f) / alloc.height),
-									 modelCenterZ - radius * 100));
-
-			GLWindow drawableWin = widget_get_gl_window(this);
-			GLDrawable drawable = (GLDrawable)drawableWin;
-			GLContext context = new GLContext(drawable, null, true, GLRenderType.RGBA_TYPE);
-
-			drawable.gl_begin(context);
-
-			var builder = new GlSelectorBuilder(pixelVolume, m_Eyeline, m_Center, m_Up);
-			var selected = builder.Visit(model.Model);
 			
-			if(selected != null)
-				model.Select(selected);
-				
-			drawable.gl_end();
-			drawable.wait_gl();
-		}
-
-		private float ScaleBetween(float start, float end, float ratio)
-		{
-			return start + ((end - start) * ratio);
+			make_current();
+			
+			var chosen = Selector.SelectAt((int)x,(int)y,model.Model,
+							alloc.width, alloc.height,
+							lduViewWidth, lduViewHeight, // scale
+						    cameraLongitude, cameraLatitude,
+						    lduScrollX, lduScrollY);
+						    
+			if(chosen != null)
+				model.Select(chosen);
 		}
 
 		private float SnapTo(float raw, float step)
@@ -363,11 +373,13 @@ namespace Ldraw.Ui.GtkGl
 		private uint delKeyVal = keyval_from_name("Delete");
 	}
 	
-	private class DropBoundsOverlay : GLib.Object, Overlay
+	private class DropBoundsOverlay : GLib.Object, Ldraw.Ui.Widgets.Overlay
 	{
 		public LdrawObject? dropObject;
 		public Vector dropLocation;
 		public Matrix dropTransform;
+		
+		public ColourContext Colours {construct; private get;}
 		
 		public void Draw(DrawingContext context)
 		{			
@@ -384,18 +396,20 @@ namespace Ldraw.Ui.GtkGl
 			var g = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MaxZ))); // (g)
 			var h = dropLocation.Add(dropTransform.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MinZ))); // (h)
 			
-			context.DrawLine(a,b);
-			context.DrawLine(b,c);
-			context.DrawLine(c,d);
-			context.DrawLine(d,a);
-			context.DrawLine(a,h);
-			context.DrawLine(h,e);
-			context.DrawLine(e,f);
-			context.DrawLine(f,g);
-			context.DrawLine(g,h);
-			context.DrawLine(g,b);
-			context.DrawLine(c,f);
-			context.DrawLine(d,e);
+			var colour = Colours.GetColourById(0);
+			
+			context.DrawLine(a,b, colour);
+			context.DrawLine(b,c, colour);
+			context.DrawLine(c,d, colour);
+			context.DrawLine(d,a, colour);
+			context.DrawLine(a,h, colour);
+			context.DrawLine(h,e, colour);
+			context.DrawLine(e,f, colour);
+			context.DrawLine(f,g, colour);
+			context.DrawLine(g,h, colour);
+			context.DrawLine(g,b, colour);
+			context.DrawLine(c,f, colour);
+			context.DrawLine(d,e, colour);
 		}
 	}
 }

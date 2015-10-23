@@ -9,7 +9,10 @@ namespace Ldraw.Ui
 	{
 		public override void load(ContainerBuilder builder)
 		{
-            builder.register<LdrawEditPane>().as<ModelEditor>();
+            builder.register<LdrawEditPane>()
+				.as<ModelEditor>()
+				.ignore_property("hadjustment")
+				.ignore_property("vadjustment");
             builder.register<LdrawViewPane>().as<ModelView>();
             builder.register<DropBoundsOverlay>(); 
 		}

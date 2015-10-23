@@ -62,7 +62,7 @@ namespace Ldraw.Ui
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();
             MenuBar menus = MainMenu.CreateMenus(accelerators, this);
-            VBox bigVBox = new VBox(false, 0);
+            var bigVBox = new Box(Orientation.VERTICAL, 0);
             bigVBox.pack_start(menus, false, false);
             
             foreach(var provider in ToolbarProviders)            
@@ -72,11 +72,11 @@ namespace Ldraw.Ui
             
             var notebook = ShowPartDropSources();
 
-            Paned treePaned = new HPaned();
+            Paned treePaned = new Paned(Orientation.HORIZONTAL);
             treePaned.add1(WithFrame(notebook));
 
-            Paned modelPanes = new VPaned();
-            VBox viewDetails = new VBox(false, 2);
+            Paned modelPanes = new Paned(Orientation.VERTICAL);
+            var viewDetails = new Box(Orientation.VERTICAL, 2);
             m_SubModels = CreateSubModelsDropDown();
             viewDetails.pack_start(m_SubModels, false, false);
 
@@ -93,7 +93,7 @@ namespace Ldraw.Ui
         
         public Widget ShowPartDropSources()
         {
-			var box = new VBox(false, 0);
+			var box = new Box(Orientation.VERTICAL, 0);
 			var notebook = new Notebook();
 			box.pack_start(notebook);
 			box.pack_start(PartsPreview, false);

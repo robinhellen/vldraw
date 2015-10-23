@@ -49,8 +49,9 @@ namespace Ldraw
 			builder.register_module<WidgetsModule>();
 			builder.register_module<GtkGlModule>();
 			builder.register_module<MoveOriginModule>();
+			builder.register_module<OpenGlModule>();
 			
-            builder.register<RunningOptions>().as<IOptions>();
+            builder.register<RunningOptions>().as<IOptions>().single_instance();
 
             builder.register<UndoStack>().single_instance();
             var animatedModel = new AnimatedModel(null);
@@ -60,7 +61,6 @@ namespace Ldraw
             
             // OpenGl stuff
             builder.register<GlRenderer>().as<Renderer>();
-            builder.register<FromFlatRenderer>().as<IRenderModel>();
             
             builder.register_module<StepsModule>();
             builder.register_module<LibraryModule>();

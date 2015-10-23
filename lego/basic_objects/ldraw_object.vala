@@ -21,6 +21,10 @@ namespace Ldraw.Lego
 			protected construct set
 			{
 				nodes = value;
+				foreach(var node in nodes)
+				{
+					node.notify.connect(() => VisibleChange());
+				}
 			}
 		}
 
