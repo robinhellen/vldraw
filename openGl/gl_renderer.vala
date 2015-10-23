@@ -50,7 +50,7 @@ namespace Ldraw.OpenGl
 			var lightLatitude = cameraLatitude + 5;
 			var lightPos = Matrix.ForRotation(Vector(1,0,0), lightLatitude)
 						.TransformMatrix(Matrix.ForRotation(Vector(0,1,0), lightLongitude))
-						.TransformVector(Vector(0,0,-currentModel.BoundingBox.Radius));
+						.TransformVector(Vector(0,0,-100 * currentModel.BoundingBox.Radius));
 			
 			var m = latTransform.TransformMatrix(longTransform);
 			var viewingAngle = new GlMatrix.FromTransformAndTranslation(m, Vector.NullVector);
