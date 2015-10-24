@@ -29,22 +29,22 @@ lego_objects_internal_packages=maths
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages=$(gee) $(gtk) $(json) diva
-lego_internal_packages=application maths expressions utils lego_objects
+lego_internal_packages=application maths utils lego_objects
 					
 
 peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) $(gtk) $(soup) $(xml) diva
-peeron_internal_packages=lego lego_objects maths expressions utils
+peeron_internal_packages=lego lego_objects maths utils
 povray_sources=$(wildcard povray/*.vala)
 povray_packages=$(gee) $(gio)
 povray_internal_packages=lego_objects maths
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=$(gee) $(gtk) diva
-part_group_internal_packages=lego lego_objects maths expressions utils
+part_group_internal_packages=lego lego_objects maths utils
 
 drag_and_drop_sources=$(wildcard ui/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) $(gtk) diva gl
-drag_and_drop_internal_packages=lego lego_objects maths expressions utils ui_widgets
+drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets
 
 gl_render_sources=$(wildcard openGl/*.vala) $(wildcard openGl/gl_api/*.vala)
 gl_render_packages=gl $(gee) $(gtk) diva
