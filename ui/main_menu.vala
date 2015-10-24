@@ -16,6 +16,7 @@ namespace Ldraw.Ui
 		{
 			var cls = (ObjectClass)typeof(MainMenu).class_ref();
 			set_collection_injection<Refactoring>(cls, "Refactorings");
+			set_collection_injection<MenuItemSource>(cls, "ItemSources");
 		}
 		
 		public AnimatedModel Model {construct; private get;}
@@ -23,6 +24,7 @@ namespace Ldraw.Ui
 		public UndoStack UndoStack {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
         public Collection<Refactoring> Refactorings {construct; private get;}
+        public Collection<MenuItemSource> ItemSources {construct; private get;}
         
         public RecentChooserMenu RecentMenu {construct; private get;}
         
@@ -54,6 +56,7 @@ namespace Ldraw.Ui
 			var fileSave = AddMenuItem(fileMenu, "_Save", () => FileSave_OnActivate(parent));
             AddMenuItem(fileMenu, "Save _As", () => FileSaveAs_OnActivate(parent));
 			AddSeparator(fileMenu);
+			AddExtraMenuItems(fileMenu, TopMenu.File, parent);			
             var fileQuit = AddMenuItem(fileMenu, "_Quit", () => main_quit());
 			
 			var editMenu = CreateMenu(menus, "_Edit", accelerators, "<Ldraw>/Edit");
@@ -64,6 +67,7 @@ namespace Ldraw.Ui
             var editRedo = AddMenuItem(editMenu, "_Redo", () => UndoStack.RedoSingle());
             UndoStack.notify["HasRedoItems"].connect(() => editRedo.sensitive = UndoStack.HasRedoItems);
             editRedo.sensitive = UndoStack.HasRedoItems;
+			AddExtraMenuItems(editMenu, TopMenu.Edit, parent);	
             
 			var modelMenu = CreateMenu(menus, "_Model", accelerators);
 			
@@ -80,6 +84,8 @@ namespace Ldraw.Ui
 			
 			AddMenuItem(modelExportMenu, "Image file (_Jpeg)", () => ExportJpg());
 			AddMenuItem(modelExportMenu, "Povray", () => ExportPov());
+			
+			AddExtraMenuItems(modelMenu, TopMenu.Model, parent);
 
 			var selectionMenu = CreateMenu(menus, "_Selection", accelerators);
 			AddMenuItem(selectionMenu, "Select _All", () =>
@@ -92,6 +98,8 @@ namespace Ldraw.Ui
                     var dlg = new AnimationDialog(Model, parent);
                     dlg.Run();
                 });
+                
+			AddExtraMenuItems(selectionMenu, TopMenu.Selection, parent);
                 
 			AddRefactorMenu(menus, accelerators, parent);
                 
@@ -114,6 +122,24 @@ namespace Ldraw.Ui
 			{
 				AddMenuItem(refactorMenu, r.GetLabel(), GetExecuteAction(r, parentWindow));
 			}
+		}
+		
+		private void AddExtraMenuItems(Gtk.Menu parent, TopMenu menu, Window dialogParent)
+		{
+			var addedAny = true;
+			foreach(var source in ItemSources)
+			{
+				var extras = source.GetItemsForMenu(menu, dialogParent);
+				if(extras.is_empty)
+					continue;
+					
+				foreach(var extra in extras)
+				{
+					parent.append(extra);
+				}				
+			}
+			if(addedAny)
+				AddSeparator(parent);				
 		}
 		
 		private Action GetExecuteAction(Refactoring r, Window parent)
