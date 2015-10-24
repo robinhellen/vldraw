@@ -9,6 +9,26 @@ using Ldraw.Maths;
 
 namespace Ldraw.Ui
 {
+	public class AnimationMenuSource : Object, MenuItemSource
+	{
+		public AnimatedModel Model {construct; private get;}
+		
+		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent)
+		{
+			if(menu != TopMenu.Selection)
+				return Collection.empty<Gtk.MenuItem>();
+				
+			var items = new ArrayList<Gtk.MenuItem>();
+			var item = new Gtk.MenuItem.with_mnemonic("_Animation");
+			item.activate.connect(() => {
+                    var dlg = new AnimationDialog(Model, dialogParent);
+                    dlg.Run();
+                });
+			items.add(item);
+			return items;
+		}
+	}
+	
 	/* AnimationDialog - gets user input on what animation to apply to nodes in the selection
 	 *
 	 * Initial display depends on selection (filtered to part nodes only.)

@@ -93,11 +93,6 @@ namespace Ldraw.Ui
 					Model.Selection.add_all(Model.Model.Nodes);
                 });
 			AddMenuItem(selectionMenu, "_Clear", () => Model.ClearSelection());
-			AddMenuItem(selectionMenu, "_Animation", () =>
-                {
-                    var dlg = new AnimationDialog(Model, parent);
-                    dlg.Run();
-                });
                 
 			AddExtraMenuItems(selectionMenu, TopMenu.Selection, parent);
                 
