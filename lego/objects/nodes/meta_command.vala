@@ -60,7 +60,10 @@ namespace Ldraw.Lego.Nodes
 		{
 			base(command, arguments);
 			Axis = Vector((float)double.parse(arguments[1]), (float)double.parse(arguments[2]), (float)double.parse(arguments[3]));
-			Angle = new Expression.Parse(string.joinv(" ", arguments[4:-1]));
+			string[] angleExpressionArgs = {};
+			for(int i = 4; i < arguments.length; i++)
+				angleExpressionArgs += arguments[i];
+			Angle = new Expression.Parse(string.joinv(" ", angleExpressionArgs));
 		}
 
 		public AnimRotateCommand.Rotation(Vector axis, Expression angle)
