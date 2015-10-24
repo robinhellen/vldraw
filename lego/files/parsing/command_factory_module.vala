@@ -10,8 +10,6 @@ namespace Ldraw.Lego
 						.keyed<CommandFactory, string>("FILE")
 						.keyed<CommandFactory, string>("NOFILE")
 						.keyed<CommandFactory, string>("LDRAW_ORG");
-			builder.register<AnimationCommandFactory>()
-						.keyed<CommandFactory, string>("ANIM");
 		}
 	}
 }

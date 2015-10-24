@@ -1,6 +1,7 @@
 using Gee;
 using Gtk;
 
+using Ldraw.Animation;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Utils;
@@ -11,14 +12,14 @@ namespace Ldraw.Ui.Widgets
 	private class ParametersDialog : GLib.Object
 	{
 		Dialog dialog;
-		ObservableList<AnimParameterCommand> model;
+		ObservableList<ParameterCommand> model;
 		LdrawObject object;
 
 		public ParametersDialog(LdrawObject object, Window parent)
 		{
 			this.object = object;
-			var parameters = object.NodesOfType<AnimParameterCommand>();
-			model = new ObservableList<AnimParameterCommand>();
+			var parameters = object.NodesOfType<ParameterCommand>();
+			model = new ObservableList<ParameterCommand>();
 
 			model.add_all(parameters);
 
@@ -41,7 +42,7 @@ namespace Ldraw.Ui.Widgets
 			boolCell.activatable = true;
 			paramList.insert_column_with_data_func(-1, "Cyclic", boolCell, (col, cell, model, iter) =>
 				{
-					AnimParameterCommand node;
+					ParameterCommand node;
 					model.get(iter, 0, out node);
 					((CellRendererToggle)cell).active = node.Cyclic;
 				});
@@ -56,7 +57,7 @@ namespace Ldraw.Ui.Widgets
 			var addNewButton = new Button.with_label("New");
 			addNewButton.clicked.connect(() =>
 			{
-				model.add(new AnimParameterCommand.Blank());
+				model.add(new ParameterCommand.Blank());
 			});
 			buttonBox.add(addNewButton);
 
@@ -64,10 +65,10 @@ namespace Ldraw.Ui.Widgets
 		}
 
 		[CCode(has_target = false)]
-		private delegate string CellFunc(AnimParameterCommand cmd);
+		private delegate string CellFunc(ParameterCommand cmd);
 
 		[CCode(has_target = false)]
-		private delegate void CellAction(AnimParameterCommand cmd, string value);
+		private delegate void CellAction(ParameterCommand cmd, string value);
 
 		private void InsertColumn(string title, TreeView view, CellFunc func, CellAction action)
 		{
@@ -80,7 +81,7 @@ namespace Ldraw.Ui.Widgets
 				});
 			view.insert_column_with_data_func(-1, title, renderer, (col, cell, model, iter) =>
 				{
-					AnimParameterCommand node;
+					ParameterCommand node;
 					model.get(iter, 0, out node);
 					((CellRendererText)cell).text = func(node);
 				});
@@ -99,8 +100,8 @@ namespace Ldraw.Ui.Widgets
 
 		private void UpdateObjectParameters()
 		{
-			var oldParams = object.NodesOfType<AnimParameterCommand>();
-			var removedParams = new ArrayList<AnimParameterCommand>();
+			var oldParams = object.NodesOfType<ParameterCommand>();
+			var removedParams = new ArrayList<ParameterCommand>();
 			foreach(var param in oldParams)
 			{
 				if(param in model)

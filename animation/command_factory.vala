@@ -1,8 +1,11 @@
+
+using Ldraw.Animation;
+using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 
-namespace Ldraw.Lego
+namespace Ldraw
 {
-	public class AnimationCommandFactory : Object, CommandFactory
+	private class AnimationCommandFactory : Object, CommandFactory
 	{
 		public MetaCommand CreateCommand(string command, string[] args)
 		{
@@ -12,9 +15,9 @@ namespace Ldraw.Lego
 			switch(args[0])
 			{
 				case "ROTATE":
-					return new AnimRotateCommand(command, args);
+					return new RotateCommand(command, args);
 				case "PARAMETER":
-					return new AnimParameterCommand(command, args);
+					return new ParameterCommand(command, args);
 					
 				default:
 					assert_not_reached();

@@ -2,6 +2,7 @@ using Gee;
 using GLib.Math;
 using Gtk;
 
+using Ldraw.Animation;
 using Ldraw.Lego.Nodes;
 using Ldraw.Utils;
 
@@ -20,13 +21,13 @@ namespace Ldraw.Ui.Widgets
 			set
 			{
 				ldrawModel = value;
-				var observable = new ObservableList<AnimParameterCommand>();
-				observable.add_all(value.Model.NodesOfType<AnimParameterCommand>());
+				var observable = new ObservableList<ParameterCommand>();
+				observable.add_all(value.Model.NodesOfType<ParameterCommand>());
 				this.model = observable;
 				ldrawModel.Model.VisibleChange.connect(() =>
 				{
-					var newObservable = new ObservableList<AnimParameterCommand>();
-					newObservable.add_all(ldrawModel.Model.NodesOfType<AnimParameterCommand>());
+					var newObservable = new ObservableList<ParameterCommand>();
+					newObservable.add_all(ldrawModel.Model.NodesOfType<ParameterCommand>());
 					this.model = newObservable;
 				});
 			}
@@ -38,7 +39,7 @@ namespace Ldraw.Ui.Widgets
 
 			insert_column_with_data_func(-1, "Name", new CellRendererText(), (col, cell, model, iter) =>
 				{
-					AnimParameterCommand node;
+					ParameterCommand node;
 					model.get(iter, 0, out node);
 					((CellRendererText)cell).text = node.Identifier;
 				});
@@ -48,13 +49,13 @@ namespace Ldraw.Ui.Widgets
 			spinRenderer.edited.connect((renderer, path, text) =>
 				{
 					var val = (float)double.parse(text);
-					var o = model as ObservableList<AnimParameterCommand>;
+					var o = model as ObservableList<ParameterCommand>;
 					var c = o.get_value_for_path(new TreePath.from_string(path));
 					Model.UpdateParameter(c.Identifier, val);
 				});
 			spinRenderer.editing_started.connect((renderer, editable, path) =>
 				{
-					var o = model as ObservableList<AnimParameterCommand>;
+					var o = model as ObservableList<ParameterCommand>;
 					var c = o.get_value_for_path(new TreePath.from_string(path));
 					var spin = editable as SpinButton;
 					if(spin == null)
@@ -69,7 +70,7 @@ namespace Ldraw.Ui.Widgets
 				});
 			insert_column_with_data_func(-1, "Value", spinRenderer, (col, cell, model, iter) =>
 				{
-					AnimParameterCommand node;
+					ParameterCommand node;
 					model.get(iter, 0, out node);
 					var renderer = ((CellRendererSpin)cell);
 

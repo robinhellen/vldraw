@@ -56,7 +56,7 @@ ui_gtk_gl_internal_packages=lego lego_objects maths expressions utils ui_widgets
 
 ui_widgets_sources=$(wildcard ui/*.vala) $(wildcard export/*.vala) $(wildcard ui/interfaces/*.vala) $(wildcard ui/undo/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl diva
-ui_widgets_internal_packages= application lego lego_objects maths expressions utils options part_group peeron povray
+ui_widgets_internal_packages= application animation lego lego_objects maths expressions utils options part_group peeron povray
 
 ui_dialogs_sources=$(wildcard ui/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl diva
@@ -70,12 +70,16 @@ steps_sources=$(wildcard steps/*.vala)
 steps_packages=$(gtk) $(gee) diva gl
 steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
+animation_sources=$(wildcard animation/*.vala)
+animation_packages=diva $(gee) $(gio) $(gtk)
+animation_internal_packages=lego lego_objects maths expressions utils
+
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala
 application_packages=$(gee) diva
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
-	application
+	application animation
 UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)

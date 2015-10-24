@@ -1,6 +1,7 @@
 using Gee;
 using Gtk;
 
+using Ldraw.Animation;
 using Ldraw.Expressions;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
@@ -141,7 +142,7 @@ namespace Ldraw.Ui
 
 			if(hasRotation)
 			{
-				var newCommand = new AnimRotateCommand.Rotation(rotationAxis, rotationAngle);
+				var newCommand = new RotateCommand.Rotation(rotationAxis, rotationAngle);
 				model.Model.InsertNode(newCommand, node);
 			}
 		}
@@ -176,9 +177,9 @@ namespace Ldraw.Ui
 			}
 		}
 
-		private Collection<Collection<AnimMetaCommand>> GetAnimationsFor(Collection<LdrawNode> nodes, LdrawObject object)
+		private Collection<Collection<AnimationCommand>> GetAnimationsFor(Collection<LdrawNode> nodes, LdrawObject object)
 		{
-			var result = new LinkedList<Collection<AnimMetaCommand>>();
+			var result = new LinkedList<Collection<AnimationCommand>>();
 			foreach(var node in nodes)
 			{
 				result.add(GetAnimationFor(node, object));
@@ -186,14 +187,14 @@ namespace Ldraw.Ui
 			return result;
 		}
 
-		private Collection<AnimMetaCommand> GetAnimationFor(LdrawNode node, LdrawObject object)
+		private Collection<AnimationCommand> GetAnimationFor(LdrawNode node, LdrawObject object)
 		{
-			var result = new LinkedList<AnimMetaCommand>();
+			var result = new LinkedList<AnimationCommand>();
 			LdrawNode previous = node;
 			while(previous != null)
 			{
 				previous = object.GetPreviousNode(previous);
-				var command = previous as AnimMetaCommand;
+				var command = previous as AnimationCommand;
 				if(command == null)
 					break;
 				result.add(command);
@@ -201,9 +202,9 @@ namespace Ldraw.Ui
 			return result;
 		}
 
-		private Collection<Collection<AnimMetaCommand>> Distinctify(Collection<Collection<AnimMetaCommand>> commandSets)
+		private Collection<Collection<AnimationCommand>> Distinctify(Collection<Collection<AnimationCommand>> commandSets)
 		{
-			var result = new LinkedList<Collection<AnimMetaCommand>>();
+			var result = new LinkedList<Collection<AnimationCommand>>();
 			foreach(var list in commandSets)
 			{
 				if(!Contains(result, list))
@@ -212,7 +213,7 @@ namespace Ldraw.Ui
 			return result;
 		}
 
-		private bool Contains(Collection<Collection<AnimMetaCommand>> list, Collection<AnimMetaCommand> value)
+		private bool Contains(Collection<Collection<AnimationCommand>> list, Collection<AnimationCommand> value)
 		{
 			foreach(var v in list)
 			{
@@ -222,7 +223,7 @@ namespace Ldraw.Ui
 			return false;
 		}
 
-		private bool AreEqual(Collection<AnimMetaCommand> a, Collection<AnimMetaCommand> b)
+		private bool AreEqual(Collection<AnimationCommand> a, Collection<AnimationCommand> b)
 		{
 			if(a.size != b.size)
 				return false;
@@ -241,11 +242,11 @@ namespace Ldraw.Ui
 			return true;
 		}
 
-		private AnimRotateCommand? FirstRotation(Collection<AnimMetaCommand> list)
+		private RotateCommand? FirstRotation(Collection<AnimationCommand> list)
 		{
 			foreach(var cmd in list)
 			{
-				var rotateCommand = cmd as AnimRotateCommand;
+				var rotateCommand = cmd as RotateCommand;
 				if(rotateCommand != null)
 					return rotateCommand;
 			}
