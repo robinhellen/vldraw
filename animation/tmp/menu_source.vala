@@ -13,9 +13,17 @@ namespace Ldraw.Ui
 		
 		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent)
 		{
-			if(menu != TopMenu.Selection)
-				return Collection.empty<Gtk.MenuItem>();
-				
+			switch(menu)
+			{
+				case TopMenu.Selection:
+					return GetSelectionItems(dialogParent);
+				default:
+					return Collection.empty<Gtk.MenuItem>();
+			}
+		}
+		
+		private Collection<Gtk.MenuItem> GetSelectionItems
+		{				
 			var items = new ArrayList<Gtk.MenuItem>();
 			var item = new Gtk.MenuItem.with_mnemonic("_Animation");
 			item.activate.connect(() => {
@@ -24,6 +32,6 @@ namespace Ldraw.Ui
                 });
 			items.add(item);
 			return items;
-		}
+		}		
 	}
 }
