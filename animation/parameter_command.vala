@@ -5,7 +5,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.Animation
 {
-	public class ParameterCommand : AnimationCommand
+	private class ParameterCommand : AnimationCommand
 	{
 		public ParameterCommand(string command, string[] arguments)
 		{

@@ -2,7 +2,7 @@ using Ldraw.Lego.Nodes;
 
 namespace Ldraw.Animation
 {
-	public abstract class AnimationCommand : MetaCommand
+	private abstract class AnimationCommand : MetaCommand
 	{
 		public AnimationCommand(string command, string[] arguments)
 		{

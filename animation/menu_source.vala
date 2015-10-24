@@ -7,7 +7,7 @@ using Ldraw.Ui;
 
 namespace Ldraw.Animation
 {
-	public class AnimationMenuSource : Object, MenuItemSource
+	private class AnimationMenuSource : Object, MenuItemSource
 	{
 		public AnimatedModel Model {construct; private get;}
 		

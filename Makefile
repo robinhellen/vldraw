@@ -71,8 +71,8 @@ steps_packages=$(gtk) $(gee) diva gl
 steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
 animation_sources=$(wildcard animation/*.vala)
-animation_packages=diva $(gee) $(gio) $(gtk)
-animation_internal_packages=lego lego_objects maths expressions utils ui_widgets
+animation_packages=diva $(gee) $(gtk) gl
+animation_internal_packages=lego lego_objects maths expressions utils ui_widgets gl_render ui_gtk_gl
 
 # Libraries that heve been rewritten with dependencies inverted
 application_sources=application/application.vala
