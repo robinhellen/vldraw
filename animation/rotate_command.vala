@@ -16,7 +16,7 @@ namespace Ldraw.Animation
 				angleExpressionArgs += arguments[i];
 			Angle = new Expression.Parse(string.joinv(" ", angleExpressionArgs));
 		}
-
+ 
 		public RotateCommand.Rotation(Vector axis, Expression angle)
 		{
 			base("!ANIM", new string[] {"ROTATE", axis.X.to_string(), axis.Y.to_string(), axis.Z.to_string(), angle.to_string()});

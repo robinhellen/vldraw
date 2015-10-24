@@ -2,6 +2,7 @@ using Diva;
 
 using Ldraw.Animation;
 using Ldraw.Lego;
+using Ldraw.OpenGl;
 using Ldraw.Ui;
 
 namespace Ldraw
@@ -13,6 +14,7 @@ namespace Ldraw
 			builder.register<AnimationCommandFactory>()
 					.keyed<CommandFactory, string>("ANIM");
 			builder.register<AnimationMenuSource>().as<MenuItemSource>();
+			builder.register<RenderAdjuster>().as<NodeAdjuster>().single_instance();
 		}
 	}
 }
