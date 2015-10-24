@@ -16,6 +16,7 @@ namespace Ldraw.OpenGl
 		public Collection<RenderNodeStrategy> RenderStrategies {get; construct;}
 		public FlatStore FlatStore {get; construct;}
 		public ShaderProgramFactory ProgramFactory {get; construct;}
+		public NodeAdjuster NodeAdjuster {get; construct;}
 		
 		static construct 
 		{
@@ -90,16 +91,17 @@ namespace Ldraw.OpenGl
 				{
 					if(!RenderStrategies.fold<bool>((s, r) => r &= s.ShouldRenderNode(node), true))
 						continue;
+					var adjustment = NodeAdjuster.GetAdjustmentFor(node);
 					var partNode = node as PartNode;
 					if(partNode == null)
 						continue;
 					var selected = node in selection;
-					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour, selected);
+					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour, selected, adjustment);
 				}
 			}
 			else
 			{
-				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour, false);	
+				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour, false, new GlMatrix.Identity());	
 			}
 			if(overlay != null)
 			{
@@ -112,12 +114,11 @@ namespace Ldraw.OpenGl
 			}
 		}
 		
-		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, Colour colour, bool selected)
+		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, Colour colour, bool selected, GlMatrix adjustment)
 		{
 			var modelTransform = new GlMatrix.FromTransformAndTranslation(transform, offset);
 			modelTransform.SetProgramUniform(program, "modelTransform");
-			var animationTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector.NullVector);
-			animationTransform.SetProgramUniform(program, "animationTransform");
+			adjustment.SetProgramUniform(program, "animationTransform");
 			
 			var defaultColour = glGetUniformLocation(program, "DefaultColour");
 			var defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");

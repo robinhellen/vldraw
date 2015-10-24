@@ -16,6 +16,7 @@ namespace Ldraw
 			builder.register<GlShaderProgramFactory>().as<ShaderProgramFactory>();
 			builder.register<CachingFlatStore>().as<FlatStore>();
 			builder.register<FramebufferGlSelector>().as<GlSelector>();
+			builder.register<DefaultNodeAdjuster>().as<NodeAdjuster>();
 		}
 	}
 }

@@ -4,7 +4,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.OpenGl
 {
-	private class GlMatrix : Object
+	public class GlMatrix : Object
 	{
 		private float values[16];
 		
@@ -14,6 +14,11 @@ namespace Ldraw.OpenGl
 					  transform[0,1], transform[1,1], transform[2,1], 0,
 					  transform[0,2], transform[1,2], transform[2,2], 0,
 					  translation.X , translation.Y , translation.Z , 1};
+		}
+		
+		public GlMatrix.Identity()
+		{
+			values = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
 		}
 		
 		public void SetProgramUniform(GLuint program, string uniformName)
