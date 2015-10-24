@@ -74,11 +74,6 @@ namespace Ldraw.Ui
 			AddMenuItem(modelMenu, "_Properties", () => {});
 			AddMenuItem(modelMenu, "Parts _List", () => ShowPartsList(parent));
 			AddMenuItem(modelMenu, "_Add sub-model", () => ModelAddSubModel_OnActivate(parent));
-			AddMenuItem(modelMenu, "_Parameters", () =>
-				{
-					var dlg = new ParametersDialog(Model.Model, parent);
-					dlg.Run();
-				});
 			
 			var modelExportMenu = AddSubMenu(modelMenu, "_Export");
 			
