@@ -1,13 +1,11 @@
 using Gee;
 using Gtk;
 
-using Ldraw.Animation;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Utils;
 
-
-namespace Ldraw.Ui.Widgets
+namespace Ldraw.Animation
 {
 	private class ParametersDialog : GLib.Object
 	{

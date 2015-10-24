@@ -2,11 +2,11 @@ using Gee;
 using GLib.Math;
 using Gtk;
 
-using Ldraw.Animation;
 using Ldraw.Lego.Nodes;
+using Ldraw.Ui;
 using Ldraw.Utils;
 
-namespace Ldraw.Ui.Widgets
+namespace Ldraw.Animation
 {
 	private class ParameterValues : TreeView
 	{

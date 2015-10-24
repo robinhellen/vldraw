@@ -1,12 +1,11 @@
 using Gee;
 using Gtk;
 
-using Ldraw.Animation;
 using Ldraw.Lego;
 using Ldraw.Maths;
-using Ldraw.Ui.Widgets;
+using Ldraw.Ui;
 
-namespace Ldraw.Ui
+namespace Ldraw.Animation
 {
 	public class AnimationMenuSource : Object, MenuItemSource
 	{

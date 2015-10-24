@@ -1,13 +1,13 @@
 using Gee;
 using Gtk;
 
-using Ldraw.Animation;
 using Ldraw.Expressions;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
+using Ldraw.Ui;
 
-namespace Ldraw.Ui
+namespace Ldraw.Animation
 {	
 	/* AnimationDialog - gets user input on what animation to apply to nodes in the selection
 	 *
