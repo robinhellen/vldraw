@@ -82,8 +82,8 @@ application_sources=application/application.vala
 application_packages=$(gee) diva
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
-	application animation animation_tmp
-UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps
+	application animation
+UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps animation_tmp
 
 TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
