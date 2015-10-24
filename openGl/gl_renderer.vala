@@ -116,6 +116,8 @@ namespace Ldraw.OpenGl
 		{
 			var modelTransform = new GlMatrix.FromTransformAndTranslation(transform, offset);
 			modelTransform.SetProgramUniform(program, "modelTransform");
+			var animationTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector.NullVector);
+			animationTransform.SetProgramUniform(program, "animationTransform");
 			
 			var defaultColour = glGetUniformLocation(program, "DefaultColour");
 			var defaultEdgeColour = glGetUniformLocation(program, "DefaultEdgeColour");

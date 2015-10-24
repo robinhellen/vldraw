@@ -62,6 +62,7 @@ layout(location = 1) in vec4 vertexColour;
 layout(location = 2) in vec3 vertexNormal;
 
 uniform mat4 modelTransform;
+uniform mat4 animationTransform;
 
 uniform mat4 scroll;
 uniform mat4 scale;
@@ -81,7 +82,7 @@ void main () {
 	vec4 v = vec4(vertexPosition_modelspace, 1);
 	
 	//vectors necessary for shading
-	Position_worldspace = (modelTransform * v).xyz;
+	Position_worldspace = (modelTransform * animationTransform * v).xyz;
 	
 	vec3 vertexPosition_cameraspace = (scroll * view_angle * modelTransform * vec4(vertexPosition_modelspace, 1)).xyz;
 	EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
