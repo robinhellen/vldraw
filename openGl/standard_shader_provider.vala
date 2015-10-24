@@ -84,13 +84,13 @@ void main () {
 	//vectors necessary for shading
 	Position_worldspace = (modelTransform * animationTransform * v).xyz;
 	
-	vec3 vertexPosition_cameraspace = (scroll * view_angle * modelTransform * vec4(vertexPosition_modelspace, 1)).xyz;
+	vec3 vertexPosition_cameraspace = (scroll * view_angle * modelTransform * animationTransform * vec4(vertexPosition_modelspace, 1)).xyz;
 	EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
 	
 	vec3 LightPosition_cameraspace = (scroll * view_angle * vec4(LightPosition_worldspace,1)).xyz;
 	LightDirection_cameraspace = LightPosition_cameraspace + EyeDirection_cameraspace;
 	
-	Normal_cameraspace = (scroll * view_angle * modelTransform * vec4(vertexNormal,0)).xyz;
+	Normal_cameraspace = (scroll * view_angle * modelTransform * animationTransform * vec4(vertexNormal,0)).xyz;
 	
 	// the position
 	gl_Position = scale * scroll * view_angle * vec4(Position_worldspace, 1);
