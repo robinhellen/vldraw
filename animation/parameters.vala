@@ -26,7 +26,7 @@ namespace Ldraw.Animation
 				"_OK", ResponseType.ACCEPT,
 				"_Cancel", ResponseType.REJECT);
 
-			var actionArea = (VBox)dialog.get_content_area();
+			var actionArea = dialog.get_content_area();
 			var paramList = new TreeView.with_model(model);
 
 			// insert the columns with editable text cells.

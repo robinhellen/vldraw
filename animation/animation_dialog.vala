@@ -47,7 +47,7 @@ namespace Ldraw.Animation
 
 			GetOriginalValues(model);
 
-			var contentArea = (VBox)dialog.get_content_area();
+			var contentArea = dialog.get_content_area();
 			var animationControlsBox = new Box(Orientation.VERTICAL, 0);
 
 			var rotationAngleEntry = new Entry();
