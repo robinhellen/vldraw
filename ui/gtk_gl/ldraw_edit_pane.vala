@@ -34,6 +34,7 @@ namespace Ldraw.Ui.GtkGl
 		{
 			can_focus = true;
 			events |= EventMask.BUTTON_PRESS_MASK 
+				   |  EventMask.BUTTON_RELEASE_MASK
 				   |  EventMask.KEY_PRESS_MASK
 				   |  EventMask.SCROLL_MASK;
 
@@ -63,6 +64,18 @@ namespace Ldraw.Ui.GtkGl
 			grab_focus();
 			switch(event.button)
 			{
+				case 3: // right button
+					CreateContextMenu().popup(null, null, null, event.button, event.time);
+					break;
+			}
+			return false;
+		}
+		
+		public override bool button_release_event(EventButton event)
+		{
+			base.button_release_event(event);
+			switch(event.button)
+			{
 				case 1: // left
 					if((event.state & ModifierType.CONTROL_MASK) != ModifierType.CONTROL_MASK)
 					{
@@ -70,10 +83,7 @@ namespace Ldraw.Ui.GtkGl
 					}
 
 					SelectTopMostUnderMouse(event.x, event.y);
-					break;
-				case 3: // right button
-					CreateContextMenu().popup(null, null, null, event.button, event.time);
-					break;
+					break;			
 			}
 			return false;
 		}
