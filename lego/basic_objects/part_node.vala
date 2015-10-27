@@ -37,7 +37,7 @@ namespace Ldraw.Lego.Nodes
 		{
 			owned get
 			{
-				return "1 %d %.f %.f %.f %.f %.f %.f %.f %.f %.f %.f %.f %.f %s".printf(
+				return "1 %d %g %g %g %g %g %g %g %g %g %g %g %g %s".printf(
 					Colour.Code,
 					Center.X, Center.Y, Center.Z,
 					Transform[0,0], Transform[0,1], Transform[0,2],
