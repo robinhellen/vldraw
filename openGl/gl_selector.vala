@@ -106,8 +106,8 @@ namespace Ldraw.OpenGl
 				return Set.empty<LdrawNode>();
 			}
 			
-			var lassoWidth = selectionRight - selectionLeft;
-			var lassoHeight = selectionBottom - selectionTop;
+			var lassoWidth = int.max(selectionRight - selectionLeft, 1);
+			var lassoHeight = int.max(selectionBottom - selectionTop, 1);
 			GLushort[] result = new GLushort[(lassoWidth + 1) * (lassoHeight + 1)];
 			glReadPixels(selectionLeft, height - selectionBottom, lassoWidth, lassoHeight, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
 			
