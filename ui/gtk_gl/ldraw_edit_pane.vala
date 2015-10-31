@@ -35,6 +35,8 @@ namespace Ldraw.Ui.GtkGl
 			can_focus = true;
 			events |= EventMask.BUTTON_PRESS_MASK 
 				   |  EventMask.BUTTON_RELEASE_MASK
+				   |  EventMask.LEAVE_NOTIFY_MASK
+				   |  EventMask.POINTER_MOTION_MASK
 				   |  EventMask.KEY_PRESS_MASK
 				   |  EventMask.SCROLL_MASK;
 
@@ -64,12 +66,17 @@ namespace Ldraw.Ui.GtkGl
 			grab_focus();
 			switch(event.button)
 			{
+				case 1:
+					mouseData = new MouseData(event.x, event.y);
+					break;
 				case 3: // right button
 					CreateContextMenu().popup(null, null, null, event.button, event.time);
 					break;
 			}
 			return false;
 		}
+		
+		private MouseData mouseData;
 		
 		public override bool button_release_event(EventButton event)
 		{
@@ -85,6 +92,20 @@ namespace Ldraw.Ui.GtkGl
 					SelectTopMostUnderMouse(event.x, event.y);
 					break;			
 			}
+			return false;
+		}
+		
+		public override bool leave_notify_event(EventCrossing event)
+		{
+			mouseData = null;
+			return false;
+		}
+		
+		public override bool motion_notify_event(EventMotion event)
+		{
+			base.motion_notify_event(event);
+			if(mouseData == null)
+				return false;
 			return false;
 		}
 		
@@ -381,5 +402,16 @@ namespace Ldraw.Ui.GtkGl
 		private uint m_HomeKeyVal = keyval_from_name("Home");
 		private uint m_EndKeyVal = keyval_from_name("End");
 		private uint delKeyVal = keyval_from_name("Delete");
+	}
+	
+	private class MouseData : Object
+	{
+		public MouseData(double x, double y)
+		{
+			this.x = x; this.y = y;
+		}
+		
+		public double x;
+		public double y;
 	}	
 }
