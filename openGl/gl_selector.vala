@@ -26,9 +26,7 @@ namespace Ldraw.OpenGl
 							int selectionRight, int selectionBottom,
 							LdrawObject model,
 							int width, int height,
-							float lduViewWidth, float lduViewHeight, // scale
-						    float cameraLongitude, float cameraLatitude,
-						    float lduScrollX, float lduScrollY)
+							ViewParameters viewParameters)
 		{
 			GLuint[] framebuffer = {0};
 			glGenFramebuffers(1, framebuffer);
@@ -54,15 +52,15 @@ namespace Ldraw.OpenGl
 			var scaleMatrix = glGetUniformLocation(program, "scale");
 			var nodeIndex = glGetUniformLocation(program, "vertexId");
 			
-			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
-			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);
+			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
 			
 			var m = latTransform.TransformMatrix(longTransform);
 			var viewingAngle = new GlMatrix.FromTransformAndTranslation(m, Vector.NullVector);
-			var scrollTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector(lduScrollX, lduScrollY, 0));
+			var scrollTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector(viewParameters.lduScrollX, viewParameters.lduScrollY, 0));
 			
-			float scaleTransform[16] = {2 / lduViewWidth, 0, 0, 0,
-										0, -2 / lduViewHeight,0, 0,
+			float scaleTransform[16] = {2 / viewParameters.lduWidth, 0, 0, 0,
+										0, -2 / viewParameters.lduHeight,0, 0,
 										0, 0, 0.0001f, 0,
 										0, 0, 0, 1};
 									

@@ -14,12 +14,13 @@ namespace Ldraw.Ui.GtkGl
 		private LdrawObject m_Model;
 		
 		// camera viewpoint definition
-		protected float cameraLongitude;
+		protected ViewParameters viewParameters;
+		/*protected float cameraLongitude;
 		protected float cameraLatitude;
 		protected float lduViewWidth;
 		protected float lduViewHeight;
 		protected float lduScrollX;
-		protected float lduScrollY;		
+		protected float lduScrollY;*/		
 		
 		protected Ldraw.Ui.Widgets.Overlay overlay = null;
 		
@@ -44,6 +45,7 @@ namespace Ldraw.Ui.GtkGl
 				
 			DefaultColour = ColourContext.GetColourById(0);
 			base.realize.connect(realize); // if we override the virtual, the base won't get called properly.
+			viewParameters = ViewParameters();
 		}
 
 		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
@@ -82,9 +84,9 @@ namespace Ldraw.Ui.GtkGl
 			}
 			
 			renderer.Render2(context, CurrentSelection, overlay,
-							 lduViewWidth, lduViewHeight, // scale
-							 cameraLongitude, cameraLatitude,
-							 lduScrollX, lduScrollY); // scroll
+							 viewParameters.lduWidth, viewParameters.lduHeight, // scale
+							 viewParameters.cameraLongitude, viewParameters.cameraLatitude,
+							 viewParameters.lduScrollX, viewParameters.lduScrollY); // scroll
 							 
 			var error = get_error();
 			if(error != null)
@@ -111,8 +113,8 @@ namespace Ldraw.Ui.GtkGl
 		{
 			Allocation old_allocation;
 			get_allocation(out old_allocation);
-			lduViewHeight *= ((float)allocation.height / old_allocation.height);
-			lduViewWidth *= ((float)allocation.width / old_allocation.width);	
+			viewParameters.lduHeight *= ((float)allocation.height / old_allocation.height);
+			viewParameters.lduWidth *= ((float)allocation.width / old_allocation.width);	
 			base.size_allocate(allocation);
 					
 		}
@@ -124,32 +126,32 @@ namespace Ldraw.Ui.GtkGl
 				switch(value)
 				{
 					case ViewAngle.Left:
-						cameraLatitude = 0;
-						cameraLongitude = 90;
+						viewParameters.cameraLatitude = 0;
+						viewParameters.cameraLongitude = 90;
 						break;
 					case ViewAngle.Right:
-						cameraLatitude = 0;
-						cameraLongitude = -90;
+						viewParameters.cameraLatitude = 0;
+						viewParameters.cameraLongitude = -90;
 						break;
 					case ViewAngle.Top:
-						cameraLatitude = -90;
-						cameraLongitude = 0;
+						viewParameters.cameraLatitude = -90;
+						viewParameters.cameraLongitude = 0;
 						break;
 					case ViewAngle.Bottom:
-						cameraLatitude = 90;
-						cameraLongitude = 0;
+						viewParameters.cameraLatitude = 90;
+						viewParameters.cameraLongitude = 0;
 						break;
 					case ViewAngle.Front:
-						cameraLatitude = 0;
-						cameraLongitude = 0;
+						viewParameters.cameraLatitude = 0;
+						viewParameters.cameraLongitude = 0;
 						break;
 					case ViewAngle.Back:
-						cameraLatitude = 0;
-						cameraLongitude = 180;
+						viewParameters.cameraLatitude = 0;
+						viewParameters.cameraLongitude = 180;
 						break;
 					case ViewAngle.Ortho:
-						cameraLatitude = -30;
-						cameraLongitude = 45;
+						viewParameters.cameraLatitude = -30;
+						viewParameters.cameraLongitude = 45;
 						break;
 					default:
 						assert_not_reached();
@@ -163,27 +165,27 @@ namespace Ldraw.Ui.GtkGl
 		{
 			var bounds = m_Model.BoundingBox;
 						
-			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
-			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);			
+			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);			
 			var m = latTransform.TransformMatrix(longTransform);
 			var transformedCenter = m.TransformVector(bounds.Center());
-			lduScrollX = -transformedCenter.X;
-			lduScrollY = -transformedCenter.Y;
+			viewParameters.lduScrollX = -transformedCenter.X;
+			viewParameters.lduScrollY = -transformedCenter.Y;
 			
 			
-			lduViewWidth = 2 * bounds.Radius;
-			lduViewHeight = 2 * bounds.Radius;
+			viewParameters.lduWidth = 2 * bounds.Radius;
+			viewParameters.lduHeight = 2 * bounds.Radius;
 			
 			Allocation alloc;
 			get_allocation(out alloc);
 			var allocRatio = (float)alloc.width / alloc.height;
 			if(allocRatio > 1)
 			{
-				lduViewWidth *= allocRatio;
+				viewParameters.lduWidth *= allocRatio;
 			}
 			else
 			{
-				lduViewHeight /= allocRatio;
+				viewParameters.lduHeight /= allocRatio;
 			}			
 		}
 		

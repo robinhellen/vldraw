@@ -121,13 +121,13 @@ namespace Ldraw.Ui.GtkGl
 			switch(event.direction)
 			{
 				case ScrollDirection.UP:
-					lduViewHeight *= Math.powf(2, -0.2f);
-					lduViewWidth *= Math.powf(2, -0.2f);
+					viewParameters.lduHeight *= Math.powf(2, -0.2f);
+					viewParameters.lduWidth *= Math.powf(2, -0.2f);
 					queue_draw();
 					break;
 				case ScrollDirection.DOWN:
-					lduViewHeight *= Math.powf(2, 0.2f);
-					lduViewWidth *= Math.powf(2, 0.2f);
+					viewParameters.lduHeight *= Math.powf(2, 0.2f);
+					viewParameters.lduWidth *= Math.powf(2, 0.2f);
 					queue_draw();
 					break;
 			}
@@ -231,24 +231,24 @@ namespace Ldraw.Ui.GtkGl
 			}
 			
 			// Go from world coordinates to screen:
-			var v = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude).TransformMatrix(
-					Matrix.ForRotation(Vector(0,1,0), -cameraLongitude)).TransformVector(
-					newPosition).Add(Vector(lduScrollX, lduScrollY, 0));
+			var v = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude).TransformMatrix(
+					Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude)).TransformVector(
+					newPosition).Add(Vector(viewParameters.lduScrollX, viewParameters.lduScrollY, 0));
 					
-			v = Matrix(2 * allocation.width / lduViewWidth, 0, 0, 0, 2 * allocation.height / lduViewHeight, 0, 0, 0, 1).TransformVector(v);
+			v = Matrix(2 * allocation.width / viewParameters.lduWidth, 0, 0, 0, 2 * allocation.height / viewParameters.lduHeight, 0, 0, 0, 1).TransformVector(v);
 			v = v.Add(Vector(allocation.width / 2, allocation.height / 2, 0));
 			
 			var dropPosition = Vector(x, y, v.Z);
 			
 			dropPosition = dropPosition.Subtract(Vector(allocation.width / 2, allocation.height / 2, 0));
-			dropPosition = Matrix(lduViewWidth / (allocation.width), 0, 0, 0, lduViewHeight / (allocation.height), 0, 0, 0, 1)
+			dropPosition = Matrix(viewParameters.lduWidth / (allocation.width), 0, 0, 0, viewParameters.lduHeight / (allocation.height), 0, 0, 0, 1)
 							.TransformVector(dropPosition);
 			dropPosition = dropPosition
-							.Subtract(Vector(lduScrollX, lduScrollY, 0));
+							.Subtract(Vector(viewParameters.lduScrollX, viewParameters.lduScrollY, 0));
 							
 			dropPosition = 
-					Matrix.ForRotation(Vector(0,1,0), cameraLongitude).TransformMatrix(
-					Matrix.ForRotation(Vector(1,0,0), cameraLatitude)).TransformVector(
+					Matrix.ForRotation(Vector(0,1,0), viewParameters.cameraLongitude).TransformMatrix(
+					Matrix.ForRotation(Vector(1,0,0), viewParameters.cameraLatitude)).TransformVector(
 					dropPosition);
 			var xD = dropPosition.X == newPosition.X ? newPosition.X : SnapTo(dropPosition.X, Settings.CurrentGrid.X);
 			var yD = dropPosition.Y == newPosition.Y ? newPosition.Y : SnapTo(dropPosition.Y, Settings.CurrentGrid.Y);
@@ -333,10 +333,10 @@ namespace Ldraw.Ui.GtkGl
 				m_Hadj.step_increment = 30;
 				m_Hadj.value_changed.connect(adj =>
 				{
-					lduScrollX = (float)adj.value;
+					viewParameters.lduScrollX = (float)adj.value;
 					queue_draw();
 				});			
-				m_Hadj.value = lduScrollX;		
+				m_Hadj.value = viewParameters.lduScrollX;		
 			}
 			get
 			{
@@ -357,10 +357,10 @@ namespace Ldraw.Ui.GtkGl
 				m_Vadj.step_increment = 30;
 				m_Vadj.value_changed.connect(adj =>
 					{
-						lduScrollY = (float)adj.value;
+						viewParameters.lduScrollY = (float)adj.value;
 						queue_draw();
 					});
-				m_Vadj.value = lduScrollY;					
+				m_Vadj.value = viewParameters.lduScrollY;					
 			}
 			get
 			{
@@ -391,9 +391,7 @@ namespace Ldraw.Ui.GtkGl
 							left,top, right, bottom,
 							model.Model,
 							alloc.width, alloc.height,
-							lduViewWidth, lduViewHeight, // scale
-						    cameraLongitude, cameraLatitude,
-						    lduScrollX, lduScrollY
+							viewParameters
 						);
 						    
 			if(chosen != null)
