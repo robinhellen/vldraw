@@ -44,8 +44,15 @@ namespace Ldraw.Ui
 			view_changed();
 		}
 		
-		public void Select(LdrawNode node)
+		public void Select(Set<LdrawNode> nodes)
 		{
+			Selection.add_all(nodes);
+			view_changed();
+		}
+		
+		public void SelectSingle(LdrawNode node)
+		{
+			Selection.clear();
 			Selection.add(node);
 			view_changed();
 		}

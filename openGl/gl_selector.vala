@@ -108,14 +108,14 @@ namespace Ldraw.OpenGl
 			
 			var lassoWidth = selectionRight - selectionLeft;
 			var lassoHeight = selectionBottom - selectionTop;
-			GLushort[] result = new GLushort[lassoWidth * lassoHeight];
-			glReadPixels(selectionLeft, height - selectionTop, lassoWidth, lassoHeight, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
+			GLushort[] result = new GLushort[(lassoWidth + 1) * (lassoHeight + 1)];
+			glReadPixels(selectionLeft, height - selectionBottom, lassoWidth, lassoHeight, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
 			
 			var selected = new HashSet<LdrawNode>();
 			for(int i = 0; i < (lassoHeight * lassoWidth); i++)
 			{
 				var index = result[i];
-				if(index < 0 || index > model.Nodes.size)
+				if(index < 0 || index >= model.Nodes.size)
 					continue;
 				
 				selected.add(model.Nodes[index]);

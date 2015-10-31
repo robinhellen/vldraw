@@ -277,8 +277,7 @@ namespace Ldraw.Ui.GtkGl
 				if(dragFinished)
 				{
 					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
-					model.ClearSelection();
-					model.Select(newNode);
+					model.SelectSingle(newNode);
 					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, addAfterNode));
 					drag_finish(context, true, false, time);
 				}
@@ -395,7 +394,7 @@ namespace Ldraw.Ui.GtkGl
 						);
 						    
 			if(chosen != null)
-				model.Select(chosen.to_array()[0]);
+				model.Select(chosen);
 			mouseData = null;
 		}
 
