@@ -113,7 +113,7 @@ namespace Ldraw.OpenGl
 			GLushort[] result = {0};
 			glReadPixels(selectionLeft, height - selectionTop, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
 						
-			if(result[0] > model.Nodes.size)
+			if(result [0] < 0 || result[0] >= model.Nodes.size)
 				return null;
 			return model.Nodes[result[0]];			
 		}
