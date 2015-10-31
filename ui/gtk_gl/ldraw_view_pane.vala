@@ -83,10 +83,7 @@ namespace Ldraw.Ui.GtkGl
 				return true;
 			}
 			
-			renderer.Render2(context, CurrentSelection, overlay,
-							 viewParameters.lduWidth, viewParameters.lduHeight, // scale
-							 viewParameters.cameraLongitude, viewParameters.cameraLatitude,
-							 viewParameters.lduScrollX, viewParameters.lduScrollY); // scroll
+			renderer.Render2(context, CurrentSelection, overlay, viewParameters); // scroll
 							 
 			var error = get_error();
 			if(error != null)

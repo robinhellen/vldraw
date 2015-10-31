@@ -13,9 +13,7 @@ namespace Ldraw.Ui
 		public abstract void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection, 
 				Overlay? overlay,
-				float lduWidth, float lduHeight,
-				float cameraLongitude, float cameraLatitude,
-				float lduScrollX, float lduScrollY);
+				ViewParameters viewParameters);
 				
 		public abstract void PrepareRender(LdrawObject model, Colour defaultColour);
 	}

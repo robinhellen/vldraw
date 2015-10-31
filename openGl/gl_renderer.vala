@@ -34,9 +34,7 @@ namespace Ldraw.OpenGl
 		public void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection,
 				Overlay? overlay,
-				float lduWidth, float lduHeight,
-				float cameraLongitude, float cameraLatitude,
-				float lduScrollX, float lduScrollY)
+				ViewParameters viewParameters)
 		{			
 			PrepareAllVertexData(currentModel);
 			
@@ -44,21 +42,21 @@ namespace Ldraw.OpenGl
 			var lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
 			var lightColour = glGetUniformLocation(program, "LightColor");
 			
-			var longTransform = Matrix.ForRotation(Vector(0,1,0), -cameraLongitude);
-			var latTransform = Matrix.ForRotation(Vector(1,0,0), -cameraLatitude);
+			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
 			
-			var lightLongitude = cameraLongitude + 5;
-			var lightLatitude = cameraLatitude + 5;
+			var lightLongitude = viewParameters.cameraLongitude + 5;
+			var lightLatitude = viewParameters.cameraLatitude + 5;
 			var lightPos = Matrix.ForRotation(Vector(1,0,0), lightLatitude)
 						.TransformMatrix(Matrix.ForRotation(Vector(0,1,0), lightLongitude))
 						.TransformVector(Vector(0,0,-100 * currentModel.BoundingBox.Radius));
 			
 			var m = latTransform.TransformMatrix(longTransform);
 			var viewingAngle = new GlMatrix.FromTransformAndTranslation(m, Vector.NullVector);
-			var scrollTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector(lduScrollX, lduScrollY, 0));
+			var scrollTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector(viewParameters.lduScrollX, viewParameters.lduScrollY, 0));
 			
-			float scaleTransform[16] = {2 / lduWidth, 0, 0, 0,
-										0, -2 / lduHeight,0, 0,
+			float scaleTransform[16] = {2 / viewParameters.lduWidth, 0, 0, 0,
+										0, -2 / viewParameters.lduHeight,0, 0,
 										0, 0, 0.0001f, 0,
 										0, 0, 0, 1};
 									
