@@ -395,7 +395,7 @@ namespace Ldraw.Ui.GtkGl
 						);
 						    
 			if(chosen != null)
-				model.Select(chosen);
+				model.Select(chosen.to_array()[0]);
 			mouseData = null;
 		}
 

@@ -21,7 +21,7 @@ namespace Ldraw.OpenGl
 			set_collection_injection<RenderNodeStrategy>(cls, "RenderStrategies");
 		}
 				
-		public LdrawNode? SelectAt(
+		public Set<LdrawNode> SelectAt(
 							int selectionLeft, int selectionTop,
 							int selectionRight, int selectionBottom,
 							LdrawObject model,
@@ -103,15 +103,24 @@ namespace Ldraw.OpenGl
 			if(status != GL_FRAMEBUFFER_COMPLETE)
 			{
 				stderr.printf(@"Framebuffer error: $(status)\n");
-				return null;
+				return Set.empty<LdrawNode>();
 			}
 			
-			GLushort[] result = {0};
-			glReadPixels(selectionLeft, height - selectionTop, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
-						
-			if(result [0] < 0 || result[0] >= model.Nodes.size)
-				return null;
-			return model.Nodes[result[0]];			
+			var lassoWidth = selectionRight - selectionLeft;
+			var lassoHeight = selectionBottom - selectionTop;
+			GLushort[] result = new GLushort[lassoWidth * lassoHeight];
+			glReadPixels(selectionLeft, height - selectionTop, lassoWidth, lassoHeight, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
+			
+			var selected = new HashSet<LdrawNode>();
+			for(int i = 0; i < (lassoHeight * lassoWidth); i++)
+			{
+				var index = result[i];
+				if(index < 0 || index > model.Nodes.size)
+					continue;
+				
+				selected.add(model.Nodes[index]);
+			}
+			return selected;			
 		}
 		
 		private void RenderObject(LdrawObject o, Matrix transform, Vector offset, GLuint program)

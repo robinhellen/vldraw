@@ -1,10 +1,12 @@
+using Gee;
+
 using Ldraw.Lego;
 
 namespace Ldraw.Ui
 {
 	public interface GlSelector : Object
 	{
-		public abstract LdrawNode? SelectAt(
+		public abstract Set<LdrawNode> SelectAt(
 							int selectionLeft, int selectionTop,
 							int selectionRight, int selectionBottom,
 							LdrawObject model,
