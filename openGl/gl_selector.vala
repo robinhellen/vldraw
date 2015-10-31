@@ -21,7 +21,10 @@ namespace Ldraw.OpenGl
 			set_collection_injection<RenderNodeStrategy>(cls, "RenderStrategies");
 		}
 				
-		public LdrawNode? SelectAt(int x,int y,LdrawObject model,
+		public LdrawNode? SelectAt(
+							int selectionLeft, int selectionTop,
+							int selectionRight, int selectionBottom,
+							LdrawObject model,
 							int width, int height,
 							float lduViewWidth, float lduViewHeight, // scale
 						    float cameraLongitude, float cameraLatitude,
@@ -108,7 +111,7 @@ namespace Ldraw.OpenGl
 			}
 			
 			GLushort[] result = {0};
-			glReadPixels(x, height - y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
+			glReadPixels(selectionLeft, height - selectionTop, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
 						
 			if(result[0] > model.Nodes.size)
 				return null;

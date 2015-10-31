@@ -375,19 +375,30 @@ namespace Ldraw.Ui.GtkGl
 
 		private void SelectTopMostUnderMouse(double x, double y)
 		{
+			if(mouseData == null)
+				mouseData = new MouseData(x, y);
 			Allocation alloc;
 			get_allocation(out alloc);
 			
 			make_current();
 			
-			var chosen = Selector.SelectAt((int)x,(int)y,model.Model,
+			var top = int.min((int)y, (int)mouseData.y);
+			var left = int.min((int)x, (int)mouseData.x);
+			var right = int.max((int)x, (int)mouseData.x);
+			var bottom = int.max((int)y, (int)mouseData.y);
+			
+			var chosen = Selector.SelectAt(
+							left,top, right, bottom,
+							model.Model,
 							alloc.width, alloc.height,
 							lduViewWidth, lduViewHeight, // scale
 						    cameraLongitude, cameraLatitude,
-						    lduScrollX, lduScrollY);
+						    lduScrollX, lduScrollY
+						);
 						    
 			if(chosen != null)
 				model.Select(chosen);
+			mouseData = null;
 		}
 
 		private float SnapTo(float raw, float step)
