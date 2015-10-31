@@ -47,8 +47,6 @@ namespace Ldraw.OpenGl
 			
 			var program = ProgramFactory.CreateProgram(ShaderType.Selection);
 			
-			var scrollMatrix = glGetUniformLocation(program, "scroll");
-			var viewAngleMatrix = glGetUniformLocation(program, "view_angle");
 			var scaleMatrix = glGetUniformLocation(program, "scale");
 			var nodeIndex = glGetUniformLocation(program, "vertexId");
 			
