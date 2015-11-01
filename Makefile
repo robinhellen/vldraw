@@ -10,7 +10,7 @@ json=json-glib-1.0
 xml=libxml-2.0
 soup=libsoup-2.4
 
-TEST_SOURCES= $(foreach folder, . expressions vector, $(wildcard tests/$(folder)/*.vala))
+TEST_SOURCES= $(foreach folder, . vector, $(wildcard tests/$(folder)/*.vala))
 
 SOURCES=$(wildcard *.vala)
 
@@ -18,6 +18,9 @@ utils_sources= $(wildcard utils/*.vala)
 utils_packages=$(gee) $(gtk)
 expressions_sources=$(wildcard expressions/*.vala)
 expressions_packages=$(gee)
+
+expressions_test_sources=$(wildcard tests/expressions/*.vala)
+
 maths_sources=$(wildcard maths/*.vala)
 options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
@@ -94,8 +97,9 @@ VALA_DEBUG_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm
 EXECUTABLE_NAME = ldraw
 TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 
-all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)
+all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME) test/expressions.test
 	./$(TEST_EXECUTABLE_NAME)
+	./test/expressions.test
 	
 $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
@@ -112,6 +116,21 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
 	touch vapi/$*.vapi
+	
+test/%.test: $$($$*_test_sources) lib/%.so h/%.h vapi/%.vapi
+ifeq ($$($$*_test_sources),)
+	$(warning No tests for $*.)
+else
+	$(VALACC) $($*_test_sources) \
+		-X -Ih --vapidir=vapi \
+		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
+		--pkg $* \
+		--vapidir=diva -X -Idiva \
+		-o test/$*.test \
+		-g -X -w \
+		 $(foreach lib, $($*_internal_packages) $*, -X lib/$(lib).so)
+	./test/$*.test
+endif
 
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
