@@ -10,8 +10,6 @@ json=json-glib-1.0
 xml=libxml-2.0
 soup=libsoup-2.4
 
-TEST_SOURCES= $(foreach folder, . vector, $(wildcard tests/$(folder)/*.vala))
-
 SOURCES=$(wildcard *.vala)
 
 utils_sources= $(wildcard utils/*.vala)
@@ -22,6 +20,7 @@ expressions_packages=$(gee)
 expressions_test_sources=$(wildcard tests/expressions/*.vala)
 
 maths_sources=$(wildcard maths/*.vala)
+maths_test_sources=$(wildcard tests/vector/*.vala) $(wildcard tests/*.vala)
 options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
 					
@@ -85,7 +84,6 @@ INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray pa
 	application
 UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps animation
 
-TEST_EXECUTABLE_SOURCES= $(TEST_SOURCES)
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) diva
 
@@ -95,18 +93,14 @@ VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -X -O
 VALA_DEBUG_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -g
 
 EXECUTABLE_NAME = ldraw
-TEST_EXECUTABLE_NAME = $(EXECUTABLE_NAME)_tests
 
-all: $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME) test/expressions.test
-	./$(TEST_EXECUTABLE_NAME)
-	./test/expressions.test
+all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test
+	./test/expressions.test 
+	./test/maths.test
 	
 $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 
-$(TEST_EXECUTABLE_NAME): $(TEST_EXECUTABLE_SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
-	$(VALACC) $(VALA_OPTS) $(TEST_EXECUTABLE_SOURCES) -o $(TEST_EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
-	
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
@@ -125,6 +119,7 @@ else
 		-X -Ih --vapidir=vapi \
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
 		--pkg $* \
+		--pkg $(gee) -X -lm \
 		--vapidir=diva -X -Idiva \
 		-o test/$*.test \
 		-g -X -w \
