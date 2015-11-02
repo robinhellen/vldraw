@@ -44,10 +44,30 @@ namespace Ldraw.Ui
 			view_changed();
 		}
 		
-		public void Select(Set<LdrawNode> nodes)
+		public void Select(Set<LdrawNode> nodes, bool toggle)
 		{
-			Selection.add_all(nodes);
+			if(toggle)
+				ToggleSelection(nodes);
+			else
+				SelectOnly(nodes);
 			view_changed();
+		}
+		
+		private void SelectOnly(Set<LdrawNode> nodes)
+		{
+			Selection.clear();
+			Selection.add_all(nodes);
+		}
+		
+		private void ToggleSelection(Set<LdrawNode> nodes)
+		{
+			foreach(var node in nodes)
+			{
+				if(node in Selection)
+					Selection.remove(node);
+				else
+					Selection.add(node);
+			}
 		}
 		
 		public void SelectSingle(LdrawNode node)
