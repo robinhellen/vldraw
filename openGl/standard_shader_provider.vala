@@ -48,9 +48,7 @@ void main(){
 	
 	vec3 diffuseColour = fragmentColour.xyz * LightColor * cosTheta; // TODO: Fall-off with distance from light source
 	vec3 ambientColour = fragmentColour.xyz * vec3(0.1,0.1,0.1);
-	//vec3 specularColour = fragmentColour * LightColor * pow(cosAlpha,5);
-	//vec3 ambientColour = vec3(0,0,0);
-	vec3 specularColour = vec3(0,0,0);
+	vec3 specularColour = fragmentColour.xyz * LightColor * 0.5 * pow(cosAlpha,5);
 	color.xyz = diffuseColour + ambientColour + specularColour;
 	color.a = fragmentColour.a;
 }
