@@ -84,12 +84,9 @@ namespace Ldraw.Ui.GtkGl
 			switch(event.button)
 			{
 				case 1: // left
-					if((event.state & ModifierType.CONTROL_MASK) != ModifierType.CONTROL_MASK)
-					{
-						model.ClearSelection();
-					}
+					bool toggle = (event.state & ModifierType.CONTROL_MASK) == ModifierType.CONTROL_MASK;
 
-					SelectTopMostUnderMouse(event.x, event.y);
+					SelectTopMostUnderMouse(event.x, event.y, toggle);
 					break;			
 			}
 			return false;
@@ -372,7 +369,7 @@ namespace Ldraw.Ui.GtkGl
 
 		// end implementation of Scrollable
 
-		private void SelectTopMostUnderMouse(double x, double y)
+		private void SelectTopMostUnderMouse(double x, double y, bool toggle)
 		{
 			if(mouseData == null)
 				mouseData = new MouseData(x, y);
@@ -394,7 +391,7 @@ namespace Ldraw.Ui.GtkGl
 						);
 						    
 			if(chosen != null)
-				model.Select(chosen);
+				model.Select(chosen, toggle);
 			mouseData = null;
 		}
 
