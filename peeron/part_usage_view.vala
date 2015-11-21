@@ -4,7 +4,7 @@ using Gtk;
 using Ldraw.Lego;
 using Ldraw.Utils;
 
-namespace Ldraw.Ui
+namespace Ldraw.Peeron
 {
 	private class PartUsageViewModel : TreeModel, TreeDragSource, GLib.Object
 	{

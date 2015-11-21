@@ -4,7 +4,7 @@ using Ldraw.Utils;
 
 namespace Ldraw.Ui
 {
-	private class SimpleList<T> : TreeView
+	public class SimpleList<T> : TreeView
 	{
 		public SimpleList()
 		{}

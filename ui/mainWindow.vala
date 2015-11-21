@@ -8,7 +8,6 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Options;
-using Ldraw.Peeron;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.DragAndDrop;
 using Ldraw.Utils;
@@ -32,7 +31,6 @@ namespace Ldraw.Ui
 		public EditPanes View {construct; private get;}
 		public ModelView PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
-		public SetList SetList {construct; get;}
         
         public Collection<IPartDragSource> PartSourcesConstruct {construct {PartSources = new ArrayList<IPartDragSource>(); PartSources.add_all(value);}}
         private Gee.List<IPartDragSource> PartSources {set; get;}

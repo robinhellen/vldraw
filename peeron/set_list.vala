@@ -6,8 +6,9 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Peeron;
 using Ldraw.Utils;
+using Ldraw.Ui;
 
-namespace Ldraw.Ui
+namespace Ldraw.Peeron
 {
 	private class SetList : Object, IPartDragSource
 	{
