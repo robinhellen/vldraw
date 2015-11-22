@@ -50,7 +50,7 @@ drag_and_drop_sources=$(wildcard ui/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) $(gtk) diva gl
 drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets
 
-gl_render_sources=$(wildcard openGl/*.vala) $(wildcard openGl/gl_api/*.vala)
+gl_render_sources=$(wildcard open_gl/*.vala) $(wildcard open_gl/gl_api/*.vala)
 gl_render_packages=gl $(gee) $(gtk) diva
 gl_render_internal_packages=lego lego_objects maths expressions utils ui_widgets ui_gtk_gl
 
