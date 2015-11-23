@@ -32,10 +32,6 @@ namespace Ldraw
             builder.register<FileReaderFactory>();
             builder.register_module<CommandFactoryModule>();
 
-            // Peeron communication
-            builder.register<InventoryReader>();
-            builder.register<ColourChart>();
-
             // UI components            
             builder.register<DialogManager>().as<IDialogManager>();
 
@@ -51,6 +47,7 @@ namespace Ldraw
 			builder.register_module<MoveOriginModule>();
 			builder.register_module<OpenGlModule>();
 			builder.register_module<AnimationModule>();
+			builder.register_module<PeeronModule>();
 			
             builder.register<RunningOptions>().as<IOptions>().single_instance();
 
