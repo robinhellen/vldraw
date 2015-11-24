@@ -42,6 +42,10 @@ namespace Ldraw.Ui
 			bar.insert(CreateGridButton(GridSize.Large, "gridLarge", ref group), -1);
 			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium", ref group), -1);
 			bar.insert(CreateGridButton(GridSize.Small, "gridSmall", ref group), -1);
+
+			bar.insert(new SeparatorToolItem(), -1);
+			
+			bar.insert(CreateManualPositionToolButton(dialogParent), -1);
 			return bar;
 		}
 
@@ -141,6 +145,12 @@ namespace Ldraw.Ui
 						return "Unknown axis.";
 				}
 			}
+		}
+		
+		private ToolButton CreateManualPositionToolButton(Window dialogParent)
+		{
+			var button = new ToolButton(new Label("Manual"), "Manual");
+			return button;
 		}
 	}
 }
