@@ -2,6 +2,7 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Maths;
+using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui
 {
@@ -78,23 +79,20 @@ namespace Ldraw.Ui
 			contentArea.add(rotationControlsBox);																	
 		}
 		
-		public void Run()
+		public void Run(UndoStack stack)
 		{
 			dialog.show_all();
 			var result = dialog.run();
 			if(result == ResponseType.ACCEPT)
 			{
-				UpdateTransforms();
+				UpdateTransforms(stack);
 			}
 			dialog.destroy();
 		}
 		
-		private void UpdateTransforms()
+		private void UpdateTransforms(UndoStack stack)
 		{
-			var transformToApply = Matrix.ForRotation(rotationAxis, rotationAngle);
-			foreach(var node in model.Selection)
-			{
-			}
+			stack.ExecuteCommand(new TransformNodesCommand.Rotation(model.Selection, rotationAxis, rotationAngle));
 		}
 	}
 }

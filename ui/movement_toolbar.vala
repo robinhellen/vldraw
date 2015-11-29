@@ -145,7 +145,7 @@ namespace Ldraw.Ui
 		{
 			var button = new ToolButton(new Label("Manual"), "Manual");
 			button.clicked.connect(() => 
-			new ManualRotationDialog(m_ModelContainer, dialogParent).Run());
+			new ManualRotationDialog(m_ModelContainer, dialogParent).Run(undoStack));
 			return button;
 		}
 	}
