@@ -150,6 +150,8 @@ namespace Ldraw.Ui
 		private ToolButton CreateManualPositionToolButton(Window dialogParent)
 		{
 			var button = new ToolButton(new Label("Manual"), "Manual");
+			button.clicked.connect(() => 
+			new ManualRotationDialog(m_ModelContainer, dialogParent).Run());
 			return button;
 		}
 	}
