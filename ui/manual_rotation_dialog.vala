@@ -88,5 +88,13 @@ namespace Ldraw.Ui
 			}
 			dialog.destroy();
 		}
+		
+		private void UpdateTransforms()
+		{
+			var transformToApply = Matrix.ForRotation(rotationAxis, rotationAngle);
+			foreach(var node in model.Selection)
+			{
+			}
+		}
 	}
 }

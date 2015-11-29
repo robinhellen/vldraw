@@ -98,13 +98,7 @@ namespace Ldraw.Ui
 
 			button.clicked.connect(() =>
 				{
-					foreach(var node in m_ModelContainer.Selection)
-					{
-						var partNode = node as PartNode;
-						if(partNode == null)
-							continue;
-						partNode.TransformPart(Matrix.ForRotation(rotationAxis, 22.5f));
-					}
+					undoStack.ExecuteCommand(new TransformNodesCommand.Rotation(m_ModelContainer.Selection, rotationAxis, 22.5f));
 				});
 
 			return button;
