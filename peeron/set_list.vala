@@ -313,7 +313,7 @@ namespace Ldraw.Peeron
 			GLib.Object partObj = partVal.get_object();
 			var current = partObj as PartGroupItem;
 
-			return LdrawObjectWithColour(current.Part.MainObject);
+			return LdrawObjectWithColour(current.Part.MainObject, current.Colour);
 		}
 	}
 }
