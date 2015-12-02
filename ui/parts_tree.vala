@@ -83,7 +83,7 @@ namespace Ldraw.Ui.Widgets
 				LdrawPart part;
 				
 				if(DatFileCache.TryGetPart.end(res, out part))
-					CurrentChanged(part.MainObject);
+					CurrentChanged(LdrawObjectWithColour(part.MainObject));
 			});
 		}
 
@@ -131,17 +131,17 @@ namespace Ldraw.Ui.Widgets
 			return m_Scrolled;
 		}
 		
-		public async LdrawObject? GetCurrentObject()
+		public async LdrawObjectWithColour? GetCurrentObject()
 		{
 			var current = CurrentPart;
 			if(current == null)
-				return null;
+				return LdrawObjectWithColour(null);
 
 			LdrawPart part;
 			if(yield DatFileCache.TryGetPart(current.Name, out part))
-				return part.MainObject;
+				return LdrawObjectWithColour(part.MainObject);
 				
-			return null;
+			return LdrawObjectWithColour(null);
 		}
 	}	
 }

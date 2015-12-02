@@ -291,14 +291,14 @@ namespace Ldraw.Peeron
 			return widget;
 		}
 		
-		public async LdrawObject? GetCurrentObject()
+		public async LdrawObjectWithColour? GetCurrentObject()
 		{
 			TreeIter active;
 			TreeSelection sel = partsView.get_selection();
 			TreeModel model;
 			if(!sel.get_selected(out model, out active))
 			{
-				return null; // no selection
+				return LdrawObjectWithColour(null); // no selection
 			}
 
 			Value val;
@@ -306,14 +306,14 @@ namespace Ldraw.Peeron
 			int rowType = val.get_int();
 
 			if(rowType != 1)
-				return null;
+				return LdrawObjectWithColour(null);
 
 			Value partVal ;
 			model.get_value(active, 2, out partVal);
 			GLib.Object partObj = partVal.get_object();
 			var current = partObj as PartGroupItem;
 
-			return current.Part.MainObject;
+			return LdrawObjectWithColour(current.Part.MainObject);
 		}
 	}
 }

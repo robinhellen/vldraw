@@ -108,12 +108,16 @@ namespace Ldraw.Ui
 			{
 				if(currentSignalHandler != 0)
 					PartSources[(int)currentPage].disconnect(currentSignalHandler);
-				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => PartsPreview.Model = newObject);
+				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => PartsPreview.Model = newObject.Object);
 				currentPage = i;
 				var source = PartSources[(int)currentPage];
 				source.GetCurrentObject.begin((obj, res) => 
 					{
-						PartsPreview.Model = source.GetCurrentObject.end(res) ?? new LdrawObject("", null);
+						var objWithColour = source.GetCurrentObject.end(res);
+						if(objWithColour != null && objWithColour.Object != null)						
+							PartsPreview.Model = objWithColour.Object;
+						 else
+							PartsPreview.Model = new LdrawObject("", null);
 					});
 			});
 			return box;

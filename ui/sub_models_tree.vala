@@ -70,9 +70,9 @@ namespace Ldraw.Ui.Widgets
 				m_Tree.model = mpdFile.SubModels;
 		}
 
-		public async LdrawObject? GetCurrentObject()
+		public async LdrawObjectWithColour? GetCurrentObject()
 		{
-			return GetCurrentObjectSync();
+			return LdrawObjectWithColour(GetCurrentObjectSync(), null);
 		}
 		
 		public LdrawObject? GetCurrentObjectSync()
