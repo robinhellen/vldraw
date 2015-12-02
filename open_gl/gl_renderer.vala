@@ -28,13 +28,13 @@ namespace Ldraw.OpenGl
 		//	  the program 
 		GLuint program = 0;
 		//	  uniform parameters to the shaders
-		Colour DefaultColour;
 		LdrawObject currentModel;
 		
 		public void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection,
 				Overlay? overlay,
-				ViewParameters viewParameters)
+				ViewParameters viewParameters, 
+				Colour defaultColour)
 		{			
 			PrepareAllVertexData(currentModel);
 			
@@ -99,7 +99,7 @@ namespace Ldraw.OpenGl
 			}
 			else
 			{
-				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, DefaultColour, false, new GlMatrix.Identity());	
+				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, defaultColour, false, new GlMatrix.Identity());	
 			}
 			if(overlay != null)
 			{
@@ -192,7 +192,7 @@ namespace Ldraw.OpenGl
 			glDrawArrays(GL_LINES, 0, arrays.lineCount / 3);
 		}
 				
-		public void PrepareRender(LdrawObject model, Colour defaultColour)
+		public void PrepareRender(LdrawObject model)
 		{
 			if(program == 0)
 			{
@@ -204,7 +204,6 @@ namespace Ldraw.OpenGl
 				glCullFace(GL_BACK);
 			}
 			
-			DefaultColour = defaultColour;
 			currentModel = model;
 			
 		}

@@ -13,8 +13,9 @@ namespace Ldraw.Ui
 		public abstract void Render2(GLContext context,
 				Gee.Set<LdrawNode> selection, 
 				Overlay? overlay,
-				ViewParameters viewParameters);
+				ViewParameters viewParameters, 
+				Colour defaultColour);
 				
-		public abstract void PrepareRender(LdrawObject model, Colour defaultColour);
+		public abstract void PrepareRender(LdrawObject model);
 	}
 }

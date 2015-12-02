@@ -83,7 +83,7 @@ namespace Ldraw.Ui.GtkGl
 				return true;
 			}
 			
-			renderer.Render2(context, CurrentSelection, overlay, viewParameters); // scroll
+			renderer.Render2(context, CurrentSelection, overlay, viewParameters, DefaultColour); // scroll
 							 
 			var error = get_error();
 			if(error != null)
@@ -103,7 +103,7 @@ namespace Ldraw.Ui.GtkGl
 			if(get_error() != null)
 				return;
 				
-			renderer.PrepareRender(m_Model, DefaultColour);
+			renderer.PrepareRender(m_Model);
 		}
 
 		public override void size_allocate(Allocation allocation)

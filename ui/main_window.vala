@@ -117,8 +117,10 @@ namespace Ldraw.Ui
 						if(objWithColour != null && objWithColour.Object != null)
 						{						
 							PartsPreview.Model = objWithColour.Object;
-							PartsPreview.DefaultColour = objWithColour.Colour ??
-								ColourContext.GetColourById(Settings.PreviewColourId);
+							if(objWithColour.Colour == null)
+								PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
+							else
+								PartsPreview.DefaultColour = objWithColour.Colour;
 						}
 						else
 						{
