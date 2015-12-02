@@ -108,7 +108,11 @@ namespace Ldraw.Ui
 			{
 				if(currentSignalHandler != 0)
 					PartSources[(int)currentPage].disconnect(currentSignalHandler);
-				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => PartsPreview.Model = newObject.Object);
+				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => 
+					{
+						PartsPreview.Model = newObject.Object ?? new LdrawObject("", null);
+						PartsPreview.DefaultColour = newObject.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
+					});
 				currentPage = i;
 				var source = PartSources[(int)currentPage];
 				source.GetCurrentObject.begin((obj, res) => 
@@ -117,10 +121,7 @@ namespace Ldraw.Ui
 						if(objWithColour != null && objWithColour.Object != null)
 						{						
 							PartsPreview.Model = objWithColour.Object;
-							if(objWithColour.Colour == null)
-								PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
-							else
-								PartsPreview.DefaultColour = objWithColour.Colour;
+							PartsPreview.DefaultColour = objWithColour.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
 						}
 						else
 						{
