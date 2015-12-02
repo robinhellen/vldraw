@@ -114,10 +114,17 @@ namespace Ldraw.Ui
 				source.GetCurrentObject.begin((obj, res) => 
 					{
 						var objWithColour = source.GetCurrentObject.end(res);
-						if(objWithColour != null && objWithColour.Object != null)						
+						if(objWithColour != null && objWithColour.Object != null)
+						{						
 							PartsPreview.Model = objWithColour.Object;
-						 else
+							PartsPreview.DefaultColour = objWithColour.Colour ??
+								ColourContext.GetColourById(Settings.PreviewColourId);
+						}
+						else
+						{
 							PartsPreview.Model = new LdrawObject("", null);
+							PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
+						}
 					});
 			});
 			return box;
