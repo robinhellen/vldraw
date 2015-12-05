@@ -2,7 +2,10 @@ DEFAULT: all
 
 .SECONDEXPANSION:
 
+# Vala compiler
 VALACC=valac-0.28
+
+# external libraries defined here for consistent versions.
 gee=gee-0.8
 gio=gio-2.0
 gtk=gtk+-3.0
@@ -11,6 +14,18 @@ xml=libxml-2.0
 soup=libsoup-2.4
 
 SOURCES=$(wildcard *.vala)
+
+# definitions for component modules
+# each module has up to four definitions:
+# foo_sources
+#    (required)
+#    Vala source files for the module
+# foo_packages
+#    System packages that the module requires to be linked against
+# foo_internal packages
+#    Other modules that this module depends on
+# foo_test_sources
+#    Vala source files for the tests for the module
 
 utils_sources= $(wildcard utils/*.vala)
 utils_packages=$(gee) $(gtk)
@@ -99,10 +114,12 @@ EXECUTABLE_NAME = ldraw
 all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test
 	./test/expressions.test 
 	./test/maths.test
-	
+
+# compilation for the final executable
 $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
 
+# Compilation for the component modules
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
@@ -113,6 +130,7 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 	touch h/$*.h
 	touch vapi/$*.vapi
 	
+# (Optional) compilation of per-module tests.
 test/%.test: $$($$*_test_sources) lib/%.so h/%.h vapi/%.vapi
 ifeq ($$($$*_test_sources),)
 	$(warning No tests for $*.)
@@ -129,10 +147,12 @@ else
 	./test/$*.test
 endif
 
+# clean all files created during normal compilation
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
 	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), vapi/$(lib).vapi)
 
+# clean temporary files that vala leaves during abnormal compilation
 tempclean:
 	rm -f $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))
 	rm -f $(patsubst %.vala,%.c,$(SOURCES) $(TEST_SOURCES))
