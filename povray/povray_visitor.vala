@@ -22,6 +22,7 @@ namespace Ldraw.Povray
 		private FileOutputStream outStream;
 		private Error caughtError;
 		private bool hadError = false;
+		private SdlGenerator sdlGenerator = new SdlGenerator();
 
 		public PovrayVisitor(string filename)
 		{
@@ -92,8 +93,10 @@ namespace Ldraw.Povray
 				currentDistinctObjs++;
 
 				var colourSdl = SdlForColour(node.Colour);
+				
+				var sdlTransform = sdlGenerator.SdlMatrixFor(node.Transform, node.Center);
 
-				currentObjectSdl += @"\tobject { $(EscapeFilename(node.Contents.FileName)) matrix $(SdlMatrixFor(node.Transform, node.Center)) $colourSdl }\n";
+				currentObjectSdl += @"\tobject { $(EscapeFilename(node.Contents.FileName)) matrix $sdlTransform $colourSdl }\n";
 			}
 			else
 			{
@@ -114,6 +117,8 @@ namespace Ldraw.Povray
 										-cameraDistance * sinf(latitude),
 										-cameraDistance * cosf(latitude) * cosf(longitude))
 					.Add(object.BoundingBox.Center());
+			var cameraLocationSdl = sdlGenerator.SdlFor(cameraVector);
+			var cameraLookAtSdl = sdlGenerator.SdlFor(object.BoundingBox.Center());
 
 			var lightsCameraObject = @"object { $(EscapeFilename(object.FileName)) }
 
@@ -124,10 +129,10 @@ background { color rgb <0,0.1,0.5>}
 camera {
 	#declare PCT = 0; // Percentage further away
 	#declare STEREO = 0; // Normal view
-	location $(SdlFor(cameraVector)) + PCT/100.0*$(SdlFor(cameraVector))
+	location $cameraLocationSdl + PCT/100.0*$cameraLocationSdl
 	sky      -y
 	right    -4/3*x
-	look_at  $(SdlFor(object.BoundingBox.Center())) // calculated
+	look_at  $cameraLookAtSdl // calculated
 	angle    $angle
 	rotate   <0,1e-5,0> // Prevent gap between adjecent quads
 	//orthographic
@@ -171,8 +176,11 @@ light_source {
 		private void WriteMeshTriangle(Vector a, Vector b, Vector c)
 		{
 			StartMesh();
+			var sdlA = sdlGenerator.SdlFor(a);
+			var sdlB = sdlGenerator.SdlFor(b);
+			var sdlC = sdlGenerator.SdlFor(c);
 
-			currentObjectSdl += @"\t\ttriangle { $(SdlFor(a)), $(SdlFor(b)), $(SdlFor(c)) }\n";
+			currentObjectSdl += @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
 
 			writingMesh = true;
 		}
@@ -210,17 +218,7 @@ light_source {
 
 			writingMesh = false;
 		}
-
-		public string SdlFor(Vector v)
-		{
-			return @"<$(v.X), $(v.Y), $(v.Z)>";
-		}
-
-		public string SdlMatrixFor(Matrix m, Vector v)
-		{
-			return @"<$(m[0,0]), $(m[1,0]), $(m[2,0]), $(m[0,1]), $(m[1,1]), $(m[2,1]), $(m[0,2]), $(m[1,2]), $(m[2,2]), $(v.X), $(v.Y), $(v.Z) >";
-		}
-
+		
 		public string SdlForColour(Colour colour)
 		{
 			if(colour.Code == 24 || colour.Code == 16)
