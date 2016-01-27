@@ -166,6 +166,9 @@ namespace Ldraw.Ui
 					else
 					{
 						subModels = mpd.SubModels;
+						TreeIter iter;
+						if(subModels.get_iter_first(out iter))
+							cb.set_active_iter(iter);
 					}
 					cb.model = subModels;
 					cb.visible = (subModels.size > 0);
