@@ -77,7 +77,6 @@ namespace Ldraw.Ui
 			
 			var modelExportMenu = AddSubMenu(modelMenu, "_Export");
 			
-			AddMenuItem(modelExportMenu, "Image file (_Jpeg)", () => ExportJpg());
 			AddMenuItem(modelExportMenu, "Povray", () => ExportPov());
 			
 			AddExtraMenuItems(modelMenu, TopMenu.Model, parent);
@@ -311,12 +310,6 @@ namespace Ldraw.Ui
 					);
             mpdModel.SubModels.add(newObject);
             Model.Load(newObject);
-        }
-
-        private void ExportJpg()
-        {
-            var exporter = new Exporter();
-            exporter.ExportJpg(Model.Model.File.MainObject, Model.Model.File.FileName + ".jpg");
         }
 
         private void ExportPov()
