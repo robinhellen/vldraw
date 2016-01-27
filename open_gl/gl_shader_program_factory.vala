@@ -22,11 +22,11 @@ namespace Ldraw.OpenGl
 			
 			glShaderSource(vertexShader, 1, {shaderProvider.VertexShader}, null);
 			glCompileShader(vertexShader);
-			CheckShaderStatus(vertexShader);
+			CheckShaderStatus(vertexShader, "Vertex Shader");
 			
 			glShaderSource(fragShader, 1, {shaderProvider.FragmentShader}, null);			
 			glCompileShader(fragShader);
-			CheckShaderStatus(fragShader);
+			CheckShaderStatus(fragShader, "Fragment Shader");
 			
 			var program = glCreateProgram();
 			glAttachShader(program, vertexShader);
@@ -37,7 +37,7 @@ namespace Ldraw.OpenGl
 			return program;			
 		}
 		
-		private void CheckShaderStatus(GLuint shader)
+		private void CheckShaderStatus(GLuint shader, string shaderName)
 		{
 			int result;
 			glGetShaderiv(shader, GL_COMPILE_STATUS, out result);
@@ -46,7 +46,7 @@ namespace Ldraw.OpenGl
 			if(result != GL_FALSE)
 				assert_not_reached();
 			
-			stderr.printf("Shader compile error: \n\t");
+			stderr.printf(@"Shader compile error in $shaderName: \n\t");
 			int log_length;
 			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, out log_length);
 			var buffer = new char[log_length];

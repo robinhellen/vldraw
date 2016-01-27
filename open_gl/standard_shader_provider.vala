@@ -93,10 +93,10 @@ void main () {
 	// the position
 	gl_Position = scale * scroll * view_angle * vec4(Position_worldspace, 1);
 	
-	// use the defualt colour if necessary.	
-	if(vertexColour.x == -1f)
-		fragmentColour = DefaultColour;
-	else if(vertexColour.x == -2f)
+	// use the default colour if necessary.	
+	if(vertexColour.x == -1)
+		fragmentColour = DefaultColour ;
+	else if(vertexColour.x == -2)
 		fragmentColour = DefaultEdgeColour;
 	else
 		fragmentColour = vertexColour;
