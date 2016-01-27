@@ -66,11 +66,17 @@ namespace Ldraw
             var container = builder.build();
 
             // load up the colours
-			var application = container.resolve<Ldraw.Application.Application>();
-			
-			application.Run(args);
-			
-            return 0;
+            try
+            {
+				var application = container.resolve<Ldraw.Application.Application>();			
+				application.Run(args);				
+				return 0;
+			}
+			catch(ResolveError e)
+			{
+				stderr.printf(@"DI configuration error: $(e.message)\n");
+				return -1;
+			}
         }
     }
 	
