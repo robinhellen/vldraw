@@ -23,7 +23,7 @@ namespace Ldraw.Lego.Nodes
 			ObjType = args[0];
 			string [] qualifiers = {};
 			var i = 1;
-			while(args[i] != "ORIGINAL" && args[i] != "UPDATE")
+			while(i < args.length && args[i] != "ORIGINAL" && args[i] != "UPDATE")
 			{
 				qualifiers += args[i];
 				i++;
