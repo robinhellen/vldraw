@@ -14,18 +14,8 @@ namespace Ldraw.Ui.Dialogs
                                                 , "_Cancel", ResponseType.CANCEL
                                                 , "_Save", ResponseType.ACCEPT);
 
-            FileFilter filter = new FileFilter();
-            filter.add_custom(
-								FileFilterFlags.FILENAME, 
-								info => (
-											info.filename.has_suffix(".ldr") 
-										 || info.filename.has_suffix(".dat") 
-										 || info.filename.has_suffix(".mpd")
-										)
-							  );
-
             dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
-            dialog.filter = filter;
+            dialog.filter = CreateLdrawFilesFilter();
             
             if(dialog.run() == ResponseType.ACCEPT)
             {
@@ -42,12 +32,10 @@ namespace Ldraw.Ui.Dialogs
             FileChooserDialog dialog = new FileChooserDialog("Open File", parent, FileChooserAction.OPEN
                                                 , "_Cancel", ResponseType.CANCEL
                                                 , "_Open", ResponseType.ACCEPT);
-
-            FileFilter filter = new FileFilter();
-            filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
-
+                                                
             dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
-            dialog.filter = filter;
+            dialog.filter = CreateLdrawFilesFilter();
+            
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
@@ -57,6 +45,20 @@ namespace Ldraw.Ui.Dialogs
             location = "";
             dialog.close();
             return false;
+		}
+		
+		private FileFilter CreateLdrawFilesFilter()
+		{
+            FileFilter filter = new FileFilter();
+            filter.add_custom(
+								FileFilterFlags.FILENAME, 
+								info => (
+											info.filename.has_suffix(".ldr") 
+										 || info.filename.has_suffix(".dat") 
+										 || info.filename.has_suffix(".mpd")
+										)
+							  );
+			return filter;			
 		}		
 	}
 }
