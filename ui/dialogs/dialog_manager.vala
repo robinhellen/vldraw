@@ -23,6 +23,7 @@ namespace Ldraw.Ui.Dialogs
                 dialog.close();
                 return true;
             }
+            location = "";
             dialog.close();
             return false;
 		}
