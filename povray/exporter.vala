@@ -1,13 +1,9 @@
-using Gdk;
 
 using Ldraw.Lego;
-using Ldraw.Lego.Library;
-using Ldraw.Maths;
-using Ldraw.Povray;
 using Ldraw.Ui;
 using Ldraw.Ui.Widgets;
 
-namespace Ldraw.Export
+namespace Ldraw.Povray
 {	
 	public class PovrayExporter : Object, Exporter
 	{

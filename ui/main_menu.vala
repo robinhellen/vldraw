@@ -2,7 +2,6 @@ using Diva;
 using Gee;
 using Gtk;
 
-using Ldraw.Export;
 using Ldraw.Lego;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Widgets;

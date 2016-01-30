@@ -54,8 +54,8 @@ peeron_packages=$(gee) $(gtk) $(soup) $(xml) diva
 peeron_internal_packages=lego lego_objects maths utils ui_widgets part_group
 
 povray_sources=$(wildcard povray/*.vala)
-povray_packages=$(gee) $(gio)
-povray_internal_packages=lego_objects maths
+povray_packages=$(gee) $(gio) $(gtk) diva 
+povray_internal_packages=lego_objects maths ui_widgets utils
 
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=$(gee) $(gtk) diva
@@ -73,9 +73,9 @@ ui_gtk_gl_sources=$(wildcard ui/gtk_gl/*.vala)
 ui_gtk_gl_packages=$(gtk) $(gee) gl diva
 ui_gtk_gl_internal_packages=lego lego_objects maths expressions utils ui_widgets options utils
 
-ui_widgets_sources=$(wildcard ui/*.vala) $(wildcard export/*.vala) $(wildcard ui/interfaces/*.vala) $(wildcard ui/undo/*.vala)
+ui_widgets_sources=$(wildcard ui/*.vala) $(wildcard ui/interfaces/*.vala) $(wildcard ui/undo/*.vala)
 ui_widgets_packages=$(gtk) $(gee) gl diva
-ui_widgets_internal_packages= application lego lego_objects maths expressions utils options part_group povray
+ui_widgets_internal_packages= application lego lego_objects maths expressions utils options part_group
 
 ui_dialogs_sources=$(wildcard ui/dialogs/*.vala)
 ui_dialogs_packages=$(gtk) $(gee) gl diva
