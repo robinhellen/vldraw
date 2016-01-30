@@ -25,7 +25,8 @@ namespace Ldraw.Ui.Dialogs
 							  );
 
             dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
-
+            dialog.filter = filter;
+            
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
@@ -46,6 +47,7 @@ namespace Ldraw.Ui.Dialogs
             filter.add_custom(FileFilterFlags.FILENAME, info => (info.filename.has_suffix(".ldr") || info.filename.has_suffix(".dat") || info.filename.has_suffix(".mpd")));
 
             dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
+            dialog.filter = filter;
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
