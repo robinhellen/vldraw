@@ -17,6 +17,7 @@ namespace Ldraw.Ui
 			var cls = (ObjectClass)typeof(MainMenu).class_ref();
 			set_collection_injection<Refactoring>(cls, "Refactorings");
 			set_collection_injection<MenuItemSource>(cls, "ItemSources");
+			set_collection_injection<Exporter>(cls, "Exporters");
 		}
 		
 		public AnimatedModel Model {construct; private get;}
@@ -25,6 +26,7 @@ namespace Ldraw.Ui
         public IDialogManager Dialogs {construct; private get;}
         public Collection<Refactoring> Refactorings {construct; private get;}
         public Collection<MenuItemSource> ItemSources {construct; private get;}
+        public Collection<Exporter> Exporters {construct; private get;}
         
         public RecentChooserMenu RecentMenu {construct; private get;}
         
@@ -76,8 +78,11 @@ namespace Ldraw.Ui
 			AddMenuItem(modelMenu, "_Add sub-model", () => ModelAddSubModel_OnActivate(parent));
 			
 			var modelExportMenu = AddSubMenu(modelMenu, "_Export");
+			foreach(var exporter in Exporters)
+			{
+				AddMenuItem(modelExportMenu, exporter.Name, () => Export(exporter));
+			}
 			
-			AddMenuItem(modelExportMenu, "Povray", () => ExportPov());
 			
 			AddExtraMenuItems(modelMenu, TopMenu.Model, parent);
 
@@ -312,10 +317,9 @@ namespace Ldraw.Ui
             Model.Load(newObject);
         }
 
-        private void ExportPov()
+        private void Export(Exporter exporter)
         {
-            var exporter = new Exporter();
-            exporter.ExportPovray(Model.Model.File.MainObject, Model.Model.File.FileName + ".pov");
+            exporter.Export(Model.Model.File.MainObject, Model.Model.File.FileName + ".pov");
         }
 
         private void ShowPartsList(Window parent)

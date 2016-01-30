@@ -3,6 +3,7 @@ using Gtk;
 
 using Ldraw.Application;
 using Ldraw.Ui.Widgets;
+using Ldraw.Export;
 
 namespace Ldraw.Ui
 {
@@ -28,6 +29,8 @@ namespace Ldraw.Ui
 					
             builder.register<LdrawEditorUi>().as<UserInterface>();
             builder.register<GtkInitialisingArgHandler>().as_decorator<ArgumentHandler>();
+            
+            builder.register<PovrayExporter>().as<Exporter>();
 		}
 	}
 }

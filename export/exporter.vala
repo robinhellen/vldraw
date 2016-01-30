@@ -5,12 +5,15 @@ using Ldraw.Lego.Library;
 using Ldraw.Maths;
 using Ldraw.Povray;
 using Ldraw.Ui;
+using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Export
 {	
-	public class Exporter : Object
+	public class PovrayExporter : Object, Exporter
 	{
-		public void ExportPovray(LdrawObject model, string filename)
+		public string Name { get {return "Povray";} }
+		
+		public void Export(LdrawObject model, string filename)
 		{
 			var visitor = new PovrayVisitor(filename);
 
