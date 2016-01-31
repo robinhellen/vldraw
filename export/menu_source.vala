@@ -57,7 +57,8 @@ namespace Ldraw.Export
 
         private void Export(Exporter exporter)
         {
-            exporter.Export(Model.Model.File.MainObject, Model.Model.File.FileName + ".pov");
+			var filename = Model.Model.File.FileName + exporter.PreferredExtension;
+            exporter.Export(Model.Model.File.MainObject, filename);
         }
         
 		private delegate void Action();

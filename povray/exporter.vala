@@ -6,7 +6,8 @@ namespace Ldraw.Povray
 {	
 	public class PovrayExporter : Object, Exporter
 	{
-		public string Name { get {return "Povray";} }
+		public string Name { get {return "Povray"; } }
+		public string PreferredExtension { get { return "pov"; } }
 		
 		public void Export(LdrawObject model, string filename)
 		{
