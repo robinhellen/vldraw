@@ -40,7 +40,7 @@ namespace Ldraw.Export
 			
 			foreach(var exporter in Exporters)
 			{
-				AddMenuItem(modelExportMenu.submenu, exporter.Name, () => Export(exporter));
+				AddMenuItem(modelExportMenu.submenu, exporter.Name, () => Export(exporter, dialogParent));
 			}
 			
 			items.add(modelExportMenu);
@@ -55,11 +55,34 @@ namespace Ldraw.Export
 			return item;
 		}	
 
-        private void Export(Exporter exporter)
+        private void Export(Exporter exporter, Window parent)
         {
-			var filename = Model.Model.File.FileName + exporter.PreferredExtension;
+			FileChooserDialog dialog = new FileChooserDialog("Export", parent, FileChooserAction.SAVE
+                                                , "_Cancel", ResponseType.CANCEL
+                                                , "_Export", ResponseType.ACCEPT);
+			dialog.do_overwrite_confirmation = true;
+			var filter = new FileFilter();
+			filter.add_pattern("*." + exporter.PreferredExtension);
+			var basename = File.new_for_path(Model.Model.File.FileName).get_basename();
+			var newName = SwitchExtension(basename, exporter.PreferredExtension);
+			dialog.set_current_name(newName);
+            
+            if(dialog.run() != ResponseType.ACCEPT)
+            {
+                dialog.close();
+                return;
+            }
+            var filename = dialog.get_filename();
+            dialog.close();            
+            
             exporter.Export(Model.Model.File.MainObject, filename);
         }
+        
+        private string SwitchExtension(string filename, string newExtension)
+        {
+			var nameOnly = filename.substring(0, filename.last_index_of_char('.'));
+			return @"$nameOnly.$newExtension";
+		}
         
 		private delegate void Action();
 	}
