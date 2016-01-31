@@ -49,6 +49,7 @@ namespace Ldraw
 			builder.register_module<AnimationModule>();
 			builder.register_module<PeeronModule>();
 			builder.register_module<PovrayModule>();
+			builder.register_module<ExportModule>();
 			
             builder.register<RunningOptions>().as<IOptions>().single_instance();
 

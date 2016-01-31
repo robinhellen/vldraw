@@ -57,6 +57,10 @@ povray_sources=$(wildcard povray/*.vala)
 povray_packages=$(gee) $(gio) $(gtk) diva 
 povray_internal_packages=lego_objects maths ui_widgets utils
 
+export_sources=$(wildcard export/*.vala)
+export_packages=$(gee) $(gio) $(gtk) diva 
+export_internal_packages=lego_objects maths ui_widgets utils
+
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=$(gee) $(gtk) diva
 part_group_internal_packages=lego lego_objects maths utils
@@ -98,7 +102,7 @@ application_sources=application/application.vala
 application_packages=$(gee) diva
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
-	application
+	application export
 UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps animation
 
 

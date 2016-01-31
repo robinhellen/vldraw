@@ -16,7 +16,6 @@ namespace Ldraw.Ui
 			var cls = (ObjectClass)typeof(MainMenu).class_ref();
 			set_collection_injection<Refactoring>(cls, "Refactorings");
 			set_collection_injection<MenuItemSource>(cls, "ItemSources");
-			set_collection_injection<Exporter>(cls, "Exporters");
 		}
 		
 		public AnimatedModel Model {construct; private get;}
@@ -25,7 +24,6 @@ namespace Ldraw.Ui
         public IDialogManager Dialogs {construct; private get;}
         public Collection<Refactoring> Refactorings {construct; private get;}
         public Collection<MenuItemSource> ItemSources {construct; private get;}
-        public Collection<Exporter> Exporters {construct; private get;}
         
         public RecentChooserMenu RecentMenu {construct; private get;}
         
@@ -75,14 +73,7 @@ namespace Ldraw.Ui
 			AddMenuItem(modelMenu, "_Properties", () => {});
 			AddMenuItem(modelMenu, "Parts _List", () => ShowPartsList(parent));
 			AddMenuItem(modelMenu, "_Add sub-model", () => ModelAddSubModel_OnActivate(parent));
-			
-			var modelExportMenu = AddSubMenu(modelMenu, "_Export");
-			foreach(var exporter in Exporters)
-			{
-				AddMenuItem(modelExportMenu, exporter.Name, () => Export(exporter));
-			}
-			
-			
+						
 			AddExtraMenuItems(modelMenu, TopMenu.Model, parent);
 
 			var selectionMenu = CreateMenu(menus, "_Selection", accelerators);
@@ -119,20 +110,18 @@ namespace Ldraw.Ui
 		
 		private void AddExtraMenuItems(Gtk.Menu parent, TopMenu menu, Window dialogParent)
 		{
-			var addedAny = true;
 			foreach(var source in ItemSources)
 			{
 				var extras = source.GetItemsForMenu(menu, dialogParent);
 				if(extras.is_empty)
 					continue;
 					
+				AddSeparator(parent);
 				foreach(var extra in extras)
 				{
 					parent.append(extra);
 				}				
-			}
-			if(addedAny)
-				AddSeparator(parent);				
+			}			
 		}
 		
 		private Action GetExecuteAction(Refactoring r, Window parent)
@@ -314,11 +303,6 @@ namespace Ldraw.Ui
 					);
             mpdModel.SubModels.add(newObject);
             Model.Load(newObject);
-        }
-
-        private void Export(Exporter exporter)
-        {
-            exporter.Export(Model.Model.File.MainObject, Model.Model.File.FileName + ".pov");
         }
 
         private void ShowPartsList(Window parent)
