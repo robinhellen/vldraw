@@ -114,9 +114,9 @@ namespace Ldraw.Ui
 			{
 				var axisLength= 1000F;
 				Vector newOrigin = Vector(dialog.x, dialog.y, dialog.z);
-				ctx.DrawLine(newOrigin, newOrigin.Add(Vector(axisLength, 0F, 0F)), colours.GetColourById(1));
-				ctx.DrawLine(newOrigin, newOrigin.Add(Vector(0F, -axisLength, 0F)), colours.GetColourById(2));	
-				ctx.DrawLine(newOrigin, newOrigin.Add(Vector(0F, 0F, axisLength)), colours.GetColourById(3));
+				ctx.DrawLine(newOrigin.Add(Vector(-axisLength, 0F, 0F)), newOrigin.Add(Vector(axisLength, 0F, 0F)), colours.GetColourById(1));
+				ctx.DrawLine(newOrigin.Add(Vector(0F, axisLength, 0F)), newOrigin.Add(Vector(0F, -axisLength, 0F)), colours.GetColourById(2));	
+				ctx.DrawLine(newOrigin.Add(Vector(0F, 0F, -axisLength)), newOrigin.Add(Vector(0F, 0F, axisLength)), colours.GetColourById(3));
 			}
 		}
 	}
