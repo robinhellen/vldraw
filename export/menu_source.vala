@@ -63,9 +63,12 @@ namespace Ldraw.Export
 			dialog.do_overwrite_confirmation = true;
 			var filter = new FileFilter();
 			filter.add_pattern("*." + exporter.PreferredExtension);
-			var basename = File.new_for_path(Model.Model.File.FileName).get_basename();
-			var newName = SwitchExtension(basename, exporter.PreferredExtension);
-			dialog.set_current_name(newName);
+			if(Model.Model.File.FileName != null)
+			{
+				var basename = File.new_for_path(Model.Model.File.FileName).get_basename();
+				var newName = SwitchExtension(basename, exporter.PreferredExtension);
+				dialog.set_current_name(newName);
+			}
             
             if(dialog.run() != ResponseType.ACCEPT)
             {
