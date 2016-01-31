@@ -1,7 +1,7 @@
 
 using Ldraw.Lego;
 
-namespace Ldraw.Ui.Widgets
+namespace Ldraw.Export
 {
 	public interface Exporter : Object
 	{

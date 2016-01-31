@@ -1,7 +1,6 @@
 
+using Ldraw.Export;
 using Ldraw.Lego;
-using Ldraw.Ui;
-using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Povray
 {	
