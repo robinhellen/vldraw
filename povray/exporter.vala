@@ -8,6 +8,7 @@ namespace Ldraw.Povray
 	{
 		public string Name { get {return "Povray"; } }
 		public string PreferredExtension { get { return "pov"; } }
+		public ExportOptionSections OptionSections {get {return ExportOptionSections.CameraPosition | ExportOptionSections.ImageDimensions | ExportOptionSections.FileName;} }
 		
 		public void Export(LdrawObject model, string filename)
 		{
