@@ -9,8 +9,9 @@ namespace Ldraw
 	public class ExportModule : Module
 	{
 		public override void load(ContainerBuilder builder)
-		{            
+		{
             builder.register<ExportMenuSource>().as<MenuItemSource>();
+            builder.register<ExportManager>();
 		}
 	}
 }
