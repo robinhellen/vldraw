@@ -52,25 +52,28 @@ namespace Ldraw.Export
 		{
 			var cameraOptions = new ExportCameraOptions();
 			options.CameraOptions = cameraOptions;
+			cameraOptions.Longitude = 45;
+			cameraOptions.Latitude  = 30;
 
 			var grid = new Grid();
 
 			grid.attach(new Label("Latitude") , 0, 0);
 			var latEntry = new Entry();
-			latEntry.text = "0";
+			latEntry.text = "30";
 			latEntry.notify["text"].connect(() =>
 				{
 					cameraOptions.Latitude = (float)double.parse(latEntry.text);
 				});
+			grid.attach(latEntry, 1, 1);
 
 			grid.attach(new Label("Longitude"), 0, 1);
 			var longEntry = new Entry();
-			longEntry.text = "0";
+			longEntry.text = "45";
 			longEntry.notify["text"].connect(() =>
 				{
 					cameraOptions.Longitude = (float)double.parse(longEntry.text);
 				});
-			grid.attach(latEntry, 1, 1);
+			grid.attach(longEntry, 1, 1);
 
 			return grid;
 		}
