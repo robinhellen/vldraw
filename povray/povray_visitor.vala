@@ -93,7 +93,7 @@ namespace Ldraw.Povray
 				currentDistinctObjs++;
 
 				var colourSdl = SdlForColour(node.Colour);
-				
+
 				var sdlTransform = sdlGenerator.SdlMatrixFor(node.Transform, node.Center);
 
 				currentObjectSdl += @"\tobject { $(EscapeFilename(node.Contents.FileName)) matrix $sdlTransform $colourSdl }\n";
@@ -104,12 +104,12 @@ namespace Ldraw.Povray
 			}
 		}
 
-		public void Finalise(LdrawObject object)
+		public void Finalise(LdrawObject object, float cameraLong, float cameraLat)
 		{
 			var angle = 67.3801f;
 			var angleRad =  (float)PI * angle / 180;
-			var longitude = (float)PI * 45.0f / 180;
-			var latitude =  (float)PI * 30.0f / 180;
+			var longitude = (float)PI * cameraLong / 180;
+			var latitude =  (float)PI * cameraLat / 180;
 
 			float cameraDistance = object.BoundingBox.Radius / tanf(angleRad / 2);
 
@@ -218,7 +218,7 @@ light_source {
 
 			writingMesh = false;
 		}
-		
+
 		public string SdlForColour(Colour colour)
 		{
 			if(colour.Code == 24 || colour.Code == 16)
@@ -228,10 +228,10 @@ light_source {
 
 			if(!(colour in exportedColours))
 			{
-				float red = colour.Red;
-				float green = colour.Green;
-				float blue = colour.Blue; 
-				float alpha = colour.Alpha;
+				float red = colour.Red / 255f;
+				float green = colour.Green / 255f;
+				float blue = colour.Blue / 255f;
+				float alpha = colour.Alpha / 255f;
 
 				var filter = alpha == 1 ? "" : @"filter $alpha ";
 

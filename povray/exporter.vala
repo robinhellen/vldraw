@@ -16,7 +16,7 @@ namespace Ldraw.Povray
 
 			visitor.Visit(model);
 
-			visitor.Finalise(model);
+			visitor.Finalise(model, exportOptions.CameraOptions.Longitude, exportOptions.CameraOptions.Latitude);
 			visitor.Finish();
 		}
 	}
