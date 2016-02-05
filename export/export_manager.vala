@@ -64,7 +64,7 @@ namespace Ldraw.Export
 				{
 					cameraOptions.Latitude = (float)double.parse(latEntry.text);
 				});
-			grid.attach(latEntry, 1, 1);
+			grid.attach(latEntry, 1, 0);
 
 			grid.attach(new Label("Longitude"), 0, 1);
 			var longEntry = new Entry();
