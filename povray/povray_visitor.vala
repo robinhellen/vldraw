@@ -10,7 +10,6 @@ namespace Ldraw.Povray
 	public class PovrayVisitor : LdrawVisitor<void>
 	{
 		private string currentObjectSdl = "";
-		private bool writingMesh = false;
 		private bool currentObjectHasNonLines = false;
 		private int currentDistinctObjs = 0;
 		private Gee.List<SdlTriangle> currentTriangles;
@@ -86,19 +85,16 @@ namespace Ldraw.Povray
 		public override void VisitSubModel(PartNode node)
 		{
 			var currentSdl = currentObjectSdl;
-			var currentInMesh = writingMesh;
 			var nonLinesInCurrent = currentObjectHasNonLines;
 			var isUnion = currentDistinctObjs;
 
 			currentObjectSdl = "";
-			currentInMesh = false;
 			currentObjectHasNonLines = false;
 			currentDistinctObjs = 0;
 
 			Visit(node.Contents);
 
 			currentObjectSdl = currentSdl;
-			writingMesh = currentInMesh;
 			currentDistinctObjs = isUnion;
 
 			if(!(node.Contents.FileName in emptyObjects))
@@ -185,8 +181,6 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 			var sdlC = sdlGenerator.SdlFor(c);
 
 			currentObjectSdl += @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
-
-			writingMesh = true;
 		}
 
 		private void Append(string sdl)
@@ -206,21 +200,13 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 
 		private void StartMesh()
 		{
-			if(!writingMesh)
-			{
-				currentObjectSdl += "\tmesh {\n";
-				currentDistinctObjs++;
-			}
-
-			writingMesh = true;
+			currentObjectSdl += "\tmesh {\n";
+			currentDistinctObjs++;
 		}
 
 		private void FinishMesh()
 		{
-			if(writingMesh)
-				currentObjectSdl += "\t}\n";
-
-			writingMesh = false;
+			currentObjectSdl += "\t}\n";
 		}
 
 		public string SdlForColour(Colour colour)
