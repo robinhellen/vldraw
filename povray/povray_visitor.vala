@@ -42,12 +42,14 @@ namespace Ldraw.Povray
 
 			if(!currentTriangles.is_empty)
 			{
-				StartMesh();
+				currentDistinctObjs++;
+
+				currentObjectSdl += "\tmesh {\n";
 				foreach(var triangle in currentTriangles)
 				{
 					WriteMeshTriangle(triangle.A, triangle.B, triangle.C);
 				}
-				FinishMesh();
+				currentObjectSdl += "\t}\n";
 			}
 
 
@@ -196,17 +198,6 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 				hadError = true;
 				caughtError = e;
 			}
-		}
-
-		private void StartMesh()
-		{
-			currentObjectSdl += "\tmesh {\n";
-			currentDistinctObjs++;
-		}
-
-		private void FinishMesh()
-		{
-			currentObjectSdl += "\t}\n";
 		}
 
 		public string SdlForColour(Colour colour)
