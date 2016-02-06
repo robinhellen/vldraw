@@ -220,25 +220,12 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 
 			if(!(colour in exportedColours))
 			{
-				float red = colour.Red / 255f;
-				float green = colour.Green / 255f;
-				float blue = colour.Blue / 255f;
-				float alpha = colour.Alpha / 255f;
-
-				var filter = alpha == 1 ? "" : @"filter $alpha ";
-
-				var colourDefSdl =
-@"#declare Colour$(colour.Code) = material { texture {
-	pigment { rgb <$red,$green,$blue> $filter}
-	finish { ambient 0.4 diffuse 0.4 }
-	finish { phong 0.5 phong_size 40 reflection 0.08 }
-} }
-";
+				var colourDefSdl = sdlGenerator.ColourDefinition(colour);
 				Append(colourDefSdl);
 				exportedColours.add(colour);
 			}
 
-			return @"material { Colour$(colour.Code) } ";
+			return sdlGenerator.ColourReference(colour);
 		}
 
 		public string EscapeFilename(string filename)

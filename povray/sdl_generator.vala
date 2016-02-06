@@ -1,4 +1,5 @@
 
+using Ldraw.Lego;
 using Ldraw.Maths;
 
 namespace Ldraw.Povray
@@ -21,6 +22,29 @@ namespace Ldraw.Povray
 	$(SdlFor(position))
 	color rgb <1,1,1>
 }";
+		}
+
+		public string ColourDefinition(Colour colour)
+		{
+			float red = colour.Red / 255f;
+			float green = colour.Green / 255f;
+			float blue = colour.Blue / 255f;
+			float alpha = colour.Alpha / 255f;
+
+			var filter = alpha == 1 ? "" : @"filter $alpha ";
+
+			return
+@"#declare Colour$(colour.Code) = material { texture {
+	pigment { rgb <$red,$green,$blue> $filter}
+	finish { ambient 0.4 diffuse 0.4 }
+	finish { phong 0.5 phong_size 40 reflection 0.08 }
+} }
+";
+		}
+
+		public string ColourReference(Colour colour)
+		{
+			return @"material { Colour$(colour.Code) } ";
 		}
 	}
 }
