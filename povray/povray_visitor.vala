@@ -13,6 +13,7 @@ namespace Ldraw.Povray
 		private bool writingMesh = false;
 		private bool currentObjectHasNonLines = false;
 		private int currentDistinctObjs = 0;
+		private Gee.List<SdlTriangle> currentTriangles;
 
 		private Set<string> exportedFiles = new HashSet<string>();
 		private Set<string> emptyObjects = new HashSet<string>();
@@ -35,7 +36,15 @@ namespace Ldraw.Povray
 			if(object.FileName in exportedFiles)
 				return;
 
+			var outerTriangles = currentTriangles;
+			currentTriangles = new LinkedList<SdlTriangle>();
+
 			base.Visit(object);
+
+			foreach(var triangle in currentTriangles)
+			{
+				WriteMeshTriangle(triangle.A, triangle.B, triangle.C);
+			}
 
 
 			WriteObjectFooter(object);
@@ -51,19 +60,21 @@ namespace Ldraw.Povray
 				Append(currentObjectSdl);
 			}
 
+			currentTriangles = outerTriangles;
+
 			exportedFiles.add(object.FileName);
 		}
 
 		public override void VisitTriangle(TriangleNode node)
 		{
-			WriteMeshTriangle(node.A, node.B, node.C);
+			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C));
 			currentObjectHasNonLines = true;
 		}
 
 		public override void VisitQuad(QuadNode node)
 		{
-			WriteMeshTriangle(node.A, node.B, node.C);
-			WriteMeshTriangle(node.D, node.A, node.C);
+			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C));
+			currentTriangles.add(new SdlTriangle(node.D, node.A, node.C));
 			currentObjectHasNonLines = true;
 		}
 
@@ -249,6 +260,18 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 				throw caughtError;
 
 			outStream.close();
+		}
+
+		private class SdlTriangle
+		{
+			public Vector A;
+			public Vector B;
+			public Vector C;
+
+			public SdlTriangle(Vector a, Vector b, Vector c)
+			{
+				A = a; B = b; C = c;
+			}
 		}
 	}
 }
