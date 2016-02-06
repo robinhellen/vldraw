@@ -139,18 +139,10 @@ camera {
 }
 
 // Lights:
-light_source {
-	<8.5,-400.778,-152.778>  // Latitude,Longitude,Radius: 45,0,477.69
-	color rgb <1,1,1>
-}
-light_source {
-	<366.768,-301.845,391.846>  // Latitude,Longitude,Radius: 30,120,477.69
-	color rgb <1,1,1>
-}
-light_source {
-	<-198.346,-476.692,304.422>  // Latitude,Longitude,Radius: 60,-120,477.69
-	color rgb <1,1,1>
-}";
+$(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)))     // Latitude,Longitude,Radius: 45,0,477.69
+$(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)))  // Latitude,Longitude,Radius: 30,120,477.69
+$(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitude,Longitude,Radius: 60,-120,477.69
+";
 
 			Append(lightsCameraObject);
 		}
