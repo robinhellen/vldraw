@@ -21,19 +21,19 @@ namespace Ldraw.Ui
 			set_collection_injection<IPartDragSource>(cls, "PartSourcesConstruct");
 			set_collection_injection<ToolbarProvider>(cls, "ToolbarProviders");
 		}
-		
+
         private ComboBox m_SubModels;
-        
+
         // DI injected components
         // Controls
         public ModelList ModelList {construct; private get;}
 		public EditPanes View {construct; private get;}
 		public ModelView PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
-        
+
         public Collection<IPartDragSource> PartSourcesConstruct {construct {PartSources = new ArrayList<IPartDragSource>(); PartSources.add_all(value);}}
         private Gee.List<IPartDragSource> PartSources {set; get;}
-        
+
         // utility objects
         public IOptions Settings {construct; private get;}
         public ILdrawFolders LdrawFolders {construct; private get;}
@@ -41,7 +41,7 @@ namespace Ldraw.Ui
         public MainMenu MainMenu {construct; private get;}
         public Collection<ToolbarProvider> ToolbarProviders {construct; private get;}
         public ColourContext ColourContext {construct; private get;}
-                
+
         construct
         {
             SetUpControls();
@@ -50,7 +50,7 @@ namespace Ldraw.Ui
 			PartsPreview.set_size_request(200, 200);
             PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
             Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId));
-                        
+
             maximize();
 		}
 
@@ -61,12 +61,12 @@ namespace Ldraw.Ui
             MenuBar menus = MainMenu.CreateMenus(accelerators, this);
             var bigVBox = new Box(Orientation.VERTICAL, 0);
             bigVBox.pack_start(menus, false, false);
-            
-            foreach(var provider in ToolbarProviders)            
+
+            foreach(var provider in ToolbarProviders)
             {
 				bigVBox.pack_start(provider.CreateToolbar(this), false, false);
 			}
-            
+
             var notebook = ShowPartDropSources();
 
             Paned treePaned = new Paned(Orientation.HORIZONTAL);
@@ -87,38 +87,38 @@ namespace Ldraw.Ui
             bigVBox.pack_start(treePaned, true, true);
             add(bigVBox);
         }
-        
+
         public Widget ShowPartDropSources()
         {
 			var box = new Box(Orientation.VERTICAL, 0);
 			var notebook = new Notebook();
 			box.pack_start(notebook);
 			box.pack_start(PartsPreview, false);
-			
+
 			ulong currentSignalHandler = 0;
 			uint currentPage = 0;
-			
+
 			foreach(var source in PartSources)
 			{
 				notebook.append_page(source.GetWidget(), new Label(source.GetTabName()));
 			}
-			
-			notebook.switch_page.connect((_, i) => 
+
+			notebook.switch_page.connect((_, i) =>
 			{
 				if(currentSignalHandler != 0)
 					PartSources[(int)currentPage].disconnect(currentSignalHandler);
-				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject => 
+				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject =>
 					{
 						PartsPreview.Model = newObject.Object ?? new LdrawObject("", null);
 						PartsPreview.DefaultColour = newObject.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
 					});
 				currentPage = i;
 				var source = PartSources[(int)currentPage];
-				source.GetCurrentObject.begin((obj, res) => 
+				source.GetCurrentObject.begin((obj, res) =>
 					{
 						var objWithColour = source.GetCurrentObject.end(res);
 						if(objWithColour != null && objWithColour.Object != null)
-						{						
+						{
 							PartsPreview.Model = objWithColour.Object;
 							PartsPreview.DefaultColour = objWithColour.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
 						}
@@ -145,32 +145,33 @@ namespace Ldraw.Ui
                 });
             cb.changed.connect(cb =>
                 {
-                    var tModel = cb.get_model();
+					var tModel = cb.get_model();
                     TreeIter tIter;
                     cb.get_active_iter(out tIter);
-                    LdrawObject object;
+					LdrawObject object;
                     tModel.get(tIter, 0, out object, -1);
                     EditingObject.Load(object);
                     UndoStack.Clear();
                 });
-                
-			EditingObject.notify["Model"].connect(() => 
+
+			EditingObject.notify["Model"].connect(() =>
 				{
 					var mpd = EditingObject.Model.File as MultipartModel;
 					ObservableList<LdrawObject> subModels;
 					if(mpd == null)
 					{
 						subModels = new ObservableList<LdrawObject>();
+						cb.visible = false;
 					}
-					else
+					else if(cb.model != mpd.SubModels)
 					{
 						subModels = mpd.SubModels;
 						TreeIter iter;
 						if(subModels.get_iter_first(out iter))
 							cb.set_active_iter(iter);
+						cb.model = subModels;
+						cb.visible = (subModels.size > 0);
 					}
-					cb.model = subModels;
-					cb.visible = (subModels.size > 0);
 				});
             return cb;
         }
@@ -196,7 +197,7 @@ namespace Ldraw.Ui
         private AccelGroup SetUpAccelerators()
         {
             AccelGroup group = new AccelGroup();
-            
+
             add_accel_group(group);
             return group;
         }
