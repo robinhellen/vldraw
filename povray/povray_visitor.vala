@@ -41,9 +41,14 @@ namespace Ldraw.Povray
 
 			base.Visit(object);
 
-			foreach(var triangle in currentTriangles)
+			if(!currentTriangles.is_empty)
 			{
-				WriteMeshTriangle(triangle.A, triangle.B, triangle.C);
+				StartMesh();
+				foreach(var triangle in currentTriangles)
+				{
+					WriteMeshTriangle(triangle.A, triangle.B, triangle.C);
+				}
+				FinishMesh();
 			}
 
 
@@ -80,8 +85,6 @@ namespace Ldraw.Povray
 
 		public override void VisitSubModel(PartNode node)
 		{
-			FinishMesh();
-
 			var currentSdl = currentObjectSdl;
 			var currentInMesh = writingMesh;
 			var nonLinesInCurrent = currentObjectHasNonLines;
@@ -172,13 +175,11 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 
 		private void WriteObjectFooter(LdrawObject object)
 		{
-			FinishMesh();
 			currentObjectSdl += @"}\n\n";
 		}
 
 		private void WriteMeshTriangle(Vector a, Vector b, Vector c)
 		{
-			StartMesh();
 			var sdlA = sdlGenerator.SdlFor(a);
 			var sdlB = sdlGenerator.SdlFor(b);
 			var sdlC = sdlGenerator.SdlFor(c);
