@@ -11,6 +11,7 @@ namespace Ldraw.Povray
 		public ExportOptionSections OptionSections {get {return ExportOptionSections.CameraPosition | ExportOptionSections.FileName;} }
 
 		public void Export(LdrawObject model, ExportOptions exportOptions)
+			requires(exportOptions.CameraOptions != null)
 		{
 			var visitor = new PovrayVisitor(exportOptions.Filename);
 
