@@ -127,7 +127,7 @@ namespace Ldraw.Povray
 			var cameraLocationSdl = sdlGenerator.SdlFor(cameraVector);
 			var cameraLookAtSdl = sdlGenerator.SdlFor(object.BoundingBox.Center());
 
-			var lightsCameraObject = @"object { $(EscapeFilename(object.FileName)) }
+			var cameraObject = @"object { $(EscapeFilename(object.FileName)) }
 
 
 // Background:
@@ -143,15 +143,12 @@ camera {
 	angle    $angle
 	rotate   <0,1e-5,0> // Prevent gap between adjecent quads
 	//orthographic
-}
+}";
+			Append(cameraObject);
 
-// Lights:
-$(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)))     // Latitude,Longitude,Radius: 45,0,477.69
-$(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)))  // Latitude,Longitude,Radius: 30,120,477.69
-$(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitude,Longitude,Radius: 60,-120,477.69
-";
-
-			Append(lightsCameraObject);
+			Append(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)));     // Latitude,Longitude,Radius: 45,   0,477.69
+			Append(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)));  // Latitude,Longitude,Radius: 30, 120,477.69
+			Append(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))); // Latitude,Longitude,Radius: 60,-120,477.69
 		}
 
 		private string GetObjectHeader(LdrawObject object)
