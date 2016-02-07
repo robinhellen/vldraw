@@ -46,5 +46,38 @@ namespace Ldraw.Povray
 		{
 			return @"material { Colour$(colour.Code) } ";
 		}
+
+		public string Mesh(Gee.List<SdlTriangle> triangles)
+			requires(!triangles.is_empty)
+		{
+			string mesh = "\tmesh {\n";
+			foreach(var triangle in triangles)
+			{
+				mesh += Triangle(triangle);
+			}
+			mesh += "\t}\n";
+			return mesh;
+		}
+
+		public string Triangle(SdlTriangle triangle)
+		{
+			var sdlA = SdlFor(triangle.A);
+			var sdlB = SdlFor(triangle.B);
+			var sdlC = SdlFor(triangle.C);
+
+			return @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
+		}
+	}
+
+	private class SdlTriangle
+	{
+		public Vector A;
+		public Vector B;
+		public Vector C;
+
+		public SdlTriangle(Vector a, Vector b, Vector c)
+		{
+			A = a; B = b; C = c;
+		}
 	}
 }

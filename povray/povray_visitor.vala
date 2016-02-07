@@ -44,12 +44,7 @@ namespace Ldraw.Povray
 			{
 				currentDistinctObjs++;
 
-				currentObjectSdl += "\tmesh {\n";
-				foreach(var triangle in currentTriangles)
-				{
-					WriteMeshTriangle(triangle.A, triangle.B, triangle.C);
-				}
-				currentObjectSdl += "\t}\n";
+				currentObjectSdl += sdlGenerator.Mesh(currentTriangles);
 			}
 
 
@@ -176,15 +171,6 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 			currentObjectSdl += @"}\n\n";
 		}
 
-		private void WriteMeshTriangle(Vector a, Vector b, Vector c)
-		{
-			var sdlA = sdlGenerator.SdlFor(a);
-			var sdlB = sdlGenerator.SdlFor(b);
-			var sdlC = sdlGenerator.SdlFor(c);
-
-			currentObjectSdl += @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
-		}
-
 		private void Append(string sdl)
 		{
 			if(hadError)
@@ -238,18 +224,6 @@ $(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))) // Latitu
 				throw caughtError;
 
 			outStream.close();
-		}
-
-		private class SdlTriangle
-		{
-			public Vector A;
-			public Vector B;
-			public Vector C;
-
-			public SdlTriangle(Vector a, Vector b, Vector c)
-			{
-				A = a; B = b; C = c;
-			}
 		}
 	}
 }
