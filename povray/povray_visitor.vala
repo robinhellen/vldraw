@@ -52,7 +52,7 @@ namespace Ldraw.Povray
 			}
 			else
 			{
-				var header = currentDistinctObjs > 1 ? GetObjectHeaderUnion(object) : GetObjectHeader(object);
+				var header = GetObjectHeader(object, currentDistinctObjs);
 				Append(@"// object: $(object.FileName), $currentDistinctObjs distinct components.\n");
 				Append(header);
 				Append(currentObjectSdl);
@@ -133,16 +133,11 @@ namespace Ldraw.Povray
 			Append(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))); // Latitude,Longitude,Radius: 60,-120,477.69
 		}
 
-		private string GetObjectHeader(LdrawObject object)
+		private string GetObjectHeader(LdrawObject object, int subObjects)
 		{
 			var escapedFilename = EscapeFilename(object.FileName);
-			return @"#declare $escapedFilename = object {\n";
-		}
-
-		private string GetObjectHeaderUnion(LdrawObject object)
-		{
-			var escapedFilename = EscapeFilename(object.FileName);
-			return @"#declare $escapedFilename = union {\n";
+			var sdlType = subObjects > 1 ? "union" : "object";
+			return @"#declare $escapedFilename = $sdlType {\n";
 		}
 
 		private string ObjectFooter(LdrawObject object)
