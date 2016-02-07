@@ -85,16 +85,4 @@ namespace Ldraw.Povray
 			return @"<$(v.X), $(v.Y), $(v.Z)>";
 		}
 	}
-
-	private class SdlTriangle
-	{
-		public Vector A;
-		public Vector B;
-		public Vector C;
-
-		public SdlTriangle(Vector a, Vector b, Vector c)
-		{
-			A = a; B = b; C = c;
-		}
-	}
 }
