@@ -67,6 +67,23 @@ namespace Ldraw.Povray
 
 			return @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
 		}
+
+		public string Camera(Vector cameraPosition, Vector cameraLookAt, float viewAngle)
+		{
+			var cameraLocationSdl = SdlFor(cameraPosition);
+			var cameraLookAtSdl = SdlFor(cameraLookAt);
+			return @"camera {
+	#declare PCT = 0; // Percentage further away
+	#declare STEREO = 0; // Normal view
+	location $cameraLocationSdl + PCT/100.0*$cameraLocationSdl
+	sky      -y
+	right    -4/3*x
+	look_at  $cameraLookAtSdl // calculated
+	angle    $viewAngle
+	rotate   <0,1e-5,0> // Prevent gap between adjacent quads
+	//orthographic
+}";
+		}
 	}
 
 	private class SdlTriangle

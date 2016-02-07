@@ -124,27 +124,11 @@ namespace Ldraw.Povray
 										-cameraDistance * sinf(latitude),
 										-cameraDistance * cosf(latitude) * cosf(longitude))
 					.Add(object.BoundingBox.Center());
-			var cameraLocationSdl = sdlGenerator.SdlFor(cameraVector);
-			var cameraLookAtSdl = sdlGenerator.SdlFor(object.BoundingBox.Center());
 
-			var cameraObject = @"object { $(EscapeFilename(object.FileName)) }
-
-
-// Background:
-background { color rgb <0,0.1,0.5>}
-
-camera {
-	#declare PCT = 0; // Percentage further away
-	#declare STEREO = 0; // Normal view
-	location $cameraLocationSdl + PCT/100.0*$cameraLocationSdl
-	sky      -y
-	right    -4/3*x
-	look_at  $cameraLookAtSdl // calculated
-	angle    $angle
-	rotate   <0,1e-5,0> // Prevent gap between adjecent quads
-	//orthographic
-}";
+			var cameraObject = @"object { $(EscapeFilename(object.FileName)) }";
 			Append(cameraObject);
+
+			Append(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle));
 
 			Append(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)));     // Latitude,Longitude,Radius: 45,   0,477.69
 			Append(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)));  // Latitude,Longitude,Radius: 30, 120,477.69
