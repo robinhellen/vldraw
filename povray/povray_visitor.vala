@@ -43,12 +43,9 @@ namespace Ldraw.Povray
 			if(!currentTriangles.is_empty)
 			{
 				currentDistinctObjs++;
-
 				currentObjectSdl += sdlGenerator.Mesh(currentTriangles);
 			}
 
-
-			WriteObjectFooter(object);
 			if(!currentObjectHasNonLines)
 			{
 				emptyObjects.add(object.FileName);
@@ -59,6 +56,7 @@ namespace Ldraw.Povray
 				Append(@"// object: $(object.FileName), $currentDistinctObjs distinct components.\n");
 				Append(header);
 				Append(currentObjectSdl);
+				Append(ObjectFooter(object));
 			}
 
 			currentTriangles = outerTriangles;
@@ -147,9 +145,9 @@ namespace Ldraw.Povray
 			return @"#declare $escapedFilename = union {\n";
 		}
 
-		private void WriteObjectFooter(LdrawObject object)
+		private string ObjectFooter(LdrawObject object)
 		{
-			currentObjectSdl += @"}\n\n";
+			return @"}\n\n";
 		}
 
 		private void Append(string sdl)
