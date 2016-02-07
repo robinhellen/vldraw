@@ -6,11 +6,6 @@ namespace Ldraw.Povray
 {
 	private class SdlGenerator
 	{
-		public string SdlFor(Vector v)
-		{
-			return @"<$(v.X), $(v.Y), $(v.Z)>";
-		}
-
 		public string SdlMatrixFor(Matrix m, Vector v)
 		{
 			return @"<$(m[0,0]), $(m[1,0]), $(m[2,0]), $(m[0,1]), $(m[1,1]), $(m[2,1]), $(m[0,2]), $(m[1,2]), $(m[2,2]), $(v.X), $(v.Y), $(v.Z) >";
@@ -19,7 +14,7 @@ namespace Ldraw.Povray
 		public string WhiteLightSource(Vector position)
 		{
 			return @"light_source {
-	$(SdlFor(position))
+	$(SdlVector(position))
 	color rgb <1,1,1>
 }";
 		}
@@ -61,17 +56,17 @@ namespace Ldraw.Povray
 
 		public string Triangle(SdlTriangle triangle)
 		{
-			var sdlA = SdlFor(triangle.A);
-			var sdlB = SdlFor(triangle.B);
-			var sdlC = SdlFor(triangle.C);
+			var sdlA = SdlVector(triangle.A);
+			var sdlB = SdlVector(triangle.B);
+			var sdlC = SdlVector(triangle.C);
 
 			return @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
 		}
 
 		public string Camera(Vector cameraPosition, Vector cameraLookAt, float viewAngle)
 		{
-			var cameraLocationSdl = SdlFor(cameraPosition);
-			var cameraLookAtSdl = SdlFor(cameraLookAt);
+			var cameraLocationSdl = SdlVector(cameraPosition);
+			var cameraLookAtSdl = SdlVector(cameraLookAt);
 			return @"camera {
 	#declare PCT = 0; // Percentage further away
 	#declare STEREO = 0; // Normal view
@@ -83,6 +78,11 @@ namespace Ldraw.Povray
 	rotate   <0,1e-5,0> // Prevent gap between adjacent quads
 	//orthographic
 }";
+		}
+
+		private string SdlVector(Vector v)
+		{
+			return @"<$(v.X), $(v.Y), $(v.Z)>";
 		}
 	}
 
