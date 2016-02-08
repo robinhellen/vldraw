@@ -39,6 +39,8 @@ namespace Ldraw.Povray
 
 		public string ColourReference(Colour colour)
 		{
+			if(colour.Code == 16 || colour.Code == 24)
+				return "";
 			return @"material { Colour$(colour.Code) } ";
 		}
 
@@ -82,7 +84,7 @@ namespace Ldraw.Povray
 
 		public string ObjectReference(SdlObjectReference reference)
 		{
-			return @"\tobject { $(reference.ObjectName) matrix $(SdlMatrixFor(reference.Transform, reference.Center))sdlTransform $(ColourReference(reference.Colour)) }\n";
+			return @"\tobject { $(reference.ObjectName) matrix $(SdlMatrixFor(reference.Transform, reference.Center)) $(ColourReference(reference.Colour)) }\n";
 		}
 
 		private string SdlVector(Vector v)

@@ -9,10 +9,9 @@ namespace Ldraw.Povray
 {
 	public class PovrayVisitor : LdrawVisitor<void>
 	{
-		private string currentObjectSdl = "";
-		private bool currentObjectHasNonLines = false;
-		private int currentDistinctObjs = 0;
 		private Gee.List<SdlTriangle> currentTriangles;
+		private Gee.List<SdlObjectReference> currentSubObjects;
+		private Set<Colour> currentColours = new HashSet<Colour>();
 
 		private Set<string> exportedFiles = new HashSet<string>();
 		private Set<string> emptyObjects = new HashSet<string>();
@@ -36,30 +35,39 @@ namespace Ldraw.Povray
 				return;
 
 			var outerTriangles = currentTriangles;
+			var outerSubModels = currentSubObjects;
 			currentTriangles = new LinkedList<SdlTriangle>();
+			currentSubObjects = new LinkedList<SdlObjectReference>();
 
 			base.Visit(object);
 
-			if(!currentTriangles.is_empty)
-			{
-				currentDistinctObjs++;
-				currentObjectSdl += sdlGenerator.Mesh(currentTriangles);
-			}
+			foreach(var colour in currentColours)
+				Append(sdlGenerator.ColourDefinition(colour));
+			exportedColours.add_all(currentColours);
+			currentColours.clear();
 
-			if(!currentObjectHasNonLines)
+			var povrayComponents = currentSubObjects.size + (currentTriangles.is_empty ? 0 : 1);
+
+			if(povrayComponents == 0)
 			{
 				emptyObjects.add(object.FileName);
 			}
 			else
 			{
-				var header = GetObjectHeader(object, currentDistinctObjs);
-				Append(@"// object: $(object.FileName), $currentDistinctObjs distinct components.\n");
+				var header = GetObjectHeader(object, povrayComponents);
+				Append(@"// object: $(object.FileName), $povrayComponents distinct components.\n");
 				Append(header);
-				Append(currentObjectSdl);
+				foreach(var reference in currentSubObjects)
+				{
+					Append(sdlGenerator.ObjectReference(reference));
+				}
+				if(!(currentTriangles.is_empty))
+					Append(sdlGenerator.Mesh(currentTriangles));
 				Append(ObjectFooter(object));
 			}
 
 			currentTriangles = outerTriangles;
+			currentSubObjects = outerSubModels;
 
 			exportedFiles.add(object.FileName);
 		}
@@ -67,40 +75,23 @@ namespace Ldraw.Povray
 		public override void VisitTriangle(TriangleNode node)
 		{
 			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C));
-			currentObjectHasNonLines = true;
 		}
 
 		public override void VisitQuad(QuadNode node)
 		{
 			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C));
 			currentTriangles.add(new SdlTriangle(node.D, node.A, node.C));
-			currentObjectHasNonLines = true;
 		}
 
 		public override void VisitSubModel(PartNode node)
 		{
-			var currentSdl = currentObjectSdl;
-			var nonLinesInCurrent = currentObjectHasNonLines;
-			var isUnion = currentDistinctObjs;
-
-			currentObjectSdl = "";
-			currentObjectHasNonLines = false;
-			currentDistinctObjs = 0;
-
 			Visit(node.Contents);
-
-			currentObjectSdl = currentSdl;
-			currentDistinctObjs = isUnion;
+			if(!(node.Colour in exportedColours))
+				currentColours.add(node.Colour);
 
 			if(!(node.Contents.FileName in emptyObjects))
 			{
-				currentObjectHasNonLines = true;
-				currentDistinctObjs++;
-				currentObjectSdl += sdlGenerator.ObjectReference(new SdlObjectReference(node));
-			}
-			else
-			{
-				currentObjectHasNonLines = nonLinesInCurrent;
+				currentSubObjects.add(new SdlObjectReference(node));
 			}
 		}
 
