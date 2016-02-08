@@ -148,23 +148,6 @@ background { color rgb <0,0.1,0.5>}";
 			}
 		}
 
-		public string SdlForColour(Colour colour)
-		{
-			if(colour.Code == 24 || colour.Code == 16)
-			{
-				return "";
-			}
-
-			if(!(colour in exportedColours))
-			{
-				var colourDefSdl = sdlGenerator.ColourDefinition(colour);
-				Append(colourDefSdl);
-				exportedColours.add(colour);
-			}
-
-			return sdlGenerator.ColourReference(colour);
-		}
-
 		public void Finish()
 			throws Error
 		{
