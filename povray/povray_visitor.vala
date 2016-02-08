@@ -109,7 +109,7 @@ namespace Ldraw.Povray
 										-cameraDistance * cosf(latitude) * cosf(longitude))
 					.Add(object.BoundingBox.Center());
 
-			var cameraObject = @"object { $(EscapeFilename(object.FileName)) }";
+			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }";
 			Append(cameraObject);
 
 			Append(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle));
@@ -121,7 +121,7 @@ namespace Ldraw.Povray
 
 		private string GetObjectHeader(LdrawObject object, int subObjects)
 		{
-			var escapedFilename = EscapeFilename(object.FileName);
+			var escapedFilename = EscapeFilenameForSdl(object.FileName);
 			var sdlType = subObjects > 1 ? "union" : "object";
 			return @"#declare $escapedFilename = $sdlType {\n";
 		}
@@ -161,20 +161,6 @@ namespace Ldraw.Povray
 			}
 
 			return sdlGenerator.ColourReference(colour);
-		}
-
-		public string EscapeFilename(string filename)
-		{
-			var escaped = filename
-					.replace(".", "_")
-					.replace("/", "__")
-					.replace("\\", "__")
-					.replace("-", "_dash_");
-
-			if(escaped[0].isdigit())
-				escaped = "_" + escaped;
-
-			return escaped;
 		}
 
 		public void Finish()
