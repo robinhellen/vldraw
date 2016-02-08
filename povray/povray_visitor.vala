@@ -17,7 +17,6 @@ namespace Ldraw.Povray
 		private Set<string> emptyObjects = new HashSet<string>();
 		private Set<Colour>	exportedColours = new HashSet<Colour>();
 
-		private File file;
 		private FileOutputStream outStream;
 		private Error caughtError;
 		private bool hadError = false;
