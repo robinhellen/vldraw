@@ -13,12 +13,18 @@ namespace Ldraw.Povray
 		public void Export(LdrawObject model, ExportOptions exportOptions)
 			requires(exportOptions.CameraOptions != null)
 		{
-			var visitor = new PovrayVisitor(exportOptions.Filename);
+			var file = File.new_for_path(exportOptions.Filename);
+			var outStream = file.replace(null, false, FileCreateFlags.NONE);
+			
+			
+			var visitor = new PovrayVisitor(outStream);
 
 			visitor.Visit(model);
 
 			visitor.Finalise(model, exportOptions.CameraOptions.Longitude, exportOptions.CameraOptions.Latitude);
 			visitor.Finish();
+
+			outStream.close();
 		}
 	}
 }

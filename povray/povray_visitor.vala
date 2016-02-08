@@ -23,10 +23,9 @@ namespace Ldraw.Povray
 		private bool hadError = false;
 		private SdlGenerator sdlGenerator = new SdlGenerator();
 
-		public PovrayVisitor(string filename)
+		public PovrayVisitor(FileOutputStream stream)
 		{
-			file = File.new_for_path(filename);
-			outStream = file.replace(null, false, FileCreateFlags.NONE);
+			outStream = stream;
 		}
 
 		public override void Visit(LdrawObject object)
@@ -153,8 +152,6 @@ background { color rgb <0,0.1,0.5>}";
 		{
 			if(hadError)
 				throw caughtError;
-
-			outStream.close();
 		}
 	}
 }
