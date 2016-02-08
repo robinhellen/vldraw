@@ -6,11 +6,6 @@ namespace Ldraw.Povray
 {
 	private class SdlGenerator
 	{
-		public string SdlMatrixFor(Matrix m, Vector v)
-		{
-			return @"<$(m[0,0]), $(m[1,0]), $(m[2,0]), $(m[0,1]), $(m[1,1]), $(m[2,1]), $(m[0,2]), $(m[1,2]), $(m[2,2]), $(v.X), $(v.Y), $(v.Z) >";
-		}
-
 		public string WhiteLightSource(Vector position)
 		{
 			return @"light_source {
@@ -84,7 +79,12 @@ namespace Ldraw.Povray
 
 		public string ObjectReference(SdlObjectReference reference)
 		{
-			return @"\tobject { $(reference.ObjectName) matrix $(SdlMatrixFor(reference.Transform, reference.Center)) $(ColourReference(reference.Colour)) }\n";
+			return @"\tobject { $(reference.ObjectName) matrix $(SdlTransform(reference.Transform, reference.Center)) $(ColourReference(reference.Colour)) }\n";
+		}
+
+		private string SdlTransform(Matrix m, Vector v)
+		{
+			return @"<$(m[0,0]), $(m[1,0]), $(m[2,0]), $(m[0,1]), $(m[1,1]), $(m[2,1]), $(m[0,2]), $(m[1,2]), $(m[2,2]), $(v.X), $(v.Y), $(v.Z) >";
 		}
 
 		private string SdlVector(Vector v)
