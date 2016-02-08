@@ -80,6 +80,11 @@ namespace Ldraw.Povray
 }";
 		}
 
+		public string ObjectReference(SdlObjectReference reference)
+		{
+			return @"\tobject { $(reference.ObjectName) matrix $(SdlMatrixFor(reference.Transform, reference.Center))sdlTransform $(ColourReference(reference.Colour)) }\n";
+		}
+
 		private string SdlVector(Vector v)
 		{
 			return @"<$(v.X), $(v.Y), $(v.Z)>";

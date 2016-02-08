@@ -96,12 +96,7 @@ namespace Ldraw.Povray
 			{
 				currentObjectHasNonLines = true;
 				currentDistinctObjs++;
-
-				var colourSdl = SdlForColour(node.Colour);
-
-				var sdlTransform = sdlGenerator.SdlMatrixFor(node.Transform, node.Center);
-
-				currentObjectSdl += @"\tobject { $(EscapeFilename(node.Contents.FileName)) matrix $sdlTransform $colourSdl }\n";
+				currentObjectSdl += sdlGenerator.ObjectReference(new SdlObjectReference(node));
 			}
 			else
 			{
