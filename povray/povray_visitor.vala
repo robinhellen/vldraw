@@ -1,5 +1,4 @@
 using Gee;
-using GLib.Math;
 
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
@@ -91,32 +90,6 @@ namespace Ldraw.Povray
 			{
 				currentSubObjects.add(new SdlObjectReference(node));
 			}
-		}
-
-		public void Finalise(LdrawObject object, float cameraLong, float cameraLat)
-		{
-			var angle = 67.3801f;
-			var angleRad =  (float)PI * angle / 180;
-			var longitude = (float)PI * cameraLong / 180;
-			var latitude =  (float)PI * cameraLat / 180;
-
-			float cameraDistance = object.BoundingBox.Radius / tanf(angleRad / 2);
-
-			var cameraVector = Vector(	cameraDistance * cosf(latitude) * sinf(longitude),
-										-cameraDistance * sinf(latitude),
-										-cameraDistance * cosf(latitude) * cosf(longitude))
-					.Add(object.BoundingBox.Center());
-
-			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }
-// Background:
-background { color rgb <0,0.1,0.5>}";
-			Append(cameraObject);
-
-			Append(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle));
-
-			Append(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)));     // Latitude,Longitude,Radius: 45,   0,477.69
-			Append(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)));  // Latitude,Longitude,Radius: 30, 120,477.69
-			Append(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f))); // Latitude,Longitude,Radius: 60,-120,477.69
 		}
 
 		private string GetObjectHeader(LdrawObject object, int subObjects)
