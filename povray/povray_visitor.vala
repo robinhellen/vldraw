@@ -109,7 +109,9 @@ namespace Ldraw.Povray
 										-cameraDistance * cosf(latitude) * cosf(longitude))
 					.Add(object.BoundingBox.Center());
 
-			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }";
+			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }
+// Background:
+background { color rgb <0,0.1,0.5>}";
 			Append(cameraObject);
 
 			Append(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle));
