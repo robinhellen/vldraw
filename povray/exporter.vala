@@ -1,3 +1,4 @@
+using Gtk;
 
 using Ldraw.Export;
 using Ldraw.Lego;
@@ -14,17 +15,26 @@ namespace Ldraw.Povray
 			requires(exportOptions.CameraOptions != null)
 		{
 			var file = File.new_for_path(exportOptions.Filename);
-			var outStream = file.replace(null, false, FileCreateFlags.NONE);
-			
-			
-			var visitor = new PovrayVisitor(outStream);
+			try
+			{
+				var outStream = file.replace(null, false, FileCreateFlags.NONE);
+				
+				
+				var visitor = new PovrayVisitor(outStream);
 
-			visitor.Visit(model);
+				visitor.Visit(model);
 
-			visitor.Finalise(model, exportOptions.CameraOptions.Longitude, exportOptions.CameraOptions.Latitude);
-			visitor.Finish();
+				visitor.Finalise(model, exportOptions.CameraOptions.Longitude, exportOptions.CameraOptions.Latitude);
+				visitor.Finish();
 
-			outStream.close();
+				outStream.close();
+			}
+			catch(Error e)
+			{
+				var msg = new MessageDialog(null, DialogFlags.MODAL, MessageType.WARNING, ButtonsType.CLOSE, @"Unable to export to file $(exportOptions.Filename): $(e.message)");
+				msg.run();
+				msg.close();
+			}
 		}
 	}
 }
