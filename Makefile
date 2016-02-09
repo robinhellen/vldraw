@@ -55,7 +55,7 @@ peeron_internal_packages=lego lego_objects maths utils ui_widgets part_group
 
 povray_sources=$(wildcard povray/*.vala)
 povray_packages=$(gee) $(gio) $(gtk) diva 
-povray_internal_packages=export lego_objects maths ui_widgets utils
+povray_internal_packages=export lego_objects lego maths ui_widgets utils
 
 export_sources=$(wildcard export/*.vala)
 export_packages=$(gee) $(gio) $(gtk) diva 

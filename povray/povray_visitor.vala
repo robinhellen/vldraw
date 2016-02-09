@@ -1,6 +1,7 @@
 using Gee;
 
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 
@@ -96,11 +97,22 @@ namespace Ldraw.Povray
 		{
 			var escapedFilename = EscapeFilenameForSdl(object.FileName);
 			var sdlType = subObjects > 1 ? "union" : "object";
+			if(object.File is LdrawPart)
+				sdlType = @"object { $sdlType";
 			return @"#declare $escapedFilename = $sdlType {\n";
 		}
 
 		private string ObjectFooter(LdrawObject object)
 		{
+			if(object.File is LdrawPart)
+			{
+				var bounds = object.BoundingBox;
+				var x = bounds.MaxX - bounds.MinX;
+				var y = bounds.MaxY - bounds.MinY;
+				var z = bounds.MaxZ - bounds.MinZ;
+				
+				return @"}\nscale <1 - 0.5 / $x, 1 - 0.5 / $y, 1 - 0.5 / $z>\n}\n\n";
+			}
 			return @"}\n\n";
 		}
 
