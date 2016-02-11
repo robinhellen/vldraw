@@ -62,6 +62,7 @@ namespace Ldraw.Povray
 
 		public string Camera(Vector cameraPosition, Vector cameraLookAt, float viewAngle)
 		{
+			cameraPosition = Vector(-cameraPosition.X, cameraPosition.Y, cameraPosition.Z);
 			var cameraLocationSdl = SdlVector(cameraPosition);
 			var cameraLookAtSdl = SdlVector(cameraLookAt);
 			return @"camera {
