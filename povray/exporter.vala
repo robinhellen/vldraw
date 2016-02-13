@@ -32,6 +32,8 @@ namespace Ldraw.Povray
 				WriteColours(pov.Colours, outStream);
 				WriteObjects(pov.ObjectsToDefine, outStream);
 
+				AddGroundPlane(model, outStream);
+
 				AddCameraAndLights(outStream, model, exportOptions.CameraOptions);
 
 				outStream.close();
@@ -69,6 +71,15 @@ background { color rgb <0,0.1,0.5>}";
 			stream.write(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)).data);     // Latitude,Longitude,Radius: 45,   0,477.69
 			stream.write(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)).data);  // Latitude,Longitude,Radius: 30, 120,477.69
 			stream.write(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f)).data); // Latitude,Longitude,Radius: 60,-120,477.69
+		}
+
+		private void AddGroundPlane(LdrawObject model, OutputStream stream)
+			throws Error
+		{
+			var planePosition = model.BoundingBox.MaxY;
+			stream.write(@"plane { -y, $(-planePosition) material { texture {
+	pigment { rgb <0.9,0.9,0.9> }
+} }} \n\n".data);
 		}
 
 		private void WriteColours(Set<Colour> colours, OutputStream stream)
