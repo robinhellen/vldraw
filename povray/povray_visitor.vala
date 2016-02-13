@@ -11,44 +11,30 @@ namespace Ldraw.Povray
 	{
 		private Gee.List<SdlTriangle> currentTriangles;
 		private Gee.List<SdlObjectReference> currentSubObjects;
-		private Set<Colour> currentColours = new HashSet<Colour>();
 
-		private Set<string> exportedFiles = new HashSet<string>();
-		private Set<string> emptyObjects = new HashSet<string>();
-		private Set<Colour>	exportedColours = new HashSet<Colour>();
-
-		private FileOutputStream outStream;
+		private OutputStream outStream;
 		private Error caughtError;
 		private bool hadError = false;
 		private SdlGenerator sdlGenerator = new SdlGenerator();
 
-		public PovrayVisitor(FileOutputStream stream)
+		public PovrayVisitor(OutputStream stream)
 		{
 			outStream = stream;
 		}
 
 		public override void Visit(LdrawObject object)
 		{
-			if(object.FileName in exportedFiles)
-				return;
-
-			var outerTriangles = currentTriangles;
-			var outerSubModels = currentSubObjects;
 			currentTriangles = new LinkedList<SdlTriangle>();
 			currentSubObjects = new LinkedList<SdlObjectReference>();
 
 			base.Visit(object);
 
-			foreach(var colour in currentColours)
-				Append(sdlGenerator.ColourDefinition(colour));
-			exportedColours.add_all(currentColours);
-			currentColours.clear();
-
 			var povrayComponents = currentSubObjects.size + (currentTriangles.is_empty ? 0 : 1);
 
 			if(povrayComponents == 0)
 			{
-				emptyObjects.add(object.FileName);
+				var escapedFilename = EscapeFilenameForSdl(object.FileName);
+				Append(@"#declare $escapedFilename = object {sphere {0,0}}\n");
 			}
 			else
 			{
@@ -63,11 +49,6 @@ namespace Ldraw.Povray
 					Append(sdlGenerator.Mesh(currentTriangles));
 				Append(ObjectFooter(object));
 			}
-
-			currentTriangles = outerTriangles;
-			currentSubObjects = outerSubModels;
-
-			exportedFiles.add(object.FileName);
 		}
 
 		public override void VisitTriangle(TriangleNode node)
@@ -83,14 +64,7 @@ namespace Ldraw.Povray
 
 		public override void VisitSubModel(PartNode node)
 		{
-			Visit(node.Contents);
-			if(!(node.Colour in exportedColours))
-				currentColours.add(node.Colour);
-
-			if(!(node.Contents.FileName in emptyObjects))
-			{
-				currentSubObjects.add(new SdlObjectReference(node));
-			}
+			currentSubObjects.add(new SdlObjectReference(node));
 		}
 
 		private string GetObjectHeader(LdrawObject object, int subObjects)
@@ -110,7 +84,7 @@ namespace Ldraw.Povray
 				var x = bounds.MaxX - bounds.MinX;
 				var y = bounds.MaxY - bounds.MinY;
 				var z = bounds.MaxZ - bounds.MinZ;
-				
+
 				return @"}\nscale <1 - 0.5 / $x, 1 - 0.5 / $y, 1 - 0.5 / $z>\n}\n\n";
 			}
 			return @"}\n\n";

@@ -1,4 +1,5 @@
 
+using Gee;
 using GLib.Math;
 using Gtk;
 
@@ -8,12 +9,15 @@ using Ldraw.Maths;
 
 namespace Ldraw.Povray
 {
-	public class PovrayExporter : Object, Exporter
+	private class PovrayExporter : Object, Exporter
 	{
 		public string Name { get {return "Povray"; } }
 		public string PreferredExtension { get { return "pov"; } }
 		public ExportOptionSections OptionSections {get {return ExportOptionSections.CameraPosition | ExportOptionSections.FileName;} }
-		
+
+		public PovrayVisitor2 Visitor {construct; get;}
+		public PovrayObjectWriter ObjectWriter {construct; get;}
+
 		private SdlGenerator sdlGenerator = new SdlGenerator();
 
 		public void Export(LdrawObject model, ExportOptions exportOptions)
@@ -22,13 +26,12 @@ namespace Ldraw.Povray
 			var file = File.new_for_path(exportOptions.Filename);
 			try
 			{
-				var outStream = file.replace(null, false, FileCreateFlags.NONE);				
-				
-				var visitor = new PovrayVisitor(outStream);
+				var outStream = file.replace(null, false, FileCreateFlags.NONE);
+				var pov = Visitor.Visit(model);
 
-				visitor.Visit(model);
-				visitor.Finish();
-				
+				WriteColours(pov.Colours, outStream);
+				WriteObjects(pov.ObjectsToDefine, outStream);
+
 				AddCameraAndLights(outStream, model, exportOptions.CameraOptions);
 
 				outStream.close();
@@ -40,8 +43,8 @@ namespace Ldraw.Povray
 				msg.close();
 			}
 		}
-		
-		private void AddCameraAndLights(FileOutputStream stream, LdrawObject object, ExportCameraOptions cameraOptions)
+
+		private void AddCameraAndLights(OutputStream stream, LdrawObject object, ExportCameraOptions cameraOptions)
 			throws Error
 		{
 			var angle = 67.3801f;
@@ -65,7 +68,30 @@ background { color rgb <0,0.1,0.5>}";
 
 			stream.write(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)).data);     // Latitude,Longitude,Radius: 45,   0,477.69
 			stream.write(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)).data);  // Latitude,Longitude,Radius: 30, 120,477.69
-			stream.write(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f)).data); // Latitude,Longitude,Radius: 60,-120,477.69			
+			stream.write(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f)).data); // Latitude,Longitude,Radius: 60,-120,477.69
 		}
+
+		private void WriteColours(Set<Colour> colours, OutputStream stream)
+			throws Error
+		{
+			foreach(var colour in colours)
+			{
+				stream.write(sdlGenerator.ColourDefinition(colour).data);
+			}
+		}
+
+		private void WriteObjects(Gee.List<LdrawObject> objects, OutputStream stream)
+			throws Error
+		{
+			foreach(var object in objects)
+			{
+				ObjectWriter.WriteDefinitionForObject(object, stream);
+			}
+		}
+	}
+
+	public interface PovrayObjectWriter : Object
+	{
+		public abstract void WriteDefinitionForObject(LdrawObject object, OutputStream stream);
 	}
 }
