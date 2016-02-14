@@ -1,4 +1,4 @@
-
+using Gdk;
 using Gee;
 using GLib.Math;
 using Gtk;
@@ -19,6 +19,7 @@ namespace Ldraw.Povray
 		public PovrayObjectWriter ObjectWriter {construct; get;}
 
 		private SdlGenerator sdlGenerator = new SdlGenerator();
+		private PovrayExtraOptions extraOptions = new PovrayExtraOptions();
 
 		public void Export(LdrawObject model, ExportOptions exportOptions)
 			requires(exportOptions.CameraOptions != null)
@@ -63,7 +64,7 @@ namespace Ldraw.Povray
 
 			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }
 // Background:
-background { color rgb <0,0.1,0.5>}";
+background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundGreen),$(extraOptions.BackgroundBlue)>}";
 			stream.write(cameraObject.data);
 
 			stream.write(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle).data);
@@ -99,6 +100,37 @@ background { color rgb <0,0.1,0.5>}";
 				ObjectWriter.WriteDefinitionForObject(object, stream);
 			}
 		}
+
+		public Widget? GetAdditionalOptionControls()
+		{
+			var grid = new Grid();
+
+			grid.attach(new Label("Background Colour: ") , 0, 0);
+			var backgroundColour = new ColorButton();
+			var colour = RGBA();
+			colour.red = extraOptions.BackgroundRed;
+			colour.green = extraOptions.BackgroundGreen;
+			colour.blue = extraOptions.BackgroundBlue;
+			colour.alpha = 1;
+			backgroundColour.rgba = colour;
+			backgroundColour.use_alpha = false;
+			grid.attach(backgroundColour, 1, 0);
+			backgroundColour.color_set.connect(() => {
+				var rgba = backgroundColour.rgba;
+				extraOptions.BackgroundRed = rgba.red;
+				extraOptions.BackgroundGreen = rgba.green;
+				extraOptions.BackgroundBlue = rgba.blue;
+			});
+
+			return grid;
+		}
+	}
+
+	private class PovrayExtraOptions
+	{
+		public double BackgroundRed   {get; set; default = 0;}
+		public double BackgroundGreen {get; set; default = 0.1;}
+		public double BackgroundBlue  {get; set; default = 0.5;}
 	}
 
 	public interface PovrayObjectWriter : Object

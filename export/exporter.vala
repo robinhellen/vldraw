@@ -1,3 +1,4 @@
+using Gtk;
 
 using Ldraw.Lego;
 
@@ -11,5 +12,7 @@ namespace Ldraw.Export
 		public abstract ExportOptionSections OptionSections {get;}
 
 		public abstract void Export(LdrawObject model, ExportOptions exportOptions);
+
+		public virtual Widget? GetAdditionalOptionControls(){return null;}
 	}
 }

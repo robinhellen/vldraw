@@ -28,6 +28,9 @@ namespace Ldraw.Export
 			{
 				extraBox.pack_start(GetCameraControls(options));
 			}
+			var extraWidget = exporter.GetAdditionalOptionControls();
+			if(extraWidget != null)
+				extraBox.pack_start(extraWidget);
 			dialog.set_extra_widget(extraBox);
 			dialog.show_all();
 
