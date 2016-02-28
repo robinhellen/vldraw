@@ -47,6 +47,7 @@ namespace Ldraw
 					stderr.printf(@"Unable to load $name as a plugin: registration returned Type '$(pluginModule.name())', expected a type implementing $(typeof(Diva.Module).name()) ");
 					continue;
 				}
+				module.make_resident();
 				var mod = (Diva.Module)Object.new(pluginModule);
 				builder.register_module(mod);
 			}

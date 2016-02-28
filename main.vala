@@ -63,7 +63,6 @@ namespace Ldraw
 			pluginLoader.LoadPlugins(builder);
 
 			// These can all be considered plugins.
-			builder.register_module<AnimationModule>();
 			builder.register_module<PeeronModule>();
 			builder.register_module<PovrayModule>();
             builder.register_module<StepsModule>();

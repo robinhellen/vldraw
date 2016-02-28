@@ -104,7 +104,9 @@ application_packages=$(gee) diva
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
 	application export
-UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps animation
+UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps
+
+PLUGINS=animation
 
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
@@ -116,7 +118,7 @@ VALA_DEBUG_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm
 
 EXECUTABLE_NAME = ldraw
 
-all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test
+all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test $(foreach plugin, $(PLUGINS), plugins/$(plugin).so)
 	./test/expressions.test
 	./test/maths.test
 
@@ -131,6 +133,17 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
 		--vapidir=diva -X -Idiva \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
+		-X -fpic -X -shared -g -X -w
+	touch h/$*.h
+	touch vapi/$*.vapi
+
+# Compilation for modules as plugins.
+plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
+	$(VALACC) $($*_sources) \
+		$(foreach pkg, $($*_packages) $($*_internal_packages) $(gmodule), --pkg $(pkg)) \
+		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
+		--vapidir=diva -X -Idiva \
+		--library=$* --vapi vapi/$*.vapi -o plugins/$*.so \
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
 	touch vapi/$*.vapi

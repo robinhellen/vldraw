@@ -7,10 +7,10 @@ using Ldraw.Ui;
 
 namespace Ldraw
 {
-	public class AnimationModule : Module
+	public class AnimationModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
-		{      			
+		{
 			builder.register<AnimationCommandFactory>()
 					.keyed<CommandFactory, string>("ANIM");
 			builder.register<AnimationMenuSource>().as<MenuItemSource>();
@@ -18,3 +18,5 @@ namespace Ldraw
 		}
 	}
 }
+
+public Type register_ldraw_plugin(GLib.Module module) {return typeof(Ldraw.AnimationModule);}
