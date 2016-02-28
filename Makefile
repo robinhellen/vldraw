@@ -102,12 +102,11 @@ animation_internal_packages=lego lego_objects maths expressions utils ui_widgets
 application_sources=application/application.vala
 application_packages=$(gee) diva
 
-INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray part_group \
+INTERNAL_LIBS=utils expressions maths options lego lego_objects part_group \
 	application export
-UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps
+UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl
 
-PLUGINS=animation
-
+PLUGINS=animation steps povray peeron
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
 

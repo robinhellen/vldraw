@@ -7,7 +7,7 @@ using Ldraw.Ui;
 
 namespace Ldraw
 {
-	public class StepsModule : Module
+	public class StepsModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{
@@ -19,3 +19,5 @@ namespace Ldraw
 		}
 	}
 }
+
+public Type register_ldraw_plugin(GLib.Module module) {return typeof(Ldraw.StepsModule);}

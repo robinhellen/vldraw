@@ -6,7 +6,6 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.OpenGl;
 using Ldraw.Options;
-using Ldraw.Peeron;
 using Ldraw.Refactor;
 using Ldraw.Ui;
 using Ldraw.Ui.Commands;
@@ -61,11 +60,6 @@ namespace Ldraw
 
 			var pluginLoader = new PluginLoader();
 			pluginLoader.LoadPlugins(builder);
-
-			// These can all be considered plugins.
-			builder.register_module<PeeronModule>();
-			builder.register_module<PovrayModule>();
-            builder.register_module<StepsModule>();
 
             builder.register_module<LibraryModule>();
 

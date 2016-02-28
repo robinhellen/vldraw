@@ -5,14 +5,16 @@ using Ldraw.Ui;
 
 namespace Ldraw
 {
-	public class PeeronModule : Module
+	public class PeeronModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{
 			builder.register<SetList>().as<IPartDragSource>();
-			
+
             builder.register<InventoryReader>();
             builder.register<ColourChart>();
 		}
 	}
 }
+
+public Type register_ldraw_plugin(GLib.Module module) {return typeof(Ldraw.PeeronModule);}
