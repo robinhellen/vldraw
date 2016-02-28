@@ -32,7 +32,7 @@ namespace Ldraw
             builder.register<FileReaderFactory>();
             builder.register_module<CommandFactoryModule>();
 
-            // UI components            
+            // UI components
             builder.register<DialogManager>().as<IDialogManager>();
 
             builder.register<LibrarySubFileLocator>().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
@@ -40,17 +40,14 @@ namespace Ldraw
 
             builder.register<OnDemandPartLoader>().as<IDatFileCache>().single_instance();
             builder.register<FileCachedLibrary>().as<ILibrary>();
-			
+
 			builder.register_module<DragAndDropModule>();
 			builder.register_module<WidgetsModule>();
 			builder.register_module<GtkGlModule>();
 			builder.register_module<MoveOriginModule>();
 			builder.register_module<OpenGlModule>();
-			builder.register_module<AnimationModule>();
-			builder.register_module<PeeronModule>();
-			builder.register_module<PovrayModule>();
 			builder.register_module<ExportModule>();
-			
+
             builder.register<RunningOptions>().as<IOptions>().single_instance();
 
             builder.register<UndoStack>().single_instance();
@@ -58,20 +55,25 @@ namespace Ldraw
             builder.register<AnimatedModel>(_ => animatedModel);
             builder.register<FileLoadingArgHandler>().as<ArgumentHandler>();
             builder.register<Ldraw.Application.Application>();
-            
+
             // OpenGl stuff
             builder.register<GlRenderer>().as<Renderer>();
-            
+
+			// These can all be considered plugins.
+			builder.register_module<AnimationModule>();
+			builder.register_module<PeeronModule>();
+			builder.register_module<PovrayModule>();
             builder.register_module<StepsModule>();
+
             builder.register_module<LibraryModule>();
-            
+
             var container = builder.build();
 
             // load up the colours
             try
             {
-				var application = container.resolve<Ldraw.Application.Application>();			
-				application.Run(args);				
+				var application = container.resolve<Ldraw.Application.Application>();
+				application.Run(args);
 				return 0;
 			}
 			catch(ResolveError e)
@@ -81,12 +83,12 @@ namespace Ldraw
 			}
         }
     }
-	
+
 	public class FileLoadingArgHandler : GLib.Object, Ldraw.Application.ArgumentHandler
 	{
 		public AnimatedModel Model {construct; private get;}
 		public LdrawFileLoader Loader {construct; private get;}
-		
+
 		public bool HandleArgs(string[] args)
 		{
 			Model.Model = new LdrawModel.Empty().MainObject;
@@ -94,7 +96,7 @@ namespace Ldraw
 			{
 				return true;
 			}
-				
+
 			var filename = args[1];
 			Loader.LoadModelFile.begin(filename, ReferenceLoadStrategy.PartsOnly, (obj, res) =>
 				{
@@ -106,9 +108,9 @@ namespace Ldraw
 					{
 						stdout.printf(e.message);
 						Model.Model = new LdrawModel.Empty().MainObject;
-					}			
+					}
 				});
-			return true;            
+			return true;
 		}
 	}
 }
