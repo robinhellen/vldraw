@@ -12,6 +12,7 @@ gtk=gtk+-3.0
 json=json-glib-1.0
 xml=libxml-2.0
 soup=libsoup-2.4
+gmodule=gmodule-2.0
 
 SOURCES=$(wildcard *.vala)
 
@@ -38,7 +39,7 @@ maths_sources=$(wildcard maths/*.vala)
 maths_test_sources=$(wildcard tests/vector/*.vala) $(wildcard tests/*.vala)
 options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
-					
+
 lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)
 lego_objects_packages=$(gee) $(gio)
 lego_objects_internal_packages=maths
@@ -47,18 +48,18 @@ lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(f
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages=$(gee) $(gtk) $(json) diva
 lego_internal_packages=application maths utils lego_objects
-					
+
 
 peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) $(gtk) $(soup) $(xml) diva
 peeron_internal_packages=lego lego_objects maths utils ui_widgets part_group
 
 povray_sources=$(wildcard povray/*.vala)
-povray_packages=$(gee) $(gio) $(gtk) diva 
+povray_packages=$(gee) $(gio) $(gtk) diva
 povray_internal_packages=export lego_objects lego maths ui_widgets utils
 
 export_sources=$(wildcard export/*.vala)
-export_packages=$(gee) $(gio) $(gtk) diva 
+export_packages=$(gee) $(gio) $(gtk) diva
 export_internal_packages=lego_objects maths ui_widgets utils
 
 part_group_sources=$(wildcard lego/*.vala)
@@ -106,7 +107,7 @@ INTERNAL_LIBS=utils expressions maths options lego lego_objects peeron povray pa
 UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl steps animation
 
 
-VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) diva
+VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
 
 VALA_PKG_ARGS = $(foreach pkg, $(VALA_PACKAGES), --pkg $(pkg))
 
@@ -116,7 +117,7 @@ VALA_DEBUG_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm
 EXECUTABLE_NAME = ldraw
 
 all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test
-	./test/expressions.test 
+	./test/expressions.test
 	./test/maths.test
 
 # compilation for the final executable
@@ -133,7 +134,7 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
 	touch vapi/$*.vapi
-	
+
 # (Optional) compilation of per-module tests.
 test/%.test: $$($$*_test_sources) lib/%.so h/%.h vapi/%.vapi
 ifeq ($$($$*_test_sources),)

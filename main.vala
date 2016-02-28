@@ -59,6 +59,9 @@ namespace Ldraw
             // OpenGl stuff
             builder.register<GlRenderer>().as<Renderer>();
 
+			var pluginLoader = new PluginLoader();
+			pluginLoader.LoadPlugins(builder);
+
 			// These can all be considered plugins.
 			builder.register_module<AnimationModule>();
 			builder.register_module<PeeronModule>();
