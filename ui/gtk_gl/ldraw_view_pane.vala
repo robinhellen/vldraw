@@ -62,7 +62,7 @@ namespace Ldraw.Ui.GtkGl
 				return true;
 			}
 
-			renderer.Render2(context, CurrentSelection, overlay, viewParameters, DefaultColour); // scroll
+			renderer.Render(context, CurrentSelection, overlay, viewParameters, DefaultColour); // scroll
 
 			var error = get_error();
 			if(error != null)
