@@ -12,18 +12,10 @@ namespace Ldraw.Ui.GtkGl
 	private class LdrawViewPane : GLArea, ModelView
 	{
 		private LdrawObject m_Model;
-		
-		// camera viewpoint definition
+
 		protected ViewParameters viewParameters;
-		/*protected float cameraLongitude;
-		protected float cameraLatitude;
-		protected float lduViewWidth;
-		protected float lduViewHeight;
-		protected float lduScrollX;
-		protected float lduScrollY;*/		
-		
 		protected Ldraw.Ui.Widgets.Overlay overlay = null;
-		
+
 		public Renderer renderer {construct; protected get;}
 		public ColourContext ColourContext {construct; protected get;}
 
@@ -39,10 +31,10 @@ namespace Ldraw.Ui.GtkGl
 			has_depth_buffer = true;
 			// minimum size 100 px square
 			set_size_request(100, 100);
-			
+
 			if(m_Model == null)
 				m_Model =  new LdrawObject("", null);
-				
+
 			DefaultColour = ColourContext.GetColourById(0);
 			base.realize.connect(realize); // if we override the virtual, the base won't get called properly.
 			viewParameters = ViewParameters();
@@ -71,20 +63,20 @@ namespace Ldraw.Ui.GtkGl
 				queue_render();
 			}
 		}
-		
+
 		public Ldraw.Ui.Widgets.Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_render());}}
 
 		public Colour DefaultColour {get; set;}
-		
+
 		public override bool render(GLContext context)
 		{
 			if(m_Model == null)
 			{
 				return true;
 			}
-			
+
 			renderer.Render2(context, CurrentSelection, overlay, viewParameters, DefaultColour); // scroll
-							 
+
 			var error = get_error();
 			if(error != null)
 			{
@@ -92,7 +84,7 @@ namespace Ldraw.Ui.GtkGl
 			}
 			return true;
 		}
-		
+
 		public new void realize()
 		{
 			if(!get_realized())
@@ -102,7 +94,7 @@ namespace Ldraw.Ui.GtkGl
 			make_current();
 			if(get_error() != null)
 				return;
-				
+
 			renderer.PrepareRender(m_Model);
 		}
 
@@ -111,9 +103,9 @@ namespace Ldraw.Ui.GtkGl
 			Allocation old_allocation;
 			get_allocation(out old_allocation);
 			viewParameters.lduHeight *= ((float)allocation.height / old_allocation.height);
-			viewParameters.lduWidth *= ((float)allocation.width / old_allocation.width);	
+			viewParameters.lduWidth *= ((float)allocation.width / old_allocation.width);
 			base.size_allocate(allocation);
-					
+
 		}
 
 		public ViewAngle Angle
@@ -157,22 +149,22 @@ namespace Ldraw.Ui.GtkGl
 				queue_render();
 			}
 		}
-		
+
 		private void CenterScrollAndZoom()
 		{
 			var bounds = m_Model.BoundingBox;
-						
+
 			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
-			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);			
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
 			var m = latTransform.TransformMatrix(longTransform);
 			var transformedCenter = m.TransformVector(bounds.Center());
 			viewParameters.lduScrollX = -transformedCenter.X;
 			viewParameters.lduScrollY = -transformedCenter.Y;
-			
-			
+
+
 			viewParameters.lduWidth = 2 * bounds.Radius;
 			viewParameters.lduHeight = 2 * bounds.Radius;
-			
+
 			Allocation alloc;
 			get_allocation(out alloc);
 			var allocRatio = (float)alloc.width / alloc.height;
@@ -183,11 +175,11 @@ namespace Ldraw.Ui.GtkGl
 			else
 			{
 				viewParameters.lduHeight /= allocRatio;
-			}			
+			}
 		}
-		
+
 		private static Gee.Set<LdrawNode> emptySelection = Gee.Set.empty<LdrawNode>();
-		
+
 		protected virtual Gee.Set<LdrawNode> CurrentSelection
 		{
 			get
