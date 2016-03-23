@@ -19,11 +19,6 @@ namespace Ldraw.Ui.GtkGl
 		public Renderer renderer {construct; protected get;}
 		public ColourContext ColourContext {construct; protected get;}
 
-		public LdrawViewPane(ViewAngle angle)
-		{
-			GLib.Object(Angle: angle);
-		}
-
 		construct
 		{
 			auto_render = true;
@@ -32,19 +27,11 @@ namespace Ldraw.Ui.GtkGl
 			// minimum size 100 px square
 			set_size_request(100, 100);
 
-			if(m_Model == null)
-				m_Model =  new LdrawObject("", null);
+			m_Model =  new LdrawObject("", null);
 
 			DefaultColour = ColourContext.GetColourById(0);
 			base.realize.connect(realize); // if we override the virtual, the base won't get called properly.
 			viewParameters = ViewParameters();
-		}
-
-		public LdrawViewPane.WithModel(ViewAngle angle, LdrawObject model)
-		{
-			this(angle);
-			m_Model = model;
-			m_Model.VisibleChange.connect(() => queue_render());
 		}
 
 		public LdrawObject Model
