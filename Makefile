@@ -3,7 +3,13 @@ DEFAULT: all
 .SECONDEXPANSION:
 
 # Vala compiler
-VALACC=valac-0.28
+ifndef VALACC
+VALACC := $(shell find $${PATH//:/ } -name valac-* | sort -r | head -n 1)
+endif
+
+ifndef VALACC
+$(error Could not find Vala compiler)
+endif
 
 # external libraries defined here for consistent versions.
 gee=gee-0.8
