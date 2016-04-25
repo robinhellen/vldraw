@@ -29,8 +29,10 @@ namespace Ldraw.Lego.Nodes
 				i++;
 			}
 			Qualifiers = qualifiers;
-			Update = args[i];
-			Date = args[i+1];
+			if(args.length >= i)
+				Update = args[i];
+			if(args.length > i)
+				Date = args[i+1];
 		}
 
 		public string ObjType {get; set;}
