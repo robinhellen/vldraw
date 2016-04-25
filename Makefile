@@ -118,7 +118,7 @@ VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
 
 VALA_PKG_ARGS = $(foreach pkg, $(VALA_PACKAGES), --pkg $(pkg))
 
-VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -X -O2 --vapidir=diva -X -Idiva -X diva/diva.so
+VALA_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -X -O2
 VALA_DEBUG_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm -g
 
 EXECUTABLE_NAME = ldraw
@@ -129,14 +129,15 @@ all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test $(foreach plugin, 
 
 # compilation for the final executable
 $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
-	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) -X -Ih
+	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) \
+	$(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) \
+	-X -Ih -X -ldiva
 
 # Compilation for the component modules
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
 		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
-		--vapidir=diva -X -Idiva \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
@@ -147,7 +148,6 @@ plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(li
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $($*_packages) $($*_internal_packages) $(gmodule), --pkg $(pkg)) \
 		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
-		--vapidir=diva -X -Idiva \
 		--library=$* --vapi vapi/$*.vapi -o plugins/$*.so \
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
@@ -163,7 +163,6 @@ else
 		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
 		--pkg $* \
 		--pkg $(gee) -X -lm \
-		--vapidir=diva -X -Idiva \
 		-o test/$*.test \
 		-g -X -w \
 		 $(foreach lib, $($*_internal_packages) $*, -X lib/$(lib).so)
