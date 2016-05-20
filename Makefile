@@ -59,16 +59,19 @@ lego_internal_packages=maths utils lego_objects
 lego_private_internal_packages=application
 
 peeron_sources=$(wildcard peeron/*.vala)
-peeron_packages=$(gee) $(gtk) $(soup) $(xml) diva
-peeron_internal_packages=lego lego_objects maths utils ui_widgets part_group
+peeron_packages=$(gee) diva
+peeron_private_packages=$(soup) $(xml) $(gtk)
+peeron_internal_packages=lego_objects ui_widgets part_group
 
 povray_sources=$(wildcard povray/*.vala)
-povray_packages=$(gee) $(gio) $(gtk) diva
-povray_internal_packages=export lego_objects lego maths ui_widgets utils
+povray_private_packages=$(gio) $(gtk)
+povray_internal_packages=lego
+povray_private_internal_packages=export ui_widgets
 
 export_sources=$(wildcard export/*.vala)
-export_packages=$(gee) $(gio) $(gtk) diva
-export_internal_packages=lego_objects maths ui_widgets utils
+export_packages=$(gtk) diva
+export_internal_packages=lego_objects utils
+export_private_internal_packages=ui_widgets
 
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=$(gee) $(gtk) diva
@@ -138,7 +141,7 @@ $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$
 all_packages = $(foreach pkg, $($(1)_internal_packages), $(pkg) $($(pkg)_packages) $(call all_packages,$(pkg)))
 
 # Compilation for the component modules
-lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
+lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_private_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $(sort \
 					$($*_packages) \
@@ -146,17 +149,23 @@ lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pack
 					$(call all_packages,$*) \
 					$($*_private_internal_packages)\
 				),--pkg $(pkg)) \
-		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
+		$(if $($*_internal_packages) $($*_private_internal_packages), -X -Ih --vapidir=vapi) \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
 	touch vapi/$*.vapi
 
 # Compilation for modules as plugins.
-plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
+plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_private_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
-		$(foreach pkg, $($*_packages) $($*_internal_packages) $(gmodule), --pkg $(pkg)) \
-		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
+		$(foreach pkg, $(sort \
+					$($*_packages) \
+					$($*_private_packages) \
+					$(call all_packages,$*) \
+					$($*_private_internal_packages) \
+					$(gmodule) \
+				),--pkg $(pkg)) \
+		$(if $($*_internal_packages) $($*_private_internal_packages), -X -Ih --vapidir=vapi) \
 		--library=$* --vapi vapi/$*.vapi -o plugins/$*.so \
 		-X -fpic -X -shared -g -X -w
 	touch h/$*.h
