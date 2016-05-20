@@ -36,25 +36,27 @@ SOURCES=$(wildcard *.vala)
 
 utils_sources= $(wildcard utils/*.vala)
 utils_packages=$(gee) $(gtk)
+
 expressions_sources=$(wildcard expressions/*.vala)
 expressions_packages=$(gee)
-
 expressions_test_sources=$(wildcard tests/expressions/*.vala)
 
 maths_sources=$(wildcard maths/*.vala)
 maths_test_sources=$(wildcard tests/vector/*.vala) $(wildcard tests/*.vala)
+
 options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
 
 lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)
-lego_objects_packages=$(gee) $(gio)
+lego_objects_packages=$(gee)
 lego_objects_internal_packages=maths
 
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
-lego_packages=$(gee) $(gtk) $(json) diva
-lego_internal_packages=application maths utils lego_objects
-
+lego_packages= diva
+lego_private_packages=$(json) $(gtk)
+lego_internal_packages=maths utils lego_objects
+lego_private_internal_packages=application
 
 peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) $(gtk) $(soup) $(xml) diva
@@ -133,10 +135,17 @@ $(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$
 	$(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) \
 	-X -Ih -X -ldiva
 
+all_packages = $(foreach pkg, $($(1)_internal_packages), $(pkg) $($(pkg)_packages) $(call all_packages,$(pkg)))
+
 # Compilation for the component modules
 lib/%.so h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages), h/$$(lib).h vapi/$$(lib).vapi)
 	$(VALACC) $($*_sources) \
-		$(foreach pkg, $($*_packages) $($*_internal_packages), --pkg $(pkg)) \
+		$(foreach pkg, $(sort \
+					$($*_packages) \
+					$($*_private_packages) \
+					$(call all_packages,$*) \
+					$($*_private_internal_packages)\
+				),--pkg $(pkg)) \
 		$(if $($*_internal_packages), -X -Ih --vapidir=vapi) \
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.so \
 		-X -fpic -X -shared -g -X -w
