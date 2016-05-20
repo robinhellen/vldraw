@@ -114,8 +114,7 @@ application_sources=application/application.vala
 application_packages=$(gee) diva
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects part_group \
-	application export
-UI_LIBS=drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl
+	application export drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl
 
 PLUGINS=animation steps povray peeron
 
@@ -133,9 +132,9 @@ all: $(EXECUTABLE_NAME) test/expressions.test test/maths.test $(foreach plugin, 
 	./test/maths.test
 
 # compilation for the final executable
-$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
+$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).so h/$(lib).h vapi/$(lib).vapi)
 	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) \
-	$(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), --pkg $(lib) -X lib/$(lib).so) \
+	$(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X lib/$(lib).so) \
 	-X -Ih -X -ldiva
 
 all_packages = $(foreach pkg, $($(1)_internal_packages), $(pkg) $($(pkg)_packages) $(call all_packages,$(pkg)))
@@ -190,7 +189,7 @@ endif
 # clean all files created during normal compilation
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
-	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS) $(UI_LIBS), vapi/$(lib).vapi)
+	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS), vapi/$(lib).vapi)
 
 # clean temporary files that vala leaves during abnormal compilation
 tempclean:
