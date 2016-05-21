@@ -3,7 +3,7 @@ using Ldraw.Ui;
 
 namespace Ldraw.Refactor
 {
-	public class MoveOriginModule : Module
+	public class MoveOriginModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{
@@ -11,3 +11,5 @@ namespace Ldraw.Refactor
 		}
 	}
 }
+
+public Type register_ldraw_plugin(GLib.Module module) {return typeof(Ldraw.Refactor.MoveOriginModule);}

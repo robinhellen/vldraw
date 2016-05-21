@@ -92,10 +92,6 @@ ui_dialogs_sources=$(wildcard ui/dialogs/*.vala)
 ui_dialogs_packages=$(gee) gl diva
 ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions utils options
 
-move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
-move_origin_packages=$(gee) diva
-move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
-
 # Plugins
 
 steps_sources=$(wildcard steps/*.vala)
@@ -116,12 +112,16 @@ povray_private_packages=$(gio)
 povray_internal_packages=lego
 povray_private_internal_packages=export ui_widgets
 
+move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
+move_origin_packages=$(gee) diva
+move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
+
 # End of module build specs
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects part_group \
-	application export drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl
+	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
-PLUGINS=animation steps povray peeron
+PLUGINS=animation steps povray peeron move_origin
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
 
@@ -194,7 +194,7 @@ endif
 # clean all files created during normal compilation
 clean:
 	rm -f $(EXECUTABLE_NAME) $(TEST_EXECUTABLE_NAME) $(EXECUTABLE_NAME)_debug
-	rm -f h/*.h lib/*.so $(foreach lib, $(INTERNAL_LIBS), vapi/$(lib).vapi)
+	rm -f h/*.h lib/*.so plugins/*.so $(foreach lib, $(INTERNAL_LIBS) $(PLUGINS), vapi/$(lib).vapi)
 
 # clean temporary files that vala leaves during abnormal compilation
 tempclean:

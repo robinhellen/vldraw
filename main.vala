@@ -6,7 +6,6 @@ using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.OpenGl;
 using Ldraw.Options;
-using Ldraw.Refactor;
 using Ldraw.Ui;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Dialogs;
@@ -43,7 +42,6 @@ namespace Ldraw
 			builder.register_module<DragAndDropModule>();
 			builder.register_module<WidgetsModule>();
 			builder.register_module<GtkGlModule>();
-			builder.register_module<MoveOriginModule>();
 			builder.register_module<OpenGlModule>();
 			builder.register_module<ExportModule>();
 
