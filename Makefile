@@ -34,6 +34,11 @@ SOURCES=$(wildcard *.vala)
 # foo_test_sources
 #    Vala source files for the tests for the module
 
+# Core modules
+application_sources=application/application.vala
+application_packages=$(gee)
+application_private_packages=diva
+
 utils_sources= $(wildcard utils/*.vala)
 utils_packages=$(gee) $(gtk)
 
@@ -54,9 +59,52 @@ lego_objects_internal_packages=maths
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages= diva
-lego_private_packages=$(json) $(gtk)
+lego_private_packages=$(json)
 lego_internal_packages=maths utils lego_objects
 lego_private_internal_packages=application
+
+part_group_sources=$(wildcard lego/*.vala)
+part_group_packages=
+part_group_internal_packages=lego
+
+ui_widgets_sources=$(wildcard ui/*.vala) $(wildcard ui/interfaces/*.vala) $(wildcard ui/undo/*.vala)
+ui_widgets_internal_packages=lego part_group
+ui_widgets_private_internal_packages=options application
+
+export_sources=$(wildcard export/*.vala)
+export_packages=diva
+export_internal_packages=lego_objects utils
+export_private_internal_packages=ui_widgets
+
+ui_gtk_gl_sources=$(wildcard ui/gtk_gl/*.vala)
+ui_gtk_gl_packages=$(gee) gl
+ui_gtk_gl_internal_packages=lego ui_widgets options utils
+
+gl_render_sources=$(wildcard open_gl/*.vala) $(wildcard open_gl/gl_api/*.vala)
+gl_render_packages=gl $(gee)
+gl_render_internal_packages=lego ui_widgets ui_gtk_gl
+
+drag_and_drop_sources=$(wildcard ui/drag_and_drop/*.vala)
+drag_and_drop_packages=$(gee) diva gl
+drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets
+
+ui_dialogs_sources=$(wildcard ui/dialogs/*.vala)
+ui_dialogs_packages=$(gee) gl diva
+ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions utils options
+
+move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
+move_origin_packages=$(gee) diva
+move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
+
+# Plugins
+
+steps_sources=$(wildcard steps/*.vala)
+steps_packages=$(gee) diva gl
+steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
+
+animation_sources=$(wildcard animation/*.vala)
+animation_packages=diva $(gee)
+animation_internal_packages=lego lego_objects maths expressions utils ui_widgets gl_render ui_gtk_gl
 
 peeron_sources=$(wildcard peeron/*.vala)
 peeron_packages=$(gee) diva
@@ -64,54 +112,11 @@ peeron_private_packages=$(soup) $(xml) $(gtk)
 peeron_internal_packages=lego_objects ui_widgets part_group
 
 povray_sources=$(wildcard povray/*.vala)
-povray_private_packages=$(gio) $(gtk)
+povray_private_packages=$(gio)
 povray_internal_packages=lego
 povray_private_internal_packages=export ui_widgets
 
-export_sources=$(wildcard export/*.vala)
-export_packages=$(gtk) diva
-export_internal_packages=lego_objects utils
-export_private_internal_packages=ui_widgets
-
-part_group_sources=$(wildcard lego/*.vala)
-part_group_packages=$(gee) $(gtk) diva
-part_group_internal_packages=lego lego_objects maths utils
-
-drag_and_drop_sources=$(wildcard ui/drag_and_drop/*.vala)
-drag_and_drop_packages=$(gee) $(gtk) diva gl
-drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets
-
-gl_render_sources=$(wildcard open_gl/*.vala) $(wildcard open_gl/gl_api/*.vala)
-gl_render_packages=gl $(gee) $(gtk) diva
-gl_render_internal_packages=lego lego_objects maths expressions utils ui_widgets ui_gtk_gl
-
-ui_gtk_gl_sources=$(wildcard ui/gtk_gl/*.vala)
-ui_gtk_gl_packages=$(gtk) $(gee) gl diva
-ui_gtk_gl_internal_packages=lego lego_objects maths expressions utils ui_widgets options utils
-
-ui_widgets_sources=$(wildcard ui/*.vala) $(wildcard ui/interfaces/*.vala) $(wildcard ui/undo/*.vala)
-ui_widgets_packages=$(gtk) $(gee) gl diva
-ui_widgets_internal_packages= application lego lego_objects maths expressions utils options part_group
-
-ui_dialogs_sources=$(wildcard ui/dialogs/*.vala)
-ui_dialogs_packages=$(gtk) $(gee) gl diva
-ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions utils options
-
-move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
-move_origin_packages=$(gtk) $(gee) diva
-move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
-
-steps_sources=$(wildcard steps/*.vala)
-steps_packages=$(gtk) $(gee) diva gl
-steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
-
-animation_sources=$(wildcard animation/*.vala)
-animation_packages=diva $(gee) $(gtk) gl
-animation_internal_packages=lego lego_objects maths expressions utils ui_widgets gl_render ui_gtk_gl
-
-# Libraries that heve been rewritten with dependencies inverted
-application_sources=application/application.vala
-application_packages=$(gee) diva
+# End of module build specs
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs move_origin ui_gtk_gl
