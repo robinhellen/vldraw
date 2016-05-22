@@ -10,10 +10,12 @@ namespace Ldraw.Povray
 		public Vector A;
 		public Vector B;
 		public Vector C;
+		public Colour? Colour;
 
-		public SdlTriangle(Vector a, Vector b, Vector c)
+		public SdlTriangle(Vector a, Vector b, Vector c, Colour? colour = null)
 		{
 			A = a; B = b; C = c;
+			Colour = colour;
 		}
 	}
 

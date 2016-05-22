@@ -53,13 +53,19 @@ namespace Ldraw.Povray
 
 		public override void VisitTriangle(TriangleNode node)
 		{
-			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C));
+			Colour c = null;
+			if(node.Colour.Code != 16 && node.Colour.Code != 24)
+				c = node.Colour;
+			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C, c));
 		}
 
 		public override void VisitQuad(QuadNode node)
 		{
-			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C));
-			currentTriangles.add(new SdlTriangle(node.D, node.A, node.C));
+			Colour c = null;
+			if(node.Colour.Code != 16 && node.Colour.Code != 24)
+				c = node.Colour;
+			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C, c));
+			currentTriangles.add(new SdlTriangle(node.D, node.A, node.C, c));
 		}
 
 		public override void VisitSubModel(PartNode node)

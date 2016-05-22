@@ -24,11 +24,11 @@ namespace Ldraw.Povray
 			var filter = alpha == 1 ? "" : @"filter $alpha ";
 
 			return
-@"#declare Colour$(colour.Code) = material { texture {
+@"#declare Colour$(colour.Code) = texture {
 	pigment { rgb <$red,$green,$blue> $filter}
 	finish { ambient 0.4 diffuse 0.4 }
 	finish { phong 0.5 phong_size 40 reflection 0.08 }
-} }
+}
 ";
 		}
 
@@ -36,7 +36,7 @@ namespace Ldraw.Povray
 		{
 			if(colour.Code == 16 || colour.Code == 24)
 				return "";
-			return @"material { Colour$(colour.Code) } ";
+			return @"texture { Colour$(colour.Code) } ";
 		}
 
 		public string Mesh(Gee.List<SdlTriangle> triangles)
@@ -57,7 +57,10 @@ namespace Ldraw.Povray
 			var sdlB = SdlVector(triangle.B);
 			var sdlC = SdlVector(triangle.C);
 
-			return @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
+			if(triangle.Colour == null)
+				return @"\t\ttriangle { $sdlA, $sdlB, $sdlC }\n";
+
+			return @"\t\ttriangle { $sdlA, $sdlB, $sdlC $(ColourReference(triangle.Colour))}\n";
 		}
 
 		public string Camera(Vector cameraPosition, Vector cameraLookAt, float viewAngle)
