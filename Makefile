@@ -23,14 +23,18 @@ gmodule=gmodule-2.0
 SOURCES=$(wildcard *.vala)
 
 # definitions for component modules
-# each module has up to four definitions:
+# each module has up to 6 definitions:
 # foo_sources
 #    (required)
 #    Vala source files for the module
 # foo_packages
 #    System packages that the module requires to be linked against
-# foo_internal packages
+# foo_private_packages
+#	 System packages that the module requires, but that are not required by the public API
+# foo_internal_packages
 #    Other modules that this module depends on
+# foo_private_internal_packages
+#	 Other modules that this module depends on, but that are not required by the public API.
 # foo_test_sources
 #    Vala source files for the tests for the module
 
