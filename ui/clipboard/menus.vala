@@ -29,6 +29,9 @@ namespace Ldraw.Ui.Clipboard
 			cut.activate.connect(() => Cut());
 			copy.activate.connect(() => Copy());
 			paste.activate.connect(() => Paste.begin());
+			AddCtrlShortcut(cut, "X");
+			AddCtrlShortcut(copy, "C");
+			AddCtrlShortcut(paste, "V");
 			return items;
 		}
 
@@ -50,6 +53,13 @@ namespace Ldraw.Ui.Clipboard
 				return;
 
 			UndoStack.ExecuteCommand(new AddNodesCommand(Model.Model, pasted, null));
+		}
+
+		private void AddCtrlShortcut(Gtk.MenuItem menu, string key)
+		{
+			menu.notify["parent"].connect_after(() => {
+				AccelMap.add_entry(menu.get_accel_path(), Gdk.keyval_from_name(key), Gdk.ModifierType.CONTROL_MASK);
+			});
 		}
 	}
 }
