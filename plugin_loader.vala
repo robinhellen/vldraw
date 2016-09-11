@@ -49,6 +49,7 @@ namespace Ldraw
 				}
 				module.make_resident();
 				var mod = (Diva.Module)Object.new(pluginModule);
+				stdout.printf(@"Loaded plugin: $name\n");
 				builder.register_module(mod);
 			}
 		}
