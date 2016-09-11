@@ -17,47 +17,47 @@ namespace Ldraw.Ui
 			set_collection_injection<Refactoring>(cls, "Refactorings");
 			set_collection_injection<MenuItemSource>(cls, "ItemSources");
 		}
-		
+
 		public AnimatedModel Model {construct; private get;}
         public LdrawFileLoader Loader {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
         public IDialogManager Dialogs {construct; private get;}
         public Collection<Refactoring> Refactorings {construct; private get;}
         public Collection<MenuItemSource> ItemSources {construct; private get;}
-        
+
         public RecentChooserMenu RecentMenu {construct; private get;}
-        
+
         construct
         {
             RecentMenu.filter = new RecentFilter();
             RecentMenu.filter.add_pattern("*.dat");
             RecentMenu.filter.add_pattern("*.ldr");
             RecentMenu.filter.add_pattern("*.mpd");
-            RecentMenu.item_activated.connect(() => 
+            RecentMenu.item_activated.connect(() =>
             {
 				var item = RecentMenu.get_current_item();
 				var file = GLib.File.new_for_uri(item.get_uri());
 				LoadFile(file.get_path());
 			});
 		}
-		
+
         public MenuBar CreateMenus(AccelGroup accelerators, Window parent)
         {
             var menus = new MenuBar();
-			
+
 			var fileMenu = CreateMenu(menus, "_File", accelerators, "<Ldraw>/File");
-			
+
 			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty().MainObject));
-			AddSeparator(fileMenu);            
-			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));            
+			AddSeparator(fileMenu);
+			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));
             AddSubMenu(fileMenu, "_Recent", RecentMenu);
-			AddSeparator(fileMenu);			
+			AddSeparator(fileMenu);
 			var fileSave = AddMenuItem(fileMenu, "_Save", () => FileSave_OnActivate(parent));
             AddMenuItem(fileMenu, "Save _As", () => FileSaveAs_OnActivate(parent));
 			AddSeparator(fileMenu);
-			AddExtraMenuItems(fileMenu, TopMenu.File, parent);			
+			AddExtraMenuItems(fileMenu, TopMenu.File, parent);
             var fileQuit = AddMenuItem(fileMenu, "_Quit", () => main_quit());
-			
+
 			var editMenu = CreateMenu(menus, "_Edit", accelerators, "<Ldraw>/Edit");
 
             var editUndo = AddMenuItem(editMenu, "_Undo", () => UndoStack.UndoSingle());
@@ -66,14 +66,14 @@ namespace Ldraw.Ui
             var editRedo = AddMenuItem(editMenu, "_Redo", () => UndoStack.RedoSingle());
             UndoStack.notify["HasRedoItems"].connect(() => editRedo.sensitive = UndoStack.HasRedoItems);
             editRedo.sensitive = UndoStack.HasRedoItems;
-			AddExtraMenuItems(editMenu, TopMenu.Edit, parent);	
-            
+			AddExtraMenuItems(editMenu, TopMenu.Edit, parent);
+
 			var modelMenu = CreateMenu(menus, "_Model", accelerators);
-			
+
 			AddMenuItem(modelMenu, "_Properties", () => {});
 			AddMenuItem(modelMenu, "Parts _List", () => ShowPartsList(parent));
 			AddMenuItem(modelMenu, "_Add sub-model", () => ModelAddSubModel_OnActivate(parent));
-						
+
 			AddExtraMenuItems(modelMenu, TopMenu.Model, parent);
 
 			var selectionMenu = CreateMenu(menus, "_Selection", accelerators);
@@ -82,11 +82,11 @@ namespace Ldraw.Ui
 					Model.Selection.add_all(Model.Model.Nodes);
                 });
 			AddMenuItem(selectionMenu, "_Clear", () => Model.ClearSelection());
-                
+
 			AddExtraMenuItems(selectionMenu, TopMenu.Selection, parent);
-                
+
 			AddRefactorMenu(menus, accelerators, parent);
-                
+
 			AddCtrlShortcut(fileNew, "N");
 			AddCtrlShortcut(fileSave, "S");
             AddCtrlShortcut(fileQuit, "Q");
@@ -95,19 +95,19 @@ namespace Ldraw.Ui
 
             return menus;
         }
-        
+
         private void AddRefactorMenu(MenuBar parent, AccelGroup accelerators, Window parentWindow)
         {
 			if(Refactorings.is_empty)
 				return;
-				
+
 			var refactorMenu = CreateMenu(parent, "Refactor", accelerators);
 			foreach(var r in Refactorings)
 			{
 				AddMenuItem(refactorMenu, r.GetLabel(), GetExecuteAction(r, parentWindow));
 			}
 		}
-		
+
 		private void AddExtraMenuItems(Gtk.Menu parent, TopMenu menu, Window dialogParent)
 		{
 			foreach(var source in ItemSources)
@@ -115,27 +115,27 @@ namespace Ldraw.Ui
 				var extras = source.GetItemsForMenu(menu, dialogParent);
 				if(extras.is_empty)
 					continue;
-					
+
 				AddSeparator(parent);
 				foreach(var extra in extras)
 				{
 					parent.append(extra);
-				}				
-			}			
+				}
+			}
 		}
-		
+
 		private Action GetExecuteAction(Refactoring r, Window parent)
 		{
-			return () => 
+			return () =>
 			{
 				Command c;
 				if(!r.PrepareToExecute(Model, parent, out c))
 					return;
-				
+
 				UndoStack.ExecuteCommand(c);
-			};			
+			};
 		}
-        
+
         private Gtk.Menu CreateMenu(MenuBar parent, string title, AccelGroup accelerators, string? accelPath = null)
         {
             var menuItem = new Gtk.MenuItem.with_mnemonic(title);
@@ -146,10 +146,10 @@ namespace Ldraw.Ui
             menu.set_accel_group(accelerators);
             if(accelPath != null)
 				menu.set_accel_path(accelPath);
-				
+
 			return menu;
 		}
-		
+
 		private Gtk.Menu AddSubMenu(Gtk.Menu parent, string title, Gtk.Menu? child = null)
 		{
 			var menuItem = new Gtk.MenuItem.with_mnemonic(title);
@@ -157,11 +157,11 @@ namespace Ldraw.Ui
 
             child = child ?? new Gtk.Menu();
             menuItem.submenu = child;
-            return child;			
+            return child;
 		}
-		
+
 		private delegate void Action();
-		
+
 		private Gtk.MenuItem AddMenuItem(Gtk.Menu menu, string title, owned Action onActivate)
 		{
 			var item = new Gtk.MenuItem.with_mnemonic(title);
@@ -169,18 +169,18 @@ namespace Ldraw.Ui
 			item.activate.connect(() => onActivate());
 			return item;
 		}
-		
+
 		private void AddSeparator(Gtk.Menu menu)
 		{
 			menu.append(new SeparatorMenuItem());
 		}
-		
+
 		private void AddCtrlShortcut(Gtk.MenuItem menu, string key)
 		{
 			AccelMap.add_entry(menu.get_accel_path(), Gdk.keyval_from_name(key), Gdk.ModifierType.CONTROL_MASK);
 		}
-        
-        // Actions        
+
+        // Actions
         private void FileOpen_OnActivate(Window parent)
         {
 			string fileToOpen;
@@ -189,7 +189,7 @@ namespace Ldraw.Ui
 				LoadFile(fileToOpen);
 			}
 		}
-        
+
         private void LoadFile(string fileName)
         {
 			Loader.LoadModelFile.begin(fileName, ReferenceLoadStrategy.PartsOnly, (obj, res) =>
@@ -203,7 +203,7 @@ namespace Ldraw.Ui
 					// TODO: print an error message
 					stdout.printf(e.message);
 				}
-				
+
 			});
 		}
 
@@ -296,8 +296,8 @@ namespace Ldraw.Ui
             }
             var nodes = new ObservableList<LdrawNode>();
             var newObject = (LdrawObject)GLib.Object.new(
-						typeof(LdrawObject), 
-						Nodes: nodes, 
+						typeof(LdrawObject),
+						Nodes: nodes,
 						FileName: newFileName,
 						File: mpdModel
 					);
