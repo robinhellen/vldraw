@@ -1,3 +1,5 @@
+using Gee;
+
 using Ldraw.Lego;
 
 namespace Ldraw.Ui.Commands
@@ -21,6 +23,29 @@ namespace Ldraw.Ui.Commands
 		public override void Undo()
 		{
 			Model.RemoveNode(NewNode);
+		}
+	}
+
+	public class AddNodesCommand : Command
+	{
+		public AddNodesCommand(LdrawObject model, Collection<LdrawNode> newNode, LdrawNode? insertAfter)
+		{
+			Object(Model: model, NewNodes: newNode, InsertAfter: insertAfter);
+		}
+
+		public LdrawObject Model {get; construct;}
+		public Collection<LdrawNode> NewNodes {get; construct;}
+		public LdrawNode InsertAfter {get; construct;}
+
+		public override void Execute()
+		{
+
+			Model.AddNodes(NewNodes);
+		}
+
+		public override void Undo()
+		{
+			Model.RemoveNodes(NewNodes);
 		}
 	}
 }
