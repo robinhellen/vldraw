@@ -20,7 +20,7 @@ namespace Ldraw.Lego
 			set_indexed_injection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
 		}
 
-		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy)
+		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy, bool observable = false)
 			throws ParseError
 		{
 			File file = File.new_for_path(filepath);
@@ -32,7 +32,7 @@ namespace Ldraw.Lego
 			MultipartSubFileLocator locator = null;
 			var colours = new CurrentFileColourContext(ColourContext);
 
-			ObservableList<LdrawNode> currentObject = new ObservableList<LdrawNode>();
+			Gee.List<LdrawNode> currentObject = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
 			LdrawObject mainObject = null;
 			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
 			string currentFileName = null;
@@ -54,7 +54,7 @@ namespace Ldraw.Lego
 								mainObject = foo;
 							}
 							subObjs.add(foo);
-							currentObject = new ObservableList<LdrawNode>();
+							currentObject = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
 							currentFileName = null;
 							continue;
 						case "FILE":
@@ -76,7 +76,7 @@ namespace Ldraw.Lego
 								locator = new MultipartSubFileLocator(Locators[strategy]);
 							}
 
-							currentObject = new ObservableList<LdrawNode>();
+							currentObject = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
 							currentFileName = command.Arguments[0];
 							continue;
 					}
