@@ -26,6 +26,7 @@ namespace Ldraw.Export
 
 	public enum ExportOptionSections
 	{
+		None = 0,
 		CameraPosition = 1,
 		ImageDimensions = 2,
 		FileName = 4;

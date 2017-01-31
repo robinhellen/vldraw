@@ -10,6 +10,8 @@ namespace Ldraw.Ui.Widgets
 	{
 		private Paned left;
 		private Paned right;
+		private bool left_exposed = false;
+		private bool right_exposed = false;
 
 		construct
 		{
@@ -19,9 +21,12 @@ namespace Ldraw.Ui.Widgets
 
 			add1(left);
 			add2(right);
-
-			left.notify["position"].connect(() => right.set_position(left.position));
-			right.notify["position"].connect(() => left.set_position(right.position));
+			
+			left.draw.connect_after(e => {{left_exposed = true; return false;}});
+			right.draw.connect_after(e => {{right_exposed = true; return false;}});
+				
+			right.notify["position"].connect(() => update_sizes(right, left));
+			left.notify["position"].connect(() => update_sizes(left, right));
 		}
 
 		public void add_top_left(Widget w)
@@ -44,14 +49,36 @@ namespace Ldraw.Ui.Widgets
 			right.pack2(w, true, true);
 		}
 		
-		public override void realize()
+		public override void map()
 		{
-			base.realize();
+			left.map.connect_after(_ => {	
+				Allocation a;
+				left.get_allocation(out a);			
+				left.position = a.height / 2;
+			});
+			right.map.connect_after(_ => {
+				Allocation a;
+				right.get_allocation(out a);
+				right.position = a.height / 2;
+			});
+			base.map();
 			Allocation a;
 			get_allocation(out a);
 			position = a.width / 2;
-			left.position = a.height / 2;
-			right.position = a.height / 2;
+		}
+				
+		bool in_update_size = false;
+		
+		private void update_sizes(Paned notified, Paned update)
+		{
+			if(in_update_size)
+				return;
+			if(!(right_exposed && left_exposed))
+				return;
+				
+			in_update_size = true;
+			update.set_position(notified.position);
+			in_update_size = false;
 		}
 	}
 
