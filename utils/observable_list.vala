@@ -25,13 +25,14 @@ namespace Ldraw.Utils
 			row_deleted(new TreePath.from_indices(index));
 
 			if(result is GLib.Object)
-			((GLib.Object)result).notify.disconnect(FireRowChangedOnNotify);
+				((GLib.Object)result).notify.disconnect(FireRowChangedOnNotify);
 
 			return result;
 		}
 
 		public override void clear()
 		{
+			// TODO: fire row_deleted for all rows
 			base.clear();
 		}
 
@@ -40,14 +41,17 @@ namespace Ldraw.Utils
 			var result =  base.add(item);
 			var index = index_of(item);
 
-			TreeIter iter = TreeIter();
-			iter.stamp = c_IteratorStamp;
-			iter.user_data = index.to_pointer();
-			row_inserted(new TreePath.from_indices(index), iter);
+			if(!inserting)
+			{
+				TreeIter iter = TreeIter();
+				iter.stamp = c_IteratorStamp;
+				iter.user_data = index.to_pointer();
+				row_inserted(new TreePath.from_indices(index), iter);
+			}
 
 
 			if(item is GLib.Object)
-			((GLib.Object)item).notify.connect(FireRowChangedOnNotify);
+				((GLib.Object)item).notify.connect(FireRowChangedOnNotify);
 
 			return result;
 		}
@@ -62,12 +66,15 @@ namespace Ldraw.Utils
 			row_changed(new TreePath.from_indices(index), iter);
 
 			if(item is GLib.Object)
-			((GLib.Object)item).notify.connect(FireRowChangedOnNotify);
+				((GLib.Object)item).notify.connect(FireRowChangedOnNotify);
 		}
 
+		bool inserting = false;
 		public override void insert(int index, T item)
 		{
+			inserting = true;
 			base.insert(index, item);
+			inserting = false;
 
 			TreeIter iter = TreeIter();
 			iter.stamp = c_IteratorStamp;
@@ -75,7 +82,7 @@ namespace Ldraw.Utils
 			row_inserted(new TreePath.from_indices(index), iter);
 
 			if(item is GLib.Object)
-			((GLib.Object)item).notify.connect(FireRowChangedOnNotify);
+				((GLib.Object)item).notify.connect(FireRowChangedOnNotify);
 		}
 
 		private void FireRowChangedOnNotify(GLib.Object sender, ParamSpec pspec)
