@@ -35,7 +35,7 @@ namespace Ldraw.Ui.Clipboard
 		{
 			Clear();
 			clipboardContents.add_all(Model.Selection);
-			if(!Clipboard.set_with_owner(targets, (b,s,i,o) => {stderr.printf("Clipboard data requested (1)\n");((ClipboardHandler)o).GetData(b,s,i);}, Clear, this))
+			if(!Clipboard.set_with_owner(targets, (b,s,i,o) => {stderr.printf("Clipboard data requested (1)\n");((ClipboardHandler)o).GetData(b,s,i);}, (cb, o) => ((ClipboardHandler)o).Clear(), this))
 				stderr.printf("Failed to set clipboard data.");
 			else
 				stderr.printf("Successfully put clipboard data");
@@ -44,15 +44,11 @@ namespace Ldraw.Ui.Clipboard
 
 		private void GetData(Gtk.Clipboard board, SelectionData selData, uint info)
 		{
-			stderr.printf("Clipboard data requested.\n");
-			if(info == textTargetId)
+			if((info == textTargetId) || (info == nodesTargetId))
 			{
 				var text = clipboardContents.fold<string>((node, s) => @"$s\r\n$(node.FileLine)", "");
-				stderr.printf("adding node info to clipboard as text.\n");
 				selData.set_text(text, text.length);
 			}
-			else if(info == nodesTargetId) {
-				stderr.printf("Copying nodes directly.\n");/* put selection into selData as raw nodes*/}
 		}
 
 		private void Clear()
@@ -68,9 +64,22 @@ namespace Ldraw.Ui.Clipboard
 			yield;
 			if(TargetInList(targets, nodesAtom))
 			{
-				// pasted nodes from same app: don't bother with actual data.
-				stderr.printf("Copied nodes directly.");
-				return DuplicateNodes(clipboardContents);
+				if(clipboardContents.is_empty)
+				{
+					var selection = Clipboard.wait_for_contents(nodesAtom);
+					var text = selection.get_text();
+					var result = new ArrayList<LdrawNode>();
+					foreach(var line in text.split("\n"))
+					{
+						result.add(yield Parser.ParseLine(line, Locator, ColourContext));
+					}
+					stderr.printf("Copied nodes via text.\n");
+				}
+				else
+				{
+					stderr.printf("Copied nodes directly.\n");
+					return DuplicateNodes(clipboardContents);
+				}
 			}
 			else if(TargetInList(targets, Atom.intern("TARGETS", true)))
 			{
