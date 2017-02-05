@@ -1,6 +1,10 @@
 using Gee;
 using Gtk;
 
+using Ldraw.Lego;
+using Ldraw.Lego.Nodes;
+using Ldraw.Maths;
+using Ldraw.Options;
 using Ldraw.Ui;
 using Ldraw.Ui.Commands;
 
@@ -11,6 +15,7 @@ namespace Ldraw.Ui.Clipboard
 		public ClipboardHandler Handler { construct; private get; }
 		public AnimatedModel Model {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
+		public IOptions Options {construct; private get;}
 
 		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent)
 		{
@@ -52,7 +57,19 @@ namespace Ldraw.Ui.Clipboard
 			if(pasted == null)
 				return;
 
+			foreach(var node in pasted)
+			{
+				var partNode = node as PartNode;
+				if(partNode == null)
+					continue;
+
+				partNode.Move(Options.CurrentGrid);
+			}
+
 			UndoStack.ExecuteCommand(new AddNodesCommand(Model.Model, pasted, null));
+			var s = new HashSet<LdrawNode>();
+			s.add_all(pasted);
+			Model.Select(s, false);
 		}
 
 		private void AddCtrlShortcut(Gtk.MenuItem menu, string key)

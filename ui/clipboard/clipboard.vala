@@ -35,10 +35,8 @@ namespace Ldraw.Ui.Clipboard
 		{
 			Clear();
 			clipboardContents.add_all(Model.Selection);
-			if(!Clipboard.set_with_owner(targets, (b,s,i,o) => {stderr.printf("Clipboard data requested (1)\n");((ClipboardHandler)o).GetData(b,s,i);}, (cb, o) => ((ClipboardHandler)o).Clear(), this))
+			if(!Clipboard.set_with_owner(targets, (b,s,i,o) => ((ClipboardHandler)o).GetData(b,s,i), (cb, o) => ((ClipboardHandler)o).Clear(), this))
 				stderr.printf("Failed to set clipboard data.");
-			else
-				stderr.printf("Successfully put clipboard data");
 			Clipboard.store();
 		}
 
@@ -73,11 +71,9 @@ namespace Ldraw.Ui.Clipboard
 					{
 						result.add(yield Parser.ParseLine(line, Locator, ColourContext));
 					}
-					stderr.printf("Copied nodes via text.\n");
 				}
 				else
 				{
-					stderr.printf("Copied nodes directly.\n");
 					return DuplicateNodes(clipboardContents);
 				}
 			}

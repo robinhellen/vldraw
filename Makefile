@@ -122,7 +122,7 @@ move_origin_internal_packages=ui_widgets lego lego_objects maths expressions uti
 
 clipboard_sources=$(wildcard ui/clipboard/*.vala)
 clipboard_packages=$(gee) diva
-clipboard_internal_packages=ui_widgets lego lego_objects
+clipboard_internal_packages=ui_widgets lego lego_objects options
 
 # End of module build specs
 
