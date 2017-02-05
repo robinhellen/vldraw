@@ -1,4 +1,7 @@
+
+using Ldraw.Lego;
 using Ldraw.Lego.Library;
+using Ldraw.Utils;
 
 namespace Ldraw.Lego
 {
@@ -6,7 +9,10 @@ namespace Ldraw.Lego
 	{
 		public LdrawModel.Empty()
 		{
-			base();
+			var nodes = new ObservableList<LdrawNode>();
+			var filename = "";
+			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: filename);
+			Object(MainObject: mainObject, FileName: filename);
 		}
 
 		public override void Save()

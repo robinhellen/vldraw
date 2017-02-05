@@ -18,6 +18,7 @@ namespace Ldraw.Ui.Widgets
 
 			m_Widget = new ScrolledWindow(null, null);
 			m_Widget.add(m_ListView);
+			m_ListView.model = Model.Model.Nodes as ObservableList;
 			Model.notify["Model"].connect(() => m_ListView.model = Model.Model.Nodes as ObservableList);
 		}
 
@@ -26,8 +27,7 @@ namespace Ldraw.Ui.Widgets
 			m_ListView = new TreeView();
 			// TODO: set up columns
 			CellRendererText renderer = new CellRendererText();
-			/*renderer.size_points = 6.0;
-			m_ListView.insert_column_with_data_func(-1, "Type", renderer, (col, cell, model, iter) =>
+			/*m_ListView.insert_column_with_data_func(-1, "Type", renderer, (col, cell, model, iter) =>
 			{
 				LdrawNode node;
 				model.get(iter, 0, out node);

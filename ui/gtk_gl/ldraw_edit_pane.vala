@@ -263,6 +263,7 @@ namespace Ldraw.Ui.GtkGl
 			}
 			
 			var dragFinished = finishDrag;
+			if(finishDrag) finishDrag = false;
 			Locator.GetObjectForName.begin(partName, (obj, res) =>
 			{
 				var droppedObject = Locator.GetObjectForName.end(res);
@@ -276,6 +277,7 @@ namespace Ldraw.Ui.GtkGl
 					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
 					model.SelectSingle(newNode);
 					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, addAfterNode));
+					finishDrag = false;
 					drag_finish(context, true, false, time);
 				}
 				else
