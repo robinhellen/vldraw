@@ -85,7 +85,7 @@ namespace Ldraw
 
 		public bool HandleArgs(string[] args)
 		{
-			Model.Model = new LdrawModel.Empty().MainObject;
+			Model.Load(new LdrawModel.Empty().MainObject);
 			if(args.length == 1)
 			{
 				return true;
@@ -96,7 +96,7 @@ namespace Ldraw
 				{
 					try
 					{
-						Model.Model = Loader.LoadModelFile.end(res).MainObject;
+						Model.Load(Loader.LoadModelFile.end(res).MainObject);
 					}
 					catch(Error e)
 					{
