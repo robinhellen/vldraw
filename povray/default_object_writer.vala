@@ -7,9 +7,9 @@ namespace Ldraw.Povray
 {
 	private class DefaultObjectWriter : PovrayObjectWriter, Object
 	{
-		public void WriteDefinitionForObject(LdrawObject object, OutputStream stream)
+		public void WriteDefinitionForObject(LdrawObject object, OutputStream stream, UnionWriter unionWriter)
 		{
-			var visitor = new PovrayVisitor(stream);
+			var visitor = new PovrayVisitor(stream, unionWriter);
 			visitor.Visit(object);
 		}
 	}

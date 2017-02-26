@@ -15,7 +15,11 @@ namespace Ldraw
 				.ignore_property("t-dup-func")
 				.ignore_property("t-destroy-func");
 			builder.register<DefaultObjectWriter>().as<PovrayObjectWriter>();
+			
+			builder.register<PartBuildExporter>().as<Exporter>();
+			builder.register<StepBuildExporter>().as<Exporter>();
 		}
 	}
 }
+
 public Type register_ldraw_plugin(GLib.Module module) {return typeof(Ldraw.PovrayModule);}

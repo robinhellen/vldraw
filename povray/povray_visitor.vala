@@ -7,19 +7,20 @@ using Ldraw.Maths;
 
 namespace Ldraw.Povray
 {
-	public class PovrayVisitor : LdrawVisitor<void>
+	private class PovrayVisitor : LdrawVisitor<void>
 	{
 		private Gee.List<SdlTriangle> currentTriangles;
 		private Gee.List<SdlObjectReference> currentSubObjects;
 
 		private OutputStream outStream;
+		private UnionWriter writer;
 		private Error caughtError;
 		private bool hadError = false;
-		private SdlGenerator sdlGenerator = new SdlGenerator();
 
-		public PovrayVisitor(OutputStream stream)
+		public PovrayVisitor(OutputStream stream, UnionWriter writer)
 		{
 			outStream = stream;
+			this.writer = writer;
 		}
 
 		public override void Visit(LdrawObject object)
@@ -38,16 +39,7 @@ namespace Ldraw.Povray
 			}
 			else
 			{
-				var header = GetObjectHeader(object, povrayComponents);
-				Append(@"// object: $(object.FileName), $povrayComponents distinct components.\n");
-				Append(header);
-				foreach(var reference in currentSubObjects)
-				{
-					Append(sdlGenerator.ObjectReference(reference));
-				}
-				if(!(currentTriangles.is_empty))
-					Append(sdlGenerator.Mesh(currentTriangles));
-				Append(ObjectFooter(object));
+				writer.WriteUnion(Append, currentSubObjects, currentTriangles, object, povrayComponents);
 			}
 		}
 
@@ -73,29 +65,6 @@ namespace Ldraw.Povray
 			currentSubObjects.add(new SdlObjectReference(node));
 		}
 
-		private string GetObjectHeader(LdrawObject object, int subObjects)
-		{
-			var escapedFilename = EscapeFilenameForSdl(object.FileName);
-			var sdlType = subObjects > 1 ? "union" : "object";
-			if(object.File is LdrawPart)
-				sdlType = @"object { $sdlType";
-			return @"#declare $escapedFilename = $sdlType {\n";
-		}
-
-		private string ObjectFooter(LdrawObject object)
-		{
-			if(object.File is LdrawPart)
-			{
-				var bounds = object.BoundingBox;
-				var x = bounds.MaxX - bounds.MinX;
-				var y = bounds.MaxY - bounds.MinY;
-				var z = bounds.MaxZ - bounds.MinZ;
-
-				return @"}\nscale <1 - 0.5 / $x, 1 - 0.5 / $y, 1 - 0.5 / $z>\n}\n\n";
-			}
-			return @"}\n\n";
-		}
-
 		private void Append(string sdl)
 		{
 			if(hadError)
@@ -116,6 +85,63 @@ namespace Ldraw.Povray
 		{
 			if(hadError)
 				throw caughtError;
+		}
+	}
+
+	private delegate void Action<T>(T param);
+
+	private interface UnionWriter : Object
+	{
+		public abstract void WriteUnion(Action<string> write,
+				Gee.List<SdlObjectReference> subObjects,
+				Gee.List<SdlTriangle> triangles,
+				LdrawObject object,
+				int unionCount);
+	}
+
+	private class StandardUnionWriter : Object, UnionWriter
+	{
+		protected SdlGenerator sdlGenerator = new SdlGenerator();
+
+		public virtual void WriteUnion(Action<string> write,
+				Gee.List<SdlObjectReference> subObjects,
+				Gee.List<SdlTriangle> triangles,
+				LdrawObject object,
+				int unionCount)
+		{
+			var header = GetObjectHeader(object, unionCount);
+			write(@"// object: $(object.FileName), $unionCount distinct components.\n");
+			write(header);
+			foreach(var reference in subObjects)
+			{
+				write(sdlGenerator.ObjectReference(reference));
+			}
+			if(!(triangles.is_empty))
+				write(sdlGenerator.Mesh(triangles));
+			write(ObjectFooter(object));
+		}
+
+		protected virtual string GetObjectHeader(LdrawObject object, int subObjects)
+		{
+			var escapedFilename = EscapeFilenameForSdl(object.FileName);
+			var sdlType = subObjects > 1 ? "union" : "object";
+			if(object.File is LdrawPart)
+				sdlType = @"object { $sdlType";
+			return @"#declare $escapedFilename = $sdlType {\n";
+		}
+
+		protected virtual string ObjectFooter(LdrawObject object)
+		{
+			if(object.File is LdrawPart)
+			{
+				var bounds = object.BoundingBox;
+				var x = bounds.MaxX - bounds.MinX;
+				var y = bounds.MaxY - bounds.MinY;
+				var z = bounds.MaxZ - bounds.MinZ;
+
+				return @"}\nscale <1 - 0.5 / $x, 1 - 0.5 / $y, 1 - 0.5 / $z>\n}\n\n";
+			}
+			return @"}\n\n";
 		}
 	}
 }

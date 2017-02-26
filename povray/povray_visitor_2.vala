@@ -20,7 +20,7 @@ namespace Ldraw.Povray
 
 		protected override Pov GetResult(LdrawObject object)
 		{
-			objectsToDefine.add(object);
+			//objectsToDefine.add(object);
 			return (Pov)Object.new(typeof(Pov), Colours: colours, ObjectsToDefine: objectsToDefine);
 		}
 
