@@ -57,7 +57,7 @@ options_sources=$(wildcard options/*.vala)
 options_internal_packages= maths
 
 lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)
-lego_objects_packages=$(gee)
+lego_objects_packages=$(gee) $(gio)
 lego_objects_internal_packages=maths
 
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
@@ -120,6 +120,10 @@ move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
 move_origin_packages=$(gee) diva
 move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
 
+extract_inline_sources=$(wildcard refactoring/extract_inline/*.vala)
+extract_inline_packages=$(gee) diva
+extract_inline_internal_packages=ui_widgets
+
 clipboard_sources=$(wildcard ui/clipboard/*.vala)
 clipboard_packages=$(gee) diva
 clipboard_internal_packages=ui_widgets lego lego_objects options
@@ -130,6 +134,7 @@ INTERNAL_LIBS=utils expressions maths options lego lego_objects part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
 PLUGINS=animation steps povray peeron move_origin clipboard
+# extract_inline
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
 

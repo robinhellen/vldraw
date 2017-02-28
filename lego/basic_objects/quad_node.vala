@@ -44,5 +44,10 @@ namespace Ldraw.Lego.Nodes
 		{
 			visitor.VisitQuad(this);
 		}
+
+		public override async void AcceptAsync(AsyncLdrawVisitor visitor)
+		{
+			yield visitor.VisitQuad(this);
+		}
 	}
 }

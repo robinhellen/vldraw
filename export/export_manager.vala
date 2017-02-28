@@ -42,7 +42,7 @@ namespace Ldraw.Export
             options.Filename = dialog.get_filename();
             dialog.close();
 
-            exporter.Export(model.File.MainObject, options);
+            exporter.Export.begin(model.File.MainObject, options);
         }
 
         private string SwitchExtension(string filename, string newExtension)

@@ -11,7 +11,7 @@ namespace Ldraw.Export
 		public abstract string PreferredExtension {get;}
 		public abstract ExportOptionSections OptionSections {get;}
 
-		public abstract void Export(LdrawObject model, ExportOptions exportOptions);
+		public abstract async void Export(LdrawObject model, ExportOptions exportOptions);
 
 		public virtual Widget? GetAdditionalOptionControls(){return null;}
 	}

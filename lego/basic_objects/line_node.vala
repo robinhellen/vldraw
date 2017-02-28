@@ -34,5 +34,10 @@ namespace Ldraw.Lego.Nodes
 		{
 			visitor.VisitLine(this);
 		}
+
+		public override async void AcceptAsync(AsyncLdrawVisitor visitor)
+		{
+			yield visitor.VisitLine(this);
+		}
 	}
 }

@@ -12,9 +12,9 @@ namespace Ldraw.Lego
 			var cls = (ObjectClass)typeof(LdrawParser).class_ref();
 			set_indexed_injection<string, CommandFactory>(cls, "CommandFactories");
 		}
-		
+
 		public Index<CommandFactory, string> CommandFactories {construct; private get;}
-		
+
 		public async LdrawNode ParseLine(string line, ISubFileLocator locator, ColourContext colourContext)
 			throws ParseError
 			requires(!("\n" in line))
@@ -49,11 +49,11 @@ namespace Ldraw.Lego
 				return new Comment("");
 			if(command != null && command.has_prefix("!"))
 				command = command.substring(1);
-				
+
 			var factory = CommandFactories[command];
 			if(factory == null)
 				return new Comment(string.joinv(" ", tokens[1: tokens.length]));
-			
+
 			return factory.CreateCommand(tokens[1], tokens[2:tokens.length]);
 		}
 
@@ -163,14 +163,14 @@ namespace Ldraw.Lego
 			}
 		}
 	}
-	
-	public interface CommandFactory : Object 
+
+	public interface CommandFactory : Object
 	{
 		public abstract MetaCommand CreateCommand(string command, string[] args);
 	}
-	
+
 	public interface ColourContext : Object
 	{
-		public abstract Colour GetColourById(int colourId);		
+		public abstract Colour GetColourById(int colourId);
 	}
 }

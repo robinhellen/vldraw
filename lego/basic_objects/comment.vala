@@ -8,7 +8,7 @@ namespace Ldraw.Lego.Nodes
 
 		public Comment(string comment)
 		{
-			CommentText = comment;			
+			CommentText = comment;
 		}
 
 		public override string Description {get {return CommentText; } }
@@ -23,6 +23,11 @@ namespace Ldraw.Lego.Nodes
 		public override void Accept(LdrawVisitor visitor)
 		{
 			visitor.VisitComment(this);
+		}
+
+		public override async void AcceptAsync(AsyncLdrawVisitor visitor)
+		{
+			yield visitor.VisitComment(this);
 		}
 	}
 }

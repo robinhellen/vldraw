@@ -21,34 +21,39 @@ namespace Ldraw.Povray
 		private SdlGenerator sdlGenerator = new SdlGenerator();
 		private PovrayExtraOptions extraOptions = new PovrayExtraOptions();
 
-		public virtual void Export(LdrawObject model, ExportOptions exportOptions)
-			requires(exportOptions.CameraOptions != null)
+		public virtual async void Export(LdrawObject model, ExportOptions exportOptions)
 		{
+			stderr.printf("Exporting to povray.\n");
 			var file = File.new_for_path(exportOptions.Filename);
+			var errorMsg = @"Unable to export to file $(exportOptions.Filename)";
 			try
 			{
-				var outStream = file.replace(null, false, FileCreateFlags.NONE);
+				var outStream = yield file.replace_async(null, false, FileCreateFlags.NONE);
 				var pov = Visitor.Visit(model);
 
-				WriteColours(pov.Colours, outStream);
-				WriteObjects(pov.ObjectsToDefine, outStream);
-				WriteMainObject(model, outStream);
+				stderr.printf("Writing colours as povray materials.\n");
+				yield WriteColours(pov.Colours, outStream);
+				stderr.printf("Writing sub object definitions");
+				yield WriteObjects(pov.ObjectsToDefine, outStream);
+				stderr.printf("Writing main object.");
+				yield WriteMainObject(model, outStream);
 
-				AddGroundPlane(model, outStream);
+				yield AddGroundPlane(model, outStream);
 
-				AddCameraAndLights(outStream, model, exportOptions.CameraOptions);
+				yield AddCameraAndLights(outStream, model, exportOptions.CameraOptions);
 
-				outStream.close();
+				yield outStream.close_async();
+				stderr.printf("Finished writing povray.");
 			}
 			catch(Error e)
 			{
-				var msg = new MessageDialog(null, DialogFlags.MODAL, MessageType.WARNING, ButtonsType.CLOSE, @"Unable to export to file $(exportOptions.Filename): $(e.message)");
+				var msg = new MessageDialog(null, DialogFlags.MODAL, MessageType.WARNING, ButtonsType.CLOSE, @"$errorMsg: $(e.message)");
 				msg.run();
 				msg.close();
 			}
 		}
 
-		private void AddCameraAndLights(OutputStream stream, LdrawObject object, ExportCameraOptions cameraOptions)
+		private async void AddCameraAndLights(OutputStream stream, LdrawObject object, ExportCameraOptions cameraOptions)
 			throws Error
 		{
 			var angle = 67.3801f;
@@ -66,45 +71,45 @@ namespace Ldraw.Povray
 			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }
 // Background:
 background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundGreen),$(extraOptions.BackgroundBlue)>}";
-			stream.write(cameraObject.data);
+			yield stream.write_async(cameraObject.data);
 
-			stream.write(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle).data);
+			yield stream.write_async(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle).data);
 
-			stream.write(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)).data);     // Latitude,Longitude,Radius: 45,   0,477.69
-			stream.write(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)).data);  // Latitude,Longitude,Radius: 30, 120,477.69
-			stream.write(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f)).data); // Latitude,Longitude,Radius: 60,-120,477.69
+			yield stream.write_async(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)).data);     // Latitude,Longitude,Radius: 45,   0,477.69
+			yield stream.write_async(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)).data);  // Latitude,Longitude,Radius: 30, 120,477.69
+			yield stream.write_async(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f)).data); // Latitude,Longitude,Radius: 60,-120,477.69
 		}
 
-		private void AddGroundPlane(LdrawObject model, OutputStream stream)
+		private async void AddGroundPlane(LdrawObject model, OutputStream stream)
 			throws Error
 		{
 			var planePosition = model.BoundingBox.MaxY;
-			stream.write(@"plane { -y, $(-planePosition) material { texture {
+			yield stream.write_async(@"plane { -y, $(-planePosition) material { texture {
 	pigment { rgb <0.9,0.9,0.9> }
 } }} \n\n".data);
 		}
 
-		private void WriteColours(Set<Colour> colours, OutputStream stream)
+		private async void WriteColours(Set<Colour> colours, OutputStream stream)
 			throws Error
 		{
 			foreach(var colour in colours)
 			{
-				stream.write(sdlGenerator.ColourDefinition(colour).data);
+				yield stream.write_async(sdlGenerator.ColourDefinition(colour).data);
 			}
 		}
 
-		private void WriteObjects(Gee.List<LdrawObject> objects, OutputStream stream)
+		private async void WriteObjects(Gee.List<LdrawObject> objects, OutputStream stream)
 			throws Error
 		{
 			foreach(var object in objects)
 			{
-				ObjectWriter.WriteDefinitionForObject(object, stream, new StandardUnionWriter());
+				yield ObjectWriter.WriteDefinitionForObject(object, stream, new StandardUnionWriter());
 			}
 		}
 
-		protected virtual void WriteMainObject(LdrawObject object, OutputStream stream)
+		protected virtual async void WriteMainObject(LdrawObject object, OutputStream stream)
 		{
-			ObjectWriter.WriteDefinitionForObject(object, stream, new StandardUnionWriter());
+			yield ObjectWriter.WriteDefinitionForObject(object, stream, new StandardUnionWriter());
 		}
 
 		public Widget? GetAdditionalOptionControls()
@@ -132,120 +137,13 @@ background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundG
 		}
 	}
 
-	private class PartBuildExporter : PovrayExporter
-	{
-		public override string Name { get {return "Povray by Parts"; } }
-		public override string PreferredExtension {get {return "mpg";}}
-
-		public override void Export(LdrawObject model, ExportOptions exportOptions)
-		{
-			InnerExport.begin(model, exportOptions);
-		}
-
-		private async void InnerExport(LdrawObject model, ExportOptions exportOptions)
-		{
-			// create temp dir
-			var tempDir = DirUtils.mkdtemp("/tmp/vldpovXXXXXX");
-			// create pov file in temp dir
-			var tdf = File.new_for_path(tempDir);
-			var tempPovray = tdf.get_child("sequence.pov");
-			var movieFilename = exportOptions.Filename;
-			exportOptions.Filename = tempPovray.get_path();
-			base.Export(model, exportOptions);
-
-			var frameCount = model.Nodes.size;
-			// invoke povray to render to a sequence of image files
-			stderr.printf(@"Rendering povray images to $tempDir\n");
-            string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D"};
-            var povrayStatus = yield async_spawn(null, povrayArgv, null
-					, SpawnFlags.SEARCH_PATH
-					| SpawnFlags.STDOUT_TO_DEV_NULL
-					| SpawnFlags.STDERR_TO_DEV_NULL
-					| SpawnFlags.DO_NOT_REAP_CHILD
-					, null);
-			stderr.printf(@"povray finished: status $povrayStatus\n");
-
-			int digits = (int)Math.log10(frameCount) + 1;
-			// stitch the image files into a single movie
-			string[] ffmpegArgv = {"ffmpeg", "-f", "image2", "-start_number", "0", "-i", @"sequence%0$(digits)d.png", movieFilename};
-			var ffmpegResult = yield async_spawn(tempDir, ffmpegArgv, null
-				, SpawnFlags.SEARCH_PATH
-				| SpawnFlags.STDOUT_TO_DEV_NULL
-				| SpawnFlags.STDERR_TO_DEV_NULL
-				| SpawnFlags.DO_NOT_REAP_CHILD
-				, null);
-			stderr.printf(@"ffmpeg finished: status $ffmpegResult\n");
-
-			// clean up the temp folder
-			try
-			{
-				var childEnum = yield tdf.enumerate_children_async("standard::*", FileQueryInfoFlags.NOFOLLOW_SYMLINKS);
-
-				var childList = yield childEnum.next_files_async(frameCount + 1);
-				foreach(var fi in childList)
-				{
-					var child = tdf.get_child(fi.get_name());
-					yield child.delete_async();
-				}
-
-				var unexpectedChildren = yield childEnum.next_files_async(1);
-				if(unexpectedChildren.length() == 0)
-				{
-					yield childEnum.close_async();
-					yield tdf.delete_async();
-				}
-				else
-				{
-					stderr.printf("Temp folder has more files in it than expected.");
-					yield childEnum.close_async();
-				}
-			}
-			catch(Error e)
-			{
-				stderr.printf(@"Error cleaning up temporary povray and renders: $(e.message)\n");
-			}
-		}
-
-		protected override void WriteMainObject(LdrawObject object, OutputStream stream)
-		{
-			ObjectWriter.WriteDefinitionForObject(object, stream, new ByPartClockedUnionWriter());
-		}
-	}
-
-	private class ByPartClockedUnionWriter : StandardUnionWriter
-	{
-		public override void WriteUnion(Action<string> write,
-				Gee.List<SdlObjectReference> subObjects,
-				Gee.List<SdlTriangle> triangles,
-				LdrawObject object,
-				int unionCount)
-		{
-			var header = GetObjectHeader(object, unionCount);
-			write(@"// object: $(object.FileName), $unionCount distinct components.\n");
-			write(header);
-			write(@"#declare stepClock = int(clock * $unionCount);\n");
-			write(@"#switch (stepClock)\n");
-			write(@"#case($unionCount)\n");
-
-			for(int i = (subObjects.size - 1); i >= 0; i--)
-			{
-				write(@"#case($i)\n");
-				write(sdlGenerator.ObjectReference(subObjects[i]));
-			}
-			write(@"#end\n");
-			if(!(triangles.is_empty))
-				write(sdlGenerator.Mesh(triangles));
-			write(ObjectFooter(object));
-		}
-	}
-
 	private class StepBuildExporter : PovrayExporter
 	{
 		public override string Name { get {return "Povray by Steps"; } }
 
-		protected override void WriteMainObject(LdrawObject object, OutputStream stream)
+		protected override async void WriteMainObject(LdrawObject object, OutputStream stream)
 		{
-			ObjectWriter.WriteDefinitionForObject(object, stream, new StandardUnionWriter());
+			yield ObjectWriter.WriteDefinitionForObject(object, stream, new StandardUnionWriter());
 		}
 	}
 
@@ -260,7 +158,7 @@ background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundG
 
 	private interface PovrayObjectWriter : Object
 	{
-		public abstract void WriteDefinitionForObject(LdrawObject object, OutputStream stream, UnionWriter writer);
+		public abstract async void WriteDefinitionForObject(LdrawObject object, OutputStream stream, UnionWriter writer);
 	}
 
 	private async int async_spawn(string? working_directory, string[] argv, string[]? envp, SpawnFlags _flags, SpawnChildSetupFunc? child_setup)

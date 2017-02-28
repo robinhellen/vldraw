@@ -83,5 +83,10 @@ namespace Ldraw.Lego.Nodes
 		{
 			visitor.VisitSubModel(this);
 		}
+
+		public override async void AcceptAsync(AsyncLdrawVisitor visitor)
+		{
+			yield visitor.VisitSubModel(this);
+		}
 	}
 }

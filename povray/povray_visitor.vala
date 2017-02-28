@@ -7,7 +7,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.Povray
 {
-	private class PovrayVisitor : LdrawVisitor<void>
+	private class PovrayVisitor : AsyncLdrawVisitor<void>
 	{
 		private Gee.List<SdlTriangle> currentTriangles;
 		private Gee.List<SdlObjectReference> currentSubObjects;
@@ -23,27 +23,27 @@ namespace Ldraw.Povray
 			this.writer = writer;
 		}
 
-		public override void Visit(LdrawObject object)
+		public override async void Visit(LdrawObject object)
 		{
 			currentTriangles = new LinkedList<SdlTriangle>();
 			currentSubObjects = new LinkedList<SdlObjectReference>();
 
-			base.Visit(object);
+			yield base.Visit(object);
 
 			var povrayComponents = currentSubObjects.size + (currentTriangles.is_empty ? 0 : 1);
 
 			if(povrayComponents == 0)
 			{
 				var escapedFilename = EscapeFilenameForSdl(object.FileName);
-				Append(@"#declare $escapedFilename = object {sphere {0,0}}\n");
+				yield Append(@"#declare $escapedFilename = object {sphere {0,0}}\n");
 			}
 			else
 			{
-				writer.WriteUnion(Append, currentSubObjects, currentTriangles, object, povrayComponents);
+				yield writer.WriteUnion(outStream, currentSubObjects, currentTriangles, object, povrayComponents);
 			}
 		}
 
-		public override void VisitTriangle(TriangleNode node)
+		public override async void VisitTriangle(TriangleNode node)
 		{
 			Colour c = null;
 			if(node.Colour.Code != 16 && node.Colour.Code != 24)
@@ -51,7 +51,7 @@ namespace Ldraw.Povray
 			currentTriangles.add(new SdlTriangle(node.A, node.B, node.C, c));
 		}
 
-		public override void VisitQuad(QuadNode node)
+		public override async void VisitQuad(QuadNode node)
 		{
 			Colour c = null;
 			if(node.Colour.Code != 16 && node.Colour.Code != 24)
@@ -60,18 +60,18 @@ namespace Ldraw.Povray
 			currentTriangles.add(new SdlTriangle(node.D, node.A, node.C, c));
 		}
 
-		public override void VisitSubModel(PartNode node)
+		public override async void VisitSubModel(PartNode node)
 		{
 			currentSubObjects.add(new SdlObjectReference(node));
 		}
 
-		private void Append(string sdl)
+		private async void Append(string sdl)
 		{
 			if(hadError)
 				return;
 			try
 			{
-				outStream.write(sdl.data);
+				yield outStream.write_async(sdl.data);
 			}
 			catch (Error e)
 			{
@@ -88,11 +88,9 @@ namespace Ldraw.Povray
 		}
 	}
 
-	private delegate void Action<T>(T param);
-
 	private interface UnionWriter : Object
 	{
-		public abstract void WriteUnion(Action<string> write,
+		public abstract async void WriteUnion(OutputStream s,
 				Gee.List<SdlObjectReference> subObjects,
 				Gee.List<SdlTriangle> triangles,
 				LdrawObject object,
@@ -103,22 +101,22 @@ namespace Ldraw.Povray
 	{
 		protected SdlGenerator sdlGenerator = new SdlGenerator();
 
-		public virtual void WriteUnion(Action<string> write,
+		public virtual async void WriteUnion(OutputStream s,
 				Gee.List<SdlObjectReference> subObjects,
 				Gee.List<SdlTriangle> triangles,
 				LdrawObject object,
 				int unionCount)
 		{
 			var header = GetObjectHeader(object, unionCount);
-			write(@"// object: $(object.FileName), $unionCount distinct components.\n");
-			write(header);
+			yield s.write_async(@"// object: $(object.FileName), $unionCount distinct components.\n".data);
+			yield s.write_async(header.data);
 			foreach(var reference in subObjects)
 			{
-				write(sdlGenerator.ObjectReference(reference));
+				yield s.write_async(sdlGenerator.ObjectReference(reference).data);
 			}
 			if(!(triangles.is_empty))
-				write(sdlGenerator.Mesh(triangles));
-			write(ObjectFooter(object));
+				yield s.write_async(sdlGenerator.Mesh(triangles).data);
+			yield s.write_async(ObjectFooter(object).data);
 		}
 
 		protected virtual string GetObjectHeader(LdrawObject object, int subObjects)
