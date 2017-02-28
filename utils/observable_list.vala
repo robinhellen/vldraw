@@ -5,6 +5,13 @@ namespace Ldraw.Utils
 {
 	public class ObservableList<T> : LinkedList<T>, TreeModel, TreeDragSource
 	{
+		public ObservableList(Collection<T>? initial_nodes = null)
+		{
+			base();
+			if(initial_nodes != null)
+				add_all(initial_nodes);
+		}
+
 		// overrides of LinkedList
 		public override bool remove(T item)
 		{
