@@ -14,7 +14,7 @@ namespace Ldraw
 			builder.register<SelectionShaderProvider>().keyed<ShaderProvider, ShaderType>(ShaderType.Selection);
 			builder.register<BfcCommandFactory>().keyed<CommandFactory, string>("BFC");
 			builder.register<GlShaderProgramFactory>().as<ShaderProgramFactory>();
-			builder.register<CachingFlatStore>().as<FlatStore>();
+			builder.register<CachingFlatStore>().as<FlatStore>().single_instance();
 			builder.register<FramebufferGlSelector>().as<GlSelector>();
 			builder.register<DefaultNodeAdjuster>().as<NodeAdjuster>();
 		}
