@@ -290,7 +290,7 @@ namespace Ldraw.OpenGl
 
 	}
 
-	private class GlDrawingContext : Object, DrawingContext
+	private class GlDrawingContext : Object, Widgets.DrawingContext
 	{
 		private Collection<float?> vertices = new LinkedList<float?>();
 		private Collection<float?> normals  = new LinkedList<float?>();

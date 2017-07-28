@@ -18,7 +18,11 @@ namespace Ldraw.Ui
             builder.register<ColourToolbar>().as<ToolbarProvider>();
             builder.register<MovementToolbar>().as<ToolbarProvider>();
             
-            builder.register<RecentChooserMenu>().as<RecentChooser>();
+            builder.register<RecentChooserMenu>().as<RecentChooser>()
+				.ignore_property("anchor-hints")
+				.ignore_property("rect-anchor-dx")
+				.ignore_property("rect-anchor-dy")
+				.ignore_property("menu-type-hint");
             builder.register<RecentManager>(() => RecentManager.get_default());            
             
             builder.register<MainWindow>()
