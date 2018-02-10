@@ -2,6 +2,7 @@ DEFAULT: all
 
 .SECONDEXPANSION:
 
+SHELL = /bin/bash
 # Vala compiler
 ifndef VALACC
 VALACC := $(shell find $${PATH//:/ } -name valac-* | sort -r | head -n 1)
