@@ -16,7 +16,7 @@ namespace Ldraw.Lego
 
 		public abstract LdrawNode TransformNode(Matrix transform, Vector center);
 
-		public abstract void Accept(LdrawVisitor visitor);
+		public abstract bool Accept(LdrawVisitor visitor);
 		public abstract async void AcceptAsync(AsyncLdrawVisitor visitor);
 
 		protected static string[] Tokenize(string line)

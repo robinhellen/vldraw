@@ -76,7 +76,7 @@ namespace Ldraw.OpenGl
 				return flat;
 			}
 
-			public override void VisitTriangle(TriangleNode triangle)
+			public override bool VisitTriangle(TriangleNode triangle)
 			{
 				PushColour(triangle.Colour, 3, Colours);
 				var a = state.Transform.TransformVector(triangle.A).Add(state.Center);
@@ -104,9 +104,10 @@ namespace Ldraw.OpenGl
 					PushVector(b, Vertices);		
 					PushVector(Vector.NullVector.Subtract(normal), Normals, 3);
 				}
+				return true;
 			}
 
-			public override void VisitQuad(QuadNode quad)
+			public override bool VisitQuad(QuadNode quad)
 			{
 				PushColour(quad.Colour, 6, Colours);
 				Vector a = state.Transform.TransformVector(quad.A).Add(state.Center);
@@ -143,9 +144,10 @@ namespace Ldraw.OpenGl
 					PushVector(c, Vertices);	
 					PushVector(Vector.NullVector.Subtract(normal), Normals, 6);
 				}
+				return true;
 			}
 
-			public override void VisitLine(LineNode line)
+			public override bool VisitLine(LineNode line)
 			{
 				PushColour(line.Colour, 2, LineColours);
 				var a = state.Transform.TransformVector(line.A).Add(state.Center);
@@ -156,9 +158,10 @@ namespace Ldraw.OpenGl
 				PushVector(a, LineVertices);	
 				PushVector(b, LineVertices);	
 				PushVector(normal, LineNormals, 2);
+				return true;
 			}
 
-			public override void VisitSubModel(PartNode part)
+			public override bool VisitSubModel(PartNode part)
 			{
 				var oldState = state;
 				state = new SavedState();
@@ -184,14 +187,15 @@ namespace Ldraw.OpenGl
 				// finally restore the old state
 				state = oldState;
 				state.BfcInvertNext = false;
+				return true;
 			}
 
-			public override void VisitComment(Comment comment)
+			public override bool VisitComment(Comment comment)
 			{
 				if(comment is BfcInvertNext)
 				{
 					state.BfcInvertNext = true;
-					return;
+					return true;
 				}
 				var certify = comment as BfcCertifyCommand;
 				if(certify != null)
@@ -213,6 +217,7 @@ namespace Ldraw.OpenGl
 					if(bfc.IsOptionSet(BfcOptions.ClipOn))
 						state.BfcOn = true;					
 				}
+				return true;
 			}
 			
 			private class SavedState

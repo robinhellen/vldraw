@@ -30,18 +30,18 @@ namespace Ldraw.Tests.Vectors
 		{
 			base("Matrix Tests");
 
-			AddTheory<Vector>("RotationOfAxis", RotationMatrixIsIdentityForAxis, data, v => v.to_string());
-			AddTheory<Vector>("RotationByZero", RotationOfZeroIsIdentity, data, v => v.to_string());
+			AddTheory<Vector?>("RotationOfAxis", RotationMatrixIsIdentityForAxis, data, v => v.to_string());
+			AddTheory<Vector?>("RotationByZero", RotationOfZeroIsIdentity, data, v => v.to_string());
 		}
 
-		public void RotationMatrixIsIdentityForAxis(Vector v)
+		public void RotationMatrixIsIdentityForAxis(Vector? v)
 		{
 			Matrix m = Matrix.ForRotation(v, 90);
 			var res = m.TransformVector(v);
 			AssertAreEqualVectors(v, res);
 		}
 
-		public void RotationOfZeroIsIdentity(Vector v)
+		public void RotationOfZeroIsIdentity(Vector? v)
 		{
 			var other = v.Cross(Vector(1, 1, 1));
 

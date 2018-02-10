@@ -35,9 +35,9 @@ namespace Ldraw.Lego.Nodes
 			return new TriangleNode(Colour, a, b, c);
 		}
 
-		public override void Accept(LdrawVisitor visitor)
+		public override bool Accept(LdrawVisitor visitor)
 		{
-			visitor.VisitTriangle(this);
+			return visitor.VisitTriangle(this);
 		}
 
 		public override async void AcceptAsync(AsyncLdrawVisitor visitor)

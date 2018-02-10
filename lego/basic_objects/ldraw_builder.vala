@@ -9,30 +9,33 @@ namespace Ldraw.Lego
 			Initialize();
 			foreach(var node in object.Nodes)
 			{
-				VisitNode(node);
+				if(!VisitNode(node))
+					break;
 			}
 			return GetResult(object);
 		}
 		
-		protected void VisitInner(LdrawObject object)
+		protected bool VisitInner(LdrawObject object)
 		{
 			foreach(var node in object.Nodes)
 			{
-				VisitNode(node);
+				if(!VisitNode(node))
+					return false;
 			}
+			return true;
 		}
 
-		public virtual void VisitNode(LdrawNode node)
+		public virtual bool VisitNode(LdrawNode node)
 		{
-			node.Accept(this);
+			return node.Accept(this);
 		}
 
-		public virtual void VisitLine(LineNode line) {}
-		public virtual void VisitTriangle(TriangleNode line) {}
-		public virtual void VisitQuad(QuadNode line) {}
-		public virtual void VisitCondLine(CondLineNode line) {}
-		public virtual void VisitSubModel(PartNode line) {}
-		public virtual void VisitComment(Comment line) {}
+		public virtual bool VisitLine(LineNode line) {return true;}
+		public virtual bool VisitTriangle(TriangleNode line) {return true;}
+		public virtual bool VisitQuad(QuadNode line) {return true;}
+		public virtual bool VisitCondLine(CondLineNode line) {return true;}
+		public virtual bool VisitSubModel(PartNode line) {return true;}
+		public virtual bool VisitComment(Comment line) {return true;}
 		
 		protected virtual void Initialize() {}
 		protected virtual T? GetResult(LdrawObject object) {return null;}

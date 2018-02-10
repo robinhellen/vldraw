@@ -33,9 +33,9 @@ namespace Ldraw.Povray
 
 				stderr.printf("Writing colours as povray materials.\n");
 				yield WriteColours(pov.Colours, outStream);
-				stderr.printf("Writing sub object definitions");
+				stderr.printf("Writing sub object definitions\n");
 				yield WriteObjects(pov.ObjectsToDefine, outStream);
-				stderr.printf("Writing main object.");
+				stderr.printf("Writing main object.\n");
 				yield WriteMainObject(model, outStream);
 
 				yield AddGroundPlane(model, outStream);
@@ -43,7 +43,7 @@ namespace Ldraw.Povray
 				yield AddCameraAndLights(outStream, model, exportOptions.CameraOptions);
 
 				yield outStream.close_async();
-				stderr.printf("Finished writing povray.");
+				stderr.printf("Finished writing povray.\n");
 			}
 			catch(Error e)
 			{

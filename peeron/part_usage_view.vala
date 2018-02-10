@@ -75,6 +75,13 @@ namespace Ldraw.Peeron
 					original.remove_at(i);
 					var path = new TreePath.from_indices(firstIndex, i);
 					row_deleted(path);
+					if(original.size == 0)
+					{
+						TreeIter iter;
+						path = new TreePath.from_indices(firstIndex);
+						get_iter(out iter, path);		
+						row_has_child_toggled(path, iter);				
+					}
 				}
 				else
 				{
@@ -88,6 +95,13 @@ namespace Ldraw.Peeron
 				original.remove_at(i);
 				var path = new TreePath.from_indices(firstIndex, i);
 				row_deleted(path);
+				if(original.size == 0)
+				{
+					TreeIter iter;
+					path = new TreePath.from_indices(firstIndex);
+					get_iter(out iter, path);		
+					row_has_child_toggled(path, iter);				
+				}
 			}
 			while(j < updatedList.size)
 			{

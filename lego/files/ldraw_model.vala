@@ -20,7 +20,7 @@ namespace Ldraw.Lego
 			try
 			{
 				var builder = new LdrFileBuilder(FilePath);
-				MainObject.BuildFromFile<void>(builder);
+				MainObject.BuildFromFile<bool>(builder);
 				builder.Finish();
 			}
 			catch(Error e)

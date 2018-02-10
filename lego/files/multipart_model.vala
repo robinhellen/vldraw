@@ -18,7 +18,7 @@ namespace Ldraw.Lego
 				{
 					builder.VisitNode(new MetaCommand("FILE", {model.FileName}));
 
-					model.BuildFromFile<void>(builder);
+					model.BuildFromFile<bool>(builder);
 
 					builder.VisitNode(new MetaCommand("NOFILE", {}));
 				}

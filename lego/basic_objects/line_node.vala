@@ -30,9 +30,9 @@ namespace Ldraw.Lego.Nodes
 			return new LineNode(Colour, a, b);
 		}
 
-		public override void Accept(LdrawVisitor visitor)
+		public override bool Accept(LdrawVisitor visitor)
 		{
-			visitor.VisitLine(this);
+			return visitor.VisitLine(this);
 		}
 
 		public override async void AcceptAsync(AsyncLdrawVisitor visitor)

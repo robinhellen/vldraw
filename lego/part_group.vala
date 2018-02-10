@@ -22,20 +22,20 @@ namespace Ldraw.Lego
 		public PartGroup.FromModel(LdrawModelFile model)
 		{
 			var builder = new GroupBuilder();
-			model.MainObject.BuildFromFile<void>(builder);
+			model.MainObject.BuildFromFile<bool>(builder);
 			Object(Items: builder.GetItems());
 		}
 
-		private class GroupBuilder : LdrawVisitor<void>
+		private class GroupBuilder : LdrawVisitor<bool>
 		{
 			private Collection<PartNode> parts = new ArrayList<PartNode>();
 
-			public override void VisitSubModel(PartNode node)
+			public override bool VisitSubModel(PartNode node)
 			{
 				var file = node.Contents.File;
 				if(file == null)
 				{
-					return;
+					return true;
 				}
 				if(file is LdrawPart)
 				{
@@ -44,12 +44,13 @@ namespace Ldraw.Lego
 				else if(file is LdrawModel
 						|| file is MultipartModel)
 				{
-					node.Contents.BuildFromFile<void>(this);
+					node.Contents.BuildFromFile<bool>(this);
 				}
 				else
 				{
 					stderr.printf(@"Unexpected class of file object: $(node.Contents.File.get_type().name()).\n");
 				}
+				return true;
 			}
 
 			public Collection<PartGroupItem> GetItems()

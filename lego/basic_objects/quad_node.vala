@@ -40,9 +40,9 @@ namespace Ldraw.Lego.Nodes
 			return new QuadNode(Colour, a, b, c, d);
 		}
 
-		public override void Accept(LdrawVisitor visitor)
+		public override bool Accept(LdrawVisitor visitor)
 		{
-			visitor.VisitQuad(this);
+			return visitor.VisitQuad(this);
 		}
 
 		public override async void AcceptAsync(AsyncLdrawVisitor visitor)

@@ -79,9 +79,9 @@ namespace Ldraw.Lego.Nodes
 			return new PartNode(newCenter, newTransform, m_Contents, Colour);
 		}
 
-		public override void Accept(LdrawVisitor visitor)
+		public override bool Accept(LdrawVisitor visitor)
 		{
-			visitor.VisitSubModel(this);
+			return visitor.VisitSubModel(this);
 		}
 
 		public override async void AcceptAsync(AsyncLdrawVisitor visitor)

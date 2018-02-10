@@ -20,9 +20,9 @@ namespace Ldraw.Lego.Nodes
 			return this;
 		}
 
-		public override void Accept(LdrawVisitor visitor)
+		public override bool Accept(LdrawVisitor visitor)
 		{
-			visitor.VisitComment(this);
+			return visitor.VisitComment(this);
 		}
 
 		public override async void AcceptAsync(AsyncLdrawVisitor visitor)

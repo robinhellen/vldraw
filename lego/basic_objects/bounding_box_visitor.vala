@@ -9,16 +9,17 @@ namespace Ldraw.Lego
 		private Matrix Transform {get; set;}
 		private Vector Center {get; set;}
 		
-		public override void VisitLine(LineNode line) 
+		public override bool VisitLine(LineNode line) 
 		{
 			Vector a = Transform.TransformVector(line.A).Add(Center);
 			Vector b = Transform.TransformVector(line.B).Add(Center);
 			
 			BoundingBox.Union(a);
 			BoundingBox.Union(b);
+			return true;
 		}
 		
-		public override void VisitTriangle(TriangleNode triangle) 
+		public override bool VisitTriangle(TriangleNode triangle) 
 		{
 			Vector a = Transform.TransformVector(triangle.A).Add(Center);
 			Vector b = Transform.TransformVector(triangle.B).Add(Center);
@@ -26,10 +27,11 @@ namespace Ldraw.Lego
 						
 			BoundingBox.Union(a);
 			BoundingBox.Union(b);
-			BoundingBox.Union(c);		
+			BoundingBox.Union(c);
+			return true;		
 		}
 		
-		public override void VisitQuad(QuadNode quad) 
+		public override bool VisitQuad(QuadNode quad) 
 		{
 			Vector a = Transform.TransformVector(quad.A).Add(Center);
 			Vector b = Transform.TransformVector(quad.B).Add(Center);
@@ -40,19 +42,21 @@ namespace Ldraw.Lego
 			BoundingBox.Union(b);
 			BoundingBox.Union(c);
 			BoundingBox.Union(d);
+			return true;
 		}
 		
-		public override void VisitCondLine(CondLineNode line) 
+		public override bool VisitCondLine(CondLineNode line) 
 		{
 			Vector a = Transform.TransformVector(line.A).Add(Center);
 			Vector b = Transform.TransformVector(line.B).Add(Center);
 			
 			BoundingBox.Union(a);
 			BoundingBox.Union(b);
+			return true;
 		}
 		
 		
-		public override void VisitSubModel(PartNode part) 
+		public override bool VisitSubModel(PartNode part) 
 		{
 			var oldCenter = Center;
 			var oldTransform = Transform;
@@ -64,11 +68,13 @@ namespace Ldraw.Lego
 			// recurse into the current builder
 			foreach(var node in part.Contents.Nodes)
 			{
-				VisitNode(node);
+				if(!VisitNode(node))
+					return false;
 			}
 			
 			Center = oldCenter;
 			Transform = oldTransform;
+			return true;
 		}
 		
 		protected override void Initialize()

@@ -32,10 +32,10 @@ namespace Ldraw.Tests.Vectors
 			var unitX = Vector(1, 0, 0);
 			var unitY = Vector(0, 1, 0);
 			var unitZ = Vector(0, 0, 1);
-			AddTheory<Vector>("DotSelf", DotSelfIsMagnitudeSquared, data, v => v.to_string());
-			AddTheory<Vector>("CrossSelf", CrossSelfIsNullVector, data, v => v.to_string());
-			AddTheory<Vector>("IdentityTransform", IdentityMatrixWorks, data, v => v.to_string());
-			AddTheory<Vector>("NullTransform", NullMatrixWorks, data, v => v.to_string());
+			AddTheory<Vector?>("DotSelf", DotSelfIsMagnitudeSquared, data, v => v.to_string());
+			AddTheory<Vector?>("CrossSelf", CrossSelfIsNullVector, data, v => v.to_string());
+			AddTheory<Vector?>("IdentityTransform", IdentityMatrixWorks, data, v => v.to_string());
+			AddTheory<Vector?>("NullTransform", NullMatrixWorks, data, v => v.to_string());
 
 			// cross product for unit vectors
 			add_test("CrossXY", () => TestCrossProduct(unitX, unitY, unitZ));
@@ -43,14 +43,14 @@ namespace Ldraw.Tests.Vectors
 			add_test("CrossZX", () => TestCrossProduct(unitZ, unitX, unitY));
 		}
 
-		public void DotSelfIsMagnitudeSquared(Vector v)
+		public void DotSelfIsMagnitudeSquared(Vector? v)
 		{
 			var squareMagnitude = v.Magnitude * v.Magnitude;
 
 			Assert.AreEqualFloat(squareMagnitude, v.Dot(v));
 		}
 
-		public void CrossSelfIsNullVector(Vector v)
+		public void CrossSelfIsNullVector(Vector? v)
 		{
 			var result = v.Cross(v);
 			AssertAreEqualVectors(Vector.NullVector, result);
@@ -61,13 +61,13 @@ namespace Ldraw.Tests.Vectors
 			AssertAreEqualVectors(expected, v1.Cross(v2));
 		}
 
-		public void IdentityMatrixWorks(Vector v)
+		public void IdentityMatrixWorks(Vector? v)
 		{
 			Matrix i = Matrix.Identity;
 			AssertAreEqualVectors(v, i.TransformVector(v));
 		}
 
-		public void NullMatrixWorks(Vector v)
+		public void NullMatrixWorks(Vector? v)
 		{
 			Matrix i = Matrix.NullMatrix;
 			AssertAreEqualVectors(Vector.NullVector, i.TransformVector(v));

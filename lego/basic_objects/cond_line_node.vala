@@ -40,9 +40,9 @@ namespace Ldraw.Lego.Nodes
 			return new CondLineNode(Colour, a, b, c, d);
 		}
 
-		public override void Accept(LdrawVisitor visitor)
+		public override bool Accept(LdrawVisitor visitor)
 		{
-			visitor.VisitCondLine(this);
+			return visitor.VisitCondLine(this);
 		}
 
 		public override async void AcceptAsync(AsyncLdrawVisitor visitor)

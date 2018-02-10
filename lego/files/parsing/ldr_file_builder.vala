@@ -1,7 +1,7 @@
 
 namespace Ldraw.Lego
 {
-	public class LdrFileBuilder : LdrawVisitor<void>
+	public class LdrFileBuilder : LdrawVisitor<bool?>
 	{
 		private File m_File;
 		private FileOutputStream m_OutStream;
@@ -16,10 +16,10 @@ namespace Ldraw.Lego
 			m_OutStream = m_File.replace(null, false, FileCreateFlags.NONE);
 		}
 
-		public override void VisitNode(LdrawNode node)
+		public override bool VisitNode(LdrawNode node)
 		{
 			if(HadError)
-				return;
+				return false;
 			try
 			{
 				m_OutStream.write(node.FileLine.data);
@@ -29,7 +29,15 @@ namespace Ldraw.Lego
 			{
 				HadError = true;
 				m_CaughtError = e;
+				return false;
 			}
+			return true;
+		}
+		
+		
+		public override bool? GetResult(LdrawObject object)
+		{
+			return HadError;
 		}
 
 		public void Finish()

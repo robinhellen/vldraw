@@ -24,7 +24,7 @@ namespace Ldraw.Povray
 			return (Pov)Object.new(typeof(Pov), Colours: colours, ObjectsToDefine: objectsToDefine);
 		}
 
-		public override void VisitSubModel(PartNode line)
+		public override bool VisitSubModel(PartNode line)
 		{
 			colours.add(line.Colour);
 			if(!(line.Contents in objectsToDefine))
@@ -32,14 +32,17 @@ namespace Ldraw.Povray
 				VisitInner(line.Contents);
 				objectsToDefine.add(line.Contents);
 			}
+			return true;
 		}
-		public override void VisitTriangle(TriangleNode line)
+		public override bool VisitTriangle(TriangleNode line)
 		{
 			colours.add(line.Colour);
+			return true;
 		}
-		public override void VisitQuad(QuadNode line)
+		public override bool VisitQuad(QuadNode line)
 		{
 			colours.add(line.Colour);
+			return true;
 		}
 	}
 

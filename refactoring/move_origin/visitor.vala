@@ -13,14 +13,11 @@ namespace Ldraw.Refactor
 		{
 			this.shift = shift;
 		}		
-
-		public override void VisitLine(LineNode line) {}
-		public override void VisitTriangle(TriangleNode line) {}
-		public override void VisitQuad(QuadNode line) {}
-		public override void VisitCondLine(CondLineNode line) {}
-		public override void VisitSubModel(PartNode line) 
+		
+		public override bool VisitSubModel(PartNode line) 
 		{
 			line.Move(shift);
+			return true;
 		}		
 	}
 }
