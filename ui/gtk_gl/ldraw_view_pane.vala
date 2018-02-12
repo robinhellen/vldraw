@@ -32,6 +32,8 @@ namespace Ldraw.Ui.GtkGl
 			DefaultColour = ColourContext.GetColourById(0);
 			base.realize.connect(realize); // if we override the virtual, the base won't get called properly.
 			viewParameters = ViewParameters();
+			viewParameters.lduHeight = 400F;
+			viewParameters.lduWidth = 400F;
 		}
 
 		public LdrawObject Model
@@ -149,6 +151,8 @@ namespace Ldraw.Ui.GtkGl
 			viewParameters.lduScrollY = -transformedCenter.Y;
 
 
+//~ 			viewParameters.lduWidth = float.max(2 * bounds.Radius, 400.0F);
+//~ 			viewParameters.lduHeight = float.max(2 * bounds.Radius, 400.0F);
 			viewParameters.lduWidth = 2 * bounds.Radius;
 			viewParameters.lduHeight = 2 * bounds.Radius;
 

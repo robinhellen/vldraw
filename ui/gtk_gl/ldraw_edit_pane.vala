@@ -325,13 +325,13 @@ namespace Ldraw.Ui.GtkGl
 				m_Hadj = value;
 				if(value == null)
 					return;
-				m_Hadj.lower = -3000;
-				m_Hadj.upper = 3000;
+				m_Hadj.lower = -300;
+				m_Hadj.upper = 300;
 				m_Hadj.page_increment = 150;
 				m_Hadj.step_increment = 30;
 				m_Hadj.value_changed.connect(adj =>
 				{
-					viewParameters.lduScrollX = (float)adj.value;
+					viewParameters.lduScrollX = -(float)adj.value;
 					queue_draw();
 				});			
 				m_Hadj.value = viewParameters.lduScrollX;		
@@ -349,13 +349,13 @@ namespace Ldraw.Ui.GtkGl
 				m_Vadj = value;
 				if(value == null)
 					return;
-				m_Vadj.lower = -3000;
-				m_Vadj.upper = 3000;
+				m_Vadj.lower = -300;
+				m_Vadj.upper = 300;
 				m_Vadj.page_increment = 150;
 				m_Vadj.step_increment = 30;
 				m_Vadj.value_changed.connect(adj =>
 					{
-						viewParameters.lduScrollY = (float)adj.value;
+						viewParameters.lduScrollY = -(float)adj.value;
 						queue_draw();
 					});
 				m_Vadj.value = viewParameters.lduScrollY;					
