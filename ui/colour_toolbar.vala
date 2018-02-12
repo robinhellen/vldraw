@@ -12,6 +12,8 @@ namespace Ldraw.Ui
 		public ColourContext ColourContext {construct; private get; }
 
 		public int ButtonSize {get; set; default = 16;}
+		
+		private bool use_new_greys = true;
 
 		public Toolbar CreateToolbar(Window window)
 		{
@@ -21,7 +23,10 @@ namespace Ldraw.Ui
 			falseVal.set_boolean(false);
 			for(int i = 0; i < 16; i++)
 			{
-				var button = CreateColourButton(i);
+				var colour_index = i;
+				if(use_new_greys && (i ==7 || i == 8))
+					colour_index += 64;
+				var button = CreateColourButton(colour_index);
 				bar.insert(button, -1);
 				bar.child_set_property(button, "homogeneous", falseVal);
 			}
