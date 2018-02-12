@@ -244,6 +244,18 @@ namespace Ldraw.Ui
 
         private void ModelAddSubModel_OnActivate(Window parent)
         {
+            var mpdModel = Model.Model.File as MultipartModel;
+            var base_filename = Model.Model.File.FileName[0:-4];
+            string new_submodel_filename;
+            if(mpdModel == null)
+            {
+				new_submodel_filename = base_filename + "s1.ldr";
+			}
+			else
+			{
+				new_submodel_filename = base_filename + @"s$(mpdModel.SubModels.size).ldr"; // TODO check for duplicates
+			}
+            
             var dialog = new Dialog.with_buttons("Model details", parent,
                 DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
                 "_OK", ResponseType.ACCEPT,
@@ -257,7 +269,9 @@ namespace Ldraw.Ui
             grid.attach(new Label("Sub-model name"), 0, 1);
             grid.attach(new Label("Description"), 0, 2);
             var filenameEntry = new Entry();
+            filenameEntry.text = new_submodel_filename;
             var nameEntry = new Entry();
+            nameEntry.text = new_submodel_filename;
             var descriptionEntry = new Entry();
             grid.attach(filenameEntry, 1, 0);
             grid.attach(nameEntry, 1, 1);
@@ -268,13 +282,12 @@ namespace Ldraw.Ui
 
             var response = dialog.run();
 
-            var mpdModel = Model.Model.File as MultipartModel;
 
             var newFileName = filenameEntry.text;
             if(newFileName == null || newFileName.length == 0)
             {
                 if(mpdModel == null)
-                    newFileName = Model.Model.File.FileName + " (1)";
+                    newFileName = Model.Model.File.FileName + " (1).ldr";
                 else
                     newFileName = Model.Model.File.FileName + @" ($(mpdModel.SubModels.size))";
             }
