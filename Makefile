@@ -41,7 +41,7 @@ SOURCES=$(wildcard *.vala)
 
 # Core modules
 application_sources=application/application.vala
-application_packages=$(gee)
+application_packages=$(gee) $(gio)
 application_private_packages=diva
 
 utils_sources= $(wildcard utils/*.vala)

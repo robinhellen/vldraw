@@ -17,15 +17,23 @@ namespace Ldraw.Application
 		
 		public void Run(string[] args)
 		{
-			foreach(var init in StartupInitializers)
-			{
-				init.Initialize();
-			}
+			var loop = new MainLoop();
+			run_initializers.begin(() => loop.quit());
+			loop.run();
 			
 			if(!ArgHandler.HandleArgs(args))
 				return;
 			
 			Ui.Start();
+		}
+		
+		private async void run_initializers()
+		{
+			var reporter = new ConsoleReporter();
+			foreach(var init in StartupInitializers)
+			{
+				yield init.Initialize(reporter);
+			}			
 		}
 	}
 	
@@ -41,6 +49,23 @@ namespace Ldraw.Application
 	
 	public interface InitializeOnStartup : Object
 	{
-		public abstract void Initialize();
+		public abstract async void Initialize(ProgressReporter reporter);
+	}
+	
+	public interface ProgressReporter : Object
+	{
+		public abstract void start_task(string task_name);
+		public abstract void task_progress(string task_name, double progress);
+		public abstract void end_task(string task_name);
+	}
+	
+	private class ConsoleReporter : Object, ProgressReporter
+	{
+		public void start_task(string task_name){}
+		public void task_progress(string task_name, double progress)
+		{
+			stdout.printf(@"$task_name: $progress\n");
+		}
+		public void end_task(string task_name){}
 	}
 }
