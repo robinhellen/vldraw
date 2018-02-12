@@ -8,7 +8,7 @@ namespace Ldraw.Povray
 	private class PartBuildExporter : PovrayExporter
 	{
 		public override string Name { get {return "Povray by Parts"; } }
-		public override string PreferredExtension {get {return "mpg";}}
+		public override string PreferredExtension {get {return "mp4";}}
 
 		public override async void Export(LdrawObject model, ExportOptions exportOptions)
 		{
@@ -25,7 +25,7 @@ namespace Ldraw.Povray
 			var frameCount = model.Nodes.size;
 			// invoke povray to render to a sequence of image files
 			stderr.printf(@"Rendering povray images to $tempDir\n");
-            string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D"};
+            string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D", "+WT2"};
             var povrayStatus = yield async_spawn(null, povrayArgv, null
 					, SpawnFlags.SEARCH_PATH
 					| SpawnFlags.STDOUT_TO_DEV_NULL
