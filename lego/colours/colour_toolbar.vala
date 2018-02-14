@@ -2,14 +2,16 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Ui.Commands;
+using Ldraw.Ui;
 
-namespace Ldraw.Ui
+namespace Ldraw.Colours
 {	
 	private class ColourToolbar : GLib.Object, ToolbarProvider
 	{
 		public AnimatedModel m_ModelContainer {construct; private get;}
 		public UndoStack undoStack {construct; private get;}
 		public ColourContext ColourContext {construct; private get; }
+		public ColourOptions colour_options {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
 		
@@ -58,6 +60,10 @@ namespace Ldraw.Ui
 			moreButton.set_tooltip_text("More colours");
 			bar.insert(moreButton, -1);
 			bar.child_set_property(moreButton, "homogeneous", falseVal);
+			
+			var palette_chooser = new MenuToolButton(new Image.from_stock("gtk-color-picker", IconSize.BUTTON), "Palettes");
+			bar.insert(palette_chooser, -1);
+			palette_chooser.menu = create_palette_menu();
 
 			return bar;
 		}
@@ -85,6 +91,13 @@ namespace Ldraw.Ui
 				});
 			button.set_tooltip_text(colour.Name);
 			return button;
+		}
+	
+		private Gtk.Menu create_palette_menu()
+		{
+			var menu = new Gtk.Menu();
+			
+			return menu;
 		}
 	}
 

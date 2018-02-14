@@ -3,7 +3,7 @@ using Ldraw.Lego.Nodes;
 
 namespace Ldraw.Lego.Library
 {
-	private class ColourMetaCommand : MetaCommand
+	public class ColourMetaCommand : MetaCommand
 	{
 		public ColourMetaCommand(string command, string[] argTokens)
 		{

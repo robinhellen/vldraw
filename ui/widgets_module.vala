@@ -15,7 +15,6 @@ namespace Ldraw.Ui
             builder.register<SubModelsTree>().as<IPartDragSource>();
             builder.register<ModelList>();
             builder.register<MainMenu>();
-            builder.register<ColourToolbar>().as<ToolbarProvider>();
             builder.register<MovementToolbar>().as<ToolbarProvider>();
             
             builder.register<RecentChooserMenu>().as<RecentChooser>()

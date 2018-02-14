@@ -61,6 +61,10 @@ lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)
 lego_objects_packages=$(gee) $(gio)
 lego_objects_internal_packages=maths
 
+lego_colours_sources=$(wildcard  lego/colours/*.vala)
+lego_colours_packages=$(gee) $(gio)
+lego_colours_internal_packages=lego ui_widgets application
+
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages= diva
@@ -131,7 +135,7 @@ clipboard_internal_packages=ui_widgets lego lego_objects options
 
 # End of module build specs
 
-INTERNAL_LIBS=utils expressions maths options lego lego_objects part_group \
+INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
 PLUGINS=animation steps povray peeron move_origin clipboard

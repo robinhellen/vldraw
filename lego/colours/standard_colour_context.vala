@@ -3,8 +3,9 @@ using Gee;
 
 using Ldraw.Application;
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 
-namespace Ldraw.Lego.Library
+namespace Ldraw.Colours
 {
 	private class StandardColourContext : Object, ColourContext, InitializeOnStartup
 	{
