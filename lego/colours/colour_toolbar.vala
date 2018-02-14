@@ -33,29 +33,7 @@ namespace Ldraw.Colours
 			}
 
 			var moreButton = new ToolButton(null, "More");
-			moreButton.clicked.connect(() =>
-				{
-					var dialog = new Dialog.with_buttons("Select colour", window,
-						DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-						"_OK",		ResponseType.ACCEPT,
-						"_Cancel",	ResponseType.REJECT
-					);
-
-					var chooser = new ColourChooser(ColourContext);
-
-					((Container)dialog.get_content_area()).add(chooser);
-
-					dialog.show_all();
-					var result = dialog.run();
-					if(result != ResponseType.ACCEPT)
-					{
-						dialog.destroy();
-						return;
-					}
-
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
-					dialog.destroy();
-				});
+			moreButton.clicked.connect(() => more_button_handler(window));
 			moreButton.set_tooltip_text("More colours");
 			bar.insert(moreButton, -1);
 			bar.child_set_property(moreButton, "homogeneous", falseVal);
@@ -128,6 +106,30 @@ namespace Ldraw.Colours
 			item.show();
 			menu.append(item);
 			return item;
+		}
+		
+		private void more_button_handler(Window window)
+		{
+			var dialog = new Dialog.with_buttons("Select colour", window,
+				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
+				"_OK",		ResponseType.ACCEPT,
+				"_Cancel",	ResponseType.REJECT
+			);
+
+			var chooser = new ColourChooser(ColourContext);
+
+			((Container)dialog.get_content_area()).add(chooser);
+
+			dialog.show_all();
+			var result = dialog.run();
+			if(result != ResponseType.ACCEPT)
+			{
+				dialog.destroy();
+				return;
+			}
+
+			undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
+			dialog.destroy();
 		}
 	}
 
