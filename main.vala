@@ -3,7 +3,7 @@ using Gtk;
 
 using Ldraw.Application;
 using Ldraw.Lego;
-using Ldraw.Lego.Colours;
+using Ldraw.Colours;
 using Ldraw.Lego.Library;
 using Ldraw.OpenGl;
 using Ldraw.Options;

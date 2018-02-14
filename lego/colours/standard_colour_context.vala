@@ -32,8 +32,9 @@ namespace Ldraw.Colours
 			
 			File file = Folders.LibraryDirectory.get_child("LDConfig.ldr");
 			var fileReader = ReaderFactory.GetReader(file);
+			var locator = new NullLocator();
 			LdrawNode node;
-			while((node = yield fileReader.next(null, null)) != null)
+			while((node = yield fileReader.next(locator, this)) != null)
 			{
 				var progress = fileReader.get_progress();
 				ColourMetaCommand colourCommand = node as ColourMetaCommand;
@@ -48,6 +49,15 @@ namespace Ldraw.Colours
 		public Colour GetColourById(int colourId)
 		{
 			return allColours[colourId];
+		}
+		
+		private class NullLocator : Object, ISubFileLocator
+		{			
+			public async LdrawObject? GetObjectFromReference(string reference)
+				throws ParseError
+			{
+				throw new ParseError.CorruptFile("Colour definitions files should not load parts.");
+			}
 		}
 	}
 }

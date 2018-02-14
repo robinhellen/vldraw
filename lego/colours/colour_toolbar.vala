@@ -1,3 +1,4 @@
+using Gee;
 using Gtk;
 
 using Ldraw.Lego;
@@ -15,7 +16,7 @@ namespace Ldraw.Colours
 
 		public int ButtonSize {get; set; default = 16;}
 		
-		private bool use_new_greys = true;
+		private Map<Colour, Image> button_images = new HashMap<Colour, Image>();
 
 		public Toolbar CreateToolbar(Window window)
 		{
@@ -26,8 +27,6 @@ namespace Ldraw.Colours
 			for(int i = 0; i < 16; i++)
 			{
 				var colour_index = i;
-				if(use_new_greys && (i ==7 || i == 8))
-					colour_index += 64;
 				var button = CreateColourButton(colour_index);
 				bar.insert(button, -1);
 				bar.child_set_property(button, "homogeneous", falseVal);
@@ -62,18 +61,43 @@ namespace Ldraw.Colours
 			bar.child_set_property(moreButton, "homogeneous", falseVal);
 			
 			var palette_chooser = new MenuToolButton(new Image.from_stock("gtk-color-picker", IconSize.BUTTON), "Palettes");
+			palette_chooser.set_menu(create_palette_menu());
 			bar.insert(palette_chooser, -1);
-			palette_chooser.menu = create_palette_menu();
 
 			return bar;
 		}
 
-		private ToolButton CreateColourButton(int colourId)
+		private ToolButton CreateColourButton(int colour_index)
 		{
+			var colour_id = colour_options.current_palette.colour_codes[colour_index];
+			var colour = ColourContext.GetColourById(colour_id);
+			var button_image = get_image_for_colour(colour);			
+			var button = new ToolButton(button_image, null);
+			button.clicked.connect(() =>
+				{
+					var c_id = colour_options.current_palette.colour_codes[colour_index];
+					var c = ColourContext.GetColourById(c_id);
+					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, c));
+				});
+			button.set_tooltip_text(colour.Name);
+			colour_options.notify["current-palette"].connect(() => {
+				var c_id = colour_options.current_palette.colour_codes[colour_index];
+				var c = ColourContext.GetColourById(c_id);
+				button.set_tooltip_text(c.Name);
+				button.set_icon_widget(get_image_for_colour(c));
+				button.show_all();
+			});
+			return button;
+		}
+		
+		private Image get_image_for_colour(Colour colour)
+		{
+			if(button_images.has_key(colour))
+			{
+				return button_images[colour];
+			}
 			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
-			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);
-			
-			var colour = ColourContext.GetColourById(colourId);
+			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);			
 			
 			uint32 fillColour = (colour.Red << 24)
 							  | (colour.Green << 16)
@@ -84,20 +108,26 @@ namespace Ldraw.Colours
 			image.fill((uint32) 255);
 			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
 			
-			var button = new ToolButton(new Image.from_pixbuf(image), null);
-			button.clicked.connect(() =>
-				{
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, colour));
-				});
-			button.set_tooltip_text(colour.Name);
-			return button;
+			var ret = new Image.from_pixbuf(image);
+			button_images[colour] = ret;
+			return ret;
 		}
 	
 		private Gtk.Menu create_palette_menu()
 		{
 			var menu = new Gtk.Menu();
-			
+			colour_options.all_palettes.fold<RadioMenuItem?>((palette, last) => append_menu_item_for_palette(menu, palette, last), null);			
 			return menu;
+		}
+		
+		private RadioMenuItem append_menu_item_for_palette(Gtk.Menu menu, Palette palette, RadioMenuItem? last)
+		{
+			var item = new RadioMenuItem.with_mnemonic(null, palette.name);
+			item.join_group(last);
+			item.activate.connect(() => {colour_options.current_palette = palette;});
+			item.show();
+			menu.append(item);
+			return item;
 		}
 	}
 

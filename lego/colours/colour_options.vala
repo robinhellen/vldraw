@@ -28,7 +28,7 @@ namespace Ldraw.Colours
 	
 	private class Palette : Object
 	{
-		public Palette.builtin(string name, int colour_codes[16])
+		public Palette.builtin(string name, int[] colour_codes)
 		{
 			Object(name:name, user_editable: false);
 			this.colour_codes = colour_codes;

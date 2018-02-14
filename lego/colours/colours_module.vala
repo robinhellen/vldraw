@@ -16,6 +16,9 @@ namespace Ldraw.Colours
 				.as<ColourContext>()
 				.as<InitializeOnStartup>();
             builder.register<ColourToolbar>().as<ToolbarProvider>();
+            builder.register<ColourOptions>()
+				.single_instance()
+				.as<InitializeOnStartup>();
 		}
 	}
 }

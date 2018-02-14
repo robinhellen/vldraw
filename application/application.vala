@@ -61,7 +61,7 @@ namespace Ldraw.Application
 	
 	private class ConsoleReporter : Object, ProgressReporter
 	{
-		public void start_task(string task_name){}
+		public void start_task(string task_name){stdout.printf(@"starting $task_name\n");}
 		public void task_progress(string task_name, double progress)
 		{
 			stdout.printf(@"$task_name: $progress\n");
