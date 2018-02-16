@@ -15,8 +15,6 @@ namespace Ldraw.Colours
 		public ColourOptions colour_options {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
-		
-		private Map<Colour, Image> button_images = new HashMap<Colour, Image>();
 
 		public Toolbar CreateToolbar(Window window)
 		{
@@ -70,10 +68,6 @@ namespace Ldraw.Colours
 		
 		private Image get_image_for_colour(Colour colour)
 		{
-			if(button_images.has_key(colour))
-			{
-				return button_images[colour];
-			}
 			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize, ButtonSize);
 			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, ButtonSize - 2, ButtonSize - 2);			
 			
@@ -87,7 +81,6 @@ namespace Ldraw.Colours
 			swatch.copy_area(0,0,ButtonSize - 2, ButtonSize - 2, image, 1, 1);
 			
 			var ret = new Image.from_pixbuf(image);
-			button_images[colour] = ret;
 			return ret;
 		}
 	
