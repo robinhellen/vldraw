@@ -81,7 +81,7 @@ namespace Ldraw.Colours
 			colours.add_all(counts.keys);
 			colours.sort((a, b) => counts[b] - counts[a]);
 			int i = 0;
-			for(i = 0; i < 16 && i <= colours.size; i++)
+			for(i = 0; i < 16 && i < colours.size; i++)
 			{
 				colour_codes[i] = colours[i];
 			}

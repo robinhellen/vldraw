@@ -56,14 +56,28 @@ namespace Ldraw.Colours
 					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, c));
 				});
 			button.set_tooltip_text(colour.Name);
-			colour_options.notify["current-palette"].connect(() => {
-				var c_id = colour_options.current_palette.colour_codes[colour_index];
-				var c = ColourContext.GetColourById(c_id);
-				button.set_tooltip_text(c.Name);
-				button.set_icon_widget(get_image_for_colour(c));
-				button.show_all();
+			var palette = colour_options.current_palette;
+			ulong handler = colour_options.current_palette.changed.connect(() => {
+				update_colour_button(button, colour_index);
+			});
+			colour_options.notify["current-palette"].connect(() => {			
+				update_colour_button(button, colour_index);
+				palette.disconnect(handler);
+				palette = colour_options.current_palette;
+				handler = palette.changed.connect(() => {
+					update_colour_button(button, colour_index);
+				});
 			});
 			return button;
+		}
+		
+		private void update_colour_button(ToolButton button, int index)
+		{
+			var c_id = colour_options.current_palette.colour_codes[index];
+			var c = ColourContext.GetColourById(c_id);
+			button.set_tooltip_text(c.Name);
+			button.set_icon_widget(get_image_for_colour(c));
+			button.show_all();
 		}
 		
 		private Image get_image_for_colour(Colour colour)
