@@ -45,9 +45,14 @@ namespace Ldraw.Ui.GtkGl
 			drag_dest_set(this, (DestDefaults)0, {LdrawDragData}, DragAction.COPY);
 			drag_dest_set_track_motion(this, true);
 			model.bind_property("Model", this, "Model");
-			model.view_changed.connect(() => queue_draw());
+			model.view_changed.connect(() => model_view_changed());
 			Model = model.Model;
 			overlay = DropOverlay;
+		}
+		
+		private void model_view_changed()
+		{			
+			queue_draw();
 		}
 		
 		protected override Gee.Set<LdrawNode> CurrentSelection
@@ -128,6 +133,7 @@ namespace Ldraw.Ui.GtkGl
 					queue_draw();
 					break;
 			}
+			update_scroll_limits();
 			return true;
 		}
 
@@ -368,6 +374,41 @@ namespace Ldraw.Ui.GtkGl
 		
 		public ScrollablePolicy hscroll_policy {get;set;}
 		public ScrollablePolicy vscroll_policy {get;set;}
+		
+		private void update_scroll_limits()
+		{
+			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
+			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
+			var m = latTransform.TransformMatrix(longTransform);
+			var bounds = model.Model.BoundingBox;
+			
+			var new_bounds = new Ldraw.Maths.Bounds();
+			new_bounds.Union(m.TransformVector(Vector(bounds.MinX, bounds.MinY, bounds.MinZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MinX, bounds.MinY, bounds.MaxZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MinX, bounds.MaxY, bounds.MinZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MinX, bounds.MaxY, bounds.MaxZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MinZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MaxX, bounds.MinY, bounds.MaxZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MaxX, bounds.MaxY, bounds.MinZ)));
+			new_bounds.Union(m.TransformVector(Vector(bounds.MaxX, bounds.MaxY, bounds.MaxZ)));	
+			
+			if(m_Vadj != null)
+			{
+				m_Vadj.lower = new_bounds.MinY;
+				m_Vadj.upper = new_bounds.MaxY;
+				m_Vadj.page_increment = 150;
+				m_Vadj.step_increment = 30;
+			}
+			if(m_Hadj != null)
+			{
+				m_Hadj.lower = new_bounds.MinX;
+				m_Hadj.upper = new_bounds.MaxX;
+				m_Hadj.page_increment = 150;
+				m_Hadj.step_increment = 30;
+			}
+		}
+		
+		
 
 		// end implementation of Scrollable
 
