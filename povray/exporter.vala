@@ -60,24 +60,43 @@ namespace Ldraw.Povray
 			var angleRad =  (float)PI * angle / 180;
 			var longitude = (float)PI * cameraOptions.Longitude / 180;
 			var latitude =  (float)PI * cameraOptions.Latitude / 180;
+			
+			var scene_center = object.BoundingBox.Center();
+			var object_ball = object.BoundingBox.Radius;
 
 			float cameraDistance = object.BoundingBox.Radius / tanf(angleRad / 2);
 
-			var cameraVector = Vector(	cameraDistance * cosf(latitude) * sinf(longitude),
-										-cameraDistance * sinf(latitude),
-										-cameraDistance * cosf(latitude) * cosf(longitude))
-					.Add(object.BoundingBox.Center());
+			var cameraVector = vector_from_lat_long(latitude, longitude, cameraDistance)
+					.Add(scene_center);
 
 			var cameraObject = @"object { $(EscapeFilenameForSdl(object.FileName)) }
 // Background:
 background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundGreen),$(extraOptions.BackgroundBlue)>}";
 			yield stream.write_async(cameraObject.data);
 
-			yield stream.write_async(sdlGenerator.Camera(cameraVector, object.BoundingBox.Center(), angle).data);
-
-			yield stream.write_async(sdlGenerator.WhiteLightSource(Vector(8.5f,-400.778f,-152.778f)).data);     // Latitude,Longitude,Radius: 45,   0,477.69
-			yield stream.write_async(sdlGenerator.WhiteLightSource(Vector(366.768f,-301.845f,391.846f)).data);  // Latitude,Longitude,Radius: 30, 120,477.69
-			yield stream.write_async(sdlGenerator.WhiteLightSource(Vector(-198.346f,-476.692f,304.422f)).data); // Latitude,Longitude,Radius: 60,-120,477.69
+			yield stream.write_async(sdlGenerator.Camera(cameraVector, scene_center, angle).data);
+			
+			var lights = new ArrayList<Vector?>();
+			lights.add(vector_from_lat_long_deg(45, 0,    5 * object_ball));
+			lights.add(vector_from_lat_long_deg(30, 120,  5 * object_ball));
+			lights.add(vector_from_lat_long_deg(60, -120, 5 * object_ball));
+			
+			foreach(var light in lights)
+			{
+				yield stream.write_async(sdlGenerator.WhiteLightSource(light).data);
+			}
+		}
+		
+		private Vector vector_from_lat_long(float lat, float long, float radius)
+		{
+			return Vector(radius * cosf(lat) * sinf(long),
+						  -radius * sinf(lat),
+						  -radius * cosf(lat) * cosf(long));
+		}
+		
+		private Vector vector_from_lat_long_deg(float lat, float long, float radius)
+		{
+			return vector_from_lat_long((float)PI * lat / 180, (float)PI * long / 180, radius);
 		}
 
 		private async void AddGroundPlane(LdrawObject model, OutputStream stream)
