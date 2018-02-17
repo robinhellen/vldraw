@@ -304,7 +304,7 @@ namespace Ldraw.Ui
                             SubModels: subObjs,
                             FileName: Model.Model.File.FileName,
                             FilePath: (Model.Model.File as LdrawModelFile).FilePath);
-
+				Model.Model.File = mpdModel;
 				Model.Load(mpdModel.MainObject);
             }
             var nodes = new ObservableList<LdrawNode>();
