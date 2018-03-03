@@ -125,9 +125,9 @@ move_origin_sources=$(wildcard refactoring/move_origin/*.vala)
 move_origin_packages=$(gee) diva
 move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
 
-extract_inline_sources=$(wildcard refactoring/extract_inline/*.vala)
+extract_inline_sources=$(wildcard refactoring/inline_submodel/*.vala)
 extract_inline_packages=$(gee) diva
-extract_inline_internal_packages=ui_widgets
+extract_inline_internal_packages=ui_widgets lego lego_objects
 
 clipboard_sources=$(wildcard ui/clipboard/*.vala)
 clipboard_packages=$(gee) diva
@@ -138,7 +138,7 @@ clipboard_internal_packages=ui_widgets lego lego_objects options
 INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
-PLUGINS=animation steps povray peeron move_origin clipboard
+PLUGINS=animation steps povray peeron move_origin clipboard extract_inline
 # extract_inline
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
