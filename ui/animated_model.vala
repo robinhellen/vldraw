@@ -41,7 +41,7 @@ namespace Ldraw.Ui
         public void ClearSelection()
         {
 			Selection.clear();
-			view_changed();
+			changed_selection();
 		}
 		
 		public void Select(Set<LdrawNode> nodes, bool toggle)
@@ -50,7 +50,7 @@ namespace Ldraw.Ui
 				ToggleSelection(nodes);
 			else
 				SelectOnly(nodes);
-			view_changed();
+			changed_selection();
 		}
 		
 		private void SelectOnly(Set<LdrawNode> nodes)
@@ -74,13 +74,13 @@ namespace Ldraw.Ui
 		{
 			Selection.clear();
 			Selection.add(node);
-			view_changed();
+			changed_selection();
 		}
 		
 		public void SelectAll(Collection<LdrawNode> node)
 		{
 			Selection.add_all(node);
-			view_changed();
+			changed_selection();
 		}
 		
 		public LdrawNode? LastSelected
@@ -93,5 +93,6 @@ namespace Ldraw.Ui
 		}
 
         public signal void view_changed();
+        public signal void changed_selection();
     }	
 }
