@@ -6,3 +6,5 @@ lib
 vapi
 test
 plugins
+build
+ldraw.exe
