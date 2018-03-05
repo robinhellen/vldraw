@@ -2,6 +2,9 @@
 
 [CCode (cprefix = "GL", gir_namespace = "GL", gir_version = "1.0", lower_case_cprefix = "gl_")]
 namespace GL {
+	[CCode (cheader_filename = "GL/glew.h", cname = "glewInit")]
+	public static GLenum glewInit ();
+	
 	[CCode (cheader_filename = "GL/glew.h", cname = "GLsync")]
 	[Compact]
 	public class GLsync {

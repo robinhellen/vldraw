@@ -20,7 +20,6 @@ namespace Ldraw.Application
 			var loop = new MainLoop();
 			run_initializers.begin(() => loop.quit());
 			loop.run();
-			
 			if(!ArgHandler.HandleArgs(args))
 				return;
 			
@@ -61,10 +60,10 @@ namespace Ldraw.Application
 	
 	private class ConsoleReporter : Object, ProgressReporter
 	{
-		public void start_task(string task_name){stdout.printf(@"starting $task_name\n");}
+		public void start_task(string task_name){/*stdout.printf(@"starting $task_name\n");*/}
 		public void task_progress(string task_name, double progress)
 		{
-			stdout.printf(@"$task_name: $progress\n");
+//~ 			stdout.printf(@"$task_name: $progress\n");
 		}
 		public void end_task(string task_name){}
 	}

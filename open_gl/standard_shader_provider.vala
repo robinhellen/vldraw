@@ -31,6 +31,7 @@ out vec4 color;
 uniform vec3 LightColor = vec3(1,1,1);
 
 void main(){
+//~ 	gl_FragDepth = gl_FragCoord.z;
 	if(length(Normal_cameraspace) == 0)
 	{
 		// I shall make lines have no normal.

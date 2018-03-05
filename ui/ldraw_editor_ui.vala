@@ -17,7 +17,7 @@ namespace Ldraw.Ui
 		}
 		
 		public void Start()
-		{			
+		{
 			Window.value.destroy.connect(() => main_quit());
 			Window.value.show_all();
 			

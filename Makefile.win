@@ -99,7 +99,7 @@ ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions uti
 # Plugins
 
 steps_sources=$(wildcard steps/*.vala)
-steps_packages=$(gee) diva gl
+steps_packages=$(gee) diva glew
 steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
 animation_sources=$(wildcard animation/*.vala)
@@ -145,9 +145,9 @@ VALA_DEBUG_OPTS= --vapidir=vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse -X -lm
 
 EXECUTABLE_NAME = ldraw
 
-all: $(EXECUTABLE_NAME).exe test/expressions.test test/maths.test $(foreach plugin, $(PLUGINS), plugins/$(plugin).dll)
-	./test/expressions.test
-	./test/maths.test
+all: build/$(EXECUTABLE_NAME).exe $(foreach plugin, $(PLUGINS), plugins/$(plugin).dll)
+#~ 	./test/expressions.test
+#~ 	./test/maths.test
 
 # compilation for the final executable
 $(EXECUTABLE_NAME).exe: $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).dll h/$(lib).h vapi/$(lib).vapi)
@@ -156,6 +156,10 @@ $(EXECUTABLE_NAME).exe: $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), lib/$(lib).d
 	--vapidir /usr/local/share/vala/vapi -X -I/usr/local/include \
 	-X -L/usr/local/lib/ \
 	-X -Ih -X -ldiva 
+	
+build/$(EXECUTABLE_NAME).exe: $(EXECUTABLE_NAME).exe
+	cp $(EXECUTABLE_NAME).exe build/
+	cp lib/*.dll build/
 
 all_packages = $(foreach pkg, $($(1)_internal_packages), $(pkg) $($(pkg)_packages) $(call all_packages,$(pkg)))
 all_internal_packages = $(foreach pkg, $($(1)_internal_packages), $(pkg) $(call all_internal_packages,$(pkg)))
@@ -189,7 +193,10 @@ plugins/%.dll: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_
 				),--pkg $(pkg)) \
 		$(if $($*_internal_packages) $($*_private_internal_packages), -X -Ih --vapidir=vapi) \
 		--library=$* --vapi vapi/$*.vapi -o plugins/$*.dll \
-		-X -fpic -X -shared -g -X -w
+		-X -fpic -X -shared -g -X -w \
+		--vapidir /usr/local/share/vala/vapi -X -I/usr/local/include \
+		$(foreach pkg, $(sort $(call all_internal_packages,$*) $($*_private_internal_packages)), -X -l$(pkg)) -X -L/usr/local/lib/ \
+		-X -fpic -X -shared -g -X -w -X -Llib -X -ldiva -X -lopengl32
 	touch h/$*.h
 	touch vapi/$*.vapi
 

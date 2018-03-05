@@ -81,10 +81,12 @@ namespace Ldraw.Ui.GtkGl
 				return;
 			}
 			make_current();
+			GL.glewInit();
 			if(get_error() != null)
 				return;
 
 			renderer.PrepareRender(m_Model);
+//~ 			assert_not_reached();e
 		}
 
 		public override void size_allocate(Allocation allocation)

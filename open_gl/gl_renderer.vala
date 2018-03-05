@@ -29,6 +29,18 @@ namespace Ldraw.OpenGl
 		GLuint program = 0;
 		//	  uniform parameters to the shaders
 		LdrawObject currentModel;
+		
+		public void check_errors(string note)
+		{
+			int c = 0;
+			GLenum err;
+			while((err = glGetError()) != GL_NO_ERROR)
+			{
+				stdout.printf(@"$note Open GL error: $err\n");
+			}
+			if(c == 0)
+				stdout.printf(@"$note No OpenGL errors.\n");
+		}
 
 		public void Render(GLContext context,
 				Gee.Set<LdrawNode> selection,
@@ -36,6 +48,7 @@ namespace Ldraw.OpenGl
 				ViewParameters viewParameters,
 				Colour defaultColour)
 		{
+			check_errors("R0");
 			PrepareAllVertexData(currentModel);
 
 			var scaleMatrix = glGetUniformLocation(program, "scale");
@@ -59,12 +72,20 @@ namespace Ldraw.OpenGl
 										0, -2 / viewParameters.lduHeight,0, 0,
 										0, 0, 0.0001f, 0,
 										0, 0, 0, 1};
+			check_errors("R1");
 
 			glEnable(GL_BLEND);
+			check_errors("R2");
+			glEnable(GL_DEPTH_TEST);
+			check_errors("R3");
+			glDepthFunc(GL_LESS);
 			glClearColor(1f,1f,1f,1f);
+			glClearDepth(1f);
+			check_errors("R4");
 			glLineWidth(2);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glUseProgram(program);
+			check_errors("R5");
 
 			viewingAngle.SetProgramUniform(program, "view_angle");
 			scrollTransform.SetProgramUniform(program, "scroll");
@@ -196,12 +217,19 @@ namespace Ldraw.OpenGl
 		{
 			if(program == 0)
 			{
+				check_errors("P1");
 				program = ProgramFactory.CreateProgram(ShaderType.Drawing);
 				GLuint vao;
 				glGenVertexArrays(1, out vao);
+				check_errors("P2");
 				glBindVertexArray(vao);
-				glEnable(GL_CULL_FACE);
-				glCullFace(GL_BACK);
+				check_errors("P3");
+				glEnable(GL_DEPTH_TEST);
+				check_errors("P4");
+				glDepthFunc(GL_LESS);
+				check_errors("P5");
+//~ 				glDisable(GL_CULL_FACE);
+//~ 				glCullFace(GL_FRONT);
 			}
 
 			currentModel = model;

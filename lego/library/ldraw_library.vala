@@ -16,7 +16,15 @@ namespace Ldraw.Lego.Library
 		construct
 		{
 			var homeFolder = File.new_for_path(Environment.get_home_dir());
+			stderr.printf(@"Looking for Ldraw library in $(m_LibraryDir.get_path()).\n");
 			m_LibraryDir = homeFolder.get_child("ldraw");
+			stderr.printf(@"Looking for Ldraw library at $(m_LibraryDir.get_path()).\n");
+			if(!m_LibraryDir.query_exists())
+			{
+				stderr.printf(@"No ldraw library found at $(m_LibraryDir.get_path()).\n");
+				stdout.printf(@"No ldraw library found at $(m_LibraryDir.get_path()).\n");
+				assert_not_reached();
+			}
 			m_PartsDirectory = m_LibraryDir.get_child("parts");
 			m_SubPartsDirectory = m_PartsDirectory.get_child("s");
 			m_PrimitivesDirectory = m_LibraryDir.get_child("p");
