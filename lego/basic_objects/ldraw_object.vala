@@ -134,7 +134,7 @@ namespace Ldraw.Lego
 
 		public void InsertNode(LdrawNode toInsert, LdrawNode after)
 		{
-			nodes.insert(nodes.index_of(after), toInsert);
+			nodes.insert(nodes.index_of(after) + 1, toInsert);
 			toInsert.notify.connect(() => VisibleChange());
 			VisibleChange();
 		}

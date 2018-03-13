@@ -162,16 +162,19 @@ namespace Ldraw.Ui
 					{
 						subModels = new ObservableList<LdrawObject>();
 						cb.visible = false;
+						return;
 					}
-					else if(cb.model != mpd.SubModels)
+					subModels = mpd.SubModels;
+					if(cb.model != mpd.SubModels)
 					{
-						subModels = mpd.SubModels;
-						TreeIter iter;
-						if(subModels.get_iter_first(out iter))
-							cb.set_active_iter(iter);
 						cb.model = subModels;
 						cb.visible = (subModels.size > 0);
 					}
+					var active_model = EditingObject.Model;
+					var i = subModels.index_of(active_model);
+					TreeIter iter;
+					if(subModels.iter_nth_child(out iter, null, i))
+						cb.set_active_iter(iter);					
 				});
             return cb;
         }

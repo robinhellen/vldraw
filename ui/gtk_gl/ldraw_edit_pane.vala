@@ -46,6 +46,7 @@ namespace Ldraw.Ui.GtkGl
 			drag_dest_set_track_motion(this, true);
 			model.bind_property("Model", this, "Model");
 			model.view_changed.connect(() => model_view_changed());
+			model.changed_selection.connect(() => model_view_changed());
 			Model = model.Model;
 			overlay = DropOverlay;
 		}
@@ -72,8 +73,11 @@ namespace Ldraw.Ui.GtkGl
 			switch(event.button)
 			{
 				case 1:
-					mouseData = new MouseData(event.x, event.y);
+					mouseData = new MouseData(event.x, event.y, event.button, viewParameters);
 					break;
+				case 2: // middle button - scroll
+					mouseData = new MouseData(event.x, event.y, event.button, viewParameters);
+					break;					
 				case 3: // right button
 					CreateContextMenu().popup(null, null, null, event.button, event.time);
 					break;
@@ -92,7 +96,13 @@ namespace Ldraw.Ui.GtkGl
 					bool toggle = (event.state & ModifierType.CONTROL_MASK) == ModifierType.CONTROL_MASK;
 
 					SelectTopMostUnderMouse(event.x, event.y, toggle);
-					break;			
+					break;
+				case 2: // middle
+					// if 3d view, move camera
+					move_camera(event.x, event.y, mouseData);
+					mouseData = null;
+					break;
+					
 			}
 			return false;
 		}
@@ -108,6 +118,9 @@ namespace Ldraw.Ui.GtkGl
 			base.motion_notify_event(event);
 			if(mouseData == null)
 				return false;
+				
+			if(mouseData.button == 2)
+				move_camera(event.x, event.y, mouseData);
 			return false;
 		}
 		
@@ -415,7 +428,7 @@ namespace Ldraw.Ui.GtkGl
 		private void SelectTopMostUnderMouse(double x, double y, bool toggle)
 		{
 			if(mouseData == null)
-				mouseData = new MouseData(x, y);
+				mouseData = new MouseData(x, y, 1, viewParameters);
 			Allocation alloc;
 			get_allocation(out alloc);
 			
@@ -437,6 +450,19 @@ namespace Ldraw.Ui.GtkGl
 				model.Select(chosen, toggle);
 			mouseData = null;
 		}
+		
+		private void move_camera(double x, double y, MouseData start)
+		{
+			Allocation alloc;
+			get_allocation(out alloc);
+			var dx = (x - start.x) / alloc.width;
+			var dlong = dx * 270;
+			var dy = (y - start.y) / alloc.height;
+			var dlat = dy * 270;
+			viewParameters.cameraLatitude = start.orig_lat - (float)dlat;
+			viewParameters.cameraLongitude = start.orig_long + (float)dlong;
+			queue_draw();
+		}
 
 		private float SnapTo(float raw, float step)
 		{
@@ -454,12 +480,17 @@ namespace Ldraw.Ui.GtkGl
 	
 	private class MouseData : Object
 	{
-		public MouseData(double x, double y)
+		public MouseData(double x, double y, uint button, ViewParameters p)
 		{
-			this.x = x; this.y = y;
+			this.x = x; this.y = y; this.button = button;
+			orig_long = p.cameraLongitude;
+			orig_lat = p.cameraLatitude;
 		}
 		
 		public double x;
 		public double y;
+		public uint button;
+		public float orig_long;
+		public float orig_lat;
 	}	
 }
