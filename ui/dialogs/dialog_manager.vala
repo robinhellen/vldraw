@@ -7,6 +7,7 @@ namespace Ldraw.Ui.Dialogs
 	public class DialogManager : GLib.Object, IDialogManager
 	{
 		public ILdrawFolders LdrawFolders {construct; get;}
+		public RecentManager recent {construct; get;}
 		
 		public bool GetSaveLocation(out string location, Window parent)
 		{
@@ -20,6 +21,7 @@ namespace Ldraw.Ui.Dialogs
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
+                recent.add_item(dialog.get_uri());
                 dialog.close();
                 return true;
             }
@@ -40,6 +42,7 @@ namespace Ldraw.Ui.Dialogs
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
+                recent.add_item(dialog.get_uri());
                 dialog.close();
                 return true;
             }
