@@ -23,7 +23,7 @@ namespace Ldraw.Ui.GtkGl
 		{
 			auto_render = true;
 			has_alpha = true;
-			has_depth_buffer = true;
+			has_depth_buffer = false; // WE're going to manage the depth buffer ourselves as the GLArea management doesn't work on windows.
 			// minimum size 100 px square
 			set_size_request(100, 100);
 
@@ -56,6 +56,9 @@ namespace Ldraw.Ui.GtkGl
 		public Ldraw.Ui.Widgets.Overlay Overlay {set{overlay = value; overlay.Changed.connect(() => queue_render());}}
 
 		public Colour DefaultColour {get; set;}
+		
+		int depth_buffer_width = 0;
+		int depth_buffer_height = 0;
 
 		public override bool render(GLContext context)
 		{
@@ -63,7 +66,25 @@ namespace Ldraw.Ui.GtkGl
 			{
 				return true;
 			}
-
+			Allocation alloc;
+			get_allocation(out alloc);
+			if(alloc.height != depth_buffer_height || alloc.width != depth_buffer_width)
+			{
+				if(depth_buffer != 0)
+					glDeleteRenderbuffers(1, {depth_buffer});
+				GLuint[] buffer = {0};
+				// ensure_buffers
+				glGenRenderbuffers(1, buffer);
+				// allocate buffers
+				glBindRenderbuffer(GL_RENDERBUFFER, buffer[0]);				
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, alloc.width, alloc.height);
+				// attach buffers
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer[0]);
+				depth_buffer = buffer[0];
+				depth_buffer_height = alloc.height;
+				depth_buffer_width = alloc.height;
+			}
+			glEnable(GL_DEPTH_TEST);
 			renderer.Render(context, CurrentSelection, overlay, viewParameters, DefaultColour); // scroll
 
 			var error = get_error();
@@ -73,6 +94,8 @@ namespace Ldraw.Ui.GtkGl
 			}
 			return true;
 		}
+		
+		GLuint depth_buffer = 0;
 
 		public new void realize()
 		{
@@ -94,7 +117,6 @@ namespace Ldraw.Ui.GtkGl
 			viewParameters.lduHeight *= ((float)allocation.height / old_allocation.height);
 			viewParameters.lduWidth *= ((float)allocation.width / old_allocation.width);
 			base.size_allocate(allocation);
-
 		}
 
 		public ViewAngle Angle
