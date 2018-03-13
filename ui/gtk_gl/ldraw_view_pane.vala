@@ -81,7 +81,6 @@ namespace Ldraw.Ui.GtkGl
 				return;
 			}
 			make_current();
-			GL.glewInit();
 			if(get_error() != null)
 				return;
 

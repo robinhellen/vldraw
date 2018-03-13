@@ -177,7 +177,7 @@ lib/%.dll h/%.h vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_pac
 		--library=$* -H h/$*.h --vapi vapi/$*.vapi -o lib/$*.dll \
 		--vapidir /usr/local/share/vala/vapi -X -I/usr/local/include \
 		$(foreach pkg, $(sort $(call all_internal_packages,$*) $($*_private_internal_packages)), -X -l$(pkg)) -X -L/usr/local/lib/ \
-		-X -fpic -X -shared -g -X -w -X -Llib -X -ldiva -X -lopengl32
+		-X -fpic -X -shared -g -X -w -X -Llib -X -ldiva -X -lepoxy
 	touch h/$*.h
 	touch vapi/$*.vapi
 
