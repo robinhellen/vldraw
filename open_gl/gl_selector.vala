@@ -103,6 +103,8 @@ namespace Ldraw.OpenGl
 			if(status != GL_FRAMEBUFFER_COMPLETE)
 			{
 				stderr.printf(@"Framebuffer error: $(status)\n");
+				glDeleteRenderbuffers(2, renderbuffer);
+				glDeleteFramebuffers(1, framebuffer);
 				return Set.empty<LdrawNode>();
 			}
 			
@@ -110,6 +112,8 @@ namespace Ldraw.OpenGl
 			var lassoHeight = int.max(selectionBottom - selectionTop, 1);
 			GLushort[] result = new GLushort[(lassoWidth + 1) * (lassoHeight + 1)];
 			glReadPixels(selectionLeft, height - selectionBottom, lassoWidth, lassoHeight, GL_RED_INTEGER, GL_UNSIGNED_SHORT, (GLvoid [])result);
+			glDeleteRenderbuffers(2, renderbuffer);
+			glDeleteFramebuffers(1, framebuffer);
 			
 			var selected = new HashSet<LdrawNode>();
 			for(int i = 0; i < (lassoHeight * lassoWidth); i++)
