@@ -7,7 +7,7 @@ using Ldraw.Maths;
 
 namespace Ldraw.OpenGl
 {
-	public class FlattenedNodes : Object
+	private class FlattenedNodes : Object
 	{
 		public float[] Vertices {get; private set;}
 		public float[] Normals {get; private set;}

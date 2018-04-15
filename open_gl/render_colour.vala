@@ -5,7 +5,7 @@ using Ldraw.Lego.Library;
 
 namespace Ldraw.OpenGl
 {
-	public class RenderColour : Object
+	private class RenderColour : Object
 	{
 		private static Map<int, RenderColour> surfaces;
 		private static Map<int, RenderColour> edges;

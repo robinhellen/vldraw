@@ -57,9 +57,6 @@ namespace Ldraw
             builder.register<FileLoadingArgHandler>().as<ArgumentHandler>();
             builder.register<Ldraw.Application.Application>();
 
-            // OpenGl stuff
-            builder.register<GlRenderer>().as<Renderer>();
-
 			var pluginLoader = new PluginLoader();
 			pluginLoader.LoadPlugins(builder);
 

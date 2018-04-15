@@ -11,7 +11,7 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.OpenGl
 {
-	public class GlRenderer : Object, Renderer
+	private class GlRenderer : Object, Renderer
 	{
 		public Collection<RenderNodeStrategy> RenderStrategies {get; construct;}
 		public FlatStore FlatStore {get; construct;}
@@ -388,24 +388,24 @@ namespace Ldraw.OpenGl
         public abstract bool ShouldRenderNode(LdrawNode node);
     }
 
-    public interface ShaderProvider : Object
+    private interface ShaderProvider : Object
     {
 		public abstract string VertexShader {get;}
 		public abstract string FragmentShader {get;}
 	}
 
-	public interface FlatStore : Object
+	private interface FlatStore : Object
 	{
 		public abstract FlattenedNodes @get(LdrawObject part);
 		public abstract void Prepare(LdrawObject part);
 	}
 
-	public interface ShaderProgramFactory : Object
+	private interface ShaderProgramFactory : Object
 	{
 		public abstract GLuint CreateProgram(ShaderType shader);
 	}
 
-	public enum ShaderType
+	private enum ShaderType
 	{
 		Drawing,
 		Selection
