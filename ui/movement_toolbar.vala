@@ -15,6 +15,8 @@ namespace Ldraw.Ui
 		public UndoStack undoStack {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
+		
+		const string icon_location = "/home/robin.git/vldraw/icons/";
 
 		public Toolbar CreateToolbar(Window dialogParent)
 		{
@@ -51,7 +53,7 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateGridButton(GridSize size, string iconName, ref unowned SList<RadioToolButton>? group)
 		{
-			string icon = "/home/robin/git/vldraw/icons/" + iconName + ".xpm";
+			string icon = icon_location + iconName + ".xpm";
 			var button = CreateToggleButtonFromImageFile(icon, ref group);
 			button.active = size == m_Options.Grid;
 
@@ -65,7 +67,7 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateTranslateButton(Axis axis, bool positive)
 		{
-			string icon = "/home/robin/git/vldraw/icons/" + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
+			string icon = icon_location + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
 
 			button.clicked.connect(() =>
@@ -87,7 +89,7 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateRotateButton(Axis axis, bool positive)
 		{
-			string icon = "/home/robin/git/vldraw/icons/rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
+			string icon = icon_location + "rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
 
 			Vector rotationAxis = Vector(axis == Axis.X ? 1.0f : 0.0f, axis == Axis.Y ? 1.0f : 0.0f, axis == Axis.Z ? 1.0f : 0.0f);
