@@ -10,17 +10,32 @@ namespace Ldraw.Lego
 		private int64 file_size;
 
 		public LdrawFileReader(File file, LdrawParser parser)
+			throws ParseError
 		{
 			m_Parser = parser;
-			stream = new DataInputStream(file.read());
-			file_size = file.query_info(FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE).get_size();
+			try
+			{
+				stream = new DataInputStream(file.read());
+				file_size = file.query_info(FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE).get_size();
+			}
+			catch(Error e)
+			{
+				throw new ParseError.FilesystemError(@"Error opening file for reading: $(e.message).");
+			}
 		}
 		
 		public async LdrawNode? next(ISubFileLocator locator, ColourContext colourContext)
-			throws ParseError, IOError, Error
+			throws ParseError
 		{
 			string line;
-			line = yield stream.read_line_async();
+			try
+			{
+				line = yield stream.read_line_async();
+			}
+			catch(Error e)
+			{
+				throw new ParseError.FilesystemError(@"Error reading file: $(e.message).");
+			}
 			if(line == null)
 				return null;
 			
@@ -42,6 +57,7 @@ namespace Ldraw.Lego
 		public LdrawParser Parser {private get; construct;}
 		
 		public LdrawFileReader GetReader(File file)
+			throws ParseError
 		{
 			return new LdrawFileReader(file, Parser);
 		}

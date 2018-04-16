@@ -17,6 +17,7 @@ namespace Ldraw
 			builder.register<CachingFlatStore>().as<FlatStore>().single_instance();
 			builder.register<FramebufferGlSelector>().as<GlSelector>();
 			builder.register<DefaultNodeAdjuster>().as<NodeAdjuster>();
+            builder.register<GlRenderer>().as<Renderer>();
 		}
 	}
 }

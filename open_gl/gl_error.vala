@@ -1,6 +1,6 @@
 namespace Ldraw.Ui
 {
-	public errordomain GlError
+	private errordomain GlError
 	{
 		InitializationError,
 		InvalidWidget,

@@ -8,5 +8,6 @@ namespace Ldraw.Lego
 		InvalidComment,
 		IncompleteLine,
 		InvalidMultipart,
+		FilesystemError
 	}
 }
