@@ -22,69 +22,12 @@ namespace Ldraw.Lego
 
 		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy, bool observable = false)
 			throws ParseError
-		{
+		{			
 			File file = File.new_for_path(filepath);
 			if(!file.query_exists() || file.query_file_type(FileQueryInfoFlags.NONE) != FileType.REGULAR)
 			{
-				throw new ParseError.MissingFile(@"Unable to find part file $filepath.");
+				throw new ParseError.MissingFile(@"Unable to find file $filepath.");
 			}
-			var fileReader = ReaderFactory.GetReader(file);
-			MultipartSubFileLocator locator = null;
-			var colours = new CurrentFileColourContext(ColourContext);
-
-			Gee.List<LdrawNode> currentObject = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
-			LdrawObject mainObject = null;
-			ObservableList<LdrawObject> subObjs = new ObservableList<LdrawObject>();
-			string currentFileName = null;
-			LdrawNode node;
-			while((node = yield fileReader.next((ISubFileLocator)locator ?? Locators[strategy], colours)) != null)
-			{
-				if(node is MetaCommand)
-				{
-					MetaCommand command = (MetaCommand)node;
-					switch(command.Command)
-					{
-						case "NOFILE":
-							if(currentFileName == null)
-								throw new ParseError.InvalidMultipart("Each file in an MPD document must start with a 0 FILE line.");
-
-							LdrawObject foo = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: currentObject, FileName: currentFileName);
-							if(mainObject == null)
-							{
-								mainObject = foo;
-							}
-							subObjs.add(foo);
-							currentObject = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
-							currentFileName = null;
-							continue;
-						case "FILE":
-							if(!currentObject.is_empty && currentFileName == null)
-							{
-								throw new ParseError.InvalidMultipart("There may not be any LDraw commands between MPD files.");
-							}
-							if(currentFileName != null)
-							{
-								LdrawObject foo = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: currentObject, FileName: currentFileName);
-								if(mainObject == null)
-								{
-									mainObject = foo;
-								}
-								subObjs.add(foo);
-							}
-							if(locator == null)
-							{
-								locator = new MultipartSubFileLocator(Locators[strategy]);
-							}
-
-							currentObject = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
-							currentFileName = command.Arguments[0];
-							continue;
-					}
-					UpdateColours(command as ColourMetaCommand, colours);
-				}
-				currentObject.add(node);
-			}
-
 			string filename;
 			try
 			{
@@ -94,33 +37,72 @@ namespace Ldraw.Lego
 			{
 				throw new ParseError.CorruptFile(@"Unable to load from filepath: $(e.message)");
 			}
-
-			if(mainObject == null)
+			
+			var fileReader = ReaderFactory.GetReader(file);
+			MultipartSubFileLocator locator = new MultipartSubFileLocator(Locators[strategy]);
+			var colours = new CurrentFileColourContext(ColourContext);
+			
+			Gee.List<LdrawNode> file_nodes;
+			string current_filename;
+			var result = yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out current_filename);
+			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: current_filename ?? filename);
+			if(result) // read all nodes in the file in one go, this is a simple Ldraw file
 			{
-				mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: currentObject, FileName: filename);
+				stderr.printf(@"Loaded $filename as simple Ldraw file.\n");
 				var model = (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
 				mainObject.File = model;
 				return model;
 			}
-			else
+			
+			stderr.printf(@"Loading $filename as multipart Ldraw file. First file is $current_filename\n");
+			var sub_files = new ObservableList<LdrawObject>();
+			sub_files.add(mainObject);
+			// We encountered 0 NOFILE, this is an MPD file.
+			while(!(yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out current_filename)))
 			{
-				if(currentFileName != null)
+				stderr.printf(@"Read sub-file $current_filename from multipart.\n");
+				var sub_file = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: current_filename);
+				sub_files.add(sub_file);
+			}
+			locator.ResolveAll(sub_files);
+			var modelFile = (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: sub_files, FileName: filename, FilePath: filepath);
+			foreach(var sf in sub_files)
+			{
+				sf.File = modelFile;
+			}
+			return modelFile;		
+		}
+		
+		/// returns true if the file is finished, false on reaching a 0 NOFILE Statement.
+		private async bool read_file_nodes(LdrawFileReader reader, MultipartSubFileLocator locator, CurrentFileColourContext colours, bool observable, out Gee.List<LdrawNode> nodes, out string? filename)
+			throws ParseError
+		{
+			nodes = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
+			filename = null;
+			while(true)
+			{
+				var node = yield reader.next(locator, colours);
+				if(node == null)
+					return true;
+			
+				if(node is MetaCommand)
 				{
-					LdrawObject foo = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: currentObject, FileName: currentFileName);
-					if(mainObject == null)
+					MetaCommand command = (MetaCommand)node;
+					switch(command.Command)
 					{
-						mainObject = foo;
+						case "NOFILE":
+							return false;
+						case "FILE":
+							if(!(nodes.is_empty && filename == null))
+							{
+								throw new ParseError.InvalidMultipart("There may not be any LDraw commands between MPD sub-files.");
+							}
+							filename = command.Arguments[0];
+							continue;
 					}
-					else
-						subObjs.add(foo);
+					UpdateColours(command as ColourMetaCommand, colours);
 				}
-				var modelFile = (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: subObjs, FileName: filename, FilePath: filepath);
-				foreach(var o in subObjs)
-				{
-					o.File = modelFile;
-				}
-				locator.ResolveAll(subObjs);
-				return modelFile;
+				nodes.add(node);
 			}
 		}
 		
