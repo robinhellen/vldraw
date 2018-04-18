@@ -52,8 +52,10 @@ namespace Ldraw.Lego
 
 			var factory = CommandFactories[command];
 			if(factory == null)
+			{
 				return new Comment(string.joinv(" ", tokens[1: tokens.length]));
-
+			}
+			
 			return factory.CreateCommand(tokens[1], tokens[2:tokens.length]);
 		}
 

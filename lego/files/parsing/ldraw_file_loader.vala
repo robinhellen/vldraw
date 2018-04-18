@@ -84,24 +84,22 @@ namespace Ldraw.Lego
 				var node = yield reader.next(locator, colours);
 				if(node == null)
 					return true;
-			
-				if(node is MetaCommand)
+					
+				if(node is MultipartFileEnd)
+					return false;
+				
+				if(node is MultipartFileStart)
 				{
-					MetaCommand command = (MetaCommand)node;
-					switch(command.Command)
+					var fileStart = (MultipartFileStart)node;
+					if(!(nodes.is_empty && filename == null))
 					{
-						case "NOFILE":
-							return false;
-						case "FILE":
-							if(!(nodes.is_empty && filename == null))
-							{
-								throw new ParseError.InvalidMultipart("There may not be any LDraw commands between MPD sub-files.");
-							}
-							filename = command.Arguments[0];
-							continue;
+						throw new ParseError.InvalidMultipart("There may not be any LDraw commands between MPD sub-files.");
 					}
-					UpdateColours(command as ColourMetaCommand, colours);
+					filename = fileStart.filename;
+					continue;
 				}
+				
+				UpdateColours(node as ColourMetaCommand, colours);
 				nodes.add(node);
 			}
 		}
