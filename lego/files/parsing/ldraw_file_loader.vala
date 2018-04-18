@@ -23,20 +23,8 @@ namespace Ldraw.Lego
 		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy, bool observable = false)
 			throws ParseError
 		{			
-			File file = File.new_for_path(filepath);
-			if(!file.query_exists() || file.query_file_type(FileQueryInfoFlags.NONE) != FileType.REGULAR)
-			{
-				throw new ParseError.MissingFile(@"Unable to find file $filepath.");
-			}
-			string filename;
-			try
-			{
-				filename = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
-			}
-			catch(Error e)
-			{
-				throw new ParseError.CorruptFile(@"Unable to load from filepath: $(e.message)");
-			}
+			var file = File.new_for_path(filepath);
+			var filename = yield get_filename(file, filepath);
 			
 			var fileReader = ReaderFactory.GetReader(file);
 			MultipartSubFileLocator locator = new MultipartSubFileLocator(Locators[strategy]);
@@ -71,6 +59,23 @@ namespace Ldraw.Lego
 				sf.File = modelFile;
 			}
 			return modelFile;		
+		}
+		
+		private async string get_filename(File file, string filepath)
+			throws ParseError
+		{			
+			if(!file.query_exists() || file.query_file_type(FileQueryInfoFlags.NONE) != FileType.REGULAR)
+			{
+				throw new ParseError.MissingFile(@"Unable to find file $filepath.");
+			}
+			try
+			{
+				return file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
+			}
+			catch(Error e)
+			{
+				throw new ParseError.CorruptFile(@"Unable to load from filepath: $(e.message)");
+			}
 		}
 		
 		/// returns true if the file is finished, false on reaching a 0 NOFILE Statement.
