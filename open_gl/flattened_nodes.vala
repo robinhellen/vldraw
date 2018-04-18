@@ -246,31 +246,33 @@ namespace Ldraw.OpenGl
 			
 			private void PushColour(Colour colour, int vertices, Collection<float?> target)
 			{
-				float red, green, blue;
+				float red, green, blue, alpha;
 				if(colour.Code == 16)
 				{
 					if(state.CurrentColour.Code == 16)
-						red = green = blue = -1;
+						red = green = blue = alpha = -1;
 					else if(state.CurrentColour.Code == 24)
-						red = green = blue = -2;
+						red = green = blue = alpha = -2;
 					else
 					{
 						red = state.CurrentColour.Red / 255f;
 						green = state.CurrentColour.Green / 255f;
 						blue = state.CurrentColour.Blue / 255f;
+						alpha = state.CurrentColour.Alpha / 255f;
 					}					
 				}
 				else if(colour.Code == 24)
 				{
 					if(state.CurrentColour.Code == 16)
-						red = green = blue = -2;
+						red = green = blue = alpha = -2;
 					else if(state.CurrentColour.Code == 24)
-						red = green = blue = -1;
+						red = green = blue = alpha = -1;
 					else
 					{
 						red = state.CurrentColour.EdgeRed / 255f;
 						green = state.CurrentColour.EdgeGreen / 255f;
 						blue = state.CurrentColour.EdgeBlue / 255f;
+						alpha = state.CurrentColour.Alpha / 255f;
 					}
 				}
 				else
@@ -278,8 +280,9 @@ namespace Ldraw.OpenGl
 					red = colour.Red / 255f;
 					green = colour.Green / 255f;
 					blue = colour.Blue / 255f;
+					alpha = colour.Alpha / 255f;
 				}
-				var alpha = colour.Alpha / 255f;
+//~ 				var alpha = colour.Alpha / 255f;
 				for(int i = 0; i < vertices; i++)
 				{
 					target.add(red);
