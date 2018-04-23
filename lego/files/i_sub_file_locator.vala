@@ -118,6 +118,7 @@ namespace Ldraw.Lego
 						return;
 					}
 				}
+				stderr.printf(@"Unable to resolve $(FileName).\n");
 			}
 		}
 	}
