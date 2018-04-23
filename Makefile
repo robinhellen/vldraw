@@ -107,6 +107,10 @@ steps_sources=$(wildcard steps/*.vala)
 steps_packages=$(gee) diva gl
 steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
+hide_sources=$(wildcard plugin_src/hide/*.vala)
+hide_packages=$(gee) diva gl
+hide_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
+
 animation_sources=$(wildcard animation/*.vala)
 animation_packages=diva $(gee)
 animation_internal_packages=lego lego_objects maths expressions utils ui_widgets gl_render ui_gtk_gl
@@ -138,7 +142,7 @@ clipboard_internal_packages=ui_widgets lego lego_objects options
 INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
-PLUGINS=animation steps povray peeron move_origin clipboard extract_inline
+PLUGINS=animation steps povray peeron move_origin clipboard extract_inline hide
 # extract_inline
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva
