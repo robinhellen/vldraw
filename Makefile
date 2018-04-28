@@ -103,7 +103,7 @@ ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions uti
 
 # Plugins
 
-steps_sources=$(wildcard steps/*.vala)
+steps_sources=$(wildcard plugin_src/steps/*.vala)
 steps_packages=$(gee) diva gl
 steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
@@ -111,16 +111,16 @@ hide_sources=$(wildcard plugin_src/hide/*.vala)
 hide_packages=$(gee) diva gl
 hide_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
 
-animation_sources=$(wildcard animation/*.vala)
+animation_sources=$(wildcard plugin_src/animation/*.vala)
 animation_packages=diva $(gee)
 animation_internal_packages=lego lego_objects maths expressions utils ui_widgets gl_render ui_gtk_gl
 
-peeron_sources=$(wildcard peeron/*.vala)
+peeron_sources=$(wildcard plugin_src/peeron/*.vala)
 peeron_packages=$(gee) diva
 peeron_private_packages=$(soup) $(xml) $(gtk)
 peeron_internal_packages=lego_objects ui_widgets part_group
 
-povray_sources=$(wildcard povray/*.vala)
+povray_sources=$(wildcard plugin_src/povray/*.vala)
 povray_private_packages=$(gio)
 povray_internal_packages=lego
 povray_private_internal_packages=export ui_widgets
@@ -133,7 +133,7 @@ extract_inline_sources=$(wildcard refactoring/inline_submodel/*.vala)
 extract_inline_packages=$(gee) diva
 extract_inline_internal_packages=ui_widgets lego lego_objects
 
-clipboard_sources=$(wildcard ui/clipboard/*.vala)
+clipboard_sources=$(wildcard plugin_src/clipboard/*.vala)
 clipboard_packages=$(gee) diva
 clipboard_internal_packages=ui_widgets lego lego_objects options
 
