@@ -53,8 +53,53 @@ namespace Ldraw.Ui
 
 		private ToolButton CreateGridButton(GridSize size, string iconName, ref unowned SList<RadioToolButton>? group)
 		{
-			string icon = icon_location + iconName + ".xpm";
-			var button = CreateToggleButtonFromImageFile(icon, ref group);
+			string inner_lines = "";
+			switch(size)
+			{
+				case GridSize.Large:
+					inner_lines = @"<line x1=\"0\"  y1=\"10\" x2=\"20\" y2=\"10\" stroke=\"black\" />
+	<line x1=\"10\" y1=\"0\"  x2=\"10\" y2=\"20\" stroke=\"black\" />";
+					break;
+				case GridSize.Medium:
+					inner_lines = @"<line x1=\"0\"  y1=\"6.66\" x2=\"20\" y2=\"6.66\" stroke=\"black\" />
+	<line x1=\"6.66\" y1=\"0\"  x2=\"6.66\" y2=\"20\" stroke=\"black\" />
+	<line x1=\"0\"  y1=\"13.33\" x2=\"20\" y2=\"13.33\" stroke=\"black\" />
+	<line x1=\"13.33\" y1=\"0\"  x2=\"13.33\" y2=\"20\" stroke=\"black\" />";
+					break;
+				case GridSize.Small:
+					inner_lines = @"<line x1=\"0\"  y1=\"10\" x2=\"20\" y2=\"10\" stroke=\"black\" />
+	<line x1=\"10\" y1=\"0\"  x2=\"10\" y2=\"20\" stroke=\"black\" />
+	<line x1=\"0\"  y1=\"5\" x2=\"20\" y2=\"5\" stroke=\"black\" />
+	<line x1=\"5\" y1=\"0\"  x2=\"5\" y2=\"20\" stroke=\"black\" />
+	<line x1=\"0\"  y1=\"15\" x2=\"20\" y2=\"15\" stroke=\"black\" />
+	<line x1=\"15\" y1=\"0\"  x2=\"15\" y2=\"20\" stroke=\"black\" />";
+					break;
+			}
+			string grid_svg = @"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+<svg  xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"$ButtonSize\" height=\"$ButtonSize\" viewBox=\"-1 -1 22 22\" >
+	<line x1=\"0\"  y1=\"0\"  x2=\"0\"  y2=\"20\" stroke=\"black\" />
+	<line x1=\"20\" y1=\"0\"  x2=\"20\" y2=\"20\" stroke=\"black\" />
+	<line x1=\"0\"  y1=\"0\"  x2=\"20\" y2=\"0\"  stroke=\"black\" />
+	<line x1=\"0\"  y1=\"20\" x2=\"20\" y2=\"20\" stroke=\"black\" />
+	$inner_lines
+</svg>";
+			Gdk.PixbufLoader loader;
+			try{
+				loader = new Gdk.PixbufLoader.with_type("svg");
+				loader.write(grid_svg.data);
+				loader.close();
+			}
+			catch(Error e)
+			{
+				stderr.printf(@"Unable to create image from SVG string: $(e.message).\n");
+				throw e;
+			}
+			var pixbuf = loader.get_pixbuf();
+			
+			var image = new Image.from_pixbuf(pixbuf);
+			var button = new RadioToolButton(group);
+			button.set_icon_widget(image);
+			group = button.get_group();
 			button.active = size == m_Options.Grid;
 
 			button.toggled.connect(() =>
@@ -62,6 +107,7 @@ namespace Ldraw.Ui
 					if(button.active)
 						m_Options.Grid = size;
 				});
+			
 			return button;
 		}
 
