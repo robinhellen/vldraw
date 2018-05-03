@@ -1,3 +1,4 @@
+using Diva;
 using Gtk;
 using Gdk;
 using Gee;
@@ -21,6 +22,13 @@ namespace Ldraw.Ui.GtkGl
 		public AnimatedModel model {construct; private get;}
 		public DropBoundsOverlay DropOverlay {construct; private get;}
 		public GlSelector Selector {construct; get;}
+		public Collection<EditorInteraction> interactions {get; construct;}
+		
+		static construct
+		{
+			var cls = (ObjectClass)typeof(LdrawEditPane).class_ref();
+			set_collection_injection<EditorInteraction>(cls, "interactions");
+		}
 
 		private Adjustment m_Hadj = null;
 		private Adjustment m_Vadj = null;
@@ -49,6 +57,10 @@ namespace Ldraw.Ui.GtkGl
 			model.changed_selection.connect(() => model_view_changed());
 			Model = model.Model;
 			overlay = DropOverlay;
+			foreach(var interaction in interactions)
+			{
+				interaction.attach(this);
+			}
 		}
 		
 		private void model_view_changed()
@@ -152,37 +164,6 @@ namespace Ldraw.Ui.GtkGl
 
 		public override bool key_press_event(Gdk.EventKey event)
 		{
-			// if button is right, popup context menu
-			if(event.keyval == m_UpKeyVal) // right mouse button
-			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, Settings.CurrentGrid.Z)));
-				return true;
-			}
-			if(event.keyval == m_DownKeyVal) // right mouse button
-			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, -Settings.CurrentGrid.Z)));
-				return true;
-			}
-			if(event.keyval == m_LeftKeyVal) // right mouse button
-			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(-Settings.CurrentGrid.X, 0, 0)));
-				return true;
-			}
-			if(event.keyval == m_RightKeyVal) // right mouse button
-			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(Settings.CurrentGrid.X, 0, 0)));
-				return true;
-			}
-			if(event.keyval == m_EndKeyVal) // right mouse button
-			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, Settings.CurrentGrid.Y, 0)));
-				return true;
-			}
-			if(event.keyval == m_HomeKeyVal) // right mouse button
-			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, -Settings.CurrentGrid.Y, 0)));
-				return true;
-			}
 			if(event.keyval == delKeyVal)
 			{
 				UndoStack.ExecuteCommand(new DeleteNodesCommand(model.Model, model.Selection));
@@ -468,13 +449,7 @@ namespace Ldraw.Ui.GtkGl
 		{
 			return step * Math.roundf(raw / step);
 		}
-
-		private uint m_UpKeyVal = keyval_from_name("Up");
-		private uint m_DownKeyVal = keyval_from_name("Down");
-		private uint m_LeftKeyVal = keyval_from_name("Left");
-		private uint m_RightKeyVal = keyval_from_name("Right");
-		private uint m_HomeKeyVal = keyval_from_name("Home");
-		private uint m_EndKeyVal = keyval_from_name("End");
+		
 		private uint delKeyVal = keyval_from_name("Delete");
 	}
 	

@@ -2,11 +2,12 @@ using Gtk;
 
 using Ldraw.Lego;
 using Ldraw.Maths;
+using Ldraw.Ui;
 using Ldraw.Ui.Commands;
 
-namespace Ldraw.Ui
+namespace Ldraw.Plugins.Movement
 {
-	public class ManualRotationDialog : Object
+	private class ManualRotationDialog : Object
 	{
 		private AnimatedModel model;
 		private Dialog dialog;

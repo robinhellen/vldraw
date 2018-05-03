@@ -4,9 +4,10 @@ using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 using Ldraw.Options;
+using Ldraw.Ui;
 using Ldraw.Ui.Commands;
 
-namespace Ldraw.Ui
+namespace Ldraw.Plugins.Movement
 {
 	private class MovementToolbar : GLib.Object, ToolbarProvider
 	{
@@ -41,9 +42,9 @@ namespace Ldraw.Ui
 			bar.insert(new SeparatorToolItem(), -1);
 
 			unowned SList<RadioToolButton>? group = null;
-			bar.insert(CreateGridButton(GridSize.Large, "gridLarge", ref group), -1);
-			bar.insert(CreateGridButton(GridSize.Medium, "gridMedium", ref group), -1);
-			bar.insert(CreateGridButton(GridSize.Small, "gridSmall", ref group), -1);
+			bar.insert(CreateGridButton(GridSize.Large,  ref group), -1);
+			bar.insert(CreateGridButton(GridSize.Medium, ref group), -1);
+			bar.insert(CreateGridButton(GridSize.Small,  ref group), -1);
 
 			bar.insert(new SeparatorToolItem(), -1);
 			
@@ -51,7 +52,7 @@ namespace Ldraw.Ui
 			return bar;
 		}
 
-		private ToolButton CreateGridButton(GridSize size, string iconName, ref unowned SList<RadioToolButton>? group)
+		private ToolButton CreateGridButton(GridSize size, ref unowned SList<RadioToolButton>? group)
 		{
 			string inner_lines = "";
 			switch(size)
@@ -157,16 +158,6 @@ namespace Ldraw.Ui
 			var image = new Image.from_file(fileName);
 			image.pixbuf = image.pixbuf.scale_simple(ButtonSize, ButtonSize, Gdk.InterpType.BILINEAR);
 			return new ToolButton(image, null);
-		}
-
-		private RadioToolButton CreateToggleButtonFromImageFile(string fileName, ref unowned SList<RadioToolButton>? group)
-		{
-			var image = new Image.from_file(fileName);
-			image.pixbuf = image.pixbuf.scale_simple(ButtonSize, ButtonSize, Gdk.InterpType.BILINEAR);
-			var button = new RadioToolButton(group);
-			button.set_icon_widget(image);
-			group = button.get_group();
-			return button;
 		}
 
 		private enum Axis

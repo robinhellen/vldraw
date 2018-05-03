@@ -137,12 +137,16 @@ clipboard_sources=$(wildcard plugin_src/clipboard/*.vala)
 clipboard_packages=$(gee) diva
 clipboard_internal_packages=ui_widgets lego lego_objects options
 
+movement_sources=$(wildcard plugin_src/movement_edits/*.vala)
+movement_packages=$(gee) diva
+movement_internal_packages=ui_widgets lego lego_objects options ui_gtk_gl
+
 # End of module build specs
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
-PLUGINS=animation steps povray peeron move_origin clipboard extract_inline hide
+PLUGINS=animation steps povray peeron move_origin clipboard extract_inline hide movement
 # extract_inline
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva

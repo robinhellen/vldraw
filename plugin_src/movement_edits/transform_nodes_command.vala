@@ -3,9 +3,9 @@ using Gee;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
-using Ldraw.Ui.Commands;
+using Ldraw.Ui;
 
-namespace Ldraw.Ui
+namespace Ldraw.Plugins.Movement
 {
 	private class TransformNodesCommand : Command
 	{
