@@ -5,9 +5,26 @@ using Ldraw.Lego.Library;
 
 namespace Ldraw.Lego
 {
+	public interface LdrawFileReference : Object
+	{
+		public abstract LdrawObject object {get; construct set;}
+		public abstract LdrawFile file {get; construct set;}
+	}
+	
+	private class LibraryFileReference : Object, LdrawFileReference
+	{
+		public LibraryFileReference(LdrawFile file, LdrawObject obj)
+		{
+			Object(object: obj, file: file);
+		}
+		
+		public LdrawObject object {get; construct set;}
+		public LdrawFile file {get; construct set;}		
+	}
+	
 	public interface ISubFileLocator : Object
 	{
-		public abstract async LdrawObject? GetObjectFromReference(string reference)
+		public abstract async LdrawFileReference? GetObjectFromReference(string reference)
 			throws ParseError;
 	}
 
@@ -15,14 +32,14 @@ namespace Ldraw.Lego
 	{
 		public IDatFileCache Library {construct; private get;}
 
-		public async LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			var partName = reference.substring(0, reference.last_index_of("."));
 
 			LdrawPart part;
 			if(yield Library.TryGetPart(partName, out part))
-				return part.MainObject;
+				return new LibraryFileReference(part, part.MainObject);
 
 			return null;
 		}
@@ -40,9 +57,13 @@ namespace Ldraw.Lego
 		public Lazy<LdrawFileLoader> loader {construct; private get;}
 		public ILdrawFolders folders {construct; private get;}
 		
-		private Map<string, LdrawObject> loaded_models = new HashMap<string, LdrawObject>(s => str_hash(s), (a, b) => str_equal(a, b));
+		private Map<string, LdrawFileReference> loaded_models = 
+			new HashMap<string, LdrawFileReference>(
+				s => str_hash(s), 
+				(a, b) => str_equal(a, b)
+			);
 		
-		public async LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			if(reference.has_prefix("models/"))
@@ -58,8 +79,9 @@ namespace Ldraw.Lego
 				var model_file = folders.ModelsDirectory.get_child(model_filename);
 				var full_filename = model_file.get_path();
 				var f = yield loader.value.LoadModelFile(full_filename, ReferenceLoadStrategy.PartsOnly, false);
-				loaded_models[model_filename] = f.MainObject;
-				return f.MainObject;
+				var file_ref = new LibraryFileReference(f, f.MainObject);
+				loaded_models[model_filename] = file_ref;
+				return file_ref;
 			}	
 			
 			return yield library_locator.GetObjectFromReference(reference);
@@ -77,15 +99,17 @@ namespace Ldraw.Lego
 			m_Proxies = new ArrayList<ProxyLdrawObject>();
 		}
 
-		public async LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			var baseVal = yield m_Locator.GetObjectFromReference(reference);
 			if(baseVal == null)
 			{
+				stderr.printf(@"Creating proxy object for $reference\n");
 				var proxy = new ProxyLdrawObject(reference);
 				m_Proxies.add(proxy);
-				return proxy;
+				var proxy_ref = new MpdProxyRef(proxy);
+				return proxy_ref;
 			}
 			return baseVal;
 		}
@@ -96,6 +120,17 @@ namespace Ldraw.Lego
 			{
 				proxy.Resolve(possibilities);
 			}
+		}
+		
+		private class MpdProxyRef : Object, LdrawFileReference
+		{
+			public MpdProxyRef(ProxyLdrawObject proxy)
+			{
+				Object(object: proxy);
+			}
+			
+			public LdrawObject object {get; construct set;}
+			public LdrawFile file {get; construct set;}
 		}
 
 		public class ProxyLdrawObject : LdrawObject
@@ -114,7 +149,7 @@ namespace Ldraw.Lego
 					{
 						Nodes = object.Nodes;
 						Description = object.Description;
-						File = object.File;
+						//File = object.File;
 						return;
 					}
 				}

@@ -17,6 +17,8 @@ namespace Ldraw.Peeron
 		private TreeView partsView;
 		private PartUsageViewModel usageViewModel;
 		private Paned widget;
+		
+		private Map<string, string> extra_name_ref = new HashMap<string, string>();
 
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
@@ -29,12 +31,13 @@ namespace Ldraw.Peeron
 			widget = new Paned(Orientation.VERTICAL);
 			InitializeControls();
 			Model.view_changed.connect(() => UpdateUsage.begin(false));
+			extra_name_ref["x187"] = "3648a";
 		}
 
 		private async void UpdateUsage(bool reset)
 		{
 			var availableParts = Aggregate(yield ToPartGroups(sets, Library));
-			var modelFile = Model.Model.File as LdrawModelFile;
+			var modelFile = Model.File as LdrawModelFile;
 			PartGroup modelGroup;
 			if(modelFile == null)
 			{
@@ -71,7 +74,11 @@ namespace Ldraw.Peeron
 
 					var content = (Box) dialog.get_content_area();
 					var setnameEntry = new Entry();
+					setnameEntry.activates_default = true;
 					content.pack_start(setnameEntry);
+					var ok = dialog.get_widget_for_response(ResponseType.ACCEPT);
+					ok.can_default = true;
+					ok.grab_default();
 
 					dialog.show_all();
 
@@ -86,7 +93,15 @@ namespace Ldraw.Peeron
 					InventoryReader.GetInventoryFor.begin(setname,
 						(obj, res) =>
 					{
-						sets.add(InventoryReader.GetInventoryFor.end(res));
+						try
+						{
+							sets.add(InventoryReader.GetInventoryFor.end(res));							
+						}
+						catch (Error e)
+						{
+							stderr.printf(@"Unable to get inventory for set $setname: $(e.message).\n");
+							return;
+						}
 						UpdateUsage.begin(true);
 					});
 				});
@@ -255,8 +270,13 @@ namespace Ldraw.Peeron
 			var items = new ArrayList<PartGroupItem>();
 			foreach(var line in i.Lines)
 			{
+				var part_ref = line.PartNumber;
+				if(extra_name_ref.has_key(part_ref))
+				{
+					part_ref = extra_name_ref[part_ref];
+				}
 				LdrawPart p;
-				if(yield lib.TryGetPart(line.PartNumber , out p))
+				if(yield lib.TryGetPart(part_ref, out p))
 				{
 					items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
 							Part: p,

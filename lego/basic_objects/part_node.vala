@@ -4,15 +4,17 @@ namespace Ldraw.Lego.Nodes
 {
 	public class PartNode : LdrawNode
 	{
+		private LdrawFile? file;
 		private LdrawObject m_Contents;
 		private string m_Text;
 
-		public PartNode(Vector center, Matrix transform, LdrawObject contents, Colour colour)
+		public PartNode(Vector center, Matrix transform, LdrawFile? file, LdrawObject contents, Colour colour)
 		{
 			Center = center;
 			Transform = transform;
 			m_Contents = contents;
 			Colour = colour;
+			this.file = file;
 
 			m_Text = contents.FileName;
 		}
@@ -24,6 +26,8 @@ namespace Ldraw.Lego.Nodes
 				return m_Contents;
 			}
 		}
+		
+		public LdrawFile File{ get{return file;}}
 
 		public override string Description
 		{
@@ -76,7 +80,7 @@ namespace Ldraw.Lego.Nodes
 			var newTransform = transform.TransformMatrix(Transform);
 			var newCenter = transform.TransformVector(Center).Add(center);
 
-			return new PartNode(newCenter, newTransform, m_Contents, Colour);
+			return new PartNode(newCenter, newTransform, file, m_Contents, Colour);
 		}
 
 		public override bool Accept(LdrawVisitor visitor)

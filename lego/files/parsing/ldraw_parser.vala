@@ -72,8 +72,9 @@ namespace Ldraw.Lego
 
 			int colourId = int.parse(tokens[1]);
 			string text = tokens[14].strip().down();
-
-			return new PartNode(center, transform, yield locator.GetObjectFromReference(text), colourContext.GetColourById(colourId));
+			
+			var reference = yield locator.GetObjectFromReference(text);
+			return new PartNode(center, transform, reference.file, reference.object, colourContext.GetColourById(colourId));
 		}
 
 		protected LdrawNode ParseLineNode(string line, ColourContext colourContext)

@@ -31,33 +31,33 @@ namespace Ldraw.Lego
 			var colours = new CurrentFileColourContext(ColourContext);
 			
 			Gee.List<LdrawNode> file_nodes;
+			string next_filename;
 			string current_filename;
-			var result = yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out current_filename);
-			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: current_filename ?? filename);
+			var result = yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out next_filename);
+			stderr.printf(@"Read $(file_nodes.size) from file: $result.\n");
+			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: filename);
 			if(result) // read all nodes in the file in one go, this is a simple Ldraw file
 			{
 				stderr.printf(@"Loaded $filename as simple Ldraw file.\n");
 				var model = (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
-				mainObject.File = model;
+				//mainObject.File = model;
 				return model;
 			}
 			
-			stderr.printf(@"Loading $filename as multipart Ldraw file. First file is $current_filename\n");
+//~ 			stderr.printf(@"Loading $filename as multipart Ldraw file. First file is $current_filename\n");
 			var sub_files = new ObservableList<LdrawObject>();
 			sub_files.add(mainObject);
 			// We encountered 0 NOFILE, this is an MPD file.
-			while(!(yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out current_filename)))
+			current_filename = next_filename;
+			while(!(yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out next_filename)))
 			{
 				stderr.printf(@"Read sub-file $current_filename from multipart.\n");
 				var sub_file = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: current_filename);
 				sub_files.add(sub_file);
+				current_filename = next_filename;
 			}
 			locator.ResolveAll(sub_files);
 			var modelFile = (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: sub_files, FileName: filename, FilePath: filepath);
-			foreach(var sf in sub_files)
-			{
-				sf.File = modelFile;
-			}
 			return modelFile;		
 		}
 		
@@ -79,29 +79,33 @@ namespace Ldraw.Lego
 		}
 		
 		/// returns true if the file is finished, false on reaching a 0 NOFILE Statement.
-		private async bool read_file_nodes(LdrawFileReader reader, MultipartSubFileLocator locator, CurrentFileColourContext colours, bool observable, out Gee.List<LdrawNode> nodes, out string? filename)
+		private async bool read_file_nodes(LdrawFileReader reader, MultipartSubFileLocator locator, CurrentFileColourContext colours, bool observable, out Gee.List<LdrawNode> nodes, out string? next_filename)
 			throws ParseError
 		{
 			nodes = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
-			filename = null;
+			next_filename = null;
 			while(true)
 			{
 				var node = yield reader.next(locator, colours);
-				if(node == null)
-					return true;
+				if(node == null) {
+					stderr.printf("Reached end of file.\n");
+					return true; }
 					
-				if(node is MultipartFileEnd)
-					return false;
+				if(node is MultipartFileEnd) {
+					stderr.printf("Multipart file ended.\n");
+//~ 					return false;
+				}
 				
 				if(node is MultipartFileStart)
 				{
+					stderr.printf("Multipart file started.\n");
 					var fileStart = (MultipartFileStart)node;
-					if(!(nodes.is_empty && filename == null))
+					if((nodes.is_empty && next_filename == null))
 					{
-						throw new ParseError.InvalidMultipart("There may not be any LDraw commands between MPD sub-files.");
+						continue;
 					}
-					filename = fileStart.filename;
-					continue;
+					next_filename = fileStart.filename;
+					return false;
 				}
 				
 				UpdateColours(node as ColourMetaCommand, colours);

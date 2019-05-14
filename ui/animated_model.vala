@@ -7,24 +7,37 @@ namespace Ldraw.Ui
 {
     public class AnimatedModel : GLib.Object
     {
-        public AnimatedModel(LdrawObject? model)
+        public AnimatedModel(LdrawFile? model)
         {
             var map = new HashMap<string, float?>();
             var selection = new HashSet<LdrawNode>();
             GLib.Object(
-				Model: model, 
+				Model: model.MainObject, 
 				CurrentParameters: map,
-				Selection: selection
+				Selection: selection,
+				File: model
 			);
         }
         
 		public LdrawObject Model {get; construct set;}
+		public LdrawFile File {get; construct set;}
         public Map<string, float?> CurrentParameters {get; construct; }
         public Set<LdrawNode> Selection {get; construct;}
 
-		public void Load(LdrawObject model)
+		public void Load(LdrawFile model)
 		{
-			Model = model;
+			File = model;
+			Model = model.MainObject;
+			CurrentParameters.clear();
+			Selection.clear();
+			
+			view_changed();
+			Model.VisibleChange.connect(() => view_changed());
+		}
+		
+		public void Switch(LdrawObject object)
+		{
+			Model = object;
 			CurrentParameters.clear();
 			Selection.clear();
 			

@@ -17,9 +17,9 @@ namespace Ldraw.Export
 			dialog.do_overwrite_confirmation = true;
 			var filter = new FileFilter();
 			filter.add_pattern("*." + exporter.PreferredExtension);
-			if(model.File.FileName != null)
+			if(model.FileName != null)
 			{
-				var basename = File.new_for_path(model.File.FileName).get_basename();
+				var basename = File.new_for_path(model.FileName).get_basename();
 				var newName = SwitchExtension(basename, exporter.PreferredExtension);
 				dialog.set_current_name(newName);
 			}
@@ -42,7 +42,7 @@ namespace Ldraw.Export
             options.Filename = dialog.get_filename();
             dialog.close();
 
-            exporter.Export.begin(model.File.MainObject, options);
+            exporter.Export.begin(model, options);
         }
 
         private string SwitchExtension(string filename, string newExtension)

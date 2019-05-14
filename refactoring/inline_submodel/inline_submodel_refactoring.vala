@@ -19,7 +19,7 @@ namespace Ldraw.Ui
 		
 		public bool PrepareToExecute(AnimatedModel model, Window dialogParent, out Command? command)
 		{
-			var file = model.Model.File;
+			var file = model.File;
 			PartNode node;
 			if(!can_inline(model, file, out node))
 			{
@@ -49,7 +49,7 @@ namespace Ldraw.Ui
 			if(part_node == null)
 				return false;
 				
-			if(part_node.Contents.File != file)
+			if(part_node.File != file)
 				return false;
 			node = part_node;
 			return true;

@@ -17,5 +17,13 @@ namespace Ldraw.Ui
 				Colour defaultColour);
 
 		public abstract void PrepareRender(LdrawObject model);
+		
+		public abstract RenderCacheMode mode {set;}
+	}
+	
+	public enum RenderCacheMode
+	{
+		CacheWholeModel,
+		CacheSubModels
 	}
 }

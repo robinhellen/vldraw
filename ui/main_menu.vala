@@ -47,7 +47,7 @@ namespace Ldraw.Ui
 
 			var fileMenu = CreateMenu(menus, "_File", accelerators, "<Ldraw>/File");
 
-			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty().MainObject));
+			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty()));
 			AddSeparator(fileMenu);
 			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));
             AddSubMenu(fileMenu, "_Recent", RecentMenu);
@@ -196,7 +196,7 @@ namespace Ldraw.Ui
 			{
 				try
 				{
-					Model.Load(Loader.LoadModelFile.end(res).MainObject);
+					Model.Load(Loader.LoadModelFile.end(res));
 				}
 				catch(ParseError e)
 				{
@@ -209,7 +209,7 @@ namespace Ldraw.Ui
 
         private void FileSave_OnActivate(Window parent)
         {
-			var file = Model.Model.File as LdrawModelFile;
+			var file = Model.File as LdrawModelFile;
             if(file.FilePath != null)
             {
                 file.Save();
@@ -227,7 +227,7 @@ namespace Ldraw.Ui
 			{
                 try
                 {
-					var f = Model.Model.File as LdrawModelFile;
+					var f = Model.File as LdrawModelFile;
                     f.FilePath = chosenFileName;
                     f.Save();
                     var file = File.new_for_path(chosenFileName);
@@ -244,8 +244,8 @@ namespace Ldraw.Ui
 
         private void ModelAddSubModel_OnActivate(Window parent)
         {
-            var mpdModel = Model.Model.File as MultipartModel;
-            var base_filename = Model.Model.File.FileName[0:-4];
+            var mpdModel = Model.File as MultipartModel;
+            var base_filename = Model.File.FileName[0:-4];
             string new_submodel_filename;
             if(mpdModel == null)
             {
@@ -287,9 +287,9 @@ namespace Ldraw.Ui
             if(newFileName == null || newFileName.length == 0)
             {
                 if(mpdModel == null)
-                    newFileName = Model.Model.File.FileName + " (1).ldr";
+                    newFileName = Model.File.FileName + " (1).ldr";
                 else
-                    newFileName = Model.Model.File.FileName + @" ($(mpdModel.SubModels.size))";
+                    newFileName = Model.File.FileName + @" ($(mpdModel.SubModels.size))";
             }
             dialog.destroy();
             if(response != ResponseType.ACCEPT)
@@ -302,10 +302,10 @@ namespace Ldraw.Ui
                 mpdModel = (MultipartModel)GLib.Object.new(typeof(MultipartModel),
                             MainObject: Model.Model,
                             SubModels: subObjs,
-                            FileName: Model.Model.File.FileName,
-                            FilePath: (Model.Model.File as LdrawModelFile).FilePath);
-				Model.Model.File = mpdModel;
-				Model.Load(mpdModel.MainObject);
+                            FileName: Model.File.FileName,
+                            FilePath: (Model.File as LdrawModelFile).FilePath);
+				Model.File = mpdModel;
+				Model.Load(mpdModel);
             }
             var nodes = new ObservableList<LdrawNode>();
             var newObject = (LdrawObject)GLib.Object.new(
@@ -315,7 +315,7 @@ namespace Ldraw.Ui
 						File: mpdModel
 					);
             mpdModel.SubModels.add(newObject);
-            Model.Load(newObject);
+            Model.Switch(newObject);
         }
 
         private void ShowPartsList(Window parent)
@@ -325,7 +325,7 @@ namespace Ldraw.Ui
                 "_OK", ResponseType.ACCEPT);
 
             var content = (Box) dialog.get_content_area();
-            var parts = new PartGroup.FromModel(Model.Model.File as LdrawModelFile);
+            var parts = new PartGroup.FromModel(Model.File as LdrawModelFile);
             var list = new ObservableList<PartGroupItem>();
             list.add_all(parts.Items);
             var view = new SimpleList<PartGroupItem>.with_model(list);

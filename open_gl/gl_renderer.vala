@@ -17,6 +17,7 @@ namespace Ldraw.OpenGl
 		public FlatStore FlatStore {get; construct;}
 		public ShaderProgramFactory ProgramFactory {get; construct;}
 		public NodeAdjuster NodeAdjuster {get; construct;}
+		public RenderCacheMode mode {set{this._mode = value;}}
 
 		static construct
 		{
@@ -29,6 +30,7 @@ namespace Ldraw.OpenGl
 		GLuint program = 0;
 		//	  uniform parameters to the shaders
 		LdrawObject currentModel;
+		RenderCacheMode _mode = RenderCacheMode.CacheWholeModel;
 
 		public void Render(GLContext context,
 				Gee.Set<LdrawNode> selection,
@@ -79,27 +81,30 @@ namespace Ldraw.OpenGl
 			glEnableVertexAttribArray(1);
 			glEnableVertexAttribArray(2);
 
-			if(currentModel.File is LdrawModelFile)
+			switch(_mode)
 			{
-				foreach(var strategy in RenderStrategies)
-				{
-					strategy.StartModel(currentModel);
-				}
-				foreach(var node in currentModel.Nodes)
-				{
-					if(!RenderStrategies.fold<bool>((s, r) => r &= s.ShouldRenderNode(node), true))
-						continue;
-					var adjustment = NodeAdjuster.GetAdjustmentFor(node);
-					var partNode = node as PartNode;
-					if(partNode == null)
-						continue;
-					var selected = node in selection;
-					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour, selected, adjustment);
-				}
-			}
-			else
-			{
-				RenderObject(currentModel, Matrix.Identity, Vector.NullVector, defaultColour, false, new GlMatrix.Identity());
+				case RenderCacheMode.CacheSubModels:
+					foreach(var strategy in RenderStrategies)
+					{
+						strategy.StartModel(currentModel);
+					}
+					foreach(var node in currentModel.Nodes)
+					{
+						if(!RenderStrategies.fold<bool>((s, r) => r &= s.ShouldRenderNode(node), true))
+							continue;
+						var adjustment = NodeAdjuster.GetAdjustmentFor(node);
+						var partNode = node as PartNode;
+						if(partNode == null)
+							continue;
+						var selected = node in selection;
+						RenderObject(partNode.Contents, partNode.Transform, partNode.Center, partNode.Colour, selected, adjustment);
+					}
+					break;
+				case RenderCacheMode.CacheWholeModel:
+					RenderObject(currentModel, Matrix.Identity, Vector.NullVector, defaultColour, false, new GlMatrix.Identity());
+					break;
+				default:
+					assert_not_reached();
 			}
 			if(overlay != null)
 			{
@@ -238,25 +243,34 @@ namespace Ldraw.OpenGl
 
 		private void PrepareAllVertexData(LdrawObject model)
 		{
-			if(!(model.File is LdrawModelFile))
+			switch(_mode)
 			{
-				arrayCache[model] = PrepareVertexData(model);
-				model.VisibleChange.connect(() => arrayCache.unset(model));
-				return;
-			}
+				case RenderCacheMode.CacheWholeModel:
+					if(!arrayCache.has_key(model))
+					{
+						arrayCache[model] = PrepareVertexData(model);
+						model.VisibleChange.connect(() => arrayCache.unset(model));
+					}
+					break;
+				case RenderCacheMode.CacheSubModels:
+					foreach(var node in model.Nodes)
+					{
+						PartNode partNode = node as PartNode;
+						if(partNode == null)
+							continue;
 
-			foreach(var node in model.Nodes)
-			{
-				PartNode partNode = node as PartNode;
-				if(partNode == null)
-					continue;
+						var obj = partNode.Contents;
+						if(arrayCache.has_key(obj))
+						{
+							continue;
+						}
 
-				var obj = partNode.Contents;
-				if(arrayCache.has_key(obj))
-					continue;
-
-				arrayCache[obj] = PrepareVertexData(obj);
-				obj.VisibleChange.connect(() => arrayCache.unset(obj));
+						arrayCache[obj] = PrepareVertexData(obj);
+						obj.VisibleChange.connect(() => arrayCache.unset(obj));
+					}
+					break;
+				default:
+					assert_not_reached();
 			}
 		}
 

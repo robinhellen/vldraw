@@ -58,12 +58,12 @@ namespace Ldraw.Colours
 		
 		private void update_palette(AnimatedModel model)
 		{
-			if(model.Model == null || !(model.Model.File is LdrawModelFile))
+			if(model.Model == null || !(model.File is LdrawModelFile))
 			{
 				colour_codes = base_colours;
 				return;
 			}
-			var pg = new PartGroup.FromModel(model.Model.File as LdrawModelFile);
+			var pg = new PartGroup.FromModel(model.File as LdrawModelFile);
 			var counts = new HashMap<int, int>();
 			foreach(var pgi in pg.Items)
 			{

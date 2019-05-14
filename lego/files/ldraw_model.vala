@@ -13,7 +13,7 @@ namespace Ldraw.Lego
 			var filename = "";
 			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: filename);
 			Object(MainObject: mainObject, FileName: filename);
-			mainObject.File = this;
+			//mainObject.File = this;
 		}
 
 		public override void Save()

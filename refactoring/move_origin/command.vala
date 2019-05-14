@@ -45,7 +45,7 @@ namespace Ldraw.Refactor
 		
 		public Collection<PartNode> GetReferences(AnimatedModel model, LdrawObject target)
 		{
-			var mpd = model.Model.File as MultipartModel;
+			var mpd = model.File as MultipartModel;
 			if(mpd == null)
 				return Collection.empty<PartNode>();
 				

@@ -53,7 +53,7 @@ namespace Ldraw.Colours
 		
 		private class NullLocator : Object, ISubFileLocator
 		{			
-			public async LdrawObject? GetObjectFromReference(string reference)
+			public async LdrawFileReference? GetObjectFromReference(string reference)
 				throws ParseError
 			{
 				throw new ParseError.CorruptFile("Colour definitions files should not load parts.");

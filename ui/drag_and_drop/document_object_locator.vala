@@ -10,7 +10,7 @@ namespace Ldraw.Ui.DragAndDrop
 
 		public async LdrawObject? GetObjectForName(string name)
 		{
-			var file = Model.Model.File as MultipartModel;
+			var file = Model.File as MultipartModel;
 			if(file == null) return null;
 			foreach(var obj in file.SubModels)
 			{

@@ -25,7 +25,7 @@ namespace Ldraw.Povray
 			var frameCount = model.Nodes.size;
 			// invoke povray to render to a sequence of image files
 			stderr.printf(@"Rendering povray images to $tempDir\n");
-            string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D", "+WT1"};
+            string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D"/*, "+WT1"*/};
             var povrayStatus = yield async_spawn(null, povrayArgv, null
 					, SpawnFlags.SEARCH_PATH
 					| SpawnFlags.STDOUT_TO_DEV_NULL

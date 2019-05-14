@@ -75,30 +75,23 @@ namespace Ldraw.OpenGl
 			glEnableVertexAttribArray(1);
 			glEnableVertexAttribArray(2);
 			
-			if(model.File is LdrawModelFile)
+			foreach(var strategy in RenderStrategies)
 			{
-				foreach(var strategy in RenderStrategies)
-				{
-					strategy.StartModel(model);
-				}
-				uint i = 0;
-				foreach(var node in model.Nodes)
-				{
-					glUniform1uiv(nodeIndex, 1, {i});
-					i++;
-					if(!RenderStrategies.fold<bool>((s, r) => r &= s.ShouldRenderNode(node), true))
-						continue;
-					var partNode = node as PartNode;
-					if(partNode == null)
-						continue;
-					RenderObject(partNode.Contents, partNode.Transform, partNode.Center, program);
-				}
+				strategy.StartModel(model);
 			}
-			else
+			uint i = 0;
+			foreach(var node in model.Nodes)
 			{
-				RenderObject(model, Matrix.Identity, Vector.NullVector, program);	
+				glUniform1uiv(nodeIndex, 1, {i});
+				i++;
+				if(!RenderStrategies.fold<bool>((s, r) => r &= s.ShouldRenderNode(node), true))
+					continue;
+				var partNode = node as PartNode;
+				if(partNode == null)
+					continue;
+				RenderObject(partNode.Contents, partNode.Transform, partNode.Center, program);
 			}
-			
+		
 			var status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 			if(status != GL_FRAMEBUFFER_COMPLETE)
 			{
@@ -116,9 +109,9 @@ namespace Ldraw.OpenGl
 			glDeleteFramebuffers(1, framebuffer);
 			
 			var selected = new HashSet<LdrawNode>();
-			for(int i = 0; i < (lassoHeight * lassoWidth); i++)
+			for(int j = 0; j < (lassoHeight * lassoWidth); j++)
 			{
-				var index = result[i];
+				var index = result[j];
 				if(index < 0 || index >= model.Nodes.size)
 					continue;
 				

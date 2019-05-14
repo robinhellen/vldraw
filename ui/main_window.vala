@@ -150,13 +150,13 @@ namespace Ldraw.Ui
                     cb.get_active_iter(out tIter);
 					LdrawObject object;
                     tModel.get(tIter, 0, out object, -1);
-                    EditingObject.Load(object);
+                    EditingObject.Switch(object);
                     UndoStack.Clear();
                 });
 
 			EditingObject.notify["Model"].connect(() =>
 				{
-					var mpd = EditingObject.Model.File as MultipartModel;
+					var mpd = EditingObject.File as MultipartModel;
 					ObservableList<LdrawObject> subModels;
 					if(mpd == null)
 					{

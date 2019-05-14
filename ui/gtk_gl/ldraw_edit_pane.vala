@@ -61,6 +61,7 @@ namespace Ldraw.Ui.GtkGl
 			{
 				interaction.attach(this);
 			}
+			renderer.mode = RenderCacheMode.CacheSubModels;
 		}
 		
 		private void model_view_changed()
@@ -91,7 +92,7 @@ namespace Ldraw.Ui.GtkGl
 					mouseData = new MouseData(event.x, event.y, event.button, viewParameters);
 					break;					
 				case 3: // right button
-					CreateContextMenu().popup(null, null, null, event.button, event.time);
+					CreateContextMenu().popup_at_pointer(event);
 					break;
 			}
 			return false;
@@ -139,7 +140,7 @@ namespace Ldraw.Ui.GtkGl
 		public override bool popup_menu()
 		{
 			base.popup_menu();
-			CreateContextMenu().popup(null, null, null, 0, get_current_event_time());
+			CreateContextMenu().popup_at_pointer();
 			return false;		
 		}
 
@@ -274,7 +275,7 @@ namespace Ldraw.Ui.GtkGl
 
 				if(dragFinished)
 				{
-					LdrawNode newNode = new PartNode(newPosition, newTransform, droppedObject, newColour);
+					LdrawNode newNode = new PartNode(newPosition, newTransform, model.File, droppedObject, newColour);
 					model.SelectSingle(newNode);
 					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, addAfterNode));
 					finishDrag = false;
@@ -402,7 +403,14 @@ namespace Ldraw.Ui.GtkGl
 			}
 		}
 		
-		
+		public bool get_border(out Border border)
+		{
+			border = Border();
+			border.bottom = 0;
+			border.left = 0;
+			border.right = border.top = 0;
+			return true;
+		}
 
 		// end implementation of Scrollable
 

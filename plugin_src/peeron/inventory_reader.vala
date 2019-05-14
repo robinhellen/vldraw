@@ -30,9 +30,9 @@ namespace Ldraw.Peeron
 				var col1 = rowNode->children->next; // ignoring the initial text item
 				var col2 = col1->next;
 				var col3 = col2->next;
-				//var col4 = col3->next;
-				//var col5 = col4->next;
-				//var col6 = col5->next;
+				//var col4 = col3->next; // description
+				//var col5 = col4->next; // picture
+				//var col6 = col5->next; // note
 
 				var qty = int.parse(col1->children->content);
 				var partNo = col2->children->children->content; // the part number is a link

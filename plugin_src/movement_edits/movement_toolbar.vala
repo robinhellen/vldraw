@@ -41,7 +41,7 @@ namespace Ldraw.Plugins.Movement
 
 			bar.insert(new SeparatorToolItem(), -1);
 
-			unowned SList<RadioToolButton>? group = null;
+			unowned SList<RadioButton>? group = null;
 			bar.insert(CreateGridButton(GridSize.Large,  ref group), -1);
 			bar.insert(CreateGridButton(GridSize.Medium, ref group), -1);
 			bar.insert(CreateGridButton(GridSize.Small,  ref group), -1);
@@ -52,7 +52,7 @@ namespace Ldraw.Plugins.Movement
 			return bar;
 		}
 
-		private ToolButton CreateGridButton(GridSize size, ref unowned SList<RadioToolButton>? group)
+		private ToolButton CreateGridButton(GridSize size, ref unowned SList<RadioButton>? group)
 		{
 			string inner_lines = "";
 			switch(size)

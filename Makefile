@@ -146,7 +146,7 @@ movement_internal_packages=ui_widgets lego lego_objects options ui_gtk_gl
 INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
-PLUGINS=animation steps povray peeron move_origin clipboard extract_inline hide movement
+PLUGINS=animation steps peeron move_origin clipboard extract_inline hide movement
 # extract_inline
 
 VALA_PACKAGES = $(gtk) $(gee) $(json) $(soup) $(xml) gl $(gio) $(gmodule) diva

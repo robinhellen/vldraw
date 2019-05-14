@@ -92,7 +92,7 @@ namespace Ldraw.Lego.Library
 			}
 			var object = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: filename);
 			var file = (T)Object.new(typeof(T), MainObject: object, FileName: filename);
-			object.File = (LdrawFile) file;
+			//object.File = (LdrawFile) file;
 			return file;
 		}
 	}
@@ -106,7 +106,7 @@ namespace Ldraw.Lego.Library
 			Object(Cache: cache);
 		}
 
-		public async LdrawObject? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference)
 			throws ParseError
 		{
 			var dir_parts = reference.split_set("/\\");
@@ -117,7 +117,7 @@ namespace Ldraw.Lego.Library
 					LdrawSubPart sp;
 					if(yield Cache.TryGetSubPart(name, out sp))
 					{
-						return sp.MainObject;
+						return new LibraryFileReference(sp, sp.MainObject);
 					}
 					break;
 				case "48":
@@ -125,7 +125,7 @@ namespace Ldraw.Lego.Library
 					LdrawHiresPrimitive hiresPrim;
 					if(yield Cache.TryGetHiresPrimitive(name, out hiresPrim))
 					{
-						return hiresPrim.MainObject;
+						return new LibraryFileReference(hiresPrim, hiresPrim.MainObject);
 					}
 					break;
 				default:
@@ -133,13 +133,13 @@ namespace Ldraw.Lego.Library
 					LdrawPrimitive prim;
 					if(yield Cache.TryGetPrimitive(name, out prim))
 					{
-						return prim.MainObject;
+						return new LibraryFileReference(prim, prim.MainObject);
 					}
 
 					LdrawPart p;
 					if(yield Cache.TryGetPart(name, out p))
 					{
-						return p.MainObject;
+						return new LibraryFileReference(p, p.MainObject);
 					}
 					break;
 			}

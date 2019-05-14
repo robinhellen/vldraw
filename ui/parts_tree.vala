@@ -45,7 +45,7 @@ namespace Ldraw.Ui.Widgets
 		{
 			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(IPartMetadata));
 
-			var categories = new LinkedList<string>();
+			var categories = new ArrayList<string>();
 			categories.add_all(yield library.GetAllCategories());
 			categories.sort();
 			foreach(string category in categories)

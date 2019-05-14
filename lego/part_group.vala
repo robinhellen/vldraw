@@ -32,7 +32,7 @@ namespace Ldraw.Lego
 
 			public override bool VisitSubModel(PartNode node)
 			{
-				var file = node.Contents.File;
+				var file = node.File;
 				if(file == null)
 				{
 					return true;
@@ -48,7 +48,7 @@ namespace Ldraw.Lego
 				}
 				else
 				{
-					stderr.printf(@"Unexpected class of file object: $(node.Contents.File.get_type().name()).\n");
+					stderr.printf(@"Unexpected class of file object: $(node.File.get_type().name()).\n");
 				}
 				return true;
 			}
@@ -59,7 +59,7 @@ namespace Ldraw.Lego
 				var map = new HashMap<LdrawPart, MultiMap<Colour?, PartNode>>();
 				foreach(var p in parts)
 				{
-					var partFile = p.Contents.File as LdrawPart;
+					var partFile = p.File as LdrawPart;
 					if(map[partFile] == null)
 					{
 						map[partFile] = new HashMultiMap<Colour?, PartNode>();

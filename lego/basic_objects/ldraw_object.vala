@@ -12,7 +12,7 @@ namespace Ldraw.Lego
 		public LdrawObject(string description, LdrawFile? file)
 		{
 			var nodeList = new ArrayList<LdrawNode>();
-			Object(Nodes: nodeList, Description: description, File: file);
+			Object(Nodes: nodeList, Description: description);//, File: file);
 		}
 
 		public Gee.List<LdrawNode> Nodes
@@ -46,7 +46,7 @@ namespace Ldraw.Lego
 
 		public string Description {get; public construct set;}
 
-		public LdrawFile File {get; construct set;}
+		// public LdrawFile File {get; construct set;}
 
 		public Bounds BoundingBox
 		{
