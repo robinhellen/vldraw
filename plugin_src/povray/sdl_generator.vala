@@ -83,7 +83,23 @@ namespace Ldraw.Povray
 
 		public string ObjectReference(SdlObjectReference reference)
 		{
+			if(reference.bounds != null)
+			{
+				return ObjectReferenceWithSeams(reference, 0.5F);
+			}
 			return @"\tobject { $(reference.ObjectName) matrix $(SdlTransform(reference.Transform, reference.Center)) $(ColourReference(reference.Colour)) }\n";
+		}
+		
+		public string ObjectReferenceWithSeams(SdlObjectReference reference, float seam_width)
+		{
+			var bounds = reference.bounds;
+			var x = bounds.MaxX - bounds.MinX;
+			var y = bounds.MaxY - bounds.MinY;
+			var z = bounds.MaxZ - bounds.MinZ;
+
+			var scale =  @"scale <1 - $seam_width / $x, 1 - $seam_width / $y, 1 - $seam_width / $z>";
+			
+			return @"\tobject { $(reference.ObjectName) $scale matrix $(SdlTransform(reference.Transform, reference.Center)) $(ColourReference(reference.Colour)) }\n";
 		}
 
 		private string SdlTransform(Matrix m, Vector v)

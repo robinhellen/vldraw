@@ -10,7 +10,7 @@ namespace Ldraw.Ui
 	{
 		public override void load(ContainerBuilder builder)
 		{
-            // builder.register<PartsTree>().as<IPartDragSource>();          
+			builder.register<PartsTree>().as<IPartDragSource>();          
             builder.register<EditPanes>();
             builder.register<SubModelsTree>().as<IPartDragSource>();
             builder.register<ModelList>();

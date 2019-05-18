@@ -1,5 +1,6 @@
 
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 
@@ -26,6 +27,7 @@ namespace Ldraw.Povray
 		public Matrix Transform;
 
 		public Colour Colour;
+		public Bounds? bounds = null;
 
 		public SdlObjectReference(PartNode part)
 		{
@@ -33,6 +35,11 @@ namespace Ldraw.Povray
 			ObjectName = EscapeFilenameForSdl(part.Contents.FileName);
 			Center = part.Center;
 			Transform = part.Transform;
+			
+			if(part.File is LdrawPart)
+			{
+				bounds = part.Contents.BoundingBox;
+			}
 		}
 	}
 

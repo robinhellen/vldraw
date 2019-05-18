@@ -63,11 +63,13 @@ namespace Ldraw.Ui.Widgets
 		
 		private void ModelChanged()		
 		{
-			var mpdFile = Model.Model as MultipartModel;
-			if(mpdFile == null)
+			var mpdFile = Model.File as MultipartModel;
+			if(mpdFile == null) {
 				m_Tree.model = new ObservableList<LdrawObject>();
-			else
+			}
+			else {
 				m_Tree.model = mpdFile.SubModels;
+			}
 		}
 
 		public async LdrawObjectWithColour? GetCurrentObject()
