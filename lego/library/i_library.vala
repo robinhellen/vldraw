@@ -1,5 +1,7 @@
 using Gee;
 
+using Ldraw.Application;
+
 namespace Ldraw.Lego.Library
 {
 	public interface ILibrary : Object
@@ -7,6 +9,10 @@ namespace Ldraw.Lego.Library
 		public abstract async Set<string> GetAllCategories();
 
 		public abstract async Collection<IPartMetadata> GetPartsByCategory(string? category);
+		
+		public abstract async void refresh(ProgressReporter reporter);
+		
+		public signal void refreshed();
 
 		//public abstract Collection<LdrawPart> GetVariantsOf(LdrawPart part);
 	}

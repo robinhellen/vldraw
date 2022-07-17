@@ -5,7 +5,7 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui
 {
-	public class GtkGlModule : Module
+	public class GtkGlModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{

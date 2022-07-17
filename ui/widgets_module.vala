@@ -6,7 +6,7 @@ using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Ui
 {
-	public class WidgetsModule : Module
+	public class WidgetsModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{
@@ -30,6 +30,7 @@ namespace Ldraw.Ui
 					
             builder.register<LdrawEditorUi>().as<UserInterface>();
             builder.register<GtkInitialisingArgHandler>().as_decorator<ArgumentHandler>();
+            builder.register<ModalProgressDialog>().as<ProgressReporter>();
 		}
 	}
 }

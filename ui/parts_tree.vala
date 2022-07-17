@@ -11,6 +11,7 @@ namespace Ldraw.Ui.Widgets
 	{
 		private ScrolledWindow m_Scrolled;
 		private TreeView m_Tree;
+		private TreeStore store;
 
 		public ILibrary Library {construct; get;}
 		public IDatFileCache DatFileCache{construct; get;}
@@ -39,11 +40,27 @@ namespace Ldraw.Ui.Widgets
 			
 			CreateAndPopulateModel.begin(Library, (obj, res) =>
 				m_Tree.model = CreateAndPopulateModel.end(res));
+				
+			Library.refreshed.connect(refresh);
+		}
+		
+		private async void refresh()
+		{
+			store.clear();
+			
+			var categories = new ArrayList<string>();
+			categories.add_all(yield Library.GetAllCategories());
+			categories.sort();
+			foreach(string category in categories)
+			{
+				yield PopulatePartsForCategory(store, category, Library);
+			}
+			yield PopulatePartsForCategory(store, null, Library); // add uncategorised items			
 		}
 
 		private async TreeModel CreateAndPopulateModel(ILibrary library)
 		{
-			TreeStore store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(IPartMetadata));
+			store = new TreeStore(4, typeof(int), typeof(string), typeof(string), typeof(IPartMetadata));
 
 			var categories = new ArrayList<string>();
 			categories.add_all(yield library.GetAllCategories());

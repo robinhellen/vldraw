@@ -2,21 +2,41 @@ using Gee;
 using GLib.Environment;
 using Json;
 
+using Ldraw.Application;
 using Ldraw.Lego;
 
 namespace Ldraw.Lego.Library
 {
-	public class FileCachedLibrary : GLib.Object, ILibrary
+	private class FileCachedLibrary : GLib.Object, ILibrary, InitializeOnStartup
 	{
 		public IDatFileCache PartFiles {construct; private get;}
 		public ILdrawFolders LibraryFolders {construct; private get;}
 
 		private MultiMap<string, IPartMetadata> categories;
 		private bool loaded;
+				
+		public async bool Initialize(ProgressReporter reporter)
+		{
+			yield EnsureLoaded(reporter);
+			return true;
+		}
+		
+		public async void refresh(ProgressReporter reporter)
+		{
+			var task_name = @"Reloading library parts.";
+			reporter.start_task(task_name);
+			var ldrawUserConfigDir = File.new_for_path(get_user_config_dir()).get_child("vldraw");
+			if(!ldrawUserConfigDir.query_exists())
+				ldrawUserConfigDir.make_directory_with_parents();
+
+			var categoryFile = ldrawUserConfigDir.get_child("categories.ldraw");
+			yield LoadCategoriesAndSave(categoryFile, reporter, task_name);
+			reporter.end_task(task_name);
+			refreshed();
+		}
 
 		public async Set<string> GetAllCategories()
 		{
-			yield EnsureLoaded();
 			var keys = categories.get_keys();
 			var filtered = new HashSet<string>();
 			foreach(var key in keys)
@@ -36,7 +56,6 @@ namespace Ldraw.Lego.Library
 
 		public async Collection<IPartMetadata> GetPartsByCategory(string? category)
 		{
-			yield EnsureLoaded();
 			var parts = categories[category];
 			var categoryParts = new LinkedList<IPartMetadata>();
 			foreach(var part in parts)
@@ -49,7 +68,7 @@ namespace Ldraw.Lego.Library
 			return categoryParts;
 		}
 
-		private async void EnsureLoaded()
+		private async void EnsureLoaded(ProgressReporter reporter)
 		{
 			if(loaded)
 				return;
@@ -60,22 +79,34 @@ namespace Ldraw.Lego.Library
 
 			var categoryFile = ldrawUserConfigDir.get_child("categories.ldraw");
 			if(!categoryFile.query_exists())
-				yield LoadCategoriesAndSave(categoryFile);
+			{
+				var task_name = "Scanning part library.";
+				reporter.start_task(task_name);
+				yield LoadCategoriesAndSave(categoryFile, reporter, task_name);
+				reporter.end_task(task_name);
+			}
 			else
 				LoadCategoriesFromCache(categoryFile);
 
 			loaded = true;
 		}
 
-		private async void LoadCategoriesAndSave(File categoryFile)
+		private async void LoadCategoriesAndSave(File categoryFile, ProgressReporter reporter, string task_name)
 		{
 			var folder = LibraryFolders.PartsDirectory;
+			double count = 0;
 			var children = folder.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
+			while(children.next_file() != null)
+				count++;
+			
+			children = folder.enumerate_children("standard::*", FileQueryInfoFlags.NONE);
 			categories = new HashMultiMap<string, LdrawPart>();
 
 			FileInfo current_file;
+			double progress = 0;
 			while((current_file = children.next_file()) != null)
 			{
+				reporter.task_progress(task_name, progress / count);
 				if(current_file.get_file_type() == FileType.DIRECTORY)
 					continue;
 
@@ -190,9 +221,15 @@ namespace Ldraw.Lego.Library
 			var generator = new Generator();
 			generator.pretty = true;
 			generator.set_root(builder.get_root());
-
-			var stream = file.append_to(FileCreateFlags.REPLACE_DESTINATION);
-			generator.to_stream(stream);
+			try
+			{
+				var stream = file.append_to(FileCreateFlags.REPLACE_DESTINATION);
+				generator.to_stream(stream);
+			}
+			catch(Error e)
+			{
+				log("vldraw-library", LogLevelFlags.LEVEL_ERROR, @"Unable to save cache of LDraw library metadata to $(file.get_path()).");
+			}
 		}
 	}
 

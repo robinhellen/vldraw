@@ -2,7 +2,9 @@ using Diva;
 using Gee;
 using Gtk;
 
+using Ldraw.Application;
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Ui.Commands;
 using Ldraw.Ui.Widgets;
 using Ldraw.Utils;
@@ -16,6 +18,7 @@ namespace Ldraw.Ui
 			var cls = (ObjectClass)typeof(MainMenu).class_ref();
 			set_collection_injection<Refactoring>(cls, "Refactorings");
 			set_collection_injection<MenuItemSource>(cls, "ItemSources");
+			set_lazy_injection<ProgressReporter>(cls, "reporter");
 		}
 
 		public AnimatedModel Model {construct; private get;}
@@ -24,6 +27,8 @@ namespace Ldraw.Ui
         public IDialogManager Dialogs {construct; private get;}
         public Collection<Refactoring> Refactorings {construct; private get;}
         public Collection<MenuItemSource> ItemSources {construct; private get;}
+        public ILibrary library {construct; private get;}
+        public Lazy<ProgressReporter> reporter {construct; private get;}
 
         public RecentChooserMenu RecentMenu {construct; private get;}
 
@@ -86,6 +91,9 @@ namespace Ldraw.Ui
 			AddExtraMenuItems(selectionMenu, TopMenu.Selection, parent);
 
 			AddRefactorMenu(menus, accelerators, parent);
+			
+			var library_menu = CreateMenu(menus, "_Library", accelerators);
+			AddMenuItem(library_menu, "_Refresh", () => library.refresh.begin(reporter.value));
 
 			AddCtrlShortcut(fileNew, "N");
 			AddCtrlShortcut(fileSave, "S");
@@ -192,7 +200,7 @@ namespace Ldraw.Ui
 
         private void LoadFile(string fileName)
         {
-			Loader.LoadModelFile.begin(fileName, ReferenceLoadStrategy.PartsOnly, true, (obj, res) =>
+			Loader.LoadModelFile.begin(fileName, ReferenceLoadStrategy.SubPartsAndPrimitives, true, (obj, res) =>
 			{
 				try
 				{
@@ -303,7 +311,7 @@ namespace Ldraw.Ui
                             MainObject: Model.Model,
                             SubModels: subObjs,
                             FileName: Model.File.FileName,
-                            FilePath: (Model.File as LdrawModelFile).FilePath);
+                            FilePath: ((LdrawModelFile)(Model.File)).FilePath);
 				Model.File = mpdModel;
 				Model.Load(mpdModel);
             }

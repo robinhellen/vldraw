@@ -40,7 +40,6 @@ namespace Ldraw
             builder.register<OnDemandSubFileLoader>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 
             builder.register<OnDemandPartLoader>().as<IDatFileCache>().single_instance();
-            builder.register<FileCachedLibrary>().as<ILibrary>().single_instance();
 
 			builder.register_module<DragAndDropModule>();
 			builder.register_module<WidgetsModule>();
@@ -52,7 +51,7 @@ namespace Ldraw
             builder.register<RunningOptions>().as<IOptions>().single_instance();
 
             builder.register<UndoStack>().single_instance();
-            var animatedModel = new AnimatedModel(null);
+            var animatedModel = new AnimatedModel(new LdrawModel.Empty());
             builder.register<AnimatedModel>(_ => animatedModel);
             builder.register<FileLoadingArgHandler>().as<ArgumentHandler>();
             builder.register<Ldraw.Application.Application>();

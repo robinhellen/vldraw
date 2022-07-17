@@ -32,7 +32,11 @@ namespace Ldraw.Application
 			var reporter = new ConsoleReporter();
 			foreach(var init in StartupInitializers)
 			{
-				yield init.Initialize(reporter);
+				var result = yield init.Initialize(reporter);
+				if(!result)
+				{
+					assert_not_reached();
+				}
 			}			
 		}
 	}
@@ -49,7 +53,7 @@ namespace Ldraw.Application
 	
 	public interface InitializeOnStartup : Object
 	{
-		public abstract async void Initialize(ProgressReporter reporter);
+		public abstract async bool Initialize(ProgressReporter reporter);
 	}
 	
 	public interface ProgressReporter : Object
@@ -57,6 +61,7 @@ namespace Ldraw.Application
 		public abstract void start_task(string task_name);
 		public abstract void task_progress(string task_name, double progress);
 		public abstract void end_task(string task_name);
+		public abstract void task_error(string task_name, string error_message);
 	}
 	
 	private class ConsoleReporter : Object, ProgressReporter
@@ -67,5 +72,9 @@ namespace Ldraw.Application
 			stdout.printf(@"$task_name: $progress\n");
 		}
 		public void end_task(string task_name){}
+		public void task_error(string task_name, string error_message)
+		{
+			log("vldraw", LogLevelFlags.LEVEL_ERROR, error_message);
+		}
 	}
 }
