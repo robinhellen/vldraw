@@ -271,10 +271,11 @@ namespace Ldraw.Peeron
 			foreach(var line in i.Lines)
 			{
 				var part_ref = line.PartNumber;
-				if(extra_name_ref.has_key(part_ref))
+				/*if(extra_name_ref.has_key(part_ref))
 				{
 					part_ref = extra_name_ref[part_ref];
-				}
+				}*/
+				if(part_ref == null) continue;
 				LdrawPart p;
 				if(yield lib.TryGetPart(part_ref, out p))
 				{

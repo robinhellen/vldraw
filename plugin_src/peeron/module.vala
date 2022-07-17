@@ -11,7 +11,8 @@ namespace Ldraw
 		{
 			builder.register<SetList>().as<IPartDragSource>();
 
-            builder.register<InventoryReader>();
+            builder.register<PeeronInventoryReader>().as<InventoryReader>();
+            builder.register<RebrickableInventoryReader>().as<InventoryReader>();
             builder.register<ColourChart>();
 		}
 	}

@@ -62,6 +62,9 @@ namespace Ldraw.Peeron
 
 		private int GetColourIdFromName(string name)
 		{
+			int id;
+			if(int.try_parse(name, out id))
+				return id;
 			Load();
 			return ColourMap[name];
 		}

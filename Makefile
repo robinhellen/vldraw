@@ -69,8 +69,8 @@ lego_sources:=$(foreach folder, files files/parsing library, $(wildcard lego/$(f
 	$(foreach n, meta_command, lego/objects/nodes/$n.vala)
 lego_packages= diva
 lego_private_packages=$(json)
-lego_internal_packages=maths utils lego_objects
-lego_private_internal_packages=application
+lego_internal_packages=maths utils lego_objects application
+
 
 part_group_sources=$(wildcard lego/*.vala)
 part_group_packages=
@@ -117,7 +117,7 @@ animation_internal_packages=lego lego_objects maths expressions utils ui_widgets
 
 peeron_sources=$(wildcard plugin_src/peeron/*.vala)
 peeron_packages=$(gee) diva
-peeron_private_packages=$(soup) $(xml) $(gtk)
+peeron_private_packages=$(soup) $(xml) $(gtk) $(json)
 peeron_internal_packages=lego_objects ui_widgets part_group
 
 povray_sources=$(wildcard plugin_src/povray/*.vala)
