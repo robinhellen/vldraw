@@ -17,16 +17,26 @@ namespace Ldraw.Colours
 		
 		private Map<int, Colour> allColours;
 		
-		public async void Initialize(ProgressReporter reporter)
+		public async bool Initialize(ProgressReporter reporter)
 		{
 			reporter.start_task(reporting_task_name);
-			yield LoadAllColours(reporter);
+			try
+			{
+				yield LoadAllColours(reporter);
+			}
+			catch(ParseError e)
+			{
+				reporter.task_error(reporting_task_name, @"Unable to load colour definitions $(e.message)");
+				return false;
+			}
 			allColours[16] = Colour.MainColour;
 			allColours[24] = Colour.ComplementColour;
 			reporter.end_task(reporting_task_name);
+			return true;
 		}
 		
 		public async void LoadAllColours(ProgressReporter reporter)
+			throws ParseError
 		{
 			allColours = new HashMap<int, Colour>();
 			

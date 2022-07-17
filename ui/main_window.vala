@@ -56,16 +56,20 @@ namespace Ldraw.Ui
 
         private void SetUpControls()
         {
+            var bigVBox = new Box(Orientation.VERTICAL, 0);
             // start with a menubar as that runs across the whole window
             var accelerators = SetUpAccelerators();
             MenuBar menus = MainMenu.CreateMenus(accelerators, this);
-            var bigVBox = new Box(Orientation.VERTICAL, 0);
             bigVBox.pack_start(menus, false, false);
 
+            var toolbars = new FlowBox();
+            toolbars.orientation = Orientation.HORIZONTAL;
+            toolbars.homogeneous = false;
             foreach(var provider in ToolbarProviders)
             {
-				bigVBox.pack_start(provider.CreateToolbar(this), false, false);
+				toolbars.add(provider.CreateToolbar(this));
 			}
+            bigVBox.pack_start(toolbars, false, false);
 
             var notebook = ShowPartDropSources();
 
@@ -109,7 +113,7 @@ namespace Ldraw.Ui
 					PartSources[(int)currentPage].disconnect(currentSignalHandler);
 				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject =>
 					{
-						PartsPreview.Model = newObject.Object ?? new LdrawObject("", null);
+						PartsPreview.Model = newObject.Object ?? new LdrawObject("");
 						PartsPreview.DefaultColour = newObject.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
 					});
 				currentPage = i;
@@ -124,7 +128,7 @@ namespace Ldraw.Ui
 						}
 						else
 						{
-							PartsPreview.Model = new LdrawObject("", null);
+							PartsPreview.Model = new LdrawObject("");
 							PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
 						}
 					});

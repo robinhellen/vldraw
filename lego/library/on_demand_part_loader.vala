@@ -53,8 +53,16 @@ namespace Ldraw.Lego.Library
 
 			if(!FolderHasFile(folder, name))
 				return false;
-
-			result = yield LoadFile(name, folder);
+			
+			try
+			{
+				result = yield LoadFile(name, folder);
+			}
+			catch(ParseError e)
+			{
+				log("vldraw-ondemandpathloader", LogLevelFlags.LEVEL_WARNING, @"Failed to load part '$name' from '$(folder.get_path())'.");
+				return false;
+			}
 			cache[name] = result;
 			return true;
 		}
@@ -78,6 +86,7 @@ namespace Ldraw.Lego.Library
 		}
 
 		private async T LoadFile<T>(string name, File folder)
+			throws ParseError
 		{
 			string filename = name + ".dat";
 			var reader = ReaderFactory.GetReader(folder.get_child(filename));
@@ -92,7 +101,6 @@ namespace Ldraw.Lego.Library
 			}
 			var object = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: nodes, FileName: filename);
 			var file = (T)Object.new(typeof(T), MainObject: object, FileName: filename);
-			//object.File = (LdrawFile) file;
 			return file;
 		}
 	}
@@ -143,7 +151,7 @@ namespace Ldraw.Lego.Library
 					}
 					break;
 			}
-			throw new ParseError.MissingFile(@"Could not locate part or primitive for $reference");
+			return null;
 		}
 
 		private string GetObjectName(string filename)

@@ -6,9 +6,9 @@ namespace Ldraw.Lego
 {
 	public abstract class LdrawFile : Object
 	{
-		public LdrawFile()
+		protected LdrawFile()
 		{
-			MainObject = new LdrawObject("", this);
+			MainObject = new LdrawObject("");
 		}
 
 		public LdrawObject MainObject {get; construct set;}

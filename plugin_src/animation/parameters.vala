@@ -50,7 +50,7 @@ namespace Ldraw.Animation
 			});
 
 			actionArea.pack_start(paramList);
-			var buttonBox = new HButtonBox();
+			var buttonBox = new ButtonBox(Orientation.HORIZONTAL);
 
 			var addNewButton = new Button.with_label("New");
 			addNewButton.clicked.connect(() =>

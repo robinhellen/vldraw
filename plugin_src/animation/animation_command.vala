@@ -4,7 +4,7 @@ namespace Ldraw.Animation
 {
 	private abstract class AnimationCommand : MetaCommand
 	{
-		public AnimationCommand(string command, string[] arguments)
+		protected AnimationCommand(string command, string[] arguments)
 		{
 			base(command, arguments);
 			AnimCommand = arguments[0];

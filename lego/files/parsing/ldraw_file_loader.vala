@@ -30,13 +30,10 @@ namespace Ldraw.Lego
 			MultipartSubFileLocator locator = new MultipartSubFileLocator(Locators[strategy]);
 			var colours = new CurrentFileColourContext(ColourContext);
 			
-			Gee.List<LdrawNode> file_nodes;
 			string next_filename = filename;
-			string current_filename;
-			var result = yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out current_filename, out next_filename, next_filename);
-			stderr.printf(@"Read $(file_nodes.size) from file: $result.\n");
-			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: current_filename);
-			if(result) // read all nodes in the file in one go, this is a simple Ldraw file
+			var result = yield read_file_nodes(fileReader, locator, colours, observable, next_filename);
+			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: result.nodes, FileName: result.filename);
+			if(result.finished) // read all nodes in the file in one go, this is a simple Ldraw file
 			{
 				stderr.printf(@"Loaded $filename as simple Ldraw file.\n");
 				var model = (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
@@ -46,12 +43,13 @@ namespace Ldraw.Lego
 			var sub_files = new ObservableList<LdrawObject>();
 			sub_files.add(mainObject);
 			// We encountered 0 NOFILE, this is an MPD file.
-			while(!(yield read_file_nodes(fileReader, locator, colours, observable, out file_nodes, out current_filename, out next_filename, next_filename)))
+			while(!result.finished)
 			{
-				stderr.printf(@"Read sub-file $current_filename from multipart.\n");
-				var sub_file = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: file_nodes, FileName: current_filename);
+				next_filename = result.next_filename;
+				result = yield read_file_nodes(fileReader, locator, colours, observable, next_filename);
+				stderr.printf(@"Read sub-file $(result.filename) from multipart.\n");
+				var sub_file = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: result.nodes, FileName: result.filename);
 				sub_files.add(sub_file);
-				current_filename = next_filename;
 			}
 			locator.ResolveAll(sub_files);
 			var modelFile = (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: sub_files, FileName: filename, FilePath: filepath);
@@ -75,18 +73,28 @@ namespace Ldraw.Lego
 			}
 		}
 		
+		private struct NodeReadResult
+		{
+			public bool finished;
+			public Gee.List<LdrawNode> nodes;
+			public string filename;
+			public string? next_filename;			
+		}		
+		
 		/// returns true if the file is finished, false on reaching a 0 NOFILE Statement.
-		private async bool read_file_nodes(LdrawFileReader reader, MultipartSubFileLocator locator, CurrentFileColourContext colours, bool observable, out Gee.List<LdrawNode> nodes, out string current_filename, out string? next_filename, string nf)
+		private async NodeReadResult read_file_nodes(LdrawFileReader reader, MultipartSubFileLocator locator, CurrentFileColourContext colours, bool observable, string nf)
 			throws ParseError
 		{
-			nodes = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
-			current_filename = nf;			
-			next_filename = null;
+			var result = NodeReadResult();
+			result.nodes = observable ? (Gee.List<LdrawNode>)new ObservableList<LdrawNode>() : new ArrayList<LdrawNode>();
+			result.filename = nf;			
+			result.next_filename = null;
+			result.finished = true;
 			while(true)
 			{
 				var node = yield reader.next(locator, colours);
 				if(node == null) {
-					return true; 
+					return result; 
 				}
 					
 				if(node is MultipartFileEnd) {
@@ -95,17 +103,18 @@ namespace Ldraw.Lego
 				if(node is MultipartFileStart)
 				{
 					var fileStart = (MultipartFileStart)node;
-					if((nodes.is_empty && next_filename == null))
+					if((result.nodes.is_empty && result.next_filename == null))
 					{
-						current_filename = fileStart.filename;
+						result.filename = fileStart.filename;
 						continue;
 					}
-					next_filename = fileStart.filename;
-					return false;
+					result.next_filename = fileStart.filename;
+					result.finished = false;
+					return result;
 				}
 				
 				UpdateColours(node as ColourMetaCommand, colours);
-				nodes.add(node);
+				result.nodes.add(node);
 			}
 		}
 		

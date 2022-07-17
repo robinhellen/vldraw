@@ -6,7 +6,7 @@ using Ldraw.Ui;
 
 namespace Ldraw
 {
-	public class OpenGlModule : Module
+	public class OpenGlModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{

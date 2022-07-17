@@ -2,7 +2,7 @@ using Diva;
 
 namespace Ldraw.Lego
 {
-	public class CommandFactoryModule : Module
+	public class CommandFactoryModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{

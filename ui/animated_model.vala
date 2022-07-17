@@ -7,7 +7,7 @@ namespace Ldraw.Ui
 {
     public class AnimatedModel : GLib.Object
     {
-        public AnimatedModel(LdrawFile? model)
+        public AnimatedModel(LdrawFile model)
         {
             var map = new HashMap<string, float?>();
             var selection = new HashSet<LdrawNode>();

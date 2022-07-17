@@ -6,7 +6,7 @@ using Ldraw.Export;
 
 namespace Ldraw
 {
-	public class ExportModule : Module
+	public class ExportModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{

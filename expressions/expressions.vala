@@ -8,6 +8,7 @@ namespace Ldraw.Expressions
 		private Gee.List<Token?> tokens;
 
 		public Expression.Parse(string expression)
+			throws ExpressionParseError
 		{
 			string currentToken = "";
 			TokenType type = TokenType.None;

@@ -9,10 +9,10 @@ namespace Ldraw.Lego
 		private Bounds m_BoundingBox;
 		private Gee.List<LdrawNode> nodes;
 
-		public LdrawObject(string description, LdrawFile? file)
+		public LdrawObject(string description)
 		{
 			var nodeList = new ArrayList<LdrawNode>();
-			Object(Nodes: nodeList, Description: description);//, File: file);
+			Object(Nodes: nodeList, Description: description);
 		}
 
 		public Gee.List<LdrawNode> Nodes

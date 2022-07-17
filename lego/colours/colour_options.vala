@@ -12,11 +12,12 @@ namespace Ldraw.Colours
 		public Collection<Palette> all_palettes {get; set;}
 		public AnimatedModel model {get; construct;}
 		
-		public async void Initialize(ProgressReporter reporter)
+		public async bool Initialize(ProgressReporter reporter)
 		{
 			reporter.start_task("Loading colour palettes");
 			create_default_palettes();
 			reporter.end_task("Loading colour palettes");
+			return true;
 		}
 		
 		private void create_default_palettes()
@@ -40,7 +41,7 @@ namespace Ldraw.Colours
 		
 		public string name {get; construct set;}
 		public bool user_editable {get; construct;}
-		public int[] colour_codes {get; set;}
+		public int[] colour_codes;
 		
 		public signal void changed();
 	}

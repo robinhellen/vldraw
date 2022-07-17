@@ -12,9 +12,9 @@ namespace Ldraw.Steps
 		{			
 			Toolbar bar = new Toolbar();
 			
-			AddButtonFromStock(bar, "go-first", () => Model.hide_selection());
-			AddButtonFromStock(bar, "go-previous", () => Model.unhide_selection());
-			AddButtonFromStock(bar, "clear", () => Model.unhide_all());
+			AddButtonFromStock(bar, "view-conceal", () => Model.hide_selection());
+			AddButtonFromStock(bar, "view-reveal", () => Model.unhide_selection());
+			AddButtonFromStock(bar, "view-restore", () => Model.unhide_all());
 			
 			bar.insert(new SeparatorToolItem(), -1);
 			return bar;

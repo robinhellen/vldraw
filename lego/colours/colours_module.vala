@@ -7,7 +7,7 @@ using Ldraw.Lego;
 
 namespace Ldraw.Colours
 {
-	public class ColoursModule : Module
+	public class ColoursModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{

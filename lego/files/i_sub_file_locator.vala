@@ -39,8 +39,9 @@ namespace Ldraw.Lego
 
 			LdrawPart part;
 			if(yield Library.TryGetPart(partName, out part))
+			{
 				return new LibraryFileReference(part, part.MainObject);
-
+			}
 			return null;
 		}
 	}
@@ -68,14 +69,11 @@ namespace Ldraw.Lego
 		{
 			if(reference.has_prefix("models/"))
 			{
-				stderr.printf(@"trying to load model file: $reference $(loaded_models.size)\n");
 				var model_filename = reference.substring(7);
 				if(loaded_models.has_key(model_filename))
 				{
-					stderr.printf(@"Already loaded.\n");
 					return loaded_models[model_filename]; // TODO: clean cache when loading a new file.
 				}			
-				stderr.printf(@"loading new.\n");	
 				var model_file = folders.ModelsDirectory.get_child(model_filename);
 				var full_filename = model_file.get_path();
 				var f = yield loader.value.LoadModelFile(full_filename, ReferenceLoadStrategy.PartsOnly, false);
@@ -105,7 +103,6 @@ namespace Ldraw.Lego
 			var baseVal = yield m_Locator.GetObjectFromReference(reference);
 			if(baseVal == null)
 			{
-				stderr.printf(@"Creating proxy object for $reference\n");
 				var proxy = new ProxyLdrawObject(reference);
 				m_Proxies.add(proxy);
 				var proxy_ref = new MpdProxyRef(proxy);
@@ -137,7 +134,7 @@ namespace Ldraw.Lego
 		{
 			public ProxyLdrawObject(string filename)
 			{
-				base("", null);
+				base("");
 				FileName = filename;
 			}
 

@@ -36,7 +36,7 @@ namespace Ldraw.Colours
 			bar.insert(moreButton, -1);
 			bar.child_set_property(moreButton, "homogeneous", falseVal);
 			
-			var palette_chooser = new MenuToolButton(new Image.from_stock("gtk-color-picker", IconSize.BUTTON), "Palettes");
+			var palette_chooser = new MenuToolButton(new Image.from_icon_name("gtk-color-picker", IconSize.BUTTON), "Palettes");
 			palette_chooser.set_menu(create_palette_menu());
 			bar.insert(palette_chooser, -1);
 

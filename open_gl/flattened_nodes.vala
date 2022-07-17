@@ -9,14 +9,14 @@ namespace Ldraw.OpenGl
 {
 	private class FlattenedNodes : Object
 	{
-		public float[] Vertices {get; private set;}
-		public float[] Normals {get; private set;}
-		public float[] Colours {get; private set;}
+		public float[] Vertices;
+		public float[] Normals;
+		public float[] Colours;
 		public int ArraySizes {get; private set;}
 		
-		public float[] LineVertices {get; private set;}
-		public float[] LineNormals {get; private set;}
-		public float[] LineColours {get; private set;}
+		public float[] LineVertices;
+		public float[] LineNormals;
+		public float[] LineColours;
 		public int LineArraySizes {get; private set;}
 		
 		public static FlattenedNodes FlatForObject(LdrawObject obj)
