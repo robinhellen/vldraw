@@ -2,7 +2,7 @@ using Diva;
 
 namespace Ldraw.Ui.DragAndDrop
 {
-	public class DragAndDropModule : Module
+	public class DragAndDropModule : Diva.Module
 	{
 		public override void load(ContainerBuilder builder)
 		{

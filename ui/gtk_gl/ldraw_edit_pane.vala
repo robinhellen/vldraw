@@ -158,6 +158,11 @@ namespace Ldraw.Ui.GtkGl
 					viewParameters.lduWidth *= Math.powf(2, 0.2f);
 					queue_draw();
 					break;
+				case ScrollDirection.LEFT:
+				case ScrollDirection.RIGHT:
+				case ScrollDirection.SMOOTH:
+					// No action on other scrolls
+					break;
 			}
 			update_scroll_limits();
 			return true;
@@ -272,10 +277,12 @@ namespace Ldraw.Ui.GtkGl
 				{
 					return;
 				}
+				var file = droppedObject.file;
+				var obje = droppedObject.object;
 
 				if(dragFinished)
 				{
-					LdrawNode newNode = new PartNode(newPosition, newTransform, model.File, droppedObject, newColour);
+					LdrawNode newNode = new PartNode(newPosition, newTransform, file, obje, newColour);
 					model.SelectSingle(newNode);
 					UndoStack.ExecuteCommand(new AddNodeCommand(model.Model, newNode, addAfterNode));
 					finishDrag = false;
@@ -283,7 +290,7 @@ namespace Ldraw.Ui.GtkGl
 				}
 				else
 				{
-					DropOverlay.dropObject = droppedObject;
+					DropOverlay.dropObject = obje;
 					DropOverlay.dropLocation = newPosition;
 					DropOverlay.dropTransform = newTransform;
 					drag_status(context, context.get_suggested_action(), time);
