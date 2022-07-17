@@ -2,6 +2,7 @@ using GLib.Math;
 
 using Ldraw.Export;
 using Ldraw.Lego;
+using Ldraw.Lego.Nodes;
 
 namespace Ldraw.Povray
 {
@@ -12,6 +13,7 @@ namespace Ldraw.Povray
 
 		public override async void Export(LdrawObject model, ExportOptions exportOptions)
 		{
+			var export_model = prepare_model(model);
 			stderr.printf("Exporting to movie.\n");
 			// create temp dir
 			var tempDir = DirUtils.mkdtemp("/tmp/vldpovXXXXXX");
@@ -20,9 +22,9 @@ namespace Ldraw.Povray
 			var tempPovray = tdf.get_child("sequence.pov");
 			var movieFilename = exportOptions.Filename;
 			exportOptions.Filename = tempPovray.get_path();
-			yield base.Export(model, exportOptions);
+			yield base.Export(export_model, exportOptions);
 
-			var frameCount = model.Nodes.size;
+			var frameCount = export_model.Nodes.size;
 			// invoke povray to render to a sequence of image files
 			stderr.printf(@"Rendering povray images to $tempDir\n");
             string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D"/*, "+WT1"*/};
@@ -78,6 +80,28 @@ namespace Ldraw.Povray
 		protected override async void WriteMainObject(LdrawObject object, OutputStream stream)
 		{
 			yield ObjectWriter.WriteDefinitionForObject(object, stream, new ByPartClockedUnionWriter());
+		}
+		
+		private LdrawObject prepare_model(LdrawObject original)
+		{
+			var new_model = new LdrawObject("Inlined " + original.Description);
+			
+			foreach(var node in original.Nodes)
+			{
+				var pn = node as PartNode;
+				if(pn == null || pn.File != null)
+				{
+					new_model.AddNode(node);
+					continue;
+				}
+				var cts = prepare_model(pn.Contents);
+				foreach(var child_node in cts.Nodes)
+				{
+					new_model.AddNode(child_node.TransformNode(pn.Transform, pn.Center));
+				}
+			}			
+			new_model.FileName = original.FileName;
+			return new_model;
 		}
 	}
 
