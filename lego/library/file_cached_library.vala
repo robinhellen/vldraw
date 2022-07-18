@@ -116,6 +116,7 @@ namespace Ldraw.Lego.Library
 				yield PartFiles.TryGetPart(name.substring(0, name.last_index_of(".")), out part);
 
 				categories[part.Category] = part;
+				progress++;
 			}
 
 			Save(categories, categoryFile);
