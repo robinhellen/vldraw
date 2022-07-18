@@ -13,7 +13,7 @@ namespace Ldraw.Plugins.Movement
 	{
 		public AnimatedModel model {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
-		public IOptions Settings {construct; private get;}
+		public GridSetting grid {construct; private get;}
 		
 		public void attach(ModelEditor editor)
 		{
@@ -23,35 +23,34 @@ namespace Ldraw.Plugins.Movement
 		
 		private bool key_press_event(Gdk.EventKey event)
 		{
-			// if button is right, popup context menu
-			if(event.keyval == up_keyval) // right mouse button
+			if(event.keyval == up_keyval)
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, Settings.CurrentGrid.Z)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, grid.Z)));
 				return true;
 			}
-			if(event.keyval == down_keyval) // right mouse button
+			if(event.keyval == down_keyval)
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, -Settings.CurrentGrid.Z)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, 0, -grid.Z)));
 				return true;
 			}
-			if(event.keyval == left_keyval) // right mouse button
+			if(event.keyval == left_keyval)
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(-Settings.CurrentGrid.X, 0, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(-grid.X, 0, 0)));
 				return true;
 			}
-			if(event.keyval == right_keyval) // right mouse button
+			if(event.keyval == right_keyval)
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(Settings.CurrentGrid.X, 0, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(grid.X, 0, 0)));
 				return true;
 			}
-			if(event.keyval == end_keyval) // right mouse button
+			if(event.keyval == end_keyval)
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, Settings.CurrentGrid.Y, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, grid.Y, 0)));
 				return true;
 			}
-			if(event.keyval == home_keyval) // right mouse button
+			if(event.keyval == home_keyval)
 			{
-				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, -Settings.CurrentGrid.Y, 0)));
+				UndoStack.ExecuteCommand(new MoveNodesCommand(model.Selection, Vector(0, -grid.Y, 0)));
 				return true;
 			}
 			return false;

@@ -5,15 +5,16 @@ using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
 using Ldraw.Options;
 using Ldraw.Ui;
+using Ldraw.Ui.GtkGl;
 using Ldraw.Ui.Commands;
 
 namespace Ldraw.Plugins.Movement
 {
-	private class MovementToolbar : GLib.Object, ToolbarProvider
+	private class MovementToolbar : GLib.Object, ToolbarProvider, PositionAdjuster
 	{
-		public AnimatedModel m_ModelContainer {construct; private get;}
-		public IOptions m_Options {construct; private get;}
+		public AnimatedModel m_ModelContainer {construct; private get;}		
 		public UndoStack undoStack {construct; private get;}
+		public GridSetting grid {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
 		
@@ -92,8 +93,7 @@ namespace Ldraw.Plugins.Movement
 			}
 			catch(Error e)
 			{
-				stderr.printf(@"Unable to create image from SVG string: $(e.message).\n");
-				throw e;
+				error(@"Unable to create image from SVG string: $(e.message).\n");
 			}
 			var pixbuf = loader.get_pixbuf();
 			
@@ -101,12 +101,12 @@ namespace Ldraw.Plugins.Movement
 			var button = new RadioToolButton(group);
 			button.set_icon_widget(image);
 			group = button.get_group();
-			button.active = size == m_Options.Grid;
+			button.active = size == GridSize.Medium; // TODO: get this from somewhere else
 
 			button.toggled.connect(() =>
 				{
 					if(button.active)
-						m_Options.Grid = size;
+						grid.set_size(size);
 				});
 			
 			return button;
@@ -120,9 +120,9 @@ namespace Ldraw.Plugins.Movement
 			button.clicked.connect(() =>
 				{
 					Vector displacement = Vector(
-												axis == Axis.X ? m_Options.CurrentGrid.X : 0.0f,
-												axis == Axis.Y ? m_Options.CurrentGrid.Y : 0.0f,
-												axis == Axis.Z ? m_Options.CurrentGrid.Z : 0.0f
+												axis == Axis.X ? grid.X : 0.0f,
+												axis == Axis.Y ? grid.Y : 0.0f,
+												axis == Axis.Z ? grid.Z : 0.0f
 											);
 
 					if(!positive)
@@ -187,6 +187,26 @@ namespace Ldraw.Plugins.Movement
 			new ManualRotationDialog(m_ModelContainer, dialogParent).Run(undoStack));
 			button.set_homogeneous(false);
 			return button;
+		}
+
+		private float snap_to(float raw, float step)
+		{
+			return step * Math.roundf(raw / step);
+		}
+		
+		public float adjust_x(float x)
+		{
+			return snap_to(x, grid.X);
+		}
+		
+		public float adjust_y(float y)
+		{
+			return snap_to(y, grid.Y);
+		}
+		
+		public float adjust_z(float z)
+		{
+			return snap_to(z, grid.Z);
 		}
 	}
 }

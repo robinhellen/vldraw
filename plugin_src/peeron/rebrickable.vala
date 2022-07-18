@@ -2,6 +2,8 @@ using Gee;
 using Json;
 using Soup;
 
+using Ldraw.Application;
+
 namespace Ldraw.Peeron
 {
 	public errordomain RebrickableError
@@ -13,6 +15,8 @@ namespace Ldraw.Peeron
 	{
 		string api_key = "";
 		
+		public ProgressReporter reporter {private get; construct;}
+		
 		public async Inventory GetInventoryFor(string setNumber)
 			throws GLib.Error
 		{
@@ -22,15 +26,15 @@ namespace Ldraw.Peeron
 			while(url != null)
 			{
 				var rq = session.request(url);
-				stderr.printf(@"Fetching $url\n");
+				debug(@"Fetching $url");
 
 				var rawStream = yield rq.send_async(null);
-				stderr.printf(@"Recieved from $url\n");
+				debug(@"Recieved from $url\n");
 				var parser = new Parser();
 				var stream = new DataInputStream(rawStream);
-				parser.error.connect(_ => stderr.printf(@"JSON parser encountered an error."));
+				parser.error.connect(_ => warning(@"JSON parser encountered an error"));
 				if(!yield parser.load_from_stream_async(stream)){
-					stderr.printf(@"Unable to parse JSON\n");
+					warning(@"Unable to parse JSON");
 					throw new RebrickableError.ParseFailure("");
 				}
 				var reader = new Reader(parser.get_root());
@@ -56,7 +60,7 @@ namespace Ldraw.Peeron
 							var elements = reader.count_elements();
 							if(elements == -1) {
 								var e = reader.get_error();
-								stderr.printf(@"$(e.message)\n");
+								warning(@"$(e.message)\n");
 							}
 							for(int i = 0; i < elements; i++)
 							{
@@ -131,10 +135,9 @@ namespace Ldraw.Peeron
 			}	
 			if(spare)
 			{
-				stderr.printf(@"Ignoring spare part.");
+				debug(@"Ignoring spare part.");
 				return null;	
 			}
-			stderr.printf(@"$part_id\n");
 			return (InventoryLine)GLib.Object.new(typeof(InventoryLine), PartNumber: part_id, Quantity: qty, Colour: @"$colour");	
 		}
 	}

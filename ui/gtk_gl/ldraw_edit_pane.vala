@@ -23,11 +23,13 @@ namespace Ldraw.Ui.GtkGl
 		public DropBoundsOverlay DropOverlay {construct; private get;}
 		public GlSelector Selector {construct; get;}
 		public Collection<EditorInteraction> interactions {get; construct;}
+		public Collection<PositionAdjuster> adjusters {get; construct;}
 		
 		static construct
 		{
 			var cls = (ObjectClass)typeof(LdrawEditPane).class_ref();
 			set_collection_injection<EditorInteraction>(cls, "interactions");
+			set_collection_injection<PositionAdjuster>(cls, "adjusters");
 		}
 
 		private Adjustment m_Hadj = null;
@@ -253,9 +255,15 @@ namespace Ldraw.Ui.GtkGl
 					Matrix.ForRotation(Vector(0,1,0), viewParameters.cameraLongitude).TransformMatrix(
 					Matrix.ForRotation(Vector(1,0,0), viewParameters.cameraLatitude)).TransformVector(
 					dropPosition);
-			var xD = dropPosition.X == newPosition.X ? newPosition.X : SnapTo(dropPosition.X, Settings.CurrentGrid.X);
-			var yD = dropPosition.Y == newPosition.Y ? newPosition.Y : SnapTo(dropPosition.Y, Settings.CurrentGrid.Y);
-			var zD = dropPosition.Z == newPosition.Z ? newPosition.Z : SnapTo(dropPosition.Z, Settings.CurrentGrid.Z);			
+			var xD = dropPosition.X;
+			var yD = dropPosition.Y;
+			var zD = dropPosition.Z;
+			foreach(var adjuster in adjusters)
+			{
+				xD = dropPosition.X == newPosition.X ? newPosition.X : adjuster.adjust_x(xD);
+				yD = dropPosition.Y == newPosition.Y ? newPosition.Y : adjuster.adjust_y(yD);
+				zD = dropPosition.Z == newPosition.Z ? newPosition.Z : adjuster.adjust_z(zD);			
+			}
 			
 			newPosition = Vector(xD,yD,zD);		
 			// get the part from the drag data
@@ -459,12 +467,6 @@ namespace Ldraw.Ui.GtkGl
 			viewParameters.cameraLongitude = start.orig_long + (float)dlong;
 			queue_draw();
 		}
-
-		private float SnapTo(float raw, float step)
-		{
-			return step * Math.roundf(raw / step);
-		}
-		
 		private uint delKeyVal = keyval_from_name("Delete");
 	}
 	

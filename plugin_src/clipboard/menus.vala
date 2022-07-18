@@ -63,7 +63,7 @@ namespace Ldraw.Ui.Clipboard
 				if(partNode == null)
 					continue;
 
-				partNode.Move(Options.CurrentGrid);
+				partNode.Move(Vector(30, 20, 30));
 			}
 
 			UndoStack.ExecuteCommand(new AddNodesCommand(Model.Model, pasted, null));

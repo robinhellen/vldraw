@@ -46,9 +46,9 @@ namespace Ldraw
 			builder.register_module<ColoursModule>();
 			builder.register_module<GtkGlModule>();
 			builder.register_module<OpenGlModule>();
+			builder.register_module<OptionsModule>();
 			builder.register_module<ExportModule>();
 
-            builder.register<RunningOptions>().as<IOptions>().single_instance();
 
             builder.register<UndoStack>().single_instance();
             var animatedModel = new AnimatedModel(new LdrawModel.Empty());

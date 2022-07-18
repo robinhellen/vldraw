@@ -23,6 +23,8 @@ namespace Ldraw.Ui
 		}
 
         private ComboBox m_SubModels;
+        const string opt_id = "colour-id";
+        private OptionDomain preview_options;
 
         // DI injected components
         // Controls
@@ -35,12 +37,24 @@ namespace Ldraw.Ui
         private Gee.List<IPartDragSource> PartSources {set; get;}
 
         // utility objects
-        public IOptions Settings {construct; private get;}
         public ILdrawFolders LdrawFolders {construct; private get;}
 		public UndoStack UndoStack {construct; private get;}
         public MainMenu MainMenu {construct; private get;}
         public Collection<ToolbarProvider> ToolbarProviders {construct; private get;}
         public ColourContext ColourContext {construct; private get;}
+        public IOptions Settings 
+        {
+			construct {
+				preview_options = value.get_domain("preview-options");
+				Value v = Value(typeof(int));
+				v.set_int(14);
+				preview_options.initialize_option(opt_id, v);
+				preview_options.option_change.connect((name, val) => {
+					if(name == opt_id)
+						PartsPreview.DefaultColour = get_preview_colour();
+				});
+			}
+		}
 
         construct
         {
@@ -48,8 +62,7 @@ namespace Ldraw.Ui
             SetUpErrorReporting();
 			PartsPreview.Angle = ViewAngle.Ortho;
 			PartsPreview.set_size_request(200, 200);
-            PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
-            Settings.notify["PreviewColourId"].connect(() => PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId));
+            PartsPreview.DefaultColour = get_preview_colour();
 
             maximize();
 		}
@@ -91,6 +104,12 @@ namespace Ldraw.Ui
             bigVBox.pack_start(treePaned, true, true);
             add(bigVBox);
         }
+        
+        private Colour get_preview_colour()
+        {
+			var v = preview_options.get_option(opt_id);
+			return ColourContext.GetColourById(v.get_int());
+		}
 
         public Widget ShowPartDropSources()
         {
@@ -114,7 +133,7 @@ namespace Ldraw.Ui
 				currentSignalHandler = PartSources[(int)i].CurrentChanged.connect(newObject =>
 					{
 						PartsPreview.Model = newObject.Object ?? new LdrawObject("");
-						PartsPreview.DefaultColour = newObject.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
+						PartsPreview.DefaultColour = newObject.Colour ?? get_preview_colour();
 					});
 				currentPage = i;
 				var source = PartSources[(int)currentPage];
@@ -124,12 +143,12 @@ namespace Ldraw.Ui
 						if(objWithColour != null && objWithColour.Object != null)
 						{
 							PartsPreview.Model = objWithColour.Object;
-							PartsPreview.DefaultColour = objWithColour.Colour ?? ColourContext.GetColourById(Settings.PreviewColourId);
+							PartsPreview.DefaultColour = objWithColour.Colour ?? get_preview_colour();
 						}
 						else
 						{
 							PartsPreview.Model = new LdrawObject("");
-							PartsPreview.DefaultColour = ColourContext.GetColourById(Settings.PreviewColourId);
+							PartsPreview.DefaultColour = get_preview_colour();
 						}
 					});
 			});

@@ -55,6 +55,7 @@ maths_sources=$(wildcard maths/*.vala)
 maths_test_sources=$(wildcard tests/vector/*.vala) $(wildcard tests/*.vala)
 
 options_sources=$(wildcard options/*.vala)
+options_private_packages=$(gee) diva
 options_internal_packages= maths
 
 lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)

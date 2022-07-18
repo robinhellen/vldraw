@@ -5,20 +5,23 @@ namespace Ldraw.Options
 {
 	public interface IOptions : Object
 	{
-		public abstract Vector SmallGrid {get; set;}
-		public abstract Vector MediumGrid {get; set;}
-		public abstract Vector LargeGrid {get; set;}
-
-		public abstract float SmallAngle {get; set;}
-		public abstract float MediumAngle {get; set;}
-		public abstract float LargeAngle {get; set;}
-
-		public abstract Vector CurrentGrid {get;}
-		public abstract float CurrentAngle {get;}
-
-		public abstract int PreviewColourId { get; }
-
-		public abstract GridSize Grid {get; set;}
+		public abstract OptionDomain get_domain(string domain);
+	}
+	
+	public interface OptionDomain : Object
+	{
+		public abstract bool initialize_option(string identifier, Value v);
+		public abstract Value get_option(string identifier);
+		public abstract void set_option(string identifier, Value v);
+		
+		public signal void option_change(string identifier, Value new_value);
+		
+		public bool initialize_option_float(string identifier, float f)
+		{
+			var v = Value(typeof(float));
+			v.set_float(f);
+			return initialize_option(identifier, v);
+		}
 	}
 
 	public enum GridSize {Small, Medium, Large;}

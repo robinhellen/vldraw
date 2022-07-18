@@ -11,6 +11,7 @@ namespace Ldraw.Plugins.Movement
 		{
             builder.register<MovementInteraction>().as<EditorInteraction>();
             builder.register<MovementToolbar>().as<ToolbarProvider>();
+            builder.register<GridSetting>().single_instance();
 		}
 	}
 }
