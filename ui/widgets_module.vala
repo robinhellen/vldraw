@@ -26,7 +26,8 @@ namespace Ldraw.Ui
             builder.register<MainWindow>()
 					.ignore_property("type")
 					.ignore_property("transient-for")
-					.ignore_property("attached-to");
+					.ignore_property("attached-to")
+					.single_instance();
 					
             builder.register<LdrawEditorUi>().as<UserInterface>();
             builder.register<GtkInitialisingArgHandler>().as_decorator<ArgumentHandler>();

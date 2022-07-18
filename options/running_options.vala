@@ -15,24 +15,35 @@ namespace Ldraw.Options
 				
 			return domains[domain];
 		}
+		
+		public Collection<string> get_all_domains()
+		{
+			return domains.keys;
+		}
     }
     
     private class JsonStoredOptionDomain : Object, OptionDomain
     {
 		private RunningOptions parent;
 		private Map<string, Value?> options = new HashMap<string, Value?>();
+		private Map<string, OptionDef?> option_definitions = new HashMap<string, OptionDef?>();
 		
 		public JsonStoredOptionDomain(RunningOptions parent)
 		{
 			this.parent = parent;
 		}
 		
-		public bool initialize_option(string identifier, Value value)
+		public bool initialize_option(OptionDef definition, Value value)
 		{
-			if(options.has_key(identifier))
+			if(option_definitions.has_key(definition.id))
+			{
+				error(@"Duplicate definition for $(definition.id)");
+			}
+			option_definitions[definition.id] = definition;
+			if(options.has_key(definition.id))
 				return true;
 				
-			options[identifier] = value;
+			options[definition.id] = value;
 			return false;
 		}
 		
@@ -47,6 +58,11 @@ namespace Ldraw.Options
 				assert_not_reached();
 				
 			options[identifier] = v;
-		}		
+		}	
+		
+		public Collection<OptionDef?> get_all_options()
+		{
+			return option_definitions.values;
+		}	
 	}
 }

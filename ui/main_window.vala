@@ -48,7 +48,7 @@ namespace Ldraw.Ui
 				preview_options = value.get_domain("preview-options");
 				Value v = Value(typeof(int));
 				v.set_int(14);
-				preview_options.initialize_option(opt_id, v);
+				preview_options.initialize_option(OptionDef(opt_id, typeof(int), "Part Preview Colour", ""), v);
 				preview_options.option_change.connect((name, val) => {
 					if(name == opt_id)
 						PartsPreview.DefaultColour = get_preview_colour();
