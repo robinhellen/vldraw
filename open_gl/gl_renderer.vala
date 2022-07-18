@@ -41,18 +41,10 @@ namespace Ldraw.OpenGl
 			PrepareAllVertexData(currentModel);
 
 			var scaleMatrix = glGetUniformLocation(program, "scale");
-			var lightPosition = glGetUniformLocation(program, "LightPosition_worldspace");
-			var lightColour = glGetUniformLocation(program, "LightColor");
 
 			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
 			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
-
-			var lightLongitude = viewParameters.cameraLongitude + 5;
-			var lightLatitude = viewParameters.cameraLatitude + 5;
-			var lightPos = Matrix.ForRotation(Vector(1,0,0), lightLatitude)
-						.TransformMatrix(Matrix.ForRotation(Vector(0,1,0), lightLongitude))
-						.TransformVector(Vector(0,0,-100 * currentModel.BoundingBox.Radius));
-
+			
 			var m = latTransform.TransformMatrix(longTransform);
 			var viewingAngle = new GlMatrix.FromTransformAndTranslation(m, Vector.NullVector);
 			var scrollTransform = new GlMatrix.FromTransformAndTranslation(Matrix.Identity, Vector(viewParameters.lduScrollX, viewParameters.lduScrollY, 0));
@@ -72,8 +64,6 @@ namespace Ldraw.OpenGl
 			scrollTransform.SetProgramUniform(program, "scroll");
 
 			glUniformMatrix4fv(scaleMatrix, 1, (GLboolean)GL_FALSE, scaleTransform);
-			glUniform3fv(lightColour, 1, {1f,1f,1f});
-			glUniform3fv(lightPosition, 1, {lightPos.X,lightPos.Y,lightPos.Z});
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

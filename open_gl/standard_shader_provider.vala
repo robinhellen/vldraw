@@ -21,36 +21,11 @@ namespace Ldraw.OpenGl
 		
 		private const string fragmentShader = @"#version 330 core
 in vec4 fragmentColour;
-in vec3 Position_worldspace;
-in vec3 EyeDirection_cameraspace;
-in vec3 Normal_cameraspace;
-in vec3 LightDirection_cameraspace;
 
 out vec4 color;
 
-uniform vec3 LightColor = vec3(1,1,1);
-
 void main(){
-	if(length(Normal_cameraspace) == 0)
-	{
-		// I shall make lines have no normal.
-		color = fragmentColour;
-		return;		
-	}
-	
-	vec3 n = normalize(Normal_cameraspace);
-	vec3 l = normalize(LightDirection_cameraspace);
-	float cosTheta = clamp(dot(n,l),0,1);
-	
-	vec3 E = normalize(EyeDirection_cameraspace);
-	vec3 R = reflect(l,n);
-	float cosAlpha = clamp(dot(E,R),0,1);
-	
-	vec3 diffuseColour = fragmentColour.xyz * LightColor * cosTheta; // TODO: Fall-off with distance from light source
-	vec3 ambientColour = fragmentColour.xyz * vec3(0.1,0.1,0.1);
-	vec3 specularColour = fragmentColour.xyz * LightColor * 0.5 * pow(cosAlpha,5);
-	color.xyz = diffuseColour + ambientColour + specularColour;
-	color.a = fragmentColour.a;
+	color = fragmentColour;
 }
 ";
 		private const string vertexShader = @"#version 330 core
