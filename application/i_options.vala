@@ -34,7 +34,16 @@ namespace Ldraw.Options
 		
 		public abstract Collection<OptionDef?> get_all_options();
 		
+		public bool initialize_option_int(OptionDef definition, int i)
+			requires(definition.type == typeof(int))
+		{
+			var v = Value(typeof(int));
+			v.set_int(i);
+			return initialize_option(definition, v);
+		}
+		
 		public bool initialize_option_float(OptionDef definition, float f)
+			requires(definition.type == typeof(float))
 		{
 			var v = Value(typeof(float));
 			v.set_float(f);
@@ -42,6 +51,7 @@ namespace Ldraw.Options
 		}
 		
 		public bool initialize_option_string(OptionDef definition, string s)
+			requires(definition.type == typeof(string))
 		{
 			var v = Value(typeof(string));
 			v.set_string(s);
