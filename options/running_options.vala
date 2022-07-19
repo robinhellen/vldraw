@@ -12,32 +12,34 @@ namespace Ldraw.Options
 		private Json.Node storage;
 		private string file_path;
 		
-		construct
-		{
+		construct {
 			domains = new HashMap<string, JsonStoredOptionDomain>();
+			storage = new Json.Node(NodeType.OBJECT);
+			storage.set_object(new Json.Object());		
 			
 			var ldraw_config_dir = File.new_for_path(get_user_config_dir()).get_child("vldraw");
-			if(!ldraw_config_dir.query_exists())
-				ldraw_config_dir.make_directory_with_parents();
+			if(!ldraw_config_dir.query_exists()) {
+				try {
+					ldraw_config_dir.make_directory_with_parents();
+				} catch(Error e) {
+					warning(@"Unable to create options folder: $(e.message)");
+				}
+			}
 
 			var options_file = ldraw_config_dir.get_child("options.json");
 			file_path = options_file.get_path();
-			if(options_file.query_exists())
-			{
+			if(options_file.query_exists()) {
 				var parser = new Parser();
-				if(parser.load_from_stream(options_file.read()))
-				{
-					storage = parser.get_root();
-					foreach(var domain in storage.get_object().get_members())
-					{
-						domains[domain] = new JsonStoredOptionDomain(this, storage.get_object().get_object_member(domain));
+				try {
+					if(parser.load_from_stream(options_file.read())) {
+						storage = parser.get_root();
+						foreach(var domain in storage.get_object().get_members()) {
+							domains[domain] = new JsonStoredOptionDomain(this, storage.get_object().get_object_member(domain));
+						}
 					}
+				} catch(Error e) {
+					warning(@"Unable to read options file: $(e.message)");					
 				}
-			}
-			else
-			{
-				storage = new Json.Node(NodeType.OBJECT);
-				storage.set_object(new Json.Object());				
 			}
 		}
 		
@@ -63,7 +65,11 @@ namespace Ldraw.Options
 			var generator = new Generator();
 			generator.pretty = true;
 			generator.root = storage;
-			generator.to_file(file_path);
+			try {
+				generator.to_file(file_path);
+			} catch(Error e) {
+				warning(@"Unable to save options: $(e.message)");
+			}
 		}
     }
     
