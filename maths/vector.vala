@@ -4,18 +4,14 @@ namespace Ldraw.Maths
 {
 	public struct Vector
 	{
-		private float m_Values[3];
+		public float m_Values[3];
 
-		public static Vector? s_NullVector = null;
+		public const Vector s_NullVector = {{0,0,0}};
 
 		public static Vector NullVector
 		{
 			get
 			{
-				if(s_NullVector == null)
-				{
-					s_NullVector = Vector(0,0,0);
-				}
 				return s_NullVector;
 			}
 		}
