@@ -40,7 +40,7 @@ SOURCES=$(wildcard *.vala)
 #    Vala source files for the tests for the module
 
 # Core modules
-application_sources=application/application.vala
+application_sources=$(wildcard application/*.vala)
 application_packages=$(gee) $(gio)
 application_private_packages=diva
 
@@ -55,8 +55,9 @@ maths_sources=$(wildcard maths/*.vala)
 maths_test_sources=$(wildcard tests/vector/*.vala) $(wildcard tests/*.vala)
 
 options_sources=$(wildcard options/*.vala)
-options_private_packages=$(gee) diva
-options_internal_packages= maths
+options_private_packages=$(gee) $(json) diva
+options_internal_packages=maths
+options_private_internal_packages=application
 
 lego_objects_sources=$(wildcard  lego/basic_objects/*.vala)
 lego_objects_packages=$(gee) $(gio)
@@ -79,7 +80,7 @@ part_group_internal_packages=lego
 
 ui_widgets_sources=$(wildcard ui/*.vala) $(wildcard ui/interfaces/*.vala) $(wildcard ui/undo/*.vala)
 ui_widgets_internal_packages=lego part_group
-ui_widgets_private_internal_packages=options application
+ui_widgets_private_internal_packages=application
 
 export_sources=$(wildcard export/*.vala)
 export_packages=diva
@@ -88,7 +89,7 @@ export_private_internal_packages=ui_widgets
 
 ui_gtk_gl_sources=$(wildcard ui/gtk_gl/*.vala)
 ui_gtk_gl_packages=$(gee) gl
-ui_gtk_gl_internal_packages=lego ui_widgets options utils
+ui_gtk_gl_internal_packages=lego ui_widgets utils
 
 gl_render_sources=$(wildcard open_gl/*.vala) $(wildcard open_gl/gl_api/*.vala)
 gl_render_packages=gl $(gee)
@@ -119,7 +120,7 @@ animation_internal_packages=lego lego_objects maths expressions utils ui_widgets
 peeron_sources=$(wildcard plugin_src/peeron/*.vala)
 peeron_packages=$(gee) diva
 peeron_private_packages=$(soup) $(xml) $(gtk) $(json)
-peeron_internal_packages=lego_objects ui_widgets part_group
+peeron_internal_packages=lego_objects ui_widgets part_group options
 
 povray_sources=$(wildcard plugin_src/povray/*.vala)
 povray_private_packages=$(gio)
@@ -136,11 +137,11 @@ extract_inline_internal_packages=ui_widgets lego lego_objects
 
 clipboard_sources=$(wildcard plugin_src/clipboard/*.vala)
 clipboard_packages=$(gee) diva
-clipboard_internal_packages=ui_widgets lego lego_objects options
+clipboard_internal_packages=ui_widgets lego lego_objects 
 
 movement_sources=$(wildcard plugin_src/movement_edits/*.vala)
 movement_packages=$(gee) diva
-movement_internal_packages=ui_widgets lego lego_objects options ui_gtk_gl
+movement_internal_packages=ui_widgets lego lego_objects ui_gtk_gl
 
 # End of module build specs
 
