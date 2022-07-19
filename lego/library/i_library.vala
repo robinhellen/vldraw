@@ -30,6 +30,8 @@ namespace Ldraw.Lego.Library
 		public abstract async bool TryGetPrimitive(string name, out LdrawPrimitive primitive);
 
 		public abstract async bool TryGetHiresPrimitive(string name, out LdrawHiresPrimitive primitive);
+		
+		public abstract async bool TryGetLoresPrimitive(string name, out LdrawLoresPrimitive primitive);
 
 		public abstract async bool TryGetPart(string name, out LdrawPart part);
 
@@ -47,6 +49,8 @@ namespace Ldraw.Lego.Library
 		public abstract File PrimitivesDirectory { get; }
 
 		public abstract File HiresPrimitivesDirectory { get; }
+		
+		public abstract File LoresPrimitivesDirectory { get; }
 
 		public abstract File ModelsDirectory {get;}
 	}

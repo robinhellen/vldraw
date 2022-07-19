@@ -11,6 +11,7 @@ namespace Ldraw.Lego.Library
 		private File m_SubPartsDirectory;
 		private File m_PrimitivesDirectory;
 		private File m_HiresPrimitivesDirectory;
+		private File m_LoresPrimitivesDirectory;
 		private File m_ModelsDirectory;
 
 		construct
@@ -21,6 +22,7 @@ namespace Ldraw.Lego.Library
 			m_SubPartsDirectory = m_PartsDirectory.get_child("s");
 			m_PrimitivesDirectory = m_LibraryDir.get_child("p");
 			m_HiresPrimitivesDirectory = m_PrimitivesDirectory.get_child("48");
+			m_LoresPrimitivesDirectory = m_PrimitivesDirectory.get_child("8");
 
 			m_ModelsDirectory = m_LibraryDir.get_child("models");
 			if(!m_ModelsDirectory.query_exists())
@@ -66,6 +68,14 @@ namespace Ldraw.Lego.Library
 			get
 			{
 				return m_HiresPrimitivesDirectory;
+			}
+		}
+
+		public File LoresPrimitivesDirectory
+		{
+			get
+			{
+				return m_LoresPrimitivesDirectory;
 			}
 		}
 

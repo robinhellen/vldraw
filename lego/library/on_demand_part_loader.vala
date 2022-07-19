@@ -21,12 +21,18 @@ namespace Ldraw.Lego.Library
 
 		private Map<string, LdrawPrimitive> primitivesCache = new HashMap<string, LdrawPrimitive>();
 		private Map<string, LdrawHiresPrimitive> hiresPrimitivesCache = new HashMap<string, LdrawHiresPrimitive>();
+		private Map<string, LdrawLoresPrimitive> loresPrimitivesCache = new HashMap<string, LdrawLoresPrimitive>();
 		private Map<string, LdrawPart> partsCache = new HashMap<string, LdrawPart>();
 		private Map<string, LdrawSubPart> subpartsCache = new HashMap<string, LdrawSubPart>();
 
 		public async bool TryGetPrimitive(string name, out LdrawPrimitive primitive)
 		{
 			return yield TryGetFile(name, primitivesCache, Folders.PrimitivesDirectory, out primitive);
+		}
+
+		public async bool TryGetLoresPrimitive(string name, out LdrawLoresPrimitive primitive)
+		{
+			return yield TryGetFile(name, loresPrimitivesCache, Folders.LoresPrimitivesDirectory, out primitive);
 		}
 
 		public async bool TryGetHiresPrimitive(string name, out LdrawHiresPrimitive primitive)
@@ -134,6 +140,14 @@ namespace Ldraw.Lego.Library
 					if(yield Cache.TryGetHiresPrimitive(name, out hiresPrim))
 					{
 						return new LibraryFileReference(hiresPrim, hiresPrim.MainObject);
+					}
+					break;
+				case "8":
+					var name = GetObjectName(dir_parts[1]);
+					LdrawLoresPrimitive loresPrim;
+					if(yield Cache.TryGetLoresPrimitive(name, out loresPrim))
+					{
+						return new LibraryFileReference(loresPrim, loresPrim.MainObject);
 					}
 					break;
 				default:
