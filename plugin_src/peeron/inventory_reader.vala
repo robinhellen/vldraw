@@ -1,5 +1,8 @@
 using Gee;
 
+using Ldraw.Lego;
+using Ldraw.Lego.Library;
+
 namespace Ldraw.Peeron
 {
 	public interface InventoryReader : GLib.Object
@@ -12,13 +15,20 @@ namespace Ldraw.Peeron
 	{
 		public string SetNumber {get; construct;}
 
-		public Collection<InventoryLine> Lines {get; construct;}
+		public Collection<InventoryLine?> Lines {get; construct;}
 	}
 
-	public class InventoryLine : GLib.Object
+	public struct InventoryLine
 	{
-		public string PartNumber {get; construct;}
-		public int Quantity {get; construct;}
-		public string Colour {get; construct;}
+		public InventoryLine(LdrawPart part, int quantity, Colour colour)
+		{
+			this.part = part;
+			this.quantity = quantity;
+			this.colour = colour;
+		}
+		
+		public LdrawPart part;
+		public int quantity;
+		public Colour colour;
 	}
 }

@@ -23,7 +23,7 @@ namespace Ldraw.Peeron
 			var xpathCtxt = new Context(doc);
 			var tableRows = xpathCtxt.eval("/html/body/table[2]/tbody/tr")->nodesetval;
 
-			var lines = new ArrayList<InventoryLine>();
+			var lines = new ArrayList<InventoryLine?>();
 			for(int i = 0; i < tableRows->length(); i++)
 			{
 				var rowNode = tableRows->item(i);
@@ -38,7 +38,7 @@ namespace Ldraw.Peeron
 				var partNo = col2->children->children->content; // the part number is a link
 				var colour = col3->children->content;
 
-				var line = (InventoryLine)GLib.Object.new(typeof(InventoryLine), PartNumber: partNo, Quantity: qty, Colour: colour);
+				var line = InventoryLine(null, qty, null);
 				lines.add(line);
 			}
 			return (Inventory) GLib.Object.new(typeof(Inventory), SetNumber: setNumber, Lines: lines);

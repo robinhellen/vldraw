@@ -49,7 +49,7 @@ namespace Ldraw.Peeron
 				modelGroup = new PartGroup.FromModel(modelFile);
 			}
 			usage = new PartGroupUsage(availableParts, modelGroup);
-			if(reset || usageViewModel == null)
+			if(usageViewModel == null)
 			{
 				usageViewModel = new PartUsageViewModel(usage);
 				partsView.model = usageViewModel;
@@ -270,24 +270,10 @@ namespace Ldraw.Peeron
 			var items = new ArrayList<PartGroupItem>();
 			foreach(var line in i.Lines)
 			{
-				var part_ref = line.PartNumber;
-				/*if(extra_name_ref.has_key(part_ref))
-				{
-					part_ref = extra_name_ref[part_ref];
-				}*/
-				if(part_ref == null) continue;
-				LdrawPart p;
-				if(yield lib.TryGetPart(part_ref, out p))
-				{
 					items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
-							Part: p,
-							Colour: ColourChart.GetColourFromName(line.Colour),
-							Quantity: line.Quantity));
-				}
-				else
-				{
-					stderr.printf(@"Unable to find part $(line.PartNumber) in library.\n");
-				}
+							Part: line.part,
+							Colour: line.colour,
+							Quantity: line.quantity));
 			}
 			return (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
 		}
