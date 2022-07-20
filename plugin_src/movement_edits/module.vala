@@ -1,6 +1,7 @@
 using Diva;
 
 using Ldraw.Ui;
+using Ldraw.Ui.GtkGl;
 using Ldraw.Ui.Widgets;
 
 namespace Ldraw.Plugins.Movement
@@ -10,7 +11,7 @@ namespace Ldraw.Plugins.Movement
 		public override void load(ContainerBuilder builder)
 		{
             builder.register<MovementInteraction>().as<EditorInteraction>();
-            builder.register<MovementToolbar>().as<ToolbarProvider>();
+            builder.register<MovementToolbar>().as<ToolbarProvider>().as<PositionAdjuster>();
             builder.register<GridSetting>().single_instance();
 		}
 	}

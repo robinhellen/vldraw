@@ -53,7 +53,6 @@ namespace Ldraw.Peeron
 				debug(@"Fetching $url");
 
 				var rawStream = yield rq.send_async(null);
-				debug(@"Recieved from $url\n");
 				var parser = new Parser();
 				var stream = new DataInputStream(rawStream);
 				parser.error.connect(_ => warning(@"JSON parser encountered an error"));
@@ -163,7 +162,10 @@ namespace Ldraw.Peeron
 							reader.end_member();
 							if(!yield library.TryGetPart(part_id, out part))
 							{
-								warning(@"Unable to find part in library from $part_id.\n");
+								reader.read_member("name");
+								var name = reader.get_string_value();
+								reader.end_member();
+								warning(@"Unable to find part in library from $part_id ($name).\n");
 								reader.end_member();
 								return null;
 							}
