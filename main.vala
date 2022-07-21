@@ -33,9 +33,6 @@ namespace Ldraw
 
             // UI components
             builder.register<DialogManager>().as<IDialogManager>();
-//~             builder.register<LibrarySubFileLocator>();
-
-//~             builder.register<ModelsSubFileLocator>().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
             builder.register<LibrarySubFileLocator>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
             builder.register<OnDemandSubFileLoader>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
 

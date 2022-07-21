@@ -66,14 +66,33 @@ namespace Ldraw.Application
 	
 	private class ConsoleReporter : Object, ProgressReporter
 	{
-		public void start_task(string task_name){stdout.printf(@"starting $task_name\n");}
-		public void task_progress(string task_name, double progress)
-		{
-			stdout.printf(@"$task_name: $progress\n");
+		private const double step = 0.1;
+		public Map<string, double?> tasks = new HashMap<string, double?>();
+		
+		public void start_task(string task_name) {
+			stdout.printf(@"starting $task_name\n");
+			tasks[task_name] = step;
 		}
-		public void end_task(string task_name){}
-		public void task_error(string task_name, string error_message)
-		{
+		
+		public void task_progress(string task_name, double progress) {
+			if(!tasks.has_key(task_name)) {
+				stdout.printf(@"Progress on unknown task: $task_name\n");
+				return;
+			}
+			double next = tasks[task_name];
+			while(progress > next) {
+				stdout.printf(@"$task_name: $((int)(next * 100))%\n");
+				next += step;
+			}
+			tasks[task_name] = next;
+		}
+		
+		public void end_task(string task_name){		
+			stdout.printf(@"finished $task_name\n");
+			tasks.unset(task_name);
+		}
+		
+		public void task_error(string task_name, string error_message) {
 			log("vldraw", LogLevelFlags.LEVEL_ERROR, error_message);
 		}
 	}
