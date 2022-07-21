@@ -7,9 +7,8 @@ namespace Ldraw.Ui.Dialogs
 	public class DialogManager : GLib.Object, IDialogManager
 	{
 		public ILdrawFolders LdrawFolders {construct; get;}
-		public RecentManager recent {construct; get;}
 		
-		public bool GetSaveLocation(out string location, Window parent)
+		public bool GetSaveLocation(out string location, Window parent, RecentManager recent)
 		{
 			FileChooserDialog dialog = new FileChooserDialog("Save File As", parent, FileChooserAction.SAVE
                                                 , "_Cancel", ResponseType.CANCEL
@@ -21,7 +20,9 @@ namespace Ldraw.Ui.Dialogs
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
-                recent.add_item(dialog.get_uri());
+                var uri = dialog.get_uri();
+                recent.add_item(uri);
+                stderr.printf(@"Recent: $uri, $location");
                 dialog.close();
                 return true;
             }
@@ -30,7 +31,7 @@ namespace Ldraw.Ui.Dialogs
             return false;
 		}
 	
-		public bool GetLoadLocation(out string location, Window parent)
+		public bool GetLoadLocation(out string location, Window parent, RecentManager recent)
 		{			
             FileChooserDialog dialog = new FileChooserDialog("Open File", parent, FileChooserAction.OPEN
                                                 , "_Cancel", ResponseType.CANCEL
@@ -42,7 +43,14 @@ namespace Ldraw.Ui.Dialogs
             if(dialog.run() == ResponseType.ACCEPT)
             {
                 location = dialog.get_filename();
-                recent.add_item(dialog.get_uri());
+                var uri = dialog.get_uri();
+                recent.add_item(uri);
+                stderr.printf(@"Recent: $uri, $location\n");
+                var info = recent.lookup_item(uri);
+                stderr.printf(@"Info: $(info.get_uri()), $(info.get_uri_display()), $(info.get_short_name()), $(info.get_display_name()), $(info.get_mime_type()), $(info.get_age()), $(info.last_application()), \n");
+                dialog.close();
+                info = recent.lookup_item("file:///home/robin/ldraw/models/modular_street/10251.mpd");
+                stderr.printf(@"Info: $(info.get_uri()), $(info.get_uri_display()), $(info.get_short_name()), $(info.get_display_name()), $(info.get_mime_type()), $(info.get_age()), $(info.last_application()), \n");
                 dialog.close();
                 return true;
             }

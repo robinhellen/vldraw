@@ -17,11 +17,11 @@ namespace Ldraw.Ui
             builder.register<MainMenu>();
             
             builder.register<RecentChooserMenu>().as<RecentChooser>()
+				.ignore_property("recent-manager")
 				.ignore_property("anchor-hints")
 				.ignore_property("rect-anchor-dx")
 				.ignore_property("rect-anchor-dy")
-				.ignore_property("menu-type-hint");
-            builder.register<RecentManager>(() => RecentManager.get_default());            
+				.ignore_property("menu-type-hint");         
             
             builder.register<MainWindow>()
 					.ignore_property("type")

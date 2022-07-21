@@ -44,6 +44,9 @@ namespace Ldraw.Ui
 				var file = GLib.File.new_for_uri(item.get_uri());
 				LoadFile(file.get_path());
 			});
+			RecentMenu.sort_type = RecentSortType.MRU;
+			RecentMenu.show_numbers = false;
+			RecentMenu.show_icons = false;
 		}
 
         public MenuBar CreateMenus(AccelGroup accelerators, Window parent)
@@ -192,7 +195,7 @@ namespace Ldraw.Ui
         private void FileOpen_OnActivate(Window parent)
         {
 			string fileToOpen;
-			if(Dialogs.GetLoadLocation(out fileToOpen, parent))
+			if(Dialogs.GetLoadLocation(out fileToOpen, parent, RecentMenu.get_recent_manager()))
 			{
 				LoadFile(fileToOpen);
 			}
@@ -231,7 +234,7 @@ namespace Ldraw.Ui
         private void FileSaveAs_OnActivate(Window parent)
         {
 			string chosenFileName;
-			if(Dialogs.GetSaveLocation(out chosenFileName, parent))
+			if(Dialogs.GetSaveLocation(out chosenFileName, parent, RecentMenu.get_recent_manager()))
 			{
                 try
                 {
