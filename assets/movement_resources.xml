@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/ldraw/rkh/vldraw">
+    <file compressed="true" preprocess="to-pixdata">icons/minusX.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/minusY.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/minusZ.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/plusX.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/plusY.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/plusZ.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/rotateMinusX.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/rotateMinusY.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/rotateMinusZ.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/rotatePlusX.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/rotatePlusY.xpm</file>
+    <file compressed="true" preprocess="to-pixdata">icons/rotatePlusZ.xpm</file>
+  </gresource>
+</gresources>

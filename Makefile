@@ -144,7 +144,7 @@ clipboard_sources=$(wildcard src/plugins/clipboard/*.vala)
 clipboard_packages=$(gee) diva
 clipboard_internal_packages=ui_widgets lego lego_objects 
 
-movement_sources=$(wildcard src/plugins/movement_edits/*.vala)
+movement_sources=$(wildcard src/plugins/movement_edits/*.vala) build/resources/movement_resources.c
 movement_packages=$(gee) diva
 movement_internal_packages=ui_widgets lego lego_objects ui_gtk_gl
 movement_vala_options=--vapidir=vapi
@@ -166,20 +166,22 @@ VALA_DEBUG_OPTS= --vapidir=build/vapi $(VALA_PKG_ARGS) -X -w -X -Ivapi -X -msse 
 
 EXECUTABLE_NAME = ldraw
 
+include $(foreach lib, $(INTERNAL_LIBS), build/make/$(lib)_resources.d) $(foreach lib, $(PLUGINS), build/make/$(lib)_resources.d)
+
 all: build/$(EXECUTABLE_NAME) build/test/expressions.test build/test/maths.test $(foreach plugin, $(PLUGINS), build/plugins/$(plugin).so)
-	./build/test/expressions.test
-	./build/test/maths.test
+#~ 	./build/test/expressions.test
+#~ 	./build/test/maths.test
 
 # compilation for the final executable
-build/$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), build/lib/$(lib).so build/h/$(lib).h build/vapi/$(lib).vapi)
-	$(VALACC) $(VALA_OPTS) $(SOURCES) -o $(EXECUTABLE_NAME) \
+build/$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), build/lib/$(lib).so build/h/$(lib).h build/vapi/$(lib).vapi) | build
+	$(VALACC) $(VALA_OPTS) $(SOURCES) -o build/$(EXECUTABLE_NAME) \
 	$(foreach lib, $(INTERNAL_LIBS), --pkg $(lib) -X build/lib/$(lib).so) \
 	-X -Ibuild/h -X -ldiva
 
 all_packages = $(foreach pkg, $($(1)_internal_packages), $(pkg) $($(pkg)_packages) $(call all_packages,$(pkg)))
 
 # Compilation for the component modules
-build/lib/%.so build/h/%.h build/vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_private_internal_packages), build/h/$$(lib).h build/vapi/$$(lib).vapi)
+build/lib/%.so build/h/%.h build/vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_private_internal_packages), build/h/$$(lib).h build/vapi/$$(lib).vapi) | build/lib build/h build/vapi
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $(sort \
 					$($*_packages) \
@@ -192,9 +194,19 @@ build/lib/%.so build/h/%.h build/vapi/%.vapi: $$($$*_sources) $$(foreach lib, $$
 		-X -fpic -X -shared -g -X -w $($*_vala_options)
 	touch build/h/$*.h
 	touch build/vapi/$*.vapi
+	
+build/resources/%.c: assets/%.xml | build/resources
+	glib-compile-resources --target=$@ --generate-source --sourcedir=assets $<
+	
+build/make/%.d: assets/%.xml | build/make
+	glib-compile-resources --dependency-file=$@ --generate-dependencies --sourcedir=assets $<
+	sed -i 's/assets\/$*.xml/build\/resources\/$*.c/g' $@
+	
+build/make/%.d: | build/make
+	truncate -s 0 $@
 
 # Compilation for modules as plugins.
-build/plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_private_internal_packages), build/h/$$(lib).h build/vapi/$$(lib).vapi)
+build/plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$($$*_private_internal_packages), build/h/$$(lib).h build/vapi/$$(lib).vapi) | build/plugins
 	$(VALACC) $($*_sources) \
 		$(foreach pkg, $(sort \
 					$($*_packages) \
@@ -210,7 +222,7 @@ build/plugins/%.so: $$($$*_sources) $$(foreach lib, $$($$*_internal_packages) $$
 	touch build/vapi/$*.vapi
 
 # (Optional) compilation of per-module tests.
-build/test/%.test: $$($$*_test_sources) build/lib/%.so build/h/%.h build/vapi/%.vapi
+build/test/%.test: $$($$*_test_sources) build/lib/%.so build/h/%.h build/vapi/%.vapi | build/test
 ifeq ($$($$*_test_sources),)
 	$(warning No tests for $*.)
 else
@@ -234,3 +246,27 @@ clean:
 tempclean:
 	rm -f $(patsubst %.vala,%.vala.c,$(SOURCES) $(TEST_SOURCES))
 	rm -f $(patsubst %.vala,%.c,$(SOURCES) $(TEST_SOURCES))
+	
+build:
+	mkdir -p build
+	
+build/h: | build
+	mkdir -p build/h
+	
+build/lib: | build
+	mkdir -p build/lib
+	
+build/make: | build
+	mkdir -p build/make
+	
+build/plugins: | build
+	mkdir -p build/plugins
+	
+build/resources: | build
+	mkdir -p build/resources
+	
+build/test: | build
+	mkdir -p build/test
+	
+build/vapi: | build
+	mkdir -p build/vapi

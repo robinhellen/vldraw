@@ -1,8 +1,1 @@
-ldraw
-ldraw_tests
-log.valgrind
-h
-lib
-vapi
-test
-plugins
+build

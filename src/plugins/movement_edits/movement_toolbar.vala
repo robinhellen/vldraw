@@ -18,7 +18,7 @@ namespace Ldraw.Plugins.Movement
 
 		public int ButtonSize {get; set; default = 16;}
 		
-		const string icon_location = "/home/robin/git/vldraw/assets/icons/";
+		const string icon_location = "/org/ldraw/rkh/vldraw/icons/";
 
 		public Toolbar CreateToolbar(Window dialogParent)
 		{
@@ -155,7 +155,7 @@ namespace Ldraw.Plugins.Movement
 
 		private ToolButton CreateButtonFromImageFile(string fileName)
 		{
-			var image = new Image.from_file(fileName);
+			var image = new Image.from_resource(fileName);
 			image.pixbuf = image.pixbuf.scale_simple(ButtonSize, ButtonSize, Gdk.InterpType.BILINEAR);
 			return new ToolButton(image, null);
 		}
