@@ -2,7 +2,9 @@ using Diva;
 using Gtk;
 
 using Ldraw.Application;
+using Ldraw.Lego;
 using Ldraw.Ui.Widgets;
+using Ldraw.Ui.Commands;
 
 namespace Ldraw.Ui
 {
@@ -15,6 +17,7 @@ namespace Ldraw.Ui
             builder.register<SubModelsTree>().as<IPartDragSource>();
             builder.register<ModelList>();
             builder.register<MainMenu>();
+            builder.register<UndoStack>().single_instance();
             
             builder.register<RecentChooserMenu>().as<RecentChooser>()
 				.ignore_property("recent-manager")
@@ -32,6 +35,9 @@ namespace Ldraw.Ui
             builder.register<LdrawEditorUi>().as<UserInterface>();
             builder.register<GtkInitialisingArgHandler>().as_decorator<ArgumentHandler>();
             builder.register<ModalProgressDialog>().as<ProgressReporter>();
+            
+            var animatedModel = new AnimatedModel(new LdrawModel.Empty());
+            builder.register<AnimatedModel>(_ => animatedModel);
 		}
 	}
 }

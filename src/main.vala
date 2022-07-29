@@ -4,6 +4,7 @@ using Gtk;
 using Ldraw.Application;
 using Ldraw.Lego;
 using Ldraw.Colours;
+using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.OpenGl;
 using Ldraw.Options;
@@ -21,46 +22,27 @@ namespace Ldraw
         public static int main(string[] args)
         {
             var builder = new ContainerBuilder();
-
-            // Parts library
-            builder.register<LdrawLibrary>().as<ILdrawFolders>();
-
-            // Model file handling
-            builder.register<LdrawFileLoader>();
-            builder.register<LdrawParser>();
-            builder.register<FileReaderFactory>();
+            
             builder.register_module<CommandFactoryModule>();
-
-            // UI components
-            builder.register<DialogManager>().as<IDialogManager>();
-            builder.register<LibrarySubFileLocator>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
-            builder.register<OnDemandSubFileLoader>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
-
-            builder.register<OnDemandPartLoader>().as<IDatFileCache>().single_instance();
-
 			builder.register_module<DragAndDropModule>();
 			builder.register_module<WidgetsModule>();
+			builder.register_module<DialogsModule>();
 			builder.register_module<ColoursModule>();
 			builder.register_module<GtkGlModule>();
 			builder.register_module<OpenGlModule>();
 			builder.register_module<OptionsModule>();
 			builder.register_module<ExportModule>();
-
-
-            builder.register<UndoStack>().single_instance();
-            var animatedModel = new AnimatedModel(new LdrawModel.Empty());
-            builder.register<AnimatedModel>(_ => animatedModel);
+			builder.register_module<LegoModule>();
+            builder.register_module<LibraryModule>();            
+            builder.register_module<ApplicationModule>();            
+            
             builder.register<FileLoadingArgHandler>().as<ArgumentHandler>();
-            builder.register<Ldraw.Application.Application>();
 
 			var pluginLoader = new PluginLoader();
 			pluginLoader.LoadPlugins(builder);
 
-            builder.register_module<LibraryModule>();
-
             var container = builder.build();
 
-            // load up the colours
             try
             {
 				var application = container.resolve<Ldraw.Application.Application>();
