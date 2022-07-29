@@ -16,7 +16,7 @@ namespace Ldraw
 				return;
 			}
 
-			var pluginDir = File.new_for_path("./plugins");
+			var pluginDir = File.new_for_path("./build/plugins");
 			try
 			{
 				var potentialPlugins = pluginDir.enumerate_children("standard::*", FileQueryInfoFlags.NONE);

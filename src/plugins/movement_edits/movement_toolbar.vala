@@ -18,7 +18,7 @@ namespace Ldraw.Plugins.Movement
 
 		public int ButtonSize {get; set; default = 16;}
 		
-		const string icon_location = "/home/robin/git/vldraw/icons/";
+		const string icon_location = "/home/robin/git/vldraw/assets/icons/";
 
 		public Toolbar CreateToolbar(Window dialogParent)
 		{
