@@ -67,6 +67,11 @@ namespace Ldraw.Lego.Library
 			
 			return categoryParts;
 		}
+		
+		public Collection<IPartMetadata> GetVariantsOf(IPartMetadata part)
+		{
+			return Collection<IPartMetadata>.empty();
+		}
 
 		private async void EnsureLoaded(ProgressReporter reporter)
 		{

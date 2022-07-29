@@ -14,7 +14,7 @@ namespace Ldraw.Lego.Library
 		
 		public signal void refreshed();
 
-		//public abstract Collection<LdrawPart> GetVariantsOf(LdrawPart part);
+		public abstract Collection<IPartMetadata> GetVariantsOf(IPartMetadata part);
 	}
 
 	public interface IPartMetadata : Object
