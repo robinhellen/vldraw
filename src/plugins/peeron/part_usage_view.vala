@@ -118,6 +118,12 @@ namespace Ldraw.Peeron
 				}
 				j++;
 			}
+		
+			original.sort((a, b) => {
+				if(a.Colour.Code < b.Colour.Code) return -1;
+				if(a.Colour.Code > b.Colour.Code) return 1;
+				return Gee.Functions.get_compare_func_for(typeof(string))(a.Part.Name, b.Part.Name);
+			});
 		}
 
 		// implementation of TreeModel

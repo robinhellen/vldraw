@@ -27,7 +27,7 @@ namespace Ldraw.Lego.Nodes
 			}
 		}
 		
-		public LdrawFile File{ get{return file;}}
+		public LdrawFile File{ get{return file;} set {file = value;}}
 
 		public override string Description
 		{

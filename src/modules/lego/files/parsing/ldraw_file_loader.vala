@@ -61,6 +61,13 @@ namespace Ldraw.Lego
 			}
 			locator.ResolveAll(sub_files);
 			var modelFile = (LdrawModelFile)Object.new(typeof(MultipartModel), MainObject: mainObject, SubModels: sub_files, FileName: filename, FilePath: filepath);
+			foreach(var sm in sub_files) {
+				foreach(var pn in sm.NodesOfType<PartNode>()) {
+					if(pn.Contents is MultipartSubFileLocator.ProxyLdrawObject) {
+						pn.File = modelFile;
+					}
+				}
+			}
 			reporter.value.end_task(task_name);
 			return modelFile;		
 		}

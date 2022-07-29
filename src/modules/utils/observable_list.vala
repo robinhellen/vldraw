@@ -37,10 +37,10 @@ namespace Ldraw.Utils
 			return result;
 		}
 
-		public override void clear()
-		{
-			// TODO: fire row_deleted for all rows
-			base.clear();
+		public override void clear() {
+			for(var ix = base.size; ix > 0; ix--) {
+				remove_at(ix - 1);
+			}				
 		}
 
 		public override bool add(T item)
