@@ -13,5 +13,8 @@
     <file compressed="true" preprocess="to-pixdata">icons/rotatePlusX.xpm</file>
     <file compressed="true" preprocess="to-pixdata">icons/rotatePlusY.xpm</file>
     <file compressed="true" preprocess="to-pixdata">icons/rotatePlusZ.xpm</file>
+    <file compressed="true">icons/gridSmall.svg</file>
+    <file compressed="true">icons/gridMedium.svg</file>
+    <file compressed="true">icons/gridLarge.svg</file>
   </gresource>
 </gresources>

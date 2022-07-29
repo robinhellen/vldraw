@@ -18,7 +18,7 @@ namespace Ldraw.Plugins.Movement
 
 		public int ButtonSize {get; set; default = 16;}
 		
-		const string icon_location = "/org/ldraw/rkh/vldraw/icons/";
+		const string resource_base = "/org/ldraw/rkh/vldraw/icons/";
 
 		public Toolbar CreateToolbar(Window dialogParent)
 		{
@@ -55,49 +55,23 @@ namespace Ldraw.Plugins.Movement
 
 		private ToolButton CreateGridButton(GridSize size, ref unowned SList<RadioButton>? group)
 		{
-			string inner_lines = "";
+			string resource_name;
 			switch(size)
 			{
 				case GridSize.Large:
-					inner_lines = @"<line x1=\"0\"  y1=\"10\" x2=\"20\" y2=\"10\" stroke=\"black\" />
-	<line x1=\"10\" y1=\"0\"  x2=\"10\" y2=\"20\" stroke=\"black\" />";
+					resource_name = "gridLarge.svg";
 					break;
 				case GridSize.Medium:
-					inner_lines = @"<line x1=\"0\"  y1=\"6.66\" x2=\"20\" y2=\"6.66\" stroke=\"black\" />
-	<line x1=\"6.66\" y1=\"0\"  x2=\"6.66\" y2=\"20\" stroke=\"black\" />
-	<line x1=\"0\"  y1=\"13.33\" x2=\"20\" y2=\"13.33\" stroke=\"black\" />
-	<line x1=\"13.33\" y1=\"0\"  x2=\"13.33\" y2=\"20\" stroke=\"black\" />";
+					resource_name = "gridMedium.svg";
 					break;
 				case GridSize.Small:
-					inner_lines = @"<line x1=\"0\"  y1=\"10\" x2=\"20\" y2=\"10\" stroke=\"black\" />
-	<line x1=\"10\" y1=\"0\"  x2=\"10\" y2=\"20\" stroke=\"black\" />
-	<line x1=\"0\"  y1=\"5\" x2=\"20\" y2=\"5\" stroke=\"black\" />
-	<line x1=\"5\" y1=\"0\"  x2=\"5\" y2=\"20\" stroke=\"black\" />
-	<line x1=\"0\"  y1=\"15\" x2=\"20\" y2=\"15\" stroke=\"black\" />
-	<line x1=\"15\" y1=\"0\"  x2=\"15\" y2=\"20\" stroke=\"black\" />";
+					resource_name = "gridSmall.svg";
 					break;
+				default:
+					assert_not_reached();
 			}
-			string grid_svg = @"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
-<svg  xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"$ButtonSize\" height=\"$ButtonSize\" viewBox=\"-1 -1 22 22\" >
-	<line x1=\"0\"  y1=\"0\"  x2=\"0\"  y2=\"20\" stroke=\"black\" />
-	<line x1=\"20\" y1=\"0\"  x2=\"20\" y2=\"20\" stroke=\"black\" />
-	<line x1=\"0\"  y1=\"0\"  x2=\"20\" y2=\"0\"  stroke=\"black\" />
-	<line x1=\"0\"  y1=\"20\" x2=\"20\" y2=\"20\" stroke=\"black\" />
-	$inner_lines
-</svg>";
-			Gdk.PixbufLoader loader;
-			try{
-				loader = new Gdk.PixbufLoader.with_type("svg");
-				loader.write(grid_svg.data);
-				loader.close();
-			}
-			catch(Error e)
-			{
-				error(@"Unable to create image from SVG string: $(e.message).\n");
-			}
-			var pixbuf = loader.get_pixbuf();
 			
-			var image = new Image.from_pixbuf(pixbuf);
+			var image = new Image.from_resource(resource_base + resource_name);
 			var button = new RadioToolButton(group);
 			button.set_icon_widget(image);
 			group = button.get_group();
@@ -114,7 +88,7 @@ namespace Ldraw.Plugins.Movement
 
 		private ToolButton CreateTranslateButton(Axis axis, bool positive)
 		{
-			string icon = icon_location + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
+			string icon = resource_base + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
 
 			button.clicked.connect(() =>
@@ -136,7 +110,7 @@ namespace Ldraw.Plugins.Movement
 
 		private ToolButton CreateRotateButton(Axis axis, bool positive)
 		{
-			string icon = icon_location + "rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
+			string icon = resource_base + "rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
 
 			Vector rotationAxis = Vector(axis == Axis.X ? 1.0f : 0.0f, axis == Axis.Y ? 1.0f : 0.0f, axis == Axis.Z ? 1.0f : 0.0f);
