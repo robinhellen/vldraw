@@ -31,7 +31,7 @@ namespace Ldraw.Animation
 
 			// insert the columns with editable text cells.
 
-			InsertColumn("Name", paramList, x => x.Identifier, (x, y) => x.Identifier =y);
+			InsertColumn("Name", paramList, x => x.Identifier, (x, y) => x.Identifier = y);
 			InsertColumn("Description", paramList, x => x.ParameterDescription, (x, y) => x.ParameterDescription = y);
 			InsertColumn("Min", paramList, x => x.Min.to_string(), (x, y) => x.Min = (float)double.parse(y));
 			InsertColumn("Max", paramList, x => x.Max.to_string(), (x, y) => x.Max = (float)double.parse(y));

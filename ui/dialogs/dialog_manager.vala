@@ -22,7 +22,6 @@ namespace Ldraw.Ui.Dialogs
                 location = dialog.get_filename();
                 var uri = dialog.get_uri();
                 recent.add_item(uri);
-                stderr.printf(@"Recent: $uri, $location");
                 dialog.close();
                 return true;
             }
@@ -45,12 +44,6 @@ namespace Ldraw.Ui.Dialogs
                 location = dialog.get_filename();
                 var uri = dialog.get_uri();
                 recent.add_item(uri);
-                stderr.printf(@"Recent: $uri, $location\n");
-                var info = recent.lookup_item(uri);
-                stderr.printf(@"Info: $(info.get_uri()), $(info.get_uri_display()), $(info.get_short_name()), $(info.get_display_name()), $(info.get_mime_type()), $(info.get_age()), $(info.last_application()), \n");
-                dialog.close();
-                info = recent.lookup_item("file:///home/robin/ldraw/models/modular_street/10251.mpd");
-                stderr.printf(@"Info: $(info.get_uri()), $(info.get_uri_display()), $(info.get_short_name()), $(info.get_display_name()), $(info.get_mime_type()), $(info.get_age()), $(info.last_application()), \n");
                 dialog.close();
                 return true;
             }
