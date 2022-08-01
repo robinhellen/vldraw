@@ -130,7 +130,7 @@ namespace Ldraw.Peeron
 		private const int c_IteratorStamp = 423958;
 
 		public Type get_column_type(int index)
-			requires (index <= 2 && index >= 0)
+			requires (index <= 3 && index >= 0)
 		{
 			switch(index)
 			{
@@ -140,6 +140,8 @@ namespace Ldraw.Peeron
 					return typeof(string);
 				case 2:
 					return typeof(PartGroupItem);
+				case 3:
+					return typeof(string);
 				default:
 					assert_not_reached();
 			}
@@ -152,7 +154,7 @@ namespace Ldraw.Peeron
 
 		public int get_n_columns()
 		{
-			return 3;
+			return 4;
 		}
 
 		// TreeIter usage
@@ -466,7 +468,7 @@ namespace Ldraw.Peeron
 			}
 		}
 
-		// columns are: int, string, PartGroupItem
+		// columns are: int, string, PartGroupItem, string
 		public void get_value(TreeIter iter, int column, out Value value)
 		{
 			if(iter.stamp != c_IteratorStamp)
@@ -523,6 +525,47 @@ namespace Ldraw.Peeron
 							}
 							var sectionIter = create_section_iter(iter);
 							section.get_value(sectionIter, 0, out value);
+							break;
+						default:
+							assert_not_reached();
+					}
+					return;
+				case 3:
+					value = Value(typeof(string));
+					switch((int) iter.user_data)
+					{
+						case 0:
+							switch((int) iter.user_data2)
+							{
+								case 0:
+									value.set_string("Unused parts"); break;
+								case 1:
+									value.set_string("Used parts"); break;
+								case 2:
+									value.set_string("Extra parts required"); break;
+								default:
+									assert_not_reached();
+							}
+							break;
+						case 1:
+							ObservableList<PartGroupItem> section;
+							switch((int) iter.user_data2)
+							{
+								case 0:
+									section = unused; break;
+								case 1:
+									section = used; break;
+								case 2:
+									section = extra; break;
+								default:
+									assert_not_reached();
+							}
+							var sectionIter = create_section_iter(iter);
+							Value pgi_value;
+							section.get_value(sectionIter, 0, out pgi_value);
+							var pgi = (PartGroupItem)pgi_value.get_object();							
+							
+							value.set_string(Markup.escape_text(@"$(pgi.Quantity) @ $(pgi.Colour.Name) $(pgi.Part.Description) ($(pgi.Part.Name))"));
 							break;
 						default:
 							assert_not_reached();

@@ -156,6 +156,8 @@ namespace Ldraw.Peeron
 				drag_set_icon_pixbuf(context, icon, 2, 2);
 			});
 			
+			partsView.set_tooltip_column(3);
+			
 			widget.add2(WithScrolls(partsView));
 
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
