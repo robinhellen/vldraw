@@ -116,10 +116,12 @@ namespace Ldraw.Peeron
 
 			var setsView = new SimpleList<Inventory>.with_model(sets);
 			setsView.insert_text_column_with_data_func(-1, "", s => s.SetNumber);
+			setsView.headers_visible = false;
 			setControls.pack_start(WithScrolls(setsView));
 			setControls.pack_start(setButtons, false);
 			widget.add1(setControls);
 			partsView = new TreeView();
+			partsView.headers_visible = false;
 			
 			append_column_for_children_only<CellRendererPixbuf>(partsView, new CellRendererPixbuf(),
 					(cell, item) => cell.pixbuf = GetPixbufImageForColour(item.Colour),

@@ -99,13 +99,14 @@ namespace Ldraw.Ui.GtkGl
 
 		public new void realize()
 		{
-			if(!get_realized())
-			{
+			if(!get_realized()) {			
 				return;
 			}
 			make_current();
-			if(get_error() != null)
-				return;
+			var error = get_error();
+			if(error != null) {
+				stderr.printf(@"error making gl area current: $(error.message).\n");
+			}
 
 			renderer.PrepareRender(m_Model);
 		}

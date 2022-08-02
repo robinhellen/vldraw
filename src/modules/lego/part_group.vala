@@ -56,24 +56,28 @@ namespace Ldraw.Lego
 			public Collection<PartGroupItem> GetItems()
 			{
 				var result = new ArrayList<PartGroupItem>();
-				var map = new HashMap<LdrawPart, MultiMap<Colour?, PartNode>>();
+				var map = new HashMap<LdrawPart, Map<Colour?, int>>();
 				foreach(var p in parts)
 				{
 					var partFile = p.File as LdrawPart;
 					if(map[partFile] == null)
 					{
-						map[partFile] = new HashMultiMap<Colour?, PartNode>();
+						map[partFile] = new HashMap<Colour?, int>();
 					}
-					map[partFile][p.Colour] = p;
+					if(map[partFile].has_key(p.Colour)) {
+						map[partFile][p.Colour] = map[partFile][p.Colour] + 1;
+					} else {
+						map[partFile][p.Colour] = 1;
+					}
 				}
 				foreach(LdrawPart p in map.keys)
 				{
-					foreach(Colour c in map[p].get_keys())
+					foreach(Colour c in map[p].keys)
 					{
 						var item = (PartGroupItem)Object.new(typeof(PartGroupItem),
 									Part: p,
 									Colour: c,
-									Quantity: map[p][c].size);
+									Quantity: map[p][c]);
 						result.add(item);
 					}
 				}
