@@ -13,7 +13,7 @@ namespace Ldraw.Ui
 				.as<ModelEditor>()
 				.ignore_property("hadjustment")
 				.ignore_property("vadjustment");
-            builder.register<LdrawViewPane>().as<ModelView>();
+            builder.register<LdrawViewPane>().as<ModelView>().keyed<ModelView, string>("new");
             builder.register<DropBoundsOverlay>(); 
 		}
 	}

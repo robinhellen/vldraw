@@ -92,5 +92,11 @@ namespace Ldraw.Lego.Nodes
 		{
 			yield visitor.VisitSubModel(this);
 		}
+		
+		public void change_part(LdrawFile new_file, LdrawObject o) {
+			file = new_file;
+			m_Contents = o;
+			m_Text = o.FileName;
+		}
 	}
 }

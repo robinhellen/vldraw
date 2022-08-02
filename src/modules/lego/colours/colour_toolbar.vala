@@ -140,7 +140,7 @@ namespace Ldraw.Colours
 		}
 	}
 
-	private class ColourChooser : VBox
+	public class ColourChooser : VBox
 	{
 		private int page = 0;
 		private Button[] buttons = new Button[32];
