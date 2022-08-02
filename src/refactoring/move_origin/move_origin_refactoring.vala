@@ -1,3 +1,4 @@
+using Diva;
 using Gtk;
 
 using Ldraw.Lego;
@@ -9,7 +10,13 @@ namespace Ldraw.Ui
 {
 	private class MoveOriginRefactoring : GLib.Object, Refactoring
 	{
-		public ModelView View {construct; private get;}
+		static construct
+		{
+			var cls = (ObjectClass)typeof(MoveOriginRefactoring).class_ref();
+			set_indexed_injection<string, ModelView>(cls, "views");
+		}
+		
+		public Index<ModelView, string> views {construct; private get;}
 		public ColourContext Colours {construct; private get;}
 		
 		public string GetLabel() {return "Move Origin";}
@@ -18,7 +25,7 @@ namespace Ldraw.Ui
 		
 		public bool PrepareToExecute(AnimatedModel model, Window dialogParent, out Command? command)
 		{
-			var dialog = new MoveOriginDialog(dialogParent, model, View, Colours);
+			var dialog = new MoveOriginDialog(dialogParent, model, views["new"], Colours);
 			Vector? shift;
 			if(!dialog.Run(out shift))
 			{
@@ -84,7 +91,6 @@ namespace Ldraw.Ui
 				view.Angle = ViewAngle.Ortho;
 
 				var response = dialog.run();
-				view_container.remove(view);
 				dialog.destroy();
 				if(response != ResponseType.ACCEPT)
 				{
