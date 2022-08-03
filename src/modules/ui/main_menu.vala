@@ -55,7 +55,10 @@ namespace Ldraw.Ui
 
 			var fileMenu = CreateMenu(menus, "_File", accelerators, "<Ldraw>/File");
 
-			var fileNew = AddMenuItem(fileMenu, "_New", () => Model.Load(new LdrawModel.Empty()));
+			var fileNew = AddMenuItem(fileMenu, "_New", () => {
+				Model.Load(new LdrawModel.Empty());
+				UndoStack.mark_save();
+			});
 			AddSeparator(fileMenu);
 			AddMenuItem(fileMenu, "_Open", () => FileOpen_OnActivate(parent));
             AddSubMenu(fileMenu, "_Recent", RecentMenu);
@@ -198,6 +201,7 @@ namespace Ldraw.Ui
 			if(Dialogs.GetLoadLocation(out fileToOpen, parent, RecentMenu.get_recent_manager()))
 			{
 				LoadFile(fileToOpen);
+				UndoStack.mark_save();
 			}
 		}
 
@@ -224,6 +228,7 @@ namespace Ldraw.Ui
             if(file.FilePath != null)
             {
                 file.Save();
+				UndoStack.mark_save();
             }
             else
             {
@@ -243,6 +248,8 @@ namespace Ldraw.Ui
                     f.Save();
                     var file = File.new_for_path(chosenFileName);
                     f.FileName = file.query_info(FileAttribute.STANDARD_NAME, FileQueryInfoFlags.NONE).get_name();
+                    UndoStack.mark_save();
+                    Model.Model.FileName = file.get_basename();
                 }
                 catch(Error e)
                 {

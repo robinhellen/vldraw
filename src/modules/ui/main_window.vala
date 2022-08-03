@@ -65,6 +65,8 @@ namespace Ldraw.Ui
             PartsPreview.DefaultColour = get_preview_colour();
 
             maximize();
+            UndoStack.notify["saved"].connect(() => update_title());
+            EditingObject.view_changed.connect(() => update_title());
 		}
 
         private void SetUpControls()
@@ -103,7 +105,23 @@ namespace Ldraw.Ui
 
             bigVBox.pack_start(treePaned, true, true);
             add(bigVBox);
+            
+            update_title();
         }
+        
+        private void update_title() {
+			var title = "VLDraw";
+			title += " ";
+			if(EditingObject.File == null) {
+				title += "(new file)";
+			} else {
+				title += EditingObject.File.FileName;
+			}
+			if(!UndoStack.saved) {
+				title += " *";
+			}
+			this.title = title;
+		}
         
         private Colour get_preview_colour()
         {
