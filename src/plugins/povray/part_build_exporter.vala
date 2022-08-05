@@ -2,6 +2,7 @@ using GLib.Math;
 
 using Ldraw.Export;
 using Ldraw.Lego;
+using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 
 namespace Ldraw.Povray
@@ -38,7 +39,7 @@ namespace Ldraw.Povray
 
 			int digits = (int)log10(frameCount) + 1;
 			// stitch the image files into a single movie
-			string[] ffmpegArgv = {"ffmpeg", "-f", "image2", "-start_number", "0", "-i", @"sequence%0$(digits)d.png", movieFilename};
+			string[] ffmpegArgv = {"ffmpeg", "-y", "-f", "image2", "-start_number", "0", "-i", @"sequence%0$(digits)d.png", movieFilename};
 			var ffmpegResult = yield async_spawn(tempDir, ffmpegArgv, null
 				, SpawnFlags.SEARCH_PATH
 				| SpawnFlags.STDOUT_TO_DEV_NULL
@@ -89,7 +90,7 @@ namespace Ldraw.Povray
 			foreach(var node in original.Nodes)
 			{
 				var pn = node as PartNode;
-				if(pn == null || pn.File != null)
+				if(pn == null || (pn.File as LdrawPart) != null)
 				{
 					new_model.AddNode(node);
 					continue;
