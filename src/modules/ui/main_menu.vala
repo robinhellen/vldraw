@@ -329,8 +329,7 @@ namespace Ldraw.Ui
             var newObject = (LdrawObject)GLib.Object.new(
 						typeof(LdrawObject),
 						Nodes: nodes,
-						FileName: newFileName,
-						File: mpdModel
+						FileName: newFileName
 					);
             mpdModel.SubModels.add(newObject);
             Model.Switch(newObject);
