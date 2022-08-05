@@ -5,21 +5,15 @@ using Ldraw.Lego.Library;
 
 namespace Ldraw.Lego
 {
-	public interface LdrawFileReference : Object
+	public class LdrawFileReference : Object
 	{
-		public abstract LdrawObject object {get; construct set;}
-		public abstract LdrawFile file {get; construct set;}
-	}
-	
-	private class LibraryFileReference : Object, LdrawFileReference
-	{
-		public LibraryFileReference(LdrawFile file, LdrawObject obj)
+		public LdrawFileReference(LdrawFile? file, LdrawObject obj)
 		{
 			Object(object: obj, file: file);
 		}
 		
 		public LdrawObject object {get; construct set;}
-		public LdrawFile file {get; construct set;}		
+		public LdrawFile? file {get; construct set;}
 	}
 	
 	public interface ISubFileLocator : Object
@@ -40,7 +34,7 @@ namespace Ldraw.Lego
 			LdrawPart part;
 			if(yield Library.TryGetPart(partName, out part))
 			{
-				return new LibraryFileReference(part, part.MainObject);
+				return new LdrawFileReference(part, part.MainObject);
 			}
 			return null;
 		}
@@ -77,7 +71,7 @@ namespace Ldraw.Lego
 				var model_file = folders.ModelsDirectory.get_child(model_filename);
 				var full_filename = model_file.get_path();
 				var f = yield loader.value.LoadModelFile(full_filename, ReferenceLoadStrategy.PartsOnly, false);
-				var file_ref = new LibraryFileReference(f, f.MainObject);
+				var file_ref = new LdrawFileReference(f, f.MainObject);
 				loaded_models[model_filename] = file_ref;
 				return file_ref;
 			}	
@@ -105,7 +99,7 @@ namespace Ldraw.Lego
 			{
 				var proxy = new ProxyLdrawObject(reference);
 				m_Proxies.add(proxy);
-				var proxy_ref = new MpdProxyRef(proxy);
+				var proxy_ref = new LdrawFileReference(null, proxy);
 				return proxy_ref;
 			}
 			return baseVal;
@@ -117,17 +111,6 @@ namespace Ldraw.Lego
 			{
 				proxy.Resolve(possibilities);
 			}
-		}
-		
-		private class MpdProxyRef : Object, LdrawFileReference
-		{
-			public MpdProxyRef(ProxyLdrawObject proxy)
-			{
-				Object(object: proxy);
-			}
-			
-			public LdrawObject object {get; construct set;}
-			public LdrawFile file {get; construct set;}
 		}
 
 		public class ProxyLdrawObject : LdrawObject

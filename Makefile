@@ -73,6 +73,10 @@ lego_packages= diva
 lego_private_packages=$(json)
 lego_internal_packages=maths utils lego_objects application
 
+library_sources=$(wildcard src/modules/library/*.vala)
+library_private_packages=$(json)
+library_internal_packages=lego
+
 part_group_sources=$(wildcard src/modules/lego/*.vala)
 part_group_packages=
 part_group_internal_packages=lego
@@ -155,7 +159,7 @@ movement_vala_options=--vapidir=vapi
 
 # End of module build specs
 
-INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours part_group \
+INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours library part_group \
 	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
 
 PLUGINS=animation steps povray peeron move_origin clipboard extract_inline hide movement switch_all

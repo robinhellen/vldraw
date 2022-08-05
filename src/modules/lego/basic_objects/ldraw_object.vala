@@ -46,8 +46,6 @@ namespace Ldraw.Lego
 
 		public string Description {get; public construct set;}
 
-		// public LdrawFile File {get; construct set;}
-
 		public Bounds BoundingBox
 		{
 			get

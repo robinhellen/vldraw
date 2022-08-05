@@ -113,12 +113,7 @@ namespace Ldraw.Lego.Library
 
 	public class OnDemandSubFileLoader : ISubFileLocator, Object
 	{
-		public IDatFileCache Cache {construct; private get;}
-
-		public OnDemandSubFileLoader(IDatFileCache cache)
-		{
-			Object(Cache: cache);
-		}
+		public OnDemandPartLoader Cache {construct; private get;}
 
 		public async LdrawFileReference? GetObjectFromReference(string reference)
 			throws ParseError
@@ -131,7 +126,7 @@ namespace Ldraw.Lego.Library
 					LdrawSubPart sp;
 					if(yield Cache.TryGetSubPart(name, out sp))
 					{
-						return new LibraryFileReference(sp, sp.MainObject);
+						return new LdrawFileReference(sp, sp.MainObject);
 					}
 					break;
 				case "48":
@@ -139,7 +134,7 @@ namespace Ldraw.Lego.Library
 					LdrawHiresPrimitive hiresPrim;
 					if(yield Cache.TryGetHiresPrimitive(name, out hiresPrim))
 					{
-						return new LibraryFileReference(hiresPrim, hiresPrim.MainObject);
+						return new LdrawFileReference(hiresPrim, hiresPrim.MainObject);
 					}
 					break;
 				case "8":
@@ -147,7 +142,7 @@ namespace Ldraw.Lego.Library
 					LdrawLoresPrimitive loresPrim;
 					if(yield Cache.TryGetLoresPrimitive(name, out loresPrim))
 					{
-						return new LibraryFileReference(loresPrim, loresPrim.MainObject);
+						return new LdrawFileReference(loresPrim, loresPrim.MainObject);
 					}
 					break;
 				default:
@@ -155,13 +150,13 @@ namespace Ldraw.Lego.Library
 					LdrawPrimitive prim;
 					if(yield Cache.TryGetPrimitive(name, out prim))
 					{
-						return new LibraryFileReference(prim, prim.MainObject);
+						return new LdrawFileReference(prim, prim.MainObject);
 					}
 
 					LdrawPart p;
 					if(yield Cache.TryGetPart(name, out p))
 					{
-						return new LibraryFileReference(p, p.MainObject);
+						return new LdrawFileReference(p, p.MainObject);
 					}
 					break;
 			}
