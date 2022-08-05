@@ -152,7 +152,7 @@ namespace Ldraw.Ui.GtkGl
 						break;
 					case ViewAngle.Ortho:
 						viewParameters.cameraLatitude = -30;
-						viewParameters.cameraLongitude = 45;
+						viewParameters.cameraLongitude = -45;
 						break;
 					default:
 						assert_not_reached();
@@ -165,19 +165,25 @@ namespace Ldraw.Ui.GtkGl
 		private void CenterScrollAndZoom()
 		{
 			var bounds = m_Model.BoundingBox;
+			
+			if(bounds.m_Initialized) {
+				var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
+				var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
+				var m = latTransform.TransformMatrix(longTransform);
+				var transformedCenter = m.TransformVector(bounds.Center());
+				viewParameters.lduScrollX = -transformedCenter.X;
+				viewParameters.lduScrollY = -transformedCenter.Y;
 
-			var longTransform = Matrix.ForRotation(Vector(0,1,0), -viewParameters.cameraLongitude);
-			var latTransform = Matrix.ForRotation(Vector(1,0,0), -viewParameters.cameraLatitude);
-			var m = latTransform.TransformMatrix(longTransform);
-			var transformedCenter = m.TransformVector(bounds.Center());
-			viewParameters.lduScrollX = -transformedCenter.X;
-			viewParameters.lduScrollY = -transformedCenter.Y;
 
+				viewParameters.lduWidth = float.max(2 * bounds.Radius, 1.0F);
+				viewParameters.lduHeight = float.max(2 * bounds.Radius, 1.0F);
+			} else {
+				viewParameters.lduScrollX = 0;
+				viewParameters.lduScrollY = 0;
 
-//~ 			viewParameters.lduWidth = float.max(2 * bounds.Radius, 400.0F);
-//~ 			viewParameters.lduHeight = float.max(2 * bounds.Radius, 400.0F);
-			viewParameters.lduWidth = 2 * bounds.Radius;
-			viewParameters.lduHeight = 2 * bounds.Radius;
+				viewParameters.lduWidth = 300;
+				viewParameters.lduHeight = 300;				
+			}
 
 			Allocation alloc;
 			get_allocation(out alloc);

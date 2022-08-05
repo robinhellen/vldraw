@@ -68,7 +68,7 @@ namespace Ldraw.Maths
 			Vector scaledDiagonal = diagonal.Scale(scale);
 			b.m_Min = center.Add(scaledDiagonal);
 			b.m_Max = center.Subtract(scaledDiagonal);
-			b.m_Initialized = true;
+			b.m_Initialized = m_Initialized;
 			return b;
 		}
 
@@ -77,7 +77,7 @@ namespace Ldraw.Maths
 			Bounds b = new Bounds();
 			b.m_Min = m.TransformVector(m_Min).Add(pos);
 			b.m_Max = m.TransformVector(m_Max).Add(pos);
-			b.m_Initialized = true;
+			b.m_Initialized = m_Initialized;
 			return b;
 		}
 
