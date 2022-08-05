@@ -81,14 +81,18 @@ part_group_sources=$(wildcard src/modules/lego/*.vala)
 part_group_packages=
 part_group_internal_packages=lego
 
-ui_widgets_sources=$(wildcard src/modules/ui/*.vala) $(wildcard src/modules/ui/interfaces/*.vala) $(wildcard src/modules/ui/undo/*.vala)
-ui_widgets_internal_packages=lego part_group
+ui_interfaces_sources=$(wildcard src/modules/ui/interfaces/*.vala)
+ui_interfaces_internal_packages=lego part_group
+ui_interfaces_private_internal_packages=application
+
+ui_widgets_sources=$(wildcard src/modules/ui/*.vala) $(wildcard src/modules/ui/undo/*.vala)
+ui_widgets_internal_packages=lego part_group ui_interfaces
 ui_widgets_private_internal_packages=application
 
 export_sources=$(wildcard src/modules/export/*.vala)
 export_packages=diva
 export_internal_packages=lego_objects utils
-export_private_internal_packages=ui_widgets
+export_private_internal_packages=ui_widgets ui_interfaces
 
 ui_gtk_gl_sources=$(wildcard src/modules/ui/gtk_gl/*.vala)
 ui_gtk_gl_packages=$(gee) gl
@@ -102,7 +106,7 @@ gl_render_vala_options=--vapidir=vapi
 
 drag_and_drop_sources=$(wildcard src/modules/ui/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) diva
-drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets
+drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets ui_interfaces
 
 ui_dialogs_sources=$(wildcard src/modules/ui/dialogs/*.vala)
 ui_dialogs_packages=$(gee) gl diva
@@ -134,7 +138,7 @@ peeron_internal_packages=lego_objects ui_widgets part_group options
 povray_sources=$(wildcard src/plugins/povray/*.vala)
 povray_private_packages=$(gio)
 povray_internal_packages=lego
-povray_private_internal_packages=export ui_widgets
+povray_private_internal_packages=export ui_widgets ui_interfaces
 
 move_origin_sources=$(wildcard src/refactoring/move_origin/*.vala)
 move_origin_packages=$(gee) diva
@@ -160,7 +164,7 @@ movement_vala_options=--vapidir=vapi
 # End of module build specs
 
 INTERNAL_LIBS=utils expressions maths options lego lego_objects lego_colours library part_group \
-	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl
+	application export drag_and_drop gl_render ui_widgets ui_dialogs ui_gtk_gl ui_interfaces
 
 PLUGINS=animation steps povray peeron move_origin clipboard extract_inline hide movement switch_all
 # extract_inline
@@ -177,8 +181,6 @@ EXECUTABLE_NAME = ldraw
 include $(foreach lib, $(INTERNAL_LIBS), build/make/$(lib)_resources.d) $(foreach lib, $(PLUGINS), build/make/$(lib)_resources.d)
 
 all: build/$(EXECUTABLE_NAME) build/test/expressions.test build/test/maths.test $(foreach plugin, $(PLUGINS), build/plugins/$(plugin).so)
-#~ 	./build/test/expressions.test
-#~ 	./build/test/maths.test
 
 # compilation for the final executable
 build/$(EXECUTABLE_NAME): $(SOURCES) $(foreach lib, $(INTERNAL_LIBS), build/lib/$(lib).so build/h/$(lib).h build/vapi/$(lib).vapi) | build
