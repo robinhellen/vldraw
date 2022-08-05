@@ -8,6 +8,22 @@ namespace Ldraw.Peeron
 {
 	private class PartUsageViewModel : TreeModel, TreeDragSource, GLib.Object
 	{
+		static CompareDataFunc<string> str_compare;
+		
+		static construct {
+			str_compare = Gee.Functions.get_compare_func_for(typeof(string));
+		}
+		
+		static int pgi_compare(PartGroupItem a, PartGroupItem b) {
+			if(a.Colour.Code < b.Colour.Code) return -1;
+			if(a.Colour.Code > b.Colour.Code) return 1;
+			
+			var cat_compare = str_compare(a.Part.Category, b.Part.Category);
+			if(cat_compare != 0)
+				return cat_compare;
+			return str_compare(a.Part.Description, b.Part.Description);
+		}
+		
 		private ObservableList<PartGroupItem> used;
 		private ObservableList<PartGroupItem> unused;
 		private ObservableList<PartGroupItem> extra;
@@ -32,7 +48,11 @@ namespace Ldraw.Peeron
 		private void UpdateList(ObservableList<PartGroupItem> original, Collection<PartGroupItem> updated, int firstIndex)
 		{
 			var updatedList = new ArrayList<PartGroupItem>();
-			updatedList.add_all(updated);			
+			updatedList.add_all(updated);
+		
+			original.sort(pgi_compare);
+		
+			updatedList.sort(pgi_compare);			
 			
 			// lists should be sorted, so I can step both
 			int i = 0;
@@ -119,11 +139,7 @@ namespace Ldraw.Peeron
 				j++;
 			}
 		
-			original.sort((a, b) => {
-				if(a.Colour.Code < b.Colour.Code) return -1;
-				if(a.Colour.Code > b.Colour.Code) return 1;
-				return Gee.Functions.get_compare_func_for(typeof(string))(a.Part.Name, b.Part.Name);
-			});
+			original.sort(pgi_compare);
 		}
 
 		// implementation of TreeModel
