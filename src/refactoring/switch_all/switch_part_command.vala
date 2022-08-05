@@ -5,7 +5,6 @@ using Ldraw.Lego.Nodes;
 using Ldraw.Lego.Library;
 using Ldraw.Maths;
 using Ldraw.Ui;
-using Ldraw.Ui.Commands;
 
 namespace Ldraw.Refactor
 {

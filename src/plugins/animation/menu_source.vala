@@ -11,7 +11,7 @@ namespace Ldraw.Animation
 	{
 		public AnimatedModel Model {construct; private get;}
 		
-		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent)
+		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent, CommandExecutor executor)
 		{
 			switch(menu)
 			{

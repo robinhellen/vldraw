@@ -3,7 +3,6 @@ using Gee;
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
 using Ldraw.Ui;
-using Ldraw.Ui.Commands;
 
 namespace Ldraw.Refactor
 {

@@ -1,8 +1,9 @@
 using Gee;
 
 using Ldraw.Lego;
+using Ldraw.Ui;
 
-namespace Ldraw.Ui.Commands
+namespace Ldraw.Colours
 {
 	public class ChangeColourCommand : Command
 	{
@@ -33,6 +34,7 @@ namespace Ldraw.Ui.Commands
 
 		public override void Execute()
 		{
+			stderr.printf(@"Executing colour change\n");
 			foreach(var node in Selection)
 			{
 				node.Colour = NewColour;
@@ -41,6 +43,7 @@ namespace Ldraw.Ui.Commands
 
 		public override void Undo()
 		{
+			stderr.printf(@"Undoing colour change\n");
 			foreach(var node in oldColours.keys)
 			{
 				node.Colour = oldColours[node];

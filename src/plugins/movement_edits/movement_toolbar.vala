@@ -12,33 +12,32 @@ namespace Ldraw.Plugins.Movement
 {
 	private class MovementToolbar : GLib.Object, ToolbarProvider, PositionAdjuster
 	{
-		public AnimatedModel m_ModelContainer {construct; private get;}		
-		public UndoStack undoStack {construct; private get;}
+		public AnimatedModel m_ModelContainer {construct; private get;}
 		public GridSetting grid {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
 		
 		const string resource_base = "/org/ldraw/rkh/vldraw/icons/";
 
-		public Toolbar CreateToolbar(Window dialogParent)
+		public Toolbar CreateToolbar(Window dialogParent, CommandExecutor executor)
 		{
 			Toolbar bar = new Toolbar();
 
 			bar.insert(new SeparatorToolItem(), -1);
-			bar.insert(CreateTranslateButton(Axis.X, true), -1);
-			bar.insert(CreateTranslateButton(Axis.X, false), -1);
-			bar.insert(CreateTranslateButton(Axis.Y, true), -1);
-			bar.insert(CreateTranslateButton(Axis.Y, false), -1);
-			bar.insert(CreateTranslateButton(Axis.Z, true), -1);
-			bar.insert(CreateTranslateButton(Axis.Z, false), -1);
+			bar.insert(CreateTranslateButton(Axis.X, true, executor), -1);
+			bar.insert(CreateTranslateButton(Axis.X, false, executor), -1);
+			bar.insert(CreateTranslateButton(Axis.Y, true, executor), -1);
+			bar.insert(CreateTranslateButton(Axis.Y, false, executor), -1);
+			bar.insert(CreateTranslateButton(Axis.Z, true, executor), -1);
+			bar.insert(CreateTranslateButton(Axis.Z, false, executor), -1);
 
 			bar.insert(new SeparatorToolItem(), -1);
-			bar.insert(CreateRotateButton(Axis.X, true), -1);
-			bar.insert(CreateRotateButton(Axis.X, false), -1);
-			bar.insert(CreateRotateButton(Axis.Y, true), -1);
-			bar.insert(CreateRotateButton(Axis.Y, false), -1);
-			bar.insert(CreateRotateButton(Axis.Z, true), -1);
-			bar.insert(CreateRotateButton(Axis.Z, false), -1);
+			bar.insert(CreateRotateButton(Axis.X, true, executor), -1);
+			bar.insert(CreateRotateButton(Axis.X, false, executor), -1);
+			bar.insert(CreateRotateButton(Axis.Y, true, executor), -1);
+			bar.insert(CreateRotateButton(Axis.Y, false, executor), -1);
+			bar.insert(CreateRotateButton(Axis.Z, true, executor), -1);
+			bar.insert(CreateRotateButton(Axis.Z, false, executor), -1);
 
 			bar.insert(new SeparatorToolItem(), -1);
 
@@ -49,7 +48,7 @@ namespace Ldraw.Plugins.Movement
 
 			bar.insert(new SeparatorToolItem(), -1);
 			
-			bar.insert(CreateManualPositionToolButton(dialogParent), -1);
+			bar.insert(CreateManualPositionToolButton(dialogParent, executor), -1);
 			return bar;
 		}
 
@@ -86,7 +85,7 @@ namespace Ldraw.Plugins.Movement
 			return button;
 		}
 
-		private ToolButton CreateTranslateButton(Axis axis, bool positive)
+		private ToolButton CreateTranslateButton(Axis axis, bool positive, CommandExecutor executor)
 		{
 			string icon = resource_base + (positive ? "plus" : "minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
@@ -102,13 +101,13 @@ namespace Ldraw.Plugins.Movement
 					if(!positive)
 						displacement = displacement.Scale(-1.0f);
 
-					undoStack.ExecuteCommand(new MoveNodesCommand(m_ModelContainer.Selection, displacement));
+					executor(new MoveNodesCommand(m_ModelContainer.Selection, displacement));
 				});
 
 			return button;
 		}
 
-		private ToolButton CreateRotateButton(Axis axis, bool positive)
+		private ToolButton CreateRotateButton(Axis axis, bool positive, CommandExecutor executor)
 		{
 			string icon = resource_base + "rotate" + (positive ? "Plus" : "Minus") + axis.to_string() + ".xpm";
 			var button = CreateButtonFromImageFile(icon);
@@ -121,7 +120,7 @@ namespace Ldraw.Plugins.Movement
 
 			button.clicked.connect(() =>
 				{
-					undoStack.ExecuteCommand(new TransformNodesCommand.Rotation(m_ModelContainer.Selection, rotationAxis, 22.5f));
+					executor(new TransformNodesCommand.Rotation(m_ModelContainer.Selection, rotationAxis, 22.5f));
 				});
 
 			return button;
@@ -154,11 +153,11 @@ namespace Ldraw.Plugins.Movement
 			}
 		}
 		
-		private ToolButton CreateManualPositionToolButton(Window dialogParent)
+		private ToolButton CreateManualPositionToolButton(Window dialogParent, CommandExecutor executor)
 		{
 			var button = new ToolButton(new Label("Manual"), "Manual");
 			button.clicked.connect(() => 
-			new ManualRotationDialog(m_ModelContainer, dialogParent).Run(undoStack));
+			new ManualRotationDialog(m_ModelContainer, dialogParent).Run(executor));
 			button.set_homogeneous(false);
 			return button;
 		}

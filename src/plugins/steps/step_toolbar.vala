@@ -8,7 +8,7 @@ namespace Ldraw.Steps
 	{
 		public StepModel Model {construct; private get;}
 		
-		public Toolbar CreateToolbar(Window dialogParent)
+		public Toolbar CreateToolbar(Window dialogParent, CommandExecutor executor)
 		{			
 			Toolbar bar = new Toolbar();
 			

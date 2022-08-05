@@ -14,10 +14,9 @@ namespace Ldraw.Ui.Clipboard
 	{
 		public ClipboardHandler Handler { construct; private get; }
 		public AnimatedModel Model {construct; private get;}
-		public UndoStack UndoStack {construct; private get;}
 		public IOptions Options {construct; private get;}
 
-		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent)
+		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent, CommandExecutor executor)
 		{
 			if(menu != TopMenu.Edit)
 				return Collection.empty<Gtk.MenuItem>();
@@ -31,19 +30,19 @@ namespace Ldraw.Ui.Clipboard
 			items.add(paste);
 			cut.sensitive = copy.sensitive = !Model.Selection.is_empty;
 			Model.view_changed.connect(() => cut.sensitive = copy.sensitive = !Model.Selection.is_empty);
-			cut.activate.connect(() => Cut());
+			cut.activate.connect(() => Cut(executor));
 			copy.activate.connect(() => Copy());
-			paste.activate.connect(() => Paste.begin());
+			paste.activate.connect(() => Paste.begin(executor));
 			AddCtrlShortcut(cut, "X");
 			AddCtrlShortcut(copy, "C");
 			AddCtrlShortcut(paste, "V");
 			return items;
 		}
 
-		private void Cut()
+		private void Cut(CommandExecutor executor)
 		{
 			Handler.PutSelectionOnClipboard();
-			UndoStack.ExecuteCommand(new DeleteNodesCommand(Model.Model, Model.Selection));
+			executor(new DeleteNodesCommand(Model.Model, Model.Selection));
 		}
 
 		private void Copy()
@@ -51,7 +50,7 @@ namespace Ldraw.Ui.Clipboard
 			Handler.PutSelectionOnClipboard();
 		}
 
-		private async void Paste()
+		private async void Paste(CommandExecutor executor)
 		{
 			var pasted = yield Handler.GetNodesFromClipboard();
 			if(pasted == null)
@@ -66,7 +65,7 @@ namespace Ldraw.Ui.Clipboard
 				partNode.Move(Vector(30, 20, 30));
 			}
 
-			UndoStack.ExecuteCommand(new AddNodesCommand(Model.Model, pasted, null));
+			executor(new AddNodesCommand(Model.Model, pasted, null));
 			var s = new HashSet<LdrawNode>();
 			s.add_all(pasted);
 			Model.Select(s, false);

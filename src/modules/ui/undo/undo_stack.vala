@@ -1,6 +1,5 @@
 using Gee;
 
-
 namespace Ldraw.Ui.Commands
 {
 	public class UndoStack : Object

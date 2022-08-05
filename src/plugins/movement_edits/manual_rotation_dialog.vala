@@ -80,20 +80,20 @@ namespace Ldraw.Plugins.Movement
 			contentArea.add(rotationControlsBox);																	
 		}
 		
-		public void Run(UndoStack stack)
+		public void Run(CommandExecutor executor)
 		{
 			dialog.show_all();
 			var result = dialog.run();
 			if(result == ResponseType.ACCEPT)
 			{
-				UpdateTransforms(stack);
+				UpdateTransforms(executor);
 			}
 			dialog.destroy();
 		}
 		
-		private void UpdateTransforms(UndoStack stack)
+		private void UpdateTransforms(CommandExecutor executor)
 		{
-			stack.ExecuteCommand(new TransformNodesCommand.Rotation(model.Selection, rotationAxis, rotationAngle));
+			executor(new TransformNodesCommand.Rotation(model.Selection, rotationAxis, rotationAngle));
 		}
 	}
 }

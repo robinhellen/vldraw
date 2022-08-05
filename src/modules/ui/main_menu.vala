@@ -126,7 +126,7 @@ namespace Ldraw.Ui
 		{
 			foreach(var source in ItemSources)
 			{
-				var extras = source.GetItemsForMenu(menu, dialogParent);
+				var extras = source.GetItemsForMenu(menu, dialogParent, cmd => UndoStack.ExecuteCommand(cmd));
 				if(extras.is_empty)
 					continue;
 

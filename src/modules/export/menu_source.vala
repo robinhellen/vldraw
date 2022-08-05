@@ -21,7 +21,7 @@ namespace Ldraw.Export
         public Collection<Exporter> Exporters {construct; private get;}
         public ExportManager ExportManager {construct; private get;}
 
-		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent)
+		public Collection<Gtk.MenuItem> GetItemsForMenu(TopMenu menu, Window dialogParent, CommandExecutor executor)
 		{
 			switch(menu)
 			{

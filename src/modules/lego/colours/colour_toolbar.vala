@@ -2,7 +2,6 @@ using Gee;
 using Gtk;
 
 using Ldraw.Lego;
-using Ldraw.Ui.Commands;
 using Ldraw.Ui;
 
 namespace Ldraw.Colours
@@ -10,13 +9,12 @@ namespace Ldraw.Colours
 	private class ColourToolbar : GLib.Object, ToolbarProvider
 	{
 		public AnimatedModel m_ModelContainer {construct; private get;}
-		public UndoStack undoStack {construct; private get;}
 		public ColourContext ColourContext {construct; private get; }
 		public ColourOptions colour_options {construct; private get;}
 
 		public int ButtonSize {get; set; default = 16;}
 
-		public Toolbar CreateToolbar(Window window)
+		public Toolbar CreateToolbar(Window window, CommandExecutor executor)
 		{
 			Toolbar bar = new Toolbar();
 			bar.insert(new SeparatorToolItem(), -1);
@@ -25,13 +23,13 @@ namespace Ldraw.Colours
 			for(int i = 0; i < 16; i++)
 			{
 				var colour_index = i;
-				var button = CreateColourButton(colour_index);
+				var button = CreateColourButton(colour_index, executor);
 				bar.insert(button, -1);
 				bar.child_set_property(button, "homogeneous", falseVal);
 			}
 
 			var moreButton = new ToolButton(null, "More");
-			moreButton.clicked.connect(() => more_button_handler(window));
+			moreButton.clicked.connect(() => more_button_handler(window, executor));
 			moreButton.set_tooltip_text("More colours");
 			bar.insert(moreButton, -1);
 			bar.child_set_property(moreButton, "homogeneous", falseVal);
@@ -43,7 +41,7 @@ namespace Ldraw.Colours
 			return bar;
 		}
 
-		private ToolButton CreateColourButton(int colour_index)
+		private ToolButton CreateColourButton(int colour_index, CommandExecutor executor)
 		{
 			var colour_id = colour_options.current_palette.colour_codes[colour_index];
 			var colour = ColourContext.GetColourById(colour_id);
@@ -53,7 +51,7 @@ namespace Ldraw.Colours
 				{
 					var c_id = colour_options.current_palette.colour_codes[colour_index];
 					var c = ColourContext.GetColourById(c_id);
-					undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, c));
+					executor(new ChangeColourCommand(m_ModelContainer.Selection, c));
 				});
 			button.set_tooltip_text(colour.Name);
 			var palette = colour_options.current_palette;
@@ -115,7 +113,7 @@ namespace Ldraw.Colours
 			return item;
 		}
 		
-		private void more_button_handler(Window window)
+		private void more_button_handler(Window window, CommandExecutor executor)
 		{
 			var dialog = new Dialog.with_buttons("Select colour", window,
 				DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
@@ -135,7 +133,7 @@ namespace Ldraw.Colours
 				return;
 			}
 
-			undoStack.ExecuteCommand(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
+			executor(new ChangeColourCommand(m_ModelContainer.Selection, chooser.ChosenColour));
 			dialog.destroy();
 		}
 	}

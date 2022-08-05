@@ -82,7 +82,7 @@ namespace Ldraw.Ui
             toolbars.homogeneous = false;
             foreach(var provider in ToolbarProviders)
             {
-				toolbars.add(provider.CreateToolbar(this));
+				toolbars.add(provider.CreateToolbar(this, cmd => UndoStack.ExecuteCommand(cmd)));
 			}
             bigVBox.pack_start(toolbars, false, false);
 

@@ -65,7 +65,7 @@ lego_objects_internal_packages=maths
 
 lego_colours_sources=$(wildcard src/modules/lego/colours/*.vala)
 lego_colours_packages=$(gee) $(gio)
-lego_colours_internal_packages=lego ui_widgets application
+lego_colours_internal_packages=lego ui_interfaces application
 
 lego_sources:=$(foreach folder, files files/parsing library, $(wildcard src/modules/lego/$(folder)/*.vala)) \
 	$(foreach n, meta_command, src/modules/lego/objects/nodes/$n.vala)
@@ -92,73 +92,73 @@ ui_widgets_private_internal_packages=application
 export_sources=$(wildcard src/modules/export/*.vala)
 export_packages=diva
 export_internal_packages=lego_objects utils
-export_private_internal_packages=ui_widgets ui_interfaces
+export_private_internal_packages=ui_interfaces
 
 ui_gtk_gl_sources=$(wildcard src/modules/ui/gtk_gl/*.vala)
 ui_gtk_gl_packages=$(gee) gl
-ui_gtk_gl_internal_packages=lego ui_widgets utils
+ui_gtk_gl_internal_packages=lego ui_interfaces utils ui_widgets
 ui_gtk_gl_vala_options=--vapidir=vapi
 
 gl_render_sources=$(wildcard src/modules/open_gl/*.vala) $(wildcard src/modules/open_gl/gl_api/*.vala)
 gl_render_packages=gl $(gee)
-gl_render_internal_packages=lego ui_widgets ui_gtk_gl
+gl_render_internal_packages=lego ui_interfaces ui_gtk_gl
 gl_render_vala_options=--vapidir=vapi
 
 drag_and_drop_sources=$(wildcard src/modules/ui/drag_and_drop/*.vala)
 drag_and_drop_packages=$(gee) diva
-drag_and_drop_internal_packages=lego lego_objects maths utils ui_widgets ui_interfaces
+drag_and_drop_internal_packages=lego lego_objects maths utils ui_interfaces
 
 ui_dialogs_sources=$(wildcard src/modules/ui/dialogs/*.vala)
 ui_dialogs_packages=$(gee) gl diva
-ui_dialogs_internal_packages= ui_widgets lego lego_objects maths expressions utils options
+ui_dialogs_internal_packages= ui_interfaces lego lego_objects maths expressions utils options
 ui_dialogs_vala_options=--vapidir=vapi
 
 # Plugins
 
 steps_sources=$(wildcard src/plugins/steps/*.vala)
 steps_packages=$(gee) diva gl
-steps_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
+steps_internal_packages=ui_interfaces lego lego_objects maths expressions utils gl_render ui_gtk_gl
 steps_vala_options=--vapidir=vapi
 
 hide_sources=$(wildcard src/plugins/hide/*.vala)
 hide_packages=$(gee) diva gl
-hide_internal_packages=ui_widgets lego lego_objects maths expressions utils gl_render ui_gtk_gl
+hide_internal_packages=ui_interfaces lego lego_objects maths expressions utils gl_render ui_gtk_gl
 hide_vala_options=--vapidir=vapi
 
 animation_sources=$(wildcard src/plugins/animation/*.vala)
 animation_packages=diva $(gee)
-animation_internal_packages=lego lego_objects maths expressions utils ui_widgets gl_render ui_gtk_gl
+animation_internal_packages=lego lego_objects maths expressions utils ui_interfaces gl_render ui_gtk_gl
 animation_vala_options=--vapidir=vapi
 
 peeron_sources=$(wildcard src/plugins/peeron/*.vala)
 peeron_packages=$(gee) diva
 peeron_private_packages=$(soup) $(xml) $(gtk) $(json)
-peeron_internal_packages=lego_objects ui_widgets part_group options
+peeron_internal_packages=lego_objects ui_interfaces ui_widgets part_group options
 
 povray_sources=$(wildcard src/plugins/povray/*.vala)
 povray_private_packages=$(gio)
 povray_internal_packages=lego
-povray_private_internal_packages=export ui_widgets ui_interfaces
+povray_private_internal_packages=export ui_interfaces
 
 move_origin_sources=$(wildcard src/refactoring/move_origin/*.vala)
 move_origin_packages=$(gee) diva
-move_origin_internal_packages=ui_widgets lego lego_objects maths expressions utils
+move_origin_internal_packages=ui_interfaces ui_widgets lego lego_objects maths expressions utils
 
 switch_all_sources=$(wildcard src/refactoring/switch_all/*.vala)
 switch_all_packages=$(gee) diva
-switch_all_internal_packages=ui_widgets lego lego_objects maths expressions utils lego_colours
+switch_all_internal_packages=ui_interfaces lego lego_objects maths expressions utils lego_colours
 
 extract_inline_sources=$(wildcard src/refactoring/inline_submodel/*.vala)
 extract_inline_packages=$(gee) diva
-extract_inline_internal_packages=ui_widgets lego lego_objects
+extract_inline_internal_packages=ui_interfaces lego lego_objects
 
 clipboard_sources=$(wildcard src/plugins/clipboard/*.vala)
 clipboard_packages=$(gee) diva
-clipboard_internal_packages=ui_widgets lego lego_objects 
+clipboard_internal_packages=ui_interfaces lego lego_objects ui_widgets
 
 movement_sources=$(wildcard src/plugins/movement_edits/*.vala) build/resources/movement_resources.c
 movement_packages=$(gee) diva
-movement_internal_packages=ui_widgets lego lego_objects ui_gtk_gl
+movement_internal_packages=ui_interfaces lego lego_objects ui_gtk_gl
 movement_vala_options=--vapidir=vapi
 
 # End of module build specs
