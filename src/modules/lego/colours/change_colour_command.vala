@@ -35,7 +35,7 @@ namespace Ldraw.Colours
 		public override void Execute()
 		{
 			stderr.printf(@"Executing colour change\n");
-			foreach(var node in Selection)
+			foreach(var node in oldColours.keys)
 			{
 				node.Colour = NewColour;
 			}
