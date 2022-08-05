@@ -22,7 +22,6 @@ namespace Ldraw.Peeron
 
 		public IDatFileCache Library {private get; construct;}
 		public InventoryReader InventoryReader {private get; construct;}
-		public ColourChart ColourChart {private get; construct;}
 		public AnimatedModel Model {construct; private get;}
 
 		construct

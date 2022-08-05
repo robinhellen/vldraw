@@ -10,10 +10,7 @@ namespace Ldraw
 		public override void load(ContainerBuilder builder)
 		{
 			builder.register<SetList>().as<IPartDragSource>();
-
-            builder.register<PeeronInventoryReader>().as<InventoryReader>();
             builder.register<RebrickableInventoryReader>().as<InventoryReader>();
-            builder.register<ColourChart>();
 		}
 	}
 }
