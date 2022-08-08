@@ -186,7 +186,10 @@ background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundG
 		SourceFunc cb = async_spawn.callback;
 		Pid pid;
 		int status = int.MIN;
-		Process.spawn_async(working_directory, argv, envp, _flags | SpawnFlags.DO_NOT_REAP_CHILD, child_setup, out pid);
+		var extra_flags = SpawnFlags.DO_NOT_REAP_CHILD
+						| SpawnFlags.STDOUT_TO_DEV_NULL
+						| SpawnFlags.STDERR_TO_DEV_NULL;
+		Process.spawn_async(working_directory, argv, envp, _flags | extra_flags, child_setup, out pid);
 		var commandline = string.joinv(" ", argv);
 		stderr.printf(@"Running '$commandline'\n");
 		ChildWatch.add(pid, (pid, _status) => {
@@ -197,4 +200,47 @@ background { color rgb <$(extraOptions.BackgroundRed),$(extraOptions.BackgroundG
 
 		return status;
 	}
+
+	private async int async_spawn_with_stderr(string? working_directory, string[] argv, string[]? envp, SpawnFlags _flags, SpawnChildSetupFunc? child_setup, ProcessOutputLine on_stderr)
+		throws SpawnError
+	{
+		SourceFunc cb = async_spawn_with_stderr.callback;
+		Pid pid;
+		int status = int.MIN;
+		var extra_flags = SpawnFlags.DO_NOT_REAP_CHILD
+						| SpawnFlags.STDOUT_TO_DEV_NULL;
+		int std_error;
+		Process.spawn_async_with_pipes(working_directory, argv, envp, _flags | extra_flags, child_setup, out pid, null, null, out std_error);
+		var commandline = string.joinv(" ", argv);
+		stderr.printf(@"Running '$commandline'\n");
+		ChildWatch.add(pid, (pid, _status) => {
+			status = _status;
+			cb();
+			});
+		IOChannel error = new IOChannel.unix_new (std_error);
+		error.add_watch (IOCondition.IN | IOCondition.HUP, (channel, condition) => {
+			if (condition == IOCondition.HUP) {
+				return false;
+			}
+
+			try {
+				string line;
+				channel.read_line (out line, null, null);
+				on_stderr(line);
+			} catch (IOChannelError e) {
+				print ("IOChannelError: %s\n", e.message);
+				return false;
+			} catch (ConvertError e) {
+				print ("ConvertError: %s\n", e.message);
+				return false;
+			}
+
+			return true;
+		});
+		yield;
+
+		return status;
+	}
+	
+	private delegate void ProcessOutputLine(string line);
 }

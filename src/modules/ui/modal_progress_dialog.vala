@@ -1,3 +1,4 @@
+using Diva;
 using Gee;
 using Gtk;
 
@@ -7,11 +8,16 @@ namespace Ldraw.Ui
 {
 	private class ModalProgressDialog : Object, ProgressReporter
 	{
+		static construct {
+			var cls = (ObjectClass)typeof(ModalProgressDialog).class_ref();
+			set_lazy_injection<MainWindow>(cls, "parent");
+		}
+		
 		private Dialog dialog = null;
 		private Collection<string> active_tasks = new ArrayList<string>();
 		private Map<string, ProgressBar> widgets = new HashMap<string, ProgressBar>();
 		
-		public MainWindow parent {private get; construct;}
+		public Lazy<MainWindow> parent {private get; construct;}
 		
 		public void start_task(string task_name)
 		{
@@ -37,6 +43,9 @@ namespace Ldraw.Ui
 		
 		public void end_task(string task_name)
 		{
+			var widget = widgets[task_name];
+			widget.destroy();
+			widgets.unset(task_name);
 			active_tasks.remove(task_name);
 			if(active_tasks.size == 0)
 			{
@@ -47,13 +56,14 @@ namespace Ldraw.Ui
 		
 		public void task_error(string task_name, string error_message)
 		{
+			end_task(task_name);
 		}
 		
 		private Dialog create_progress_dialog()
 		{
 			var dialog = new Dialog();
 			dialog.set_title("Operation Progress");
-			dialog.set_transient_for(parent);
+			dialog.set_transient_for(parent.value);
 			dialog.set_modal(true);
 			
 			return dialog;

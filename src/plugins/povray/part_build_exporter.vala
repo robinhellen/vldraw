@@ -1,5 +1,6 @@
 using GLib.Math;
 
+using Ldraw.Application;
 using Ldraw.Export;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
@@ -11,9 +12,12 @@ namespace Ldraw.Povray
 	{
 		public override string Name { get {return "Povray by Parts"; } }
 		public override string PreferredExtension {get {return "mp4";}}
+		public ProgressReporter reporter {construct; private get;}
 
 		public override async void Export(LdrawObject model, ExportOptions exportOptions)
 		{
+			const string task_name = "Creating build movie";
+			reporter.start_task(task_name);
 			var export_model = prepare_model(model);
 			stderr.printf("Exporting to movie.\n");
 			// create temp dir
@@ -25,28 +29,31 @@ namespace Ldraw.Povray
 			exportOptions.Filename = tempPovray.get_path();
 			yield base.Export(export_model, exportOptions);
 
+			reporter.task_progress(task_name, 0.1);
+			var pov_task = "Rendering frames";
+			reporter.start_task(pov_task);
 			var frameCount = export_model.Nodes.size;
 			// invoke povray to render to a sequence of image files
-			stderr.printf(@"Rendering povray images to $tempDir\n");
             string[] povrayArgv = {"povray", tempPovray.get_path(), @"+KFF$(frameCount)", @"+O$tempDir/", "-D"/*, "+WT1"*/};
-            var povrayStatus = yield async_spawn(null, povrayArgv, null
-					, SpawnFlags.SEARCH_PATH
-					| SpawnFlags.STDOUT_TO_DEV_NULL
-					| SpawnFlags.STDERR_TO_DEV_NULL
-					| SpawnFlags.DO_NOT_REAP_CHILD
-					, null);
-			stderr.printf(@"povray finished: status $povrayStatus\n");
+            var povrayStatus = yield async_spawn_with_stderr(null, povrayArgv, null, SpawnFlags.SEARCH_PATH, null, x => {
+				if(!x.has_prefix("Rendering frame")) {
+					return;
+				}
+				var progress = x[16:];
+				var frame = int.parse(progress.split(" ")[0]);
+				reporter.task_progress(pov_task, (frame - 1) / (double) frameCount);
+			});
+			reporter.end_task(pov_task);
+			reporter.task_progress(task_name, 0.3);
 
 			int digits = (int)log10(frameCount) + 1;
 			// stitch the image files into a single movie
+			var ffmpeg_task = "Compiling movie";
+			reporter.start_task(ffmpeg_task);
 			string[] ffmpegArgv = {"ffmpeg", "-y", "-f", "image2", "-start_number", "0", "-i", @"sequence%0$(digits)d.png", movieFilename};
-			var ffmpegResult = yield async_spawn(tempDir, ffmpegArgv, null
-				, SpawnFlags.SEARCH_PATH
-				| SpawnFlags.STDOUT_TO_DEV_NULL
-				| SpawnFlags.STDERR_TO_DEV_NULL
-				| SpawnFlags.DO_NOT_REAP_CHILD
-				, null);
-			stderr.printf(@"ffmpeg finished: status $ffmpegResult\n");
+			var ffmpegResult = yield async_spawn(tempDir, ffmpegArgv, null, SpawnFlags.SEARCH_PATH, null);
+			reporter.end_task(ffmpeg_task);
+			reporter.task_progress(task_name, 0.6);
 
 			// clean up the temp folder
 			try
@@ -71,10 +78,11 @@ namespace Ldraw.Povray
 					stderr.printf("Temp folder has more files in it than expected.");
 					yield childEnum.close_async();
 				}
+				reporter.end_task(task_name);
 			}
 			catch(Error e)
 			{
-				stderr.printf(@"Error cleaning up temporary povray and renders: $(e.message)\n");
+				reporter.task_error(task_name, @"Error cleaning up temporary povray and renders: $(e.message)\n");
 			}
 		}
 

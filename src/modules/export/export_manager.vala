@@ -41,8 +41,11 @@ namespace Ldraw.Export
             }
             options.Filename = dialog.get_filename();
             dialog.close();
-
-            exporter.Export.begin(model, options);
+			
+			Idle.add(() => {
+				exporter.Export.begin(model, options);
+				return Source.REMOVE;
+			});
         }
 
         private string SwitchExtension(string filename, string newExtension)
