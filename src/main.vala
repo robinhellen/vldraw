@@ -71,7 +71,7 @@ namespace Ldraw
 			}
 
 			var filename = args[1];
-			Loader.LoadModelFile.begin(filename, ReferenceLoadStrategy.PartsOnly, true, (obj, res) =>
+			Loader.LoadModelFile.begin(filename, ReferenceContext.Model, true, (obj, res) =>
 				{
 					try
 					{

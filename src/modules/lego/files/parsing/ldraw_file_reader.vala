@@ -5,14 +5,16 @@ namespace Ldraw.Lego
 {
 	public class LdrawFileReader : Object
 	{
-		private LdrawParser m_Parser;
+		private LdrawParser parser;
 		private DataInputStream stream;
 		private int64 file_size;
+		private ReferenceContext ref_context;
 
-		public LdrawFileReader(File file, LdrawParser parser)
+		public LdrawFileReader(File file, LdrawParser parser, ReferenceContext ref_context)
 			throws ParseError
 		{
-			m_Parser = parser;
+			this.parser = parser;
+			this.ref_context = ref_context;
 			try
 			{
 				stream = new DataInputStream(file.read());
@@ -24,7 +26,7 @@ namespace Ldraw.Lego
 			}
 		}
 		
-		public async LdrawNode? next(ISubFileLocator locator, ColourContext colourContext)
+		public async LdrawNode? next(Collection<ISubFileLocator> locators, ColourContext colourContext)
 			throws ParseError
 		{
 			string line;
@@ -41,9 +43,9 @@ namespace Ldraw.Lego
 			
 			line = line.strip();
 			if(line == "")
-				return yield next(locator, colourContext); // ignore blank lines
+				return yield next(locators, colourContext); // ignore blank lines
 
-			return yield m_Parser.ParseLine(line, locator, colourContext);
+			return yield parser.ParseLine(line, locators, colourContext, ref_context);
 		}
 		
 		public double get_progress()
@@ -54,12 +56,12 @@ namespace Ldraw.Lego
 	
 	public class FileReaderFactory : Object
 	{
-		public LdrawParser Parser {private get; construct;}
+		public LdrawParser parser {private get; construct;}
 		
-		public LdrawFileReader GetReader(File file)
+		public LdrawFileReader GetReader(File file, ReferenceContext context)
 			throws ParseError
 		{
-			return new LdrawFileReader(file, Parser);
+			return new LdrawFileReader(file, parser, context);
 		}
 	}
 }

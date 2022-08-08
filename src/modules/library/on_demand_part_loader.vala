@@ -7,17 +7,17 @@ namespace Ldraw.Lego.Library
 {
 	public class OnDemandPartLoader : Object, IDatFileCache
 	{
-		public ILdrawFolders Folders {construct; private get;}
-		public LdrawParser Parser {construct; private get;}
-		public FileReaderFactory ReaderFactory {construct; private get;}
-		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
-		public ColourContext ColourContext {construct; private get;}
-
 		static construct
 		{
 			var cls = (ObjectClass)typeof(OnDemandPartLoader).class_ref();
-			set_indexed_injection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
+			set_lazy_injection<OnDemandSubFileLoader>(cls, "locator");
 		}
+		
+		public ILdrawFolders Folders {construct; private get;}
+		public LdrawParser Parser {construct; private get;}
+		public FileReaderFactory ReaderFactory {construct; private get;}
+		public Lazy<OnDemandSubFileLoader> locator {construct; private get;}
+		public ColourContext ColourContext {construct; private get;}
 
 		private Map<string, LdrawPrimitive> primitivesCache = new HashMap<string, LdrawPrimitive>();
 		private Map<string, LdrawHiresPrimitive> hiresPrimitivesCache = new HashMap<string, LdrawHiresPrimitive>();
@@ -95,13 +95,14 @@ namespace Ldraw.Lego.Library
 			throws ParseError
 		{
 			string filename = name + ".dat";
-			var reader = ReaderFactory.GetReader(folder.get_child(filename));
+			var reader = ReaderFactory.GetReader(folder.get_child(filename), ReferenceContext.Library);
 
 			var nodes = new ArrayList<LdrawNode>();
 			
 			LdrawNode node;
-			var locator = Locators[ReferenceLoadStrategy.SubPartsAndPrimitives];
-			while((node = yield reader.next(locator, ColourContext)) != null)
+			var locators = new ArrayList<ISubFileLocator>();
+			locators.add(locator.value);
+			while((node = yield reader.next(locators, ColourContext)) != null)
 			{
 				nodes.add(node);
 			}
@@ -115,9 +116,11 @@ namespace Ldraw.Lego.Library
 	{
 		public OnDemandPartLoader Cache {construct; private get;}
 
-		public async LdrawFileReference? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
 			throws ParseError
 		{
+			if(context != ReferenceContext.Library)
+				return null;
 			var dir_parts = reference.split_set("/\\");
 			switch(dir_parts[0])
 			{

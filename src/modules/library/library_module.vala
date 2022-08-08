@@ -11,8 +11,8 @@ namespace Ldraw.Lego.Library
             builder.register<FileCachedLibrary>().as<ILibrary>().as<InitializeOnStartup>().single_instance();
             builder.register<LdrawLibrary>().as<ILdrawFolders>();
             builder.register<OnDemandPartLoader>().as<IDatFileCache>().single_instance();    
-            builder.register<OnDemandSubFileLoader>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.SubPartsAndPrimitives);
-		
+            builder.register<OnDemandSubFileLoader>().single_instance();
+            builder.register<SubFileLocator>().single_instance().as<ISubFileLocator>();		
 		}
 	}
 }

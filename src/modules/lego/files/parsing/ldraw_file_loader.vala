@@ -9,42 +9,56 @@ using Ldraw.Utils;
 namespace Ldraw.Lego
 {
 	public class LdrawFileLoader : Object
-	{		
-		public IDatFileCache Library {construct; private get;}
-		public LdrawParser Parser {construct; private get;}
-		public Index<ISubFileLocator, ReferenceLoadStrategy> Locators {construct; private get;}
-		public FileReaderFactory ReaderFactory {construct; private get;}
-		public ColourContext ColourContext {construct; private get;}
-		public Lazy<ProgressReporter> reporter {construct; private get;}
+	{
+		public Collection<ISubFileLocator> locators {construct; private get;}
+		public FileReaderFactory reader_factory {construct; private get;}
+		public ColourContext colour_context {construct; private get;}
+		public ProgressReporter reporter {construct; private get;}
 
 		static construct
 		{
 			var cls = (ObjectClass)typeof(LdrawFileLoader).class_ref();
-			set_indexed_injection<ReferenceLoadStrategy, ISubFileLocator>(cls, "Locators");
-			set_lazy_injection<ProgressReporter>(cls, "reporter");
+			set_collection_injection<ISubFileLocator>(cls, "locators");
 		}
 
-		public async LdrawModelFile LoadModelFile(string filepath, ReferenceLoadStrategy strategy, bool observable = false)
+		public async LdrawModelFile LoadModelFile(string filepath, ReferenceContext context, bool observable = false)
 			throws ParseError
 		{			
 			var file = File.new_for_path(filepath);
 			var filename = yield get_filename(file, filepath);
 			var task_name = @"Loading $filename";
-			reporter.value.start_task(task_name);
+			reporter.start_task(task_name);
 			
-			var fileReader = ReaderFactory.GetReader(file);
-			MultipartSubFileLocator locator = new MultipartSubFileLocator(Locators[strategy]);
-			var colours = new CurrentFileColourContext(ColourContext);
+			var fileReader = reader_factory.GetReader(file, context);
+			var colours = new CurrentFileColourContext(colour_context);
+			if(context == ReferenceContext.Library) {
+				string next_filename = filename;
+				var result = yield read_file_nodes(fileReader, locators, colours, observable, next_filename, task_name);
+				var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: result.nodes, FileName: result.filename);
+				if(!result.finished) {
+					throw new ParseError.InvalidMultipart(@"Part files in library cannot be multipart files.");
+				}
+				info(@"Loaded $filename as simple Ldraw file.\n");
+				var model = (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
+				
+				reporter.end_task(task_name);			
+				return model;
+			}
+			
+			MultipartSubFileLocator locator = new MultipartSubFileLocator();
+			var all_locators = new ArrayList<ISubFileLocator>();
+			all_locators.insert_all(0, locators);
+			all_locators.insert(locators.size, locator);
 			
 			string next_filename = filename;
-			var result = yield read_file_nodes(fileReader, locator, colours, observable, next_filename, task_name);
+			var result = yield read_file_nodes(fileReader, all_locators, colours, observable, next_filename, task_name);
 			var mainObject = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: result.nodes, FileName: result.filename);
 			if(result.finished) // read all nodes in the file in one go, this is a simple Ldraw file
 			{
 				info(@"Loaded $filename as simple Ldraw file.\n");
 				var model = (LdrawModel)Object.new(typeof(LdrawModel), MainObject: mainObject, FileName: filename, FilePath: filepath);
 				
-				reporter.value.end_task(task_name);			
+				reporter.end_task(task_name);			
 				return model;
 			}
 			
@@ -54,7 +68,7 @@ namespace Ldraw.Lego
 			while(!result.finished)
 			{
 				next_filename = result.next_filename;
-				result = yield read_file_nodes(fileReader, locator, colours, observable, next_filename, task_name);
+				result = yield read_file_nodes(fileReader, all_locators, colours, observable, next_filename, task_name);
 				stderr.printf(@"Read sub-file $(result.filename) from multipart.\n");
 				var sub_file = (LdrawObject)Object.new(typeof(LdrawObject), Nodes: result.nodes, FileName: result.filename);
 				sub_files.add(sub_file);
@@ -68,7 +82,7 @@ namespace Ldraw.Lego
 					}
 				}
 			}
-			reporter.value.end_task(task_name);
+			reporter.end_task(task_name);
 			return modelFile;		
 		}
 		
@@ -98,7 +112,7 @@ namespace Ldraw.Lego
 		}		
 		
 		/// returns true if the file is finished, false on reaching a 0 NOFILE Statement.
-		private async NodeReadResult read_file_nodes(LdrawFileReader reader, MultipartSubFileLocator locator, CurrentFileColourContext colours, bool observable, string nf, string task_name)
+		private async NodeReadResult read_file_nodes(LdrawFileReader reader, Collection<ISubFileLocator> locators, CurrentFileColourContext colours, bool observable, string nf, string task_name)
 			throws ParseError
 		{
 			var result = NodeReadResult();
@@ -108,8 +122,8 @@ namespace Ldraw.Lego
 			result.finished = true;
 			while(true)
 			{
-				var node = yield reader.next(locator, colours);
-				reporter.value.task_progress(task_name, reader.get_progress());
+				var node = yield reader.next(locators, colours);
+				reporter.task_progress(task_name, reader.get_progress());
 				if(node == null) {
 					return result; 
 				}

@@ -207,7 +207,7 @@ namespace Ldraw.Ui
 
         private void LoadFile(string fileName)
         {
-			Loader.LoadModelFile.begin(fileName, ReferenceLoadStrategy.SubPartsAndPrimitives, true, (obj, res) =>
+			Loader.LoadModelFile.begin(fileName, ReferenceContext.Model, true, (obj, res) =>
 			{
 				try
 				{

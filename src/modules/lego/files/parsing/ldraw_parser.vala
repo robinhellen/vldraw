@@ -1,7 +1,9 @@
+using Diva;
+using Gee;
+
 using Ldraw.Lego.Library;
 using Ldraw.Lego.Nodes;
 using Ldraw.Maths;
-using Diva;
 
 namespace Ldraw.Lego
 {
@@ -15,7 +17,7 @@ namespace Ldraw.Lego
 
 		public Index<CommandFactory, string> CommandFactories {construct; private get;}
 
-		public async LdrawNode ParseLine(string line, ISubFileLocator locator, ColourContext colourContext)
+		public async LdrawNode ParseLine(string line, Collection<ISubFileLocator> locators, ColourContext colourContext, ReferenceContext ref_context)
 			throws ParseError
 			requires(!("\n" in line))
 		{
@@ -25,7 +27,7 @@ namespace Ldraw.Lego
 					// may be a meta command
 					return ParseCommentNode(line);
 				case '1':
-					return yield ParsePartNode(line, locator, colourContext);
+					return yield ParsePartNode(line, locators, colourContext, ref_context);
 				case '2':
 					return ParseLineNode(line, colourContext);
 				case '3':
@@ -59,7 +61,7 @@ namespace Ldraw.Lego
 			return factory.CreateCommand(tokens[1], tokens[2:tokens.length]);
 		}
 
-		protected async LdrawNode ParsePartNode(string line, ISubFileLocator locator, ColourContext colourContext)
+		protected async LdrawNode ParsePartNode(string line, Collection<ISubFileLocator> locators, ColourContext colourContext, ReferenceContext ref_context)
 			throws ParseError
 		{
 			var tokens = Tokenize(line);
@@ -73,7 +75,15 @@ namespace Ldraw.Lego
 			int colourId = int.parse(tokens[1]);
 			string text = tokens[14].strip().down();
 			
-			var reference = yield locator.GetObjectFromReference(text);
+			LdrawFileReference reference = null;
+			foreach(var locator in locators) {
+				reference = yield locator.GetObjectFromReference(text, ref_context);
+				if(reference != null) break;
+			}
+			if(reference == null) {
+				throw new ParseError.MissingFile(@"Unable to find file matching '$text'");
+			}
+			
 			return new PartNode(center, transform, reference.file, reference.object, colourContext.GetColourById(colourId));
 		}
 

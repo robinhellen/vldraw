@@ -11,9 +11,7 @@ namespace Ldraw.Lego
             builder.register<LdrawFileLoader>();
             builder.register<FileReaderFactory>();
             builder.register<LdrawParser>();
-            builder.register<LibrarySubFileLocator>().single_instance().keyed<ISubFileLocator, ReferenceLoadStrategy>(ReferenceLoadStrategy.PartsOnly);
-			builder.register<ColourMetaCommandFactory>()
-				.keyed<CommandFactory, string>("COLOUR");	
+			builder.register<ColourMetaCommandFactory>().keyed<CommandFactory, string>("COLOUR");	
         }
 	}
 }

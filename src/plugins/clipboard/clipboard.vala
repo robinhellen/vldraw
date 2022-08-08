@@ -1,3 +1,4 @@
+using Diva;
 using Gdk;
 using Gee;
 using Gtk;
@@ -10,10 +11,16 @@ namespace Ldraw.Ui.Clipboard
 {
 	private class ClipboardHandler : Object
 	{
+		static construct
+		{
+			var cls = (ObjectClass)typeof(ClipboardHandler).class_ref();
+			set_collection_injection<ISubFileLocator>(cls, "locators");
+		}
+	
 		public AnimatedModel Model { private get; construct; }
 		public Gtk.Clipboard Clipboard { private get; construct; }
 		public LdrawParser Parser {private get; construct; }
-		public ISubFileLocator Locator {private get; construct;}
+		public Collection<ISubFileLocator> locators {private get; construct;}
 		public ColourContext ColourContext {construct; private get;}
 
 		private Set<LdrawNode> clipboardContents;
@@ -69,7 +76,7 @@ namespace Ldraw.Ui.Clipboard
 					var result = new ArrayList<LdrawNode>();
 					foreach(var line in text.split("\n"))
 					{
-						result.add(yield Parser.ParseLine(line, Locator, ColourContext));
+						result.add(yield Parser.ParseLine(line, locators, ColourContext, ReferenceContext.Model));
 					}
 				}
 				else
@@ -94,7 +101,7 @@ namespace Ldraw.Ui.Clipboard
 			{
 				foreach(var line in text.split("\n"))
 				{
-					result.add(yield Parser.ParseLine(line, Locator, ColourContext));
+					result.add(yield Parser.ParseLine(line, locators, ColourContext, ReferenceContext.Model));
 				}
 			}
 			catch(ParseError e)

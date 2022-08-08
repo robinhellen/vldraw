@@ -15,29 +15,28 @@ namespace Ldraw.Lego
 		public LdrawObject object {get; construct set;}
 		public LdrawFile? file {get; construct set;}
 	}
+
+	public enum ReferenceContext
+	{
+		Library,
+		Model;
+		
+		public string to_string() {
+			switch(this) {
+				case Library:
+					return "LIBRARY";
+				case Model:
+					return "MODEL";
+				default:
+					assert_not_reached();
+			}
+		}
+	}
 	
 	public interface ISubFileLocator : Object
 	{
-		public abstract async LdrawFileReference? GetObjectFromReference(string reference)
+		public abstract async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
 			throws ParseError;
-	}
-
-	public class LibrarySubFileLocator : Object, ISubFileLocator
-	{
-		public IDatFileCache Library {construct; private get;}
-
-		public async LdrawFileReference? GetObjectFromReference(string reference)
-			throws ParseError
-		{
-			var partName = reference.substring(0, reference.last_index_of("."));
-
-			LdrawPart part;
-			if(yield Library.TryGetPart(partName, out part))
-			{
-				return new LdrawFileReference(part, part.MainObject);
-			}
-			return null;
-		}
 	}
 	
 	public class ModelsSubFileLocator : Object, ISubFileLocator
@@ -48,7 +47,6 @@ namespace Ldraw.Lego
 			set_lazy_injection<LdrawFileLoader>(cls, "loader");
 		}
 		
-		public LibrarySubFileLocator library_locator {construct; private get;}
 		public Lazy<LdrawFileLoader> loader {construct; private get;}
 		public ILdrawFolders folders {construct; private get;}
 		
@@ -58,56 +56,47 @@ namespace Ldraw.Lego
 				(a, b) => str_equal(a, b)
 			);
 		
-		public async LdrawFileReference? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
 			throws ParseError
 		{
-			if(reference.has_prefix("models/"))
+			if(context != ReferenceContext.Model) {
+				return null;
+			}
+			if(loaded_models.has_key(reference))
 			{
-				var model_filename = reference.substring(7);
-				if(loaded_models.has_key(model_filename))
-				{
-					return loaded_models[model_filename]; // TODO: clean cache when loading a new file.
-				}			
-				var model_file = folders.ModelsDirectory.get_child(model_filename);
-				var full_filename = model_file.get_path();
-				var f = yield loader.value.LoadModelFile(full_filename, ReferenceLoadStrategy.PartsOnly, false);
-				var file_ref = new LdrawFileReference(f, f.MainObject);
-				loaded_models[model_filename] = file_ref;
-				return file_ref;
-			}	
-			
-			return yield library_locator.GetObjectFromReference(reference);
+				return loaded_models[reference]; // TODO: clean cache when loading a new file.
+			}			
+			var model_file = folders.ModelsDirectory.get_child(reference);
+			if(!model_file.query_exists()) {
+				return null;
+			}
+			var full_filename = model_file.get_path();
+			var f = yield loader.value.LoadModelFile(full_filename, ReferenceContext.Model, false);
+			var file_ref = new LdrawFileReference(f, f.MainObject);
+			loaded_models[reference] = file_ref;
+			return file_ref;
 		}
 	}
 
 	public class MultipartSubFileLocator : Object, ISubFileLocator
 	{
-		private ISubFileLocator m_Locator;
-		private Collection<ProxyLdrawObject> m_Proxies;
+		private Collection<ProxyLdrawObject> proxies = new ArrayList<ProxyLdrawObject>();
 
-		public MultipartSubFileLocator(ISubFileLocator baseLocator)
-		{
-			m_Locator = baseLocator;
-			m_Proxies = new ArrayList<ProxyLdrawObject>();
-		}
-
-		public async LdrawFileReference? GetObjectFromReference(string reference)
+		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
 			throws ParseError
 		{
-			var baseVal = yield m_Locator.GetObjectFromReference(reference);
-			if(baseVal == null)
-			{
-				var proxy = new ProxyLdrawObject(reference);
-				m_Proxies.add(proxy);
-				var proxy_ref = new LdrawFileReference(null, proxy);
-				return proxy_ref;
+			if(context != ReferenceContext.Model) {
+				return null;
 			}
-			return baseVal;
+			var proxy = new ProxyLdrawObject(reference);
+			proxies.add(proxy);
+			var proxy_ref = new LdrawFileReference(null, proxy);
+			return proxy_ref;
 		}
 
 		public void ResolveAll(Collection<LdrawObject> possibilities)
 		{
-			foreach(var proxy in m_Proxies)
+			foreach(var proxy in proxies)
 			{
 				proxy.Resolve(possibilities);
 			}
@@ -129,27 +118,11 @@ namespace Ldraw.Lego
 					{
 						Nodes = object.Nodes;
 						Description = object.Description;
-						//File = object.File;
 						return;
 					}
 				}
-				stderr.printf(@"Unable to resolve $(FileName).\n");
+				warning(@"Unable to resolve $(FileName).\n");
 			}
 		}
-	}
-
-	[Flags]
-	public enum LibraryObjectTypes
-	{
-		Part = 1,
-		SubPart = 2,
-		Primitive = 4,
-		HiResPrimitive = 8,
-	}
-
-	public enum ReferenceLoadStrategy
-	{
-		PartsOnly,
-		SubPartsAndPrimitives,
 	}
 }
