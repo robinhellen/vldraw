@@ -1,3 +1,4 @@
+using Gee;
 
 using Ldraw.Lego;
 using Ldraw.Lego.Nodes;
@@ -9,38 +10,39 @@ namespace Ldraw.Animation
 {
 	private class RenderAdjuster : Object, NodeAdjuster
 	{
-		private RotateCommand lastCommand = null;
-		private int targetFramerate = 20;
+		private RotateCommand last_command = null;
+		private int target_framerate = 20;
+		public Map<string, float?> parameters = new HashMap<string, float?>();
 		
 		public AnimatedModel Model {construct; private get;}
 		
 		construct
 		{
-			Timeout.add(1000 / targetFramerate, RotateCurrentParams);
+			Timeout.add(1000 / target_framerate, RotateCurrentParams);
 		}
 		
 		public GlMatrix GetAdjustmentFor(LdrawNode node)
 		{
-			var partNode = node as PartNode;
-			if(partNode != null)
+			var part_node = node as PartNode;
+			if(part_node != null)
 			{
-				if(lastCommand == null)
+				if(last_command == null)
 					return new GlMatrix.Identity();
 				
-				var angle = lastCommand.Angle.Evaluate(Model.CurrentParameters);
-				var rotation = Matrix.ForRotation(lastCommand.Axis, angle);
-				lastCommand = null;
+				var angle = last_command.Angle.Evaluate(parameters);
+				var rotation = Matrix.ForRotation(last_command.Axis, angle);
+				last_command = null;
 				return new GlMatrix.FromTransformAndTranslation(rotation, Vector.NullVector);
 			}
-			var rotateCommand = node as RotateCommand;
-			if(rotateCommand != null)
+			var rotate_command = node as RotateCommand;
+			if(rotate_command != null)
 			{
-				lastCommand = rotateCommand;
+				last_command = rotate_command;
 			}
-			var parameterCommand = node as ParameterCommand;
-			if(parameterCommand != null && !Model.CurrentParameters.has_key(parameterCommand.Identifier))
+			var parameter_command = node as ParameterCommand;
+			if(parameter_command != null && !parameters.has_key(parameter_command.Identifier))
 			{
-				Model.CurrentParameters[parameterCommand.Identifier] = parameterCommand.Min;
+				parameters[parameter_command.Identifier] = parameter_command.Min;
 			}
 			return new GlMatrix.Identity();
 		}
@@ -51,16 +53,16 @@ namespace Ldraw.Animation
 			var params = Model.Model.NodesOfType<ParameterCommand>();
 			foreach(var param in params)
 			{
-				if(!Model.CurrentParameters.has_key(param.Identifier))
+				if(!parameters.has_key(param.Identifier))
 				{
-					Model.CurrentParameters[param.Identifier] = param.Min;
+					parameters[param.Identifier] = param.Min;
 				}
-				var step = (param.Max - param.Min) / targetFramerate / 11;
-				var current = Model.CurrentParameters[param.Identifier];
-				var newVal = current + step;
-				if(newVal >= param.Max)
-					newVal = param.Min;
-				Model.CurrentParameters[param.Identifier] = (current + step);
+				var step = (param.Max - param.Min) / target_framerate / 11;
+				var current = parameters[param.Identifier];
+				var new_val = current + step;
+				if(new_val >= param.Max)
+					new_val = param.Min;
+				parameters[param.Identifier] = (current + step);
 			}
 			if(!params.is_empty)
 			{

@@ -32,6 +32,7 @@ namespace Ldraw.Animation
 				});
 			}
 		}
+		public RenderAdjuster adjuster {construct; private get;}
 
 		public ParameterValues(AnimatedModel ldrawModel)
 		{
@@ -51,7 +52,8 @@ namespace Ldraw.Animation
 					var val = (float)double.parse(text);
 					var o = model as ObservableList<ParameterCommand>;
 					var c = o.get_value_for_path(new TreePath.from_string(path));
-					Model.UpdateParameter(c.Identifier, val);
+					adjuster.parameters[c.Identifier] = val;
+					Model.view_changed();
 				});
 			spinRenderer.editing_started.connect((renderer, editable, path) =>
 				{
@@ -66,7 +68,7 @@ namespace Ldraw.Animation
 					spin.set_digits(2 - ((int) log10f(c.Max - c.Min)));
 					spin.set_increments((c.Max - c.Min) / 100, (c.Max - c.Min) / 10);
 					spin.set_range(c.Min, c.Max);
-					spin.set_value(Model.CurrentParameters[c.Identifier] ?? 0);
+					spin.set_value(adjuster.parameters[c.Identifier] ?? 0);
 				});
 			insert_column_with_data_func(-1, "Value", spinRenderer, (col, cell, model, iter) =>
 				{
@@ -79,7 +81,7 @@ namespace Ldraw.Animation
 						defaultValue = node.Min;
 					if(node.Max < 0)
 						defaultValue = node.Max;
-					renderer.text = (Model.CurrentParameters[node.Identifier] ?? defaultValue).to_string();
+					renderer.text = (adjuster.parameters[node.Identifier] ?? defaultValue).to_string();
 					renderer.adjustment = new Adjustment(0, 0, 0, 0, 0, 0);
 				});
 		}

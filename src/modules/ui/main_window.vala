@@ -28,7 +28,7 @@ namespace Ldraw.Ui
 
         // DI injected components
         // Controls
-        public ModelList ModelList {construct; private get;}
+//~         public ModelList ModelList {construct; private get;}
 		public EditPanes View {construct; private get;}
 		public ModelView PartsPreview {construct; private get;}
 		public AnimatedModel EditingObject {construct; get;}
@@ -96,7 +96,7 @@ namespace Ldraw.Ui
             m_SubModels = CreateSubModelsDropDown();
             viewDetails.pack_start(m_SubModels, false, false);
 
-            viewDetails.pack_start(ModelList.Widget);
+//~             viewDetails.pack_start(ModelList.Widget);
 
             modelPanes.add1(WithFrame(viewDetails));
             modelPanes.add2(WithFrame(View));
