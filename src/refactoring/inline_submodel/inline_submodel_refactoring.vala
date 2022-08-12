@@ -24,7 +24,7 @@ namespace Ldraw.Ui
 			if(!can_inline(model, file, out node))
 			{
 				command = null;
-				stderr.printf("Selection not suitable to inline.\n");
+				warning("Selection not suitable to inline.\n");
 				return false;
 			}
 			var dialog = new InlineSubmodelDialog(dialogParent, model, node, file as MultipartModel);
@@ -94,26 +94,19 @@ namespace Ldraw.Ui
 				content.pack_start(box, true, true, 5);
 			}
 			
-			public bool Run(out Command? command)
-			{
+			public bool Run(out Command? command) {
 				dialog.show_all();
 
 				var response = dialog.run();
 				dialog.destroy();
-				if(response != ResponseType.ACCEPT)
-				{
+				if(response != ResponseType.ACCEPT) {
 					command = null;
 					return false;
 				}
 				
-				if(inline_all)
-				{
-					stderr.printf(@"Inline all\n");
+				if(inline_all) {
 					command = new InlineSubModelCommand.all(reference.Contents, multi_model, remove_definition);
-				}
-				else
-				{
-					stderr.printf(@"Inline single\n");
+				} else {
 					command = new InlineSubModelCommand.from_reference(model.Model, reference, multi_model, remove_definition);	
 				}				
 				return true;
