@@ -13,9 +13,13 @@ namespace Ldraw.Ui.Dialogs
 			FileChooserDialog dialog = new FileChooserDialog("Save File As", parent, FileChooserAction.SAVE
                                                 , "_Cancel", ResponseType.CANCEL
                                                 , "_Save", ResponseType.ACCEPT);
-
-            dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
             dialog.filter = CreateLdrawFilesFilter();
+            try {
+				dialog.add_shortcut_folder(LdrawFolders.ModelsDirectory.get_path());
+			} catch (Error e) {
+				warning("Unable to add models folder as shortcut: $(e.message)");
+				// Can continue without the models folder.
+			}
             
             if(dialog.run() == ResponseType.ACCEPT)
             {
@@ -36,8 +40,13 @@ namespace Ldraw.Ui.Dialogs
                                                 , "_Cancel", ResponseType.CANCEL
                                                 , "_Open", ResponseType.ACCEPT);
                                                 
-            dialog.set_current_folder_file(LdrawFolders.ModelsDirectory);
             dialog.filter = CreateLdrawFilesFilter();
+            try {
+				dialog.add_shortcut_folder(LdrawFolders.ModelsDirectory.get_path());
+			} catch (Error e) {
+				warning("Unable to add models folder as shortcut: $(e.message)");
+				// Can continue without the models folder.
+			}
             
             if(dialog.run() == ResponseType.ACCEPT)
             {
