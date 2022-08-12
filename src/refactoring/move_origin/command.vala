@@ -49,7 +49,7 @@ namespace Ldraw.Refactor
 				return Collection.empty<PartNode>();
 				
 			var references = Iterator.concat<LdrawNode>(mpd.SubModels.map<Iterator<LdrawNode>>(x => x.Nodes.iterator()))
-					.map<PartNode>(x => x as PartNode)
+					.map<PartNode?>(x => x as PartNode)
 					.filter(x => x != null)
 					.filter(x => x.Contents.FileName == target.FileName);
 			
