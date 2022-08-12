@@ -97,7 +97,7 @@ namespace Ldraw.Options
 		{
 			if(option_definitions.has_key(definition.id))
 			{
-				error(@"Duplicate definition for $(definition.id)");
+				return true;
 			}
 			option_definitions[definition.id] = definition;
 			if(options.has_key(definition.id))

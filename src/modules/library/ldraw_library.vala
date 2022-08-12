@@ -1,33 +1,46 @@
 using Gee;
 
 using Ldraw;
+using Ldraw.Options;
 
 namespace Ldraw.Lego.Library
 {
 	public class LdrawLibrary : Object, ILdrawFolders
 	{
-		private File m_LibraryDir;
-		private File m_PartsDirectory;
-		private File m_SubPartsDirectory;
-		private File m_PrimitivesDirectory;
-		private File m_HiresPrimitivesDirectory;
-		private File m_LoresPrimitivesDirectory;
-		private File m_ModelsDirectory;
+		private File library_dir;
+		private File parts_dir;
+		private File sub_parts_dir;
+		private File primitives_dir;
+		private File hires_primitives_dir;
+		private File lores_primitives_dir;
+		private File models_dir;
+		
+		private OptionDomain library_options;
+		const string opt_id = "library_base";
+		
+        public IOptions settings 
+        {
+			construct {
+				var homeFolder = File.new_for_path(Environment.get_home_dir());
+				library_dir = homeFolder.get_child("ldraw");
+				library_options = value.get_domain("library-options");
+				library_options.initialize_option_string(OptionDef(opt_id, typeof(string), "Library base folder", ""), library_dir.get_path());
+			}
+		}
 
 		construct
 		{
-			var homeFolder = File.new_for_path(Environment.get_home_dir());
-			m_LibraryDir = homeFolder.get_child("ldraw");
-			m_PartsDirectory = m_LibraryDir.get_child("parts");
-			m_SubPartsDirectory = m_PartsDirectory.get_child("s");
-			m_PrimitivesDirectory = m_LibraryDir.get_child("p");
-			m_HiresPrimitivesDirectory = m_PrimitivesDirectory.get_child("48");
-			m_LoresPrimitivesDirectory = m_PrimitivesDirectory.get_child("8");
+			library_dir = File.new_for_path(library_options.get_option(opt_id).get_string());
+			parts_dir = library_dir.get_child("parts");
+			sub_parts_dir = parts_dir.get_child("s");
+			primitives_dir = library_dir.get_child("p");
+			hires_primitives_dir = primitives_dir.get_child("48");
+			lores_primitives_dir = primitives_dir.get_child("8");
 
-			m_ModelsDirectory = m_LibraryDir.get_child("models");
-			if(!m_ModelsDirectory.query_exists())
+			models_dir = library_dir.get_child("models");
+			if(!models_dir.query_exists())
 			{
-				m_ModelsDirectory = m_LibraryDir.get_child("MODELS");
+				models_dir = library_dir.get_child("MODELS");
 			}
 		}
 
@@ -35,7 +48,7 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
-				return m_LibraryDir;
+				return library_dir;
 			}
 		}
 
@@ -43,7 +56,7 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
-				return m_PartsDirectory;
+				return parts_dir;
 			}
 		}
 
@@ -51,7 +64,7 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
-				return m_SubPartsDirectory;
+				return sub_parts_dir;
 			}
 		}
 
@@ -59,7 +72,7 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
-				return m_PrimitivesDirectory;
+				return primitives_dir;
 			}
 		}
 
@@ -67,7 +80,7 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
-				return m_HiresPrimitivesDirectory;
+				return hires_primitives_dir;
 			}
 		}
 
@@ -75,11 +88,11 @@ namespace Ldraw.Lego.Library
 		{
 			get
 			{
-				return m_LoresPrimitivesDirectory;
+				return lores_primitives_dir;
 			}
 		}
 
-		public File ModelsDirectory {get{return m_ModelsDirectory;}}
+		public File ModelsDirectory {get{return models_dir;}}
 	}
 
 	public errordomain InitializationError
