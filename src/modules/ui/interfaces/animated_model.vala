@@ -29,7 +29,6 @@ namespace Ldraw.Ui
 			
 			view_changed();
 			Model.VisibleChange.connect(() => view_changed());
-			model_loaded(model);
 		}
 		
 		public void Switch(LdrawObject object)
@@ -97,6 +96,5 @@ namespace Ldraw.Ui
 
         public signal void view_changed();
         public signal void changed_selection();
-        public signal void model_loaded(LdrawFile file);
     }	
 }
