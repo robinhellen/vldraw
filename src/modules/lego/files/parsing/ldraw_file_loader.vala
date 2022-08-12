@@ -129,6 +129,7 @@ namespace Ldraw.Lego
 				}
 					
 				if(node is MultipartFileEnd) {
+					continue;
 				}
 				
 				if(node is MultipartFileStart)
