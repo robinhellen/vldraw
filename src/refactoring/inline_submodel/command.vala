@@ -59,7 +59,7 @@ namespace Ldraw.Refactor
 				LdrawNode last = reference;
 				foreach(var node in replacements[reference])
 				{
-					object.InsertNode(node, last);
+					object.add_node_after(node, last);
 					last = node;
 				}
 				object.RemoveNode(reference);
@@ -90,7 +90,7 @@ namespace Ldraw.Refactor
 					if(first)
 					{
 						first = false;
-						object.InsertNode(reference, node);
+						object.add_node_after(reference, node);
 					}
 					object.RemoveNode(node);
 				}

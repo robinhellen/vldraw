@@ -143,7 +143,7 @@ namespace Ldraw.Animation
 			if(hasRotation)
 			{
 				var newCommand = new RotateCommand.Rotation(rotationAxis, rotationAngle);
-				model.Model.InsertNode(newCommand, node);
+				model.Model.add_node_before(newCommand, node);
 			}
 		}
 

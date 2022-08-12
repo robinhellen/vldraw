@@ -3,7 +3,7 @@ using Gtk;
 
 namespace Ldraw.Utils
 {
-	public class ObservableList<T> : LinkedList<T>, TreeModel, TreeDragSource
+	public class ObservableList<T> : LinkedList<T>, TreeModel, TreeDragSource, TreeDragDest
 	{
 		public ObservableList(Collection<T>? initial_nodes = null)
 		{
@@ -51,7 +51,7 @@ namespace Ldraw.Utils
 			if(!inserting)
 			{
 				TreeIter iter = TreeIter();
-				iter.stamp = c_IteratorStamp;
+				iter.stamp = iterator_stamp;
 				iter.user_data = index.to_pointer();
 				row_inserted(new TreePath.from_indices(index), iter);
 			}
@@ -68,7 +68,7 @@ namespace Ldraw.Utils
 			base.set(index, item);
 
 			TreeIter iter = TreeIter();
-			iter.stamp = c_IteratorStamp;
+			iter.stamp = iterator_stamp;
 			iter.user_data = index.to_pointer();
 			row_changed(new TreePath.from_indices(index), iter);
 
@@ -84,7 +84,7 @@ namespace Ldraw.Utils
 			inserting = false;
 
 			TreeIter iter = TreeIter();
-			iter.stamp = c_IteratorStamp;
+			iter.stamp = iterator_stamp;
 			iter.user_data = index.to_pointer();
 			row_inserted(new TreePath.from_indices(index), iter);
 
@@ -97,13 +97,13 @@ namespace Ldraw.Utils
 			T item = (T) sender;
 			var current = index_of(item);
 			TreeIter cIter = TreeIter();
-			cIter.stamp = c_IteratorStamp;
+			cIter.stamp = iterator_stamp;
 			cIter.user_data = current.to_pointer();
 			row_changed(new TreePath.from_indices(current), cIter);
 		}
 
 		// implementation of TreeModel
-		private const int c_IteratorStamp = 757398;
+		private const int iterator_stamp = 757398;
 
 		public Type get_column_type(int index)
 			requires (index == 0)
@@ -131,7 +131,7 @@ namespace Ldraw.Utils
 			if(size <= listIndex)
 				return false;
 
-			iter.stamp = c_IteratorStamp;
+			iter.stamp = iterator_stamp;
 			iter.user_data = listIndex.to_pointer();
 			return true;
 		}
@@ -187,14 +187,14 @@ namespace Ldraw.Utils
 				return false;
 			}
 
-			child.stamp = c_IteratorStamp;
+			child.stamp = iterator_stamp;
 			child.user_data = n.to_pointer();
 			return true;
 		}
 
 		public bool iter_next(ref TreeIter iter)
 		{
-			if(iter.stamp != c_IteratorStamp || (int)(iter.user_data) >= size - 1)
+			if(iter.stamp != iterator_stamp || (int)(iter.user_data) >= size - 1)
 			{
 				iter.stamp = 0;
 				return false;
@@ -205,7 +205,7 @@ namespace Ldraw.Utils
 
 		public bool iter_previous(ref TreeIter iter)
 		{
-			if(iter.stamp != c_IteratorStamp || (int)(iter.user_data) == 0)
+			if(iter.stamp != iterator_stamp || (int)(iter.user_data) == 0)
 			{
 				iter.stamp = 0;
 				return false;
@@ -216,7 +216,7 @@ namespace Ldraw.Utils
 
 		public TreePath? get_path(TreeIter iter)
 		{
-			if(iter.stamp != c_IteratorStamp)
+			if(iter.stamp != iterator_stamp)
 			{
 				return null;
 			}
@@ -227,7 +227,7 @@ namespace Ldraw.Utils
 		public void get_value(TreeIter iter, int column, out Value value)
 		{
 			value = Value(element_type);
-			if(iter.stamp != c_IteratorStamp || (int)(iter.user_data) >= size || column != 0)
+			if(iter.stamp != iterator_stamp || (int)(iter.user_data) >= size || column != 0)
 			{
 				value.set_instance(null);
 				return;
@@ -241,19 +241,55 @@ namespace Ldraw.Utils
 
 		public bool drag_data_delete(TreePath path)
 		{
-			return false;
+			if(path.get_depth() != 1) return false;
+			var index = path.get_indices()[0];
+
+			if(size <= index)
+				return false;
+				
+			remove_at(index);
+			return true;
 		}
 
-		public bool drag_data_get(TreePath path, SelectionData selData)
+		public bool drag_data_get(TreePath path, SelectionData selection_data)
 		{
-			return false;
+			return tree_set_row_drag_data(selection_data, this, path);
 		}
 
 		public bool row_draggable(TreePath path)
 		{
-			return true;
+			return path.get_depth() == 1 && path.get_indices()[0] < size;
 		}
 
 		// end implementation of TreeDragSource
+
+		// implementation of TreeDragDest
+
+		public bool drag_data_received(TreePath path, SelectionData selection_data)
+		{
+			if(path.get_depth() != 1) return false;
+			var index = path.get_indices()[0];
+
+			if(size <= index)
+				return false;
+			
+			TreeModel m;
+			TreePath p;
+			if(!tree_get_row_drag_data(selection_data, out m, out p)) return false;
+			if(m != this) return false;
+			if(p.get_depth() != 1 || p.get_indices()[0] >= size) return false;
+			
+			var x = ((Gee.List<T>)this).get(p.get_indices()[0]);
+			insert(index, x);
+			
+			return true;
+		}
+
+		public bool row_drop_possible(TreePath path, SelectionData selection_data)
+		{
+			return path.get_depth() == 1 && path.get_indices()[0] < size;
+		}
+
+		// end implementation of TreeDragDest
 	}
 }

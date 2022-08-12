@@ -86,7 +86,7 @@ ui_interfaces_internal_packages=lego part_group
 ui_interfaces_private_internal_packages=application
 
 ui_widgets_sources=$(wildcard src/modules/ui/*.vala) $(wildcard src/modules/ui/undo/*.vala)
-ui_widgets_internal_packages=lego part_group ui_interfaces
+ui_widgets_internal_packages=lego part_group ui_interfaces ui_dialogs
 ui_widgets_private_internal_packages=application
 
 export_sources=$(wildcard src/modules/export/*.vala)
@@ -109,9 +109,8 @@ drag_and_drop_packages=$(gee) diva
 drag_and_drop_internal_packages=lego lego_objects maths utils ui_interfaces
 
 ui_dialogs_sources=$(wildcard src/modules/ui/dialogs/*.vala)
-ui_dialogs_packages=$(gee) gl diva
+ui_dialogs_packages=$(gee) diva
 ui_dialogs_internal_packages= ui_interfaces lego lego_objects maths expressions utils options
-ui_dialogs_vala_options=--vapidir=vapi
 
 # Plugins
 

@@ -6,6 +6,7 @@ using Ldraw.Application;
 using Ldraw.Lego;
 using Ldraw.Lego.Library;
 using Ldraw.Ui.Commands;
+using Ldraw.Ui.Dialogs;
 using Ldraw.Ui.Widgets;
 using Ldraw.Utils;
 
@@ -81,9 +82,10 @@ namespace Ldraw.Ui
 
 			var modelMenu = CreateMenu(menus, "_Model", accelerators);
 
-			AddMenuItem(modelMenu, "_Properties", () => {});
-			AddMenuItem(modelMenu, "Parts _List", () => ShowPartsList(parent));
+			AddMenuItem(modelMenu, "_Parts _List", () => ShowPartsList(parent));
 			AddMenuItem(modelMenu, "_Add sub-model", () => ModelAddSubModel_OnActivate(parent));
+			var model_details = AddMenuItem(modelMenu, "_Details", () => edit_model_details(parent));
+			var model_submodels = AddMenuItem(modelMenu, "_Sub-models", () => show_submodels(parent));
 
 			AddExtraMenuItems(modelMenu, TopMenu.Model, parent);
 
@@ -259,6 +261,22 @@ namespace Ldraw.Ui
                 }
             }
         }
+        
+        private void edit_model_details(Window parent) {
+			var dialog = new ModelDetails.from_model(parent, Model.Model);
+			if(!dialog.run())
+				return;
+				
+			Model.Model.FileName = dialog.filename;
+			Model.Model.Description = dialog.description;
+		}
+		
+		private void show_submodels(Window parent) {
+			var mpd = Model.File as MultipartModel;
+			if(mpd == null) return;
+			var dialog = new SubModels(parent, mpd);
+			dialog.run();
+		}
 
         private void ModelAddSubModel_OnActivate(Window parent)
         {
@@ -273,63 +291,38 @@ namespace Ldraw.Ui
 			{
 				new_submodel_filename = base_filename + @"s$(mpdModel.SubModels.size).ldr"; // TODO check for duplicates
 			}
-            
-            var dialog = new Dialog.with_buttons("Model details", parent,
-                DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
-                "_OK", ResponseType.ACCEPT,
-                "_Cancel", ResponseType.REJECT);
+			
+			var dialog = new ModelDetails(parent);
+            dialog.filename = new_submodel_filename;
 
-            var content = (Box) dialog.get_content_area();
-            var grid = new Grid();
-				grid.column_homogeneous = false;
-				grid.row_homogeneous = false;
-            grid.attach(new Label("Filename"), 0, 0);
-            grid.attach(new Label("Sub-model name"), 0, 1);
-            grid.attach(new Label("Description"), 0, 2);
-            var filenameEntry = new Entry();
-            filenameEntry.text = new_submodel_filename;
-            var nameEntry = new Entry();
-            nameEntry.text = new_submodel_filename;
-            var descriptionEntry = new Entry();
-            grid.attach(filenameEntry, 1, 0);
-            grid.attach(nameEntry, 1, 1);
-            grid.attach(descriptionEntry, 1, 2);
-            content.pack_start(grid);
-
-            dialog.show_all();
-
-            var response = dialog.run();
+            if(!dialog.run())
+				return;
 
 
-            var newFileName = filenameEntry.text;
-            if(newFileName == null || newFileName.length == 0)
-            {
-                if(mpdModel == null)
-                    newFileName = Model.File.FileName + " (1).ldr";
-                else
-                    newFileName = Model.File.FileName + @" ($(mpdModel.SubModels.size))";
-            }
-            dialog.destroy();
-            if(response != ResponseType.ACCEPT)
-                return;
+            var new_filename = dialog.filename;
 
             if(mpdModel == null)
             {
                 var subObjs = new ObservableList<LdrawObject>();
                 subObjs.add(Model.Model);
+                var new_path = ((LdrawModelFile)(Model.File)).FilePath;
+                if(new_path == null) new_path = "";
+                if(new_path.has_suffix(".ldr") || new_path.has_suffix(".dat"))
+					new_path = new_path[:-4];
+				new_path += ".mpd";
                 mpdModel = (MultipartModel)GLib.Object.new(typeof(MultipartModel),
                             MainObject: Model.Model,
                             SubModels: subObjs,
                             FileName: Model.File.FileName,
-                            FilePath: ((LdrawModelFile)(Model.File)).FilePath);
-				Model.File = mpdModel;
+                            FilePath: new_path);
 				Model.Load(mpdModel);
             }
             var nodes = new ObservableList<LdrawNode>();
             var newObject = (LdrawObject)GLib.Object.new(
 						typeof(LdrawObject),
 						Nodes: nodes,
-						FileName: newFileName
+						FileName: new_filename,
+						Description: dialog.description
 					);
             mpdModel.SubModels.add(newObject);
             Model.Switch(newObject);

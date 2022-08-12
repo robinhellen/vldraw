@@ -6,8 +6,9 @@ namespace Ldraw.Lego
 {
 	public class LdrawObject : Object
 	{
-		private Bounds m_BoundingBox;
+		private Bounds bounds;
 		private Gee.List<LdrawNode> nodes;
+		private string _description = "";
 
 		public LdrawObject(string description)
 		{
@@ -44,17 +45,30 @@ namespace Ldraw.Lego
 
 		public string FileName {get; set;}
 
-		public string Description {get; public construct set;}
+		public string Description {
+			get {return _description;} 
+			set {
+				_description = value;
+				Comment description_comment;
+				if(!nodes.is_empty && nodes[0].get_type() == typeof(Comment)) {
+					description_comment = (Comment)nodes[0];
+					description_comment.CommentText = value;
+				} else {
+					description_comment = new Comment(value);
+					nodes.insert(0, description_comment);
+				}
+			}
+		}
 
 		public Bounds BoundingBox
 		{
 			get
 			{
-				if(m_BoundingBox == null)
+				if(bounds == null)
 				{
-					m_BoundingBox = CalculateBounds();
+					bounds = CalculateBounds();
 				}
-				return m_BoundingBox;
+				return bounds;
 			}
 		}
 
@@ -104,37 +118,32 @@ namespace Ldraw.Lego
 			{
 				Nodes.insert(Nodes.index_of(after) + 1, newNode);
 			}
-			m_BoundingBox = null;
 			newNode.notify.connect(() => VisibleChange());
 			VisibleChange();
 		}
+		
+		public void add_node_after(LdrawNode node, LdrawNode after) {
+			nodes.insert(nodes.index_of(after) + 1, node);
+			node.notify.connect(() => VisibleChange());
+			VisibleChange();
+		}
+		
+		public void add_node_before(LdrawNode node, LdrawNode before) {
+			nodes.insert(nodes.index_of(before), node);
+			node.notify.connect(() => VisibleChange());
+			VisibleChange();
+		}
 
-		public void AddHeaderNode(LdrawNode node)
+		public void AddHeaderNode(Comment node)
 		{
-			LdrawNode lastHeader = null;
+			LdrawNode last_header = null;
 			foreach(var n in nodes)
 			{
 				if(!(n is Comment))
 					break;
-				lastHeader = n;
+				last_header = n;
 			}
-			if(lastHeader == null)
-				nodes.add(node);
-
-			else
-				nodes.insert(Nodes.index_of(lastHeader) + 1, node);
-
-			ComponentsChanged();
-			VisibleChange();
-			m_BoundingBox = null;
-			node.notify["ColourId"].connect(() => VisibleChange());
-		}
-
-		public void InsertNode(LdrawNode toInsert, LdrawNode after)
-		{
-			nodes.insert(nodes.index_of(after) + 1, toInsert);
-			toInsert.notify.connect(() => VisibleChange());
-			VisibleChange();
+			AddNode(node, last_header);
 		}
 
 		public void RemoveNodes(Collection<LdrawNode> toDelete)
@@ -167,9 +176,7 @@ namespace Ldraw.Lego
 
 		public virtual signal void VisibleChange()
 		{
-			m_BoundingBox = null;
+			bounds = null;
 		}
-
-		public signal void ComponentsChanged();
 	}
 }

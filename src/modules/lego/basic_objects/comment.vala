@@ -4,7 +4,7 @@ namespace Ldraw.Lego.Nodes
 {
 	public class Comment : LdrawNode
 	{
-		public string CommentText {get; protected set;}
+		public string CommentText {get; set;}
 
 		public Comment(string comment)
 		{
