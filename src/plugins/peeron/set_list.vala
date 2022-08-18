@@ -3,8 +3,6 @@ using Gee;
 using Gtk;
 
 using Ldraw.Lego;
-using Ldraw.Lego.Library;
-using Ldraw.Peeron;
 using Ldraw.Utils;
 using Ldraw.Ui;
 
@@ -14,29 +12,25 @@ namespace Ldraw.Peeron
 	{
 		private ObservableList<Inventory> sets;
 		private PartGroupUsage usage;
-		private TreeView partsView;
-		private PartUsageViewModel usageViewModel;
+		private TreeView parts_view;
+		private PartUsageViewModel usage_view_model;
 		private Paned widget;
-		
-		private Map<string, string> extra_name_ref = new HashMap<string, string>();
 
-		public IDatFileCache Library {private get; construct;}
-		public InventoryReader InventoryReader {private get; construct;}
-		public AnimatedModel Model {construct; private get;}
+		public InventoryReader inventory_reader {private get; construct;}
+		public AnimatedModel model {construct; private get;}
 
 		construct
 		{
 			sets = new ObservableList<Inventory>();
 			widget = new Paned(Orientation.VERTICAL);
-			InitializeControls();
-			Model.view_changed.connect(() => UpdateUsage.begin(false));
-			extra_name_ref["x187"] = "3648a";
+			initialize_controls();
+			model.view_changed.connect(() => update_usage.begin(false));
 		}
 
-		private async void UpdateUsage(bool reset)
+		private async void update_usage(bool reset)
 		{
-			var availableParts = Aggregate(yield ToPartGroups(sets, Library));
-			var modelFile = Model.File as LdrawModelFile;
+			var availableParts = aggregate(yield to_part_groups(sets));
+			var modelFile = model.File as LdrawModelFile;
 			PartGroup modelGroup;
 			if(modelFile == null)
 			{
@@ -48,18 +42,18 @@ namespace Ldraw.Peeron
 				modelGroup = new PartGroup.FromModel(modelFile);
 			}
 			usage = new PartGroupUsage(availableParts, modelGroup);
-			if(usageViewModel == null)
+			if(usage_view_model == null)
 			{
-				usageViewModel = new PartUsageViewModel(usage);
-				partsView.model = usageViewModel;
+				usage_view_model = new PartUsageViewModel(usage);
+				parts_view.model = usage_view_model;
 			}
 			else
 			{
-				usageViewModel.Update(usage);
+				usage_view_model.Update(usage);
 			}
 		}
 
-		private void InitializeControls()
+		private void initialize_controls()
 		{
 			var setControls = new Box(Orientation.VERTICAL, 0);
 			var setButtons = new Box(Orientation.HORIZONTAL, 2);
@@ -89,19 +83,19 @@ namespace Ldraw.Peeron
 					if(response != ResponseType.ACCEPT)
 						return;
 
-					InventoryReader.GetInventoryFor.begin(setname,
+					inventory_reader.GetInventoryFor.begin(setname,
 						(obj, res) =>
 					{
 						try
 						{
-							sets.add(InventoryReader.GetInventoryFor.end(res));							
+							sets.add(inventory_reader.GetInventoryFor.end(res));							
 						}
 						catch (Error e)
 						{
 							stderr.printf(@"Unable to get inventory for set $setname: $(e.message).\n");
 							return;
 						}
-						UpdateUsage.begin(true);
+						update_usage.begin(true);
 					});
 				});
 			setButtons.pack_start(addButton);
@@ -110,7 +104,7 @@ namespace Ldraw.Peeron
 			clearButton.clicked.connect(() =>
 			{
 				sets.clear();
-				UpdateUsage.begin(true);
+				update_usage.begin(true);
 			});
 
 			var setsView = new SimpleList<Inventory>.with_model(sets);
@@ -119,14 +113,14 @@ namespace Ldraw.Peeron
 			setControls.pack_start(WithScrolls(setsView));
 			setControls.pack_start(setButtons, false);
 			widget.add1(setControls);
-			partsView = new TreeView();
-			partsView.headers_visible = false;
+			parts_view = new TreeView();
+			parts_view.headers_visible = false;
 			
-			append_column_for_children_only<CellRendererPixbuf>(partsView, new CellRendererPixbuf(),
-					(cell, item) => cell.pixbuf = GetPixbufImageForColour(item.Colour),
+			append_column_for_children_only<CellRendererPixbuf>(parts_view, new CellRendererPixbuf(),
+					(cell, item) => cell.pixbuf = get_pixbuf_image_for_colour(item.Colour),
 					cell => cell.pixbuf = null);
 					
-			partsView.insert_column_with_data_func(-1, "", new CellRendererText(),
+			parts_view.insert_column_with_data_func(-1, "", new CellRendererText(),
 					(col, cell, model, iter) =>
 					{
 						Value rowTypeValue;
@@ -151,22 +145,22 @@ namespace Ldraw.Peeron
 						}
 					});
 
-			partsView.drag_begin.connect_after((context) => {
+			parts_view.drag_begin.connect_after((context) => {
 				var icon = new Pixbuf(Colorspace.RGB, true, 8, 4, 4);
 				icon.fill(0);
 				drag_set_icon_pixbuf(context, icon, 2, 2);
 			});
 			
-			partsView.set_tooltip_column(3);
+			parts_view.set_tooltip_column(3);
 			
-			widget.add2(WithScrolls(partsView));
+			widget.add2(WithScrolls(parts_view));
 
 			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
-			partsView.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
-			partsView.drag_data_get.connect((context, data, info, time) =>
+			parts_view.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, {LdrawDragData}, Gdk.DragAction.COPY);
+			parts_view.drag_data_get.connect((context, data, info, time) =>
 				{
 					TreeIter active;
-					TreeSelection sel = partsView.get_selection();
+					TreeSelection sel = parts_view.get_selection();
 					TreeModel model;
 					if(!sel.get_selected(out model, out active))
 					{
@@ -190,15 +184,15 @@ namespace Ldraw.Peeron
 					var dragData = @"$currentName,$colourId";
 					data.set(Gdk.Atom.intern("LdrawFile", false), 8, dragData.data);
 				});
-			partsView.cursor_changed.connect(OnCursorChanged);
+			parts_view.cursor_changed.connect(on_cursor_changed);
 		}
 		
-		private async void OnCursorChanged()
+		private async void on_cursor_changed()
 		{ 
 			CurrentChanged(yield GetCurrentObject());
 		}
 		
-		private Pixbuf GetPixbufImageForColour(Colour colour)
+		private Pixbuf get_pixbuf_image_for_colour(Colour colour)
 		{
 			Gdk.Pixbuf image = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 16, 16);
 			Gdk.Pixbuf swatch = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 14, 14);
@@ -241,18 +235,18 @@ namespace Ldraw.Peeron
 					});
 		}
 
-		private PartGroup Aggregate(Collection<PartGroup> sets)
+		private PartGroup aggregate(Collection<PartGroup> sets)
 		{
 			var items = new ArrayList<PartGroupItem>();
 			var result = (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
 			foreach(var group in sets)
 			{
-				Combine(result, group);
+				combine(result, group);
 			}
 			return result;
 		}
 
-		private void Combine(PartGroup result, PartGroup p)
+		private void combine(PartGroup result, PartGroup p)
 		{
 			foreach(var item in p.Items)
 			{
@@ -268,25 +262,25 @@ namespace Ldraw.Peeron
 			}
 		}
 
-		private async PartGroup ToPartGroup(Inventory i, IDatFileCache lib)
+		private async PartGroup to_part_group(Inventory i)
 		{
 			var items = new ArrayList<PartGroupItem>();
 			foreach(var line in i.Lines)
 			{
-					items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
-							Part: line.part,
-							Colour: line.colour,
-							Quantity: line.quantity));
+				items.add((PartGroupItem)GLib.Object.new(typeof(PartGroupItem),
+						Part: line.part,
+						Colour: line.colour,
+						Quantity: line.quantity));
 			}
 			return (PartGroup)GLib.Object.new(typeof(PartGroup), Items: items);
 		}
 
-		private async Collection<PartGroup> ToPartGroups(Collection<Inventory> sets, IDatFileCache lib)
+		private async Collection<PartGroup> to_part_groups(Collection<Inventory> sets)
 		{
 			var result = new ArrayList<PartGroup>();
 			foreach(var inventory in sets)
 			{
-				result.add(yield ToPartGroup(inventory, lib));
+				result.add(yield to_part_group(inventory));
 			}
 			return result;
 		}
@@ -304,7 +298,7 @@ namespace Ldraw.Peeron
 		public async LdrawObjectWithColour? GetCurrentObject()
 		{
 			TreeIter active;
-			TreeSelection sel = partsView.get_selection();
+			TreeSelection sel = parts_view.get_selection();
 			TreeModel model;
 			if(!sel.get_selected(out model, out active))
 			{

@@ -88,7 +88,7 @@ namespace Ldraw.Peeron
 							var elements = reader.count_elements();
 							if(elements == -1) {
 								var e = reader.get_error();
-								warning(@"$(e.message)\n");
+								warning(@"$(e.message)");
 							}
 							for(int i = 0; i < elements; i++)
 							{
@@ -128,7 +128,7 @@ namespace Ldraw.Peeron
 							var elements = reader.count_elements();
 							if(elements == -1) {
 								var e = reader.get_error();
-								warning(@"$(e.message)\n");
+								warning(@"$(e.message)");
 							}
 							string[] refs = {};
 							for(int i = 0; i < elements; i++)
@@ -144,12 +144,16 @@ namespace Ldraw.Peeron
 								}
 								if(yield library.TryGetPart(part_ref, out part))
 								{
+									if(part.Category[0] == '=' || part.Category[0] == '~') {
+										warning(@"$part_ref moved, obsolete or specific colour.");
+										continue;
+									}
 									break;
 								}
 								else if (i == (elements - 1))
 								{
 									var part_refs_str = string.joinv(", ", refs);
-									warning(@"Unable to find part in library from possibilities: $part_refs_str.\n");
+									warning(@"Unable to find part in library from possibilities: $part_refs_str.");
 								}
 							}
 						}
@@ -165,7 +169,7 @@ namespace Ldraw.Peeron
 								reader.read_member("name");
 								var name = reader.get_string_value();
 								reader.end_member();
-								warning(@"Unable to find part in library from $part_id ($name).\n");
+								warning(@"Unable to find part in library from $part_id ($name).");
 								reader.end_member();
 								return null;
 							}

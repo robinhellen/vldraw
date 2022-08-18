@@ -31,7 +31,7 @@ namespace Ldraw.Ui.Widgets
 			m_Tree.cursor_changed.connect(Tree_OnCursorChanged);
 
 			// set up for drag and drop
-			TargetEntry LdrawDragData = {"LdrawFile", 0, 0};
+			TargetEntry LdrawDragData = {"LdrawFile", TargetFlags.SAME_APP, 0};
 			m_Tree.enable_model_drag_source(ModifierType.BUTTON1_MASK, {LdrawDragData}, DragAction.COPY);
 
 			//m_Tree.drag_begin.connect_after(Tree_OnDragBegin);
