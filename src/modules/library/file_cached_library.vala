@@ -63,7 +63,7 @@ namespace Ldraw.Lego.Library
 				categoryParts.add(part);
 			}
 			
-			categoryParts.sort((a, b) => strcmp(a.Description, b.Description));
+			categoryParts.sort((a, b) => strcmp(a.description, b.description));
 			
 			return categoryParts;
 		}
@@ -120,7 +120,7 @@ namespace Ldraw.Lego.Library
 				LdrawPart part;
 				yield PartFiles.TryGetPart(name.substring(0, name.last_index_of(".")), out part);
 
-				categories[part.Category] = part;
+				categories[part.category] = part;
 				progress++;
 			}
 
@@ -175,8 +175,7 @@ namespace Ldraw.Lego.Library
 						break;
 					case "keywords":
 						var elements = reader.count_elements();
-						for(int i = 0; i < elements; i++)
-						{
+						for(int i = 0; i < elements; i++) {
 							reader.read_element(i);
 							keywords.add(reader.get_string_value());
 							reader.end_element();
@@ -186,7 +185,7 @@ namespace Ldraw.Lego.Library
 				reader.end_member();
 			}
 			
-			return new PartMetaData(name, description, category, keywords);
+			return new PartMetaData(name, description, category, keywords, PartFiles);
 		}
 
 		private void Save(MultiMap<string, IPartMetadata> categories, File file)
@@ -202,17 +201,17 @@ namespace Ldraw.Lego.Library
 					builder.begin_object();
 
 					builder.set_member_name("name");
-					builder.add_string_value(data.Name);
+					builder.add_string_value(data.name);
 
 					builder.set_member_name("category");
-					builder.add_string_value(data.Category);
+					builder.add_string_value(data.category);
 
 					builder.set_member_name("description");
-					builder.add_string_value(data.Description);
+					builder.add_string_value(data.description);
 
 					builder.set_member_name("keywords");
 					builder.begin_array();
-					foreach(var keyword in data.Keywords)
+					foreach(var keyword in data.keywords)
 					{
 						builder.add_string_value(keyword);
 					}
@@ -241,22 +240,32 @@ namespace Ldraw.Lego.Library
 
 	public class PartMetaData : GLib.Object, IPartMetadata
 	{
-		private string name;
-		private string category;
-		private string description;
-		private Collection<string> keywords;
+		private string name_;
+		private string category_;
+		private string description_;
+		private Collection<string> keywords_;
+		private IDatFileCache cache;
 
-		public PartMetaData(string name, string description, string category, Collection<string> keywords)
+		public PartMetaData(string name, string description, string category, Collection<string> keywords, IDatFileCache cache)
 		{
-			this.name = name;
-			this.category = category;
-			this.description = description;
-			this.keywords = keywords;
+			name_ = name;
+			category_ = category;
+			description_ = description;
+			keywords_ = keywords;
+			this.cache = cache;
 		}
 
-		public string Name {get{return name;}}
-		public string Category {get{return category;}}
-		public Collection<string> Keywords {get{return keywords;}}
-		public string Description {get{return description;}}
+		public string name {get{return name_;}}
+		public string category {get{return category_;}}
+		public Collection<string> keywords {get{return keywords_;}}
+		public string description {get{return description_;}}
+		
+		public async LdrawPart get_part() {
+			LdrawPart p;
+			if(!yield cache.TryGetPart(name_, out p)) {
+				assert_not_reached();
+			}
+			return p;
+		}
 	}
 }

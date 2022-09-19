@@ -8,7 +8,6 @@ namespace Ldraw.Lego.Library
 		public IDatFileCache library {construct; private get;}
 
 		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
-			throws ParseError
 		{
 			if(context != ReferenceContext.Model) {
 				return null;

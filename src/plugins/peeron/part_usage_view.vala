@@ -18,10 +18,10 @@ namespace Ldraw.Peeron
 			if(a.Colour.Code < b.Colour.Code) return -1;
 			if(a.Colour.Code > b.Colour.Code) return 1;
 			
-			var cat_compare = str_compare(a.Part.Category, b.Part.Category);
+			var cat_compare = str_compare(a.Part.category, b.Part.category);
 			if(cat_compare != 0)
 				return cat_compare;
-			return str_compare(a.Part.Description, b.Part.Description);
+			return str_compare(a.Part.description, b.Part.description);
 		}
 		
 		private ObservableList<PartGroupItem> used;
@@ -581,7 +581,7 @@ namespace Ldraw.Peeron
 							section.get_value(sectionIter, 0, out pgi_value);
 							var pgi = (PartGroupItem)pgi_value.get_object();							
 							
-							value.set_string(Markup.escape_text(@"$(pgi.Quantity) @ $(pgi.Colour.Name) $(pgi.Part.Description) ($(pgi.Part.Name))"));
+							value.set_string(Markup.escape_text(@"$(pgi.Quantity) @ $(pgi.Colour.Name) $(pgi.Part.description) ($(pgi.Part.name))"));
 							break;
 						default:
 							assert_not_reached();

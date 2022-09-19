@@ -1,8 +1,6 @@
 using Diva;
 using Gee;
 
-
-
 namespace Ldraw.Lego.Library
 {
 	public class OnDemandPartLoader : Object, IDatFileCache
@@ -13,11 +11,11 @@ namespace Ldraw.Lego.Library
 			set_lazy_injection<OnDemandSubFileLoader>(cls, "locator");
 		}
 		
-		public ILdrawFolders Folders {construct; private get;}
-		public LdrawParser Parser {construct; private get;}
-		public FileReaderFactory ReaderFactory {construct; private get;}
-		public Lazy<OnDemandSubFileLoader> locator {construct; private get;}
-		public ColourContext ColourContext {construct; private get;}
+		public ILdrawFolders Folders {construct; protected get;}
+		public LdrawParser Parser {construct; protected get;}
+		public FileReaderFactory ReaderFactory {construct; protected get;}
+		public Lazy<OnDemandSubFileLoader> locator {construct; protected get;}
+		public ColourContext ColourContext {construct; protected get;}
 
 		private Map<string, LdrawPrimitive> primitivesCache = new HashMap<string, LdrawPrimitive>();
 		private Map<string, LdrawHiresPrimitive> hiresPrimitivesCache = new HashMap<string, LdrawHiresPrimitive>();
@@ -40,7 +38,7 @@ namespace Ldraw.Lego.Library
 			return yield TryGetFile(name, hiresPrimitivesCache, Folders.HiresPrimitivesDirectory, out primitive);
 		}
 
-		public async bool TryGetPart(string name, out LdrawPart part)
+		public virtual async bool TryGetPart(string name, out LdrawPart part)
 		{
 			return yield TryGetFile(name, partsCache, Folders.PartsDirectory, out part);
 		}
@@ -50,7 +48,7 @@ namespace Ldraw.Lego.Library
 			return yield TryGetFile(name, subpartsCache, Folders.SubPartsDirectory, out part);
 		}
 
-		private async bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
+		protected virtual async bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
 		{
 			if(InCache(name, cache, out result))
 			{
@@ -117,7 +115,6 @@ namespace Ldraw.Lego.Library
 		public OnDemandPartLoader Cache {construct; private get;}
 
 		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
-			throws ParseError
 		{
 			if(context != ReferenceContext.Library)
 				return null;

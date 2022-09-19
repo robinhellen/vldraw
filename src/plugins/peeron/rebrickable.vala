@@ -144,7 +144,7 @@ namespace Ldraw.Peeron
 								}
 								if(yield library.TryGetPart(part_ref, out part))
 								{
-									if(part.Category[0] == '=' || part.Category[0] == '~') {
+									if(part.category[0] == '=' || part.category[0] == '~') {
 										warning(@"$part_ref moved, obsolete or specific colour.");
 										continue;
 									}

@@ -14,7 +14,6 @@ namespace Ldraw.Ui.Widgets
 		private TreeStore store;
 
 		public ILibrary Library {construct; get;}
-		public IDatFileCache DatFileCache{construct; get;}
 
 		construct
 		{
@@ -85,7 +84,7 @@ namespace Ldraw.Ui.Widgets
 			{
 				TreeIter partIter;
 				store.append(out partIter, categoryIter);
-				store.set(partIter, 0, 1, 1, part.Description, 2, part.Name, 3, part, -1);
+				store.set(partIter, 0, 1, 1, part.description, 2, part.name, 3, part, -1);
 			}
 		}
 
@@ -94,20 +93,18 @@ namespace Ldraw.Ui.Widgets
 			var current = CurrentPart;
 			if(current == null)
 				return;
-
-			DatFileCache.TryGetPart.begin(current.Name, (obj, res) => 
-			{
-				LdrawPart part;
 				
-				if(DatFileCache.TryGetPart.end(res, out part))
-					CurrentChanged(LdrawObjectWithColour(part.MainObject));
+			current.get_part.begin((obj, res) => 
+			{
+				var p = current.get_part.end(res);
+				CurrentChanged(LdrawObjectWithColour(p.MainObject));
 			});
 		}
 
 		private void Tree_OnDragDataGet(DragContext context, SelectionData data, uint info, uint time)
 		{
 			IPartMetadata current = CurrentPart;
-			string currentName = current.Name;
+			string currentName = current.name;
 			data.set(Atom.intern("LdrawFile", false), 8, currentName.data);
 		}
 
@@ -154,11 +151,8 @@ namespace Ldraw.Ui.Widgets
 			if(current == null)
 				return LdrawObjectWithColour(null);
 
-			LdrawPart part;
-			if(yield DatFileCache.TryGetPart(current.Name, out part))
-				return LdrawObjectWithColour(part.MainObject);
-				
-			return LdrawObjectWithColour(null);
+			var part = yield current.get_part();
+			return LdrawObjectWithColour(part.MainObject);
 		}
 	}	
 }

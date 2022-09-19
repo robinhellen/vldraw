@@ -342,7 +342,7 @@ namespace Ldraw.Ui
             view.insert_text_column_with_data_func(-1, "Colour",
                     item => item.Colour.Name);
             view.insert_text_column_with_data_func(-1, "Part Name",
-                    item => item.Part.Name);
+                    item => item.Part.name);
             view.insert_text_column_with_data_func(-1, "Quantity",
                     item => item.Quantity.to_string());
 

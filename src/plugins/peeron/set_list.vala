@@ -139,8 +139,8 @@ namespace Ldraw.Peeron
 							var item = (PartGroupItem)pgi.get_object();
 							if(item == null)
 								return;
-							var desc = item.Part.Description;
-							var name = item.Part.Name;
+							var desc = item.Part.description;
+							var name = item.Part.name;
 							((CellRendererText) cell).text = @"$desc ($name)";
 						}
 					});
@@ -179,7 +179,7 @@ namespace Ldraw.Peeron
 					GLib.Object partObj = partVal.get_object();
 					var current = partObj as PartGroupItem;
 
-					string currentName = current.Part.Name;
+					string currentName = current.Part.name;
 					var colourId = current.Colour.Code;
 					var dragData = @"$currentName,$colourId";
 					data.set(Gdk.Atom.intern("LdrawFile", false), 8, dragData.data);

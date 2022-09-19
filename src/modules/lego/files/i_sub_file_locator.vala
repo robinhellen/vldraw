@@ -14,6 +14,7 @@ namespace Ldraw.Lego
 		
 		public LdrawObject object {get; construct set;}
 		public LdrawFile? file {get; construct set;}
+		public string source_desc {get; construct set; default = "";}
 	}
 
 	public enum ReferenceContext
@@ -35,8 +36,23 @@ namespace Ldraw.Lego
 	
 	public interface ISubFileLocator : Object
 	{
-		public abstract async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
-			throws ParseError;
+		public abstract async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context);
+	}
+	
+	public async LdrawFileReference? get_single_sub_file(Collection<ISubFileLocator> locators, string reference, ReferenceContext context) {
+		LdrawFileReference? sub_file = null;
+		foreach(var locator in locators) {
+			var located = yield locator.GetObjectFromReference(reference, context);
+			if(located == null) {
+				continue;
+			}
+			if(sub_file == null) {
+				sub_file = located;
+			} else {
+				warning(@"Additional possibility found for $reference from $(located.source_desc). Using $(sub_file.source_desc)");
+			}
+		}
+		return sub_file;
 	}
 	
 	public class ModelsSubFileLocator : Object, ISubFileLocator
@@ -57,7 +73,6 @@ namespace Ldraw.Lego
 			);
 		
 		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
-			throws ParseError
 		{
 			if(context != ReferenceContext.Model) {
 				return null;
@@ -71,10 +86,14 @@ namespace Ldraw.Lego
 				return null;
 			}
 			var full_filename = model_file.get_path();
-			var f = yield loader.value.LoadModelFile(full_filename, ReferenceContext.Model, false);
-			var file_ref = new LdrawFileReference(f, f.MainObject);
-			loaded_models[reference] = file_ref;
-			return file_ref;
+			try {
+				var f = yield loader.value.LoadModelFile(full_filename, ReferenceContext.Model, false);
+				var file_ref = new LdrawFileReference(f, f.MainObject);
+				loaded_models[reference] = file_ref;
+				return file_ref;
+			} catch (ParseError e) {
+				return null;
+			}
 		}
 	}
 
@@ -83,7 +102,6 @@ namespace Ldraw.Lego
 		private Collection<ProxyLdrawObject> proxies = new ArrayList<ProxyLdrawObject>();
 
 		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
-			throws ParseError
 		{
 			if(context != ReferenceContext.Model) {
 				return null;

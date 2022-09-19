@@ -1,4 +1,5 @@
 using Diva;
+using Gee;
 using Gtk;
 
 using Ldraw.Lego;
@@ -16,11 +17,12 @@ namespace Ldraw.Ui
 		{
 			var cls = (ObjectClass)typeof(SwitchPartRefactoring).class_ref();
 			set_indexed_injection<string, ModelView>(cls, "views");
+			set_collection_injection<ISubFileLocator>(cls, "locators");
 		}
 		
 		public Index<ModelView, string> views {construct; private get;}
 		public ColourContext colour_context {construct; private get;}
-		public IDatFileCache library {construct; private get;}
+		public Collection<ISubFileLocator> locators {construct; private get;}
         public IOptions settings 
         {
 			construct {
@@ -39,7 +41,7 @@ namespace Ldraw.Ui
 		{
 			var v = preview_options.get_option(opt_id);
 			var default_colour = colour_context.GetColourById(v.get_int());
-			var dialog = new SwitchPartDialog(dialogParent, model, views["new"], views["new"], library, default_colour);
+			var dialog = new SwitchPartDialog(dialogParent, model, views["new"], views["new"], locators, default_colour);
 			LdrawPart old;
 			LdrawPart new_part;
 			SwitchMode mode;
@@ -58,17 +60,17 @@ namespace Ldraw.Ui
 			private Container view_container;
 			private ModelView from_view;
 			private ModelView to_view;
-			private IDatFileCache library;
+			private Collection<ISubFileLocator> locators;
 						
 			private SwitchMode mode = SwitchMode.CurrentSubModel;
 			private LdrawPart from;
 			private LdrawPart to;
 			
-			public SwitchPartDialog(Window parent, AnimatedModel model, ModelView original_view, ModelView new_view, IDatFileCache library, Colour default_colour)
+			public SwitchPartDialog(Window parent, AnimatedModel model, ModelView original_view, ModelView new_view, Collection<ISubFileLocator> locators, Colour default_colour)
 			{
 				from_view = original_view;
 				to_view = new_view;
-				this.library = library;
+				this.locators = locators;
 				
 				dialog = new Dialog.with_buttons("Model details", parent,
 					DialogFlags.MODAL | DialogFlags.DESTROY_WITH_PARENT,
@@ -90,7 +92,7 @@ namespace Ldraw.Ui
 				original_view.DefaultColour = default_colour;
 				var o_txt = new Entry();
 				o_txt.changed.connect(from_changed);
-				o_txt.hexpand = false;
+				o_txt.vexpand = false;
 				grid.attach(o_txt, 2, 0);
 				grid.attach(new Label("To"), 0, 1);
 				grid.attach(new_view, 1, 1);
@@ -99,7 +101,7 @@ namespace Ldraw.Ui
 				new_view.DefaultColour = default_colour;
 				var n_txt = new Entry();
 				n_txt.changed.connect(to_changed);
-				n_txt.hexpand = false;
+				n_txt.vexpand = false;
 				grid.attach(n_txt, 2, 1);
 				
 				grid.attach(new Label("Change All:"), 0, 2);
@@ -143,22 +145,32 @@ namespace Ldraw.Ui
 			}
 			
 			private async void from_changed(Editable entry) {
-				yield library.TryGetPart(entry.get_chars(), out from);
-				if(from != null) {
-					from_view.Model = from.MainObject;
+				var part_id = entry.get_chars();
+				if(part_id.contains(".")) {
+					part_id += ".dat";
+				}
+				var sfr = yield get_single_sub_file(locators, part_id, ReferenceContext.Model);
+				if(sfr != null) {
+					from_view.Model = sfr.object;
 				} else {
 					from_view.Model = new LdrawObject("");
 				}
+				from = sfr.file as LdrawPart;
 				dialog.set_response_sensitive(ResponseType.ACCEPT, from != null && to != null);
 			}
 			
 			private async void to_changed(Editable entry) {
-				yield library.TryGetPart(entry.get_chars(), out to);
-				if(to != null) {
-					to_view.Model = to.MainObject;
+				var part_id = entry.get_chars();
+				if(part_id.contains(".")) {
+					part_id += ".dat";
+				}
+				var sfr = yield get_single_sub_file(locators, part_id, ReferenceContext.Model);
+				if(sfr != null) {
+					to_view.Model = sfr.object;
 				} else {
 					to_view.Model = new LdrawObject("");
 				}
+				to = sfr.file as LdrawPart;
 				dialog.set_response_sensitive(ResponseType.ACCEPT, from != null && to != null);
 			}
 			

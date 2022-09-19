@@ -58,17 +58,13 @@ namespace Ldraw.Colours
 			}
 		}
 		
-		public Colour GetColourById(int colourId)
-		{
+		public Colour GetColourById(int colourId) {
 			return allColours[colourId];
 		}
 		
-		private class NullLocator : Object, ISubFileLocator
-		{			
-			public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
-				throws ParseError
-			{
-				throw new ParseError.CorruptFile("Colour definitions files should not load parts.");
+		private class NullLocator : Object, ISubFileLocator {			
+			public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context) {
+				assert_not_reached();
 			}
 		}
 	}

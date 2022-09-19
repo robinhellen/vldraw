@@ -101,7 +101,7 @@ namespace Ldraw.Lego
 		public static int SortFunc(PartGroupItem a, PartGroupItem b)
 		{
 			// first sort by part number
-			var partNoCompare = strcmp(a.Part.Name, b.Part.Name);
+			var partNoCompare = strcmp(a.Part.name, b.Part.name);
 			if(partNoCompare != 0)
 				return partNoCompare;
 			// then by colour
