@@ -155,7 +155,7 @@ namespace Ldraw.Ui
 				} else {
 					from_view.Model = new LdrawObject("");
 				}
-				from = sfr.file as LdrawPart;
+				from = sfr == null ? null : sfr.file as LdrawPart;
 				dialog.set_response_sensitive(ResponseType.ACCEPT, from != null && to != null);
 			}
 			
@@ -170,7 +170,7 @@ namespace Ldraw.Ui
 				} else {
 					to_view.Model = new LdrawObject("");
 				}
-				to = sfr.file as LdrawPart;
+				to = sfr == null ? null : sfr.file as LdrawPart;
 				dialog.set_response_sensitive(ResponseType.ACCEPT, from != null && to != null);
 			}
 			

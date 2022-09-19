@@ -20,15 +20,15 @@ namespace Ldraw.Peeron
 		static construct
 		{
 			var cls = (ObjectClass)typeof(RebrickableInventoryReader).class_ref();
-			set_lazy_injection<ProgressReporter>(cls, "reporter");
+			set_collection_injection<ISubFileLocator>(cls, "locators");
 		}
 		
 		private string api_key;
 		private OptionDomain option_domain;
 		
-		public IDatFileCache library {private get; construct;}
+		public Collection<ISubFileLocator> locators {construct; private get;}
 		public ColourContext colour_context {construct; private get;}
-		public Lazy<ProgressReporter> reporter {private get; construct;}
+		public ProgressReporter reporter {private get; construct;}
 		public IOptions options {
 			construct {
 				option_domain = value.get_domain("rebrickable");
@@ -41,7 +41,7 @@ namespace Ldraw.Peeron
 			throws GLib.Error
 		{
 			var task_name = @"Fetching set inventory for $setNumber";
-			reporter.value.start_task(task_name);
+			reporter.start_task(task_name);
 			var lines = new ArrayList<InventoryLine?>();
 			int64 count = 0;
 			var progress = 0;
@@ -95,7 +95,7 @@ namespace Ldraw.Peeron
 								reader.read_element(i);
 								var line = yield read_line(reader);
 								progress++;
-								reporter.value.task_progress(task_name, progress / (double)count);
+								reporter.task_progress(task_name, progress / (double)count);
 								if(line != null)
 									lines.add(line);
 								reader.end_element();
@@ -105,7 +105,7 @@ namespace Ldraw.Peeron
 					}
 				}
 			}
-			reporter.value.end_task(task_name);
+			reporter.end_task(task_name);
 
 			return (Inventory) GLib.Object.new(typeof(Inventory), SetNumber: setNumber, Lines: lines);
 		}
@@ -142,19 +142,26 @@ namespace Ldraw.Peeron
 									warning(@"null part id at element $i");
 									continue;
 								}
-								if(yield library.TryGetPart(part_ref, out part))
+								var file_ref = yield get_single_sub_file(locators, part_ref, ReferenceContext.Model);
+								if(file_ref != null)
 								{
+									var ref_part = file_ref.file as LdrawPart;
+									if(ref_part == null) {
+										warning(@"$part_ref does not resolve to a part.");
+										continue;
+									}
+									part = ref_part;
 									if(part.category[0] == '=' || part.category[0] == '~') {
 										warning(@"$part_ref moved, obsolete or specific colour.");
 										continue;
 									}
 									break;
 								}
-								else if (i == (elements - 1))
-								{
-									var part_refs_str = string.joinv(", ", refs);
-									warning(@"Unable to find part in library from possibilities: $part_refs_str.");
-								}
+							}
+							if (part == null && elements != 0)
+							{
+								var part_refs_str = string.joinv(", ", refs);
+								warning(@"Unable to find part in library from possibilities: $part_refs_str.");
 							}
 						}
 						reader.end_member();
@@ -164,7 +171,8 @@ namespace Ldraw.Peeron
 							reader.read_member("part_num");
 							var part_id = reader.get_string_value();
 							reader.end_member();
-							if(!yield library.TryGetPart(part_id, out part))
+							var file_ref = yield get_single_sub_file(locators, part_id, ReferenceContext.Model);
+							if(file_ref == null)
 							{
 								reader.read_member("name");
 								var name = reader.get_string_value();
@@ -173,6 +181,7 @@ namespace Ldraw.Peeron
 								reader.end_member();
 								return null;
 							}
+							part = file_ref.file as LdrawPart;
 						}
 						reader.end_member();
 						break;
