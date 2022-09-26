@@ -9,12 +9,13 @@ namespace Ldraw.Lego
 	{
 		public LdrawFileReference(LdrawFile? file, LdrawObject obj)
 		{
-			Object(object: obj, file: file);
+			Object(object: obj, file: file, source_desc: "unknown", ignore_duplicate: false);
 		}
 		
 		public LdrawObject object {get; construct set;}
 		public LdrawFile? file {get; construct set;}
 		public string source_desc {get; construct set; default = "";}
+		public bool ignore_duplicate {get; construct set; default = false;}
 	}
 
 	public enum ReferenceContext
@@ -48,6 +49,10 @@ namespace Ldraw.Lego
 			}
 			if(sub_file == null) {
 				sub_file = located;
+			} else if(located.ignore_duplicate || sub_file.ignore_duplicate) {
+				if(sub_file.ignore_duplicate) {
+					sub_file = located;
+				}
 			} else {
 				warning(@"Additional possibility found for $reference from $(located.source_desc). Using $(sub_file.source_desc)");
 			}

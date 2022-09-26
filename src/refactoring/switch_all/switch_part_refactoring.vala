@@ -66,6 +66,9 @@ namespace Ldraw.Ui
 			private LdrawPart from;
 			private LdrawPart to;
 			
+			private int64 from_dt = get_monotonic_time();
+			private int64 to_dt = get_monotonic_time();
+			
 			public SwitchPartDialog(Window parent, AnimatedModel model, ModelView original_view, ModelView new_view, Collection<ISubFileLocator> locators, Colour default_colour)
 			{
 				from_view = original_view;
@@ -145,11 +148,18 @@ namespace Ldraw.Ui
 			}
 			
 			private async void from_changed(Editable entry) {
+				var t_entry = get_monotonic_time();
+				if(t_entry > from_dt)
+					from_dt = t_entry;
+				
 				var part_id = entry.get_chars();
 				if(part_id.contains(".")) {
 					part_id += ".dat";
 				}
 				var sfr = yield get_single_sub_file(locators, part_id, ReferenceContext.Model);
+				if(t_entry < from_dt)
+					return;
+					
 				if(sfr != null) {
 					from_view.Model = sfr.object;
 				} else {
@@ -160,11 +170,18 @@ namespace Ldraw.Ui
 			}
 			
 			private async void to_changed(Editable entry) {
+				var t_entry = get_monotonic_time();
+				if(t_entry > to_dt)
+					to_dt = t_entry;
+					
 				var part_id = entry.get_chars();
 				if(part_id.contains(".")) {
 					part_id += ".dat";
 				}
 				var sfr = yield get_single_sub_file(locators, part_id, ReferenceContext.Model);
+				if(t_entry < to_dt)
+					return;
+					
 				if(sfr != null) {
 					to_view.Model = sfr.object;
 				} else {

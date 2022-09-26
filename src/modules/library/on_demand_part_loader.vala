@@ -48,7 +48,7 @@ namespace Ldraw.Lego.Library
 			return yield TryGetFile(name, subpartsCache, Folders.SubPartsDirectory, out part);
 		}
 
-		protected virtual async bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
+		public async bool TryGetFile<T>(string name, Map<string, T> cache, File folder, out T result)
 		{
 			if(InCache(name, cache, out result))
 			{
@@ -64,7 +64,7 @@ namespace Ldraw.Lego.Library
 			}
 			catch(ParseError e)
 			{
-				log("vldraw-ondemandpathloader", LogLevelFlags.LEVEL_WARNING, @"Failed to load part '$name' from '$(folder.get_path())'.");
+				warning(@"Failed to load part '$name' from '$(folder.get_path())': $(e.message)");
 				return false;
 			}
 			cache[name] = result;
@@ -114,7 +114,7 @@ namespace Ldraw.Lego.Library
 	{
 		public OnDemandPartLoader Cache {construct; private get;}
 
-		public async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
+		public virtual async LdrawFileReference? GetObjectFromReference(string reference, ReferenceContext context)
 		{
 			if(context != ReferenceContext.Library)
 				return null;

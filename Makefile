@@ -74,7 +74,7 @@ lego_private_packages=$(json)
 lego_internal_packages=maths utils lego_objects application
 
 library_sources=$(wildcard src/modules/library/*.vala)
-library_private_packages=$(json)
+library_private_packages=$(json) $(soup)
 library_internal_packages=lego
 
 part_group_sources=$(wildcard src/modules/lego/*.vala)
